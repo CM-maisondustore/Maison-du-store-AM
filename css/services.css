@@ -1,0 +1,103 @@
+/* ==========================================================================
+   services.css
+   Sections de présentation de l'entreprise : services, processus (« à
+   propos ») et réalisations. Les trois partagent le même vocabulaire de
+   cartes ; la maquette n'ayant pas de feuille dédiée, elles sont ici.
+   ========================================================================== */
+
+/* --- Services ---------------------------------------------------------------- */
+.service-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-5);
+}
+
+.service-card {
+  display: grid;
+  gap: var(--space-3);
+  align-content: start;
+  padding: var(--space-5);
+  background: var(--color-white);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+}
+
+.service-card__icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin-bottom: var(--space-2);
+  background: var(--color-gold-tint);
+  border-radius: 50%;
+  color: var(--color-gold-text);
+}
+
+.service-card__text {
+  font-size: var(--text-sm);
+  color: var(--color-text-soft);
+}
+
+/* --- Processus --------------------------------------------------------------- */
+.process__intro {
+  max-width: 44rem;
+}
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-5);
+  counter-reset: none;
+}
+
+.step {
+  display: grid;
+  gap: var(--space-3);
+  align-content: start;
+  padding: var(--space-5);
+  background: var(--color-white);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+}
+
+.step__number {
+  font-family: var(--font-label);
+  font-size: var(--text-lg);
+  font-weight: 500;
+  color: var(--color-gold);
+  line-height: 1;
+}
+
+.step__text {
+  font-size: var(--text-sm);
+  color: var(--color-text-soft);
+}
+
+/* --- Réalisations ------------------------------------------------------------ */
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-6) var(--space-5);
+}
+
+.gallery-item {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.gallery-item .image-placeholder {
+  border-radius: var(--radius-md);
+}
+
+.gallery-item__title {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 500;
+  color: var(--color-ink);
+  line-height: var(--leading-snug);
+}
+
+.gallery-item__text {
+  font-size: var(--text-sm);
+  color: var(--color-text-soft);
+}

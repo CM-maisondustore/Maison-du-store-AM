@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1c1c1c">
+  <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/header.css">
+  <link rel="stylesheet" href="css/footer.css">
+  <link rel="stylesheet" href="css/hero.css">
+  <link rel="stylesheet" href="css/services.css">
+  <link rel="stylesheet" href="css/catalogue.css">
+  <link rel="stylesheet" href="css/produits.css">
+  <link rel="stylesheet" href="css/contact.css">
+  <link rel="stylesheet" href="css/rendez-vous.css">
+  <link rel="stylesheet" href="css/devis.css">
+  <link rel="stylesheet" href="css/placeholders.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <title>Maison du Store AM — Stores &amp; Rideaux Sur Mesure à Abidjan</title>
+  <meta name="description" content="Stores et rideaux sur mesure à Abidjan : conception, fabrication et pose par Maison du Store AM. Demandez votre devis gratuit ou prenez rendez-vous.">
+</head>
+<body>
+<svg class="sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16 9.8"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.4v.1"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.9v.1"/></symbol>
+  <symbol id="i-warning" viewBox="0 0 24 24"><path d="M12 4.5l9 15.5H3z"/><path d="M12 10v4.5M12 17.4v.1"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M6.6 3.8h3l1.3 4-2 1.3a11 11 0 0 0 5.9 5.9l1.3-2 4 1.3v3a2 2 0 0 1-2.2 2A15.5 15.5 0 0 1 4.6 6a2 2 0 0 1 2-2.2z"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="13" rx="2"/><path d="M4 7l8 6 8-6"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s6.5-5.6 6.5-10.5a6.5 6.5 0 0 0-13 0C5.5 15.4 12 21 12 21z"/><circle cx="12" cy="10.5" r="2.3"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4.5 7h15M9.5 7V4.5h5V7M6.5 7l.8 12.5h9.4L17.5 7M10 11v5M14 11v5"/></symbol>
+  <symbol id="i-chevron-left" viewBox="0 0 24 24"><path d="M14.5 6l-6 6 6 6"/></symbol>
+  <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="M9.5 6l6 6-6 6"/></symbol>
+  <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="M6 9.5l6 6 6-6"/></symbol>
+  <symbol id="i-image" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="14" rx="2"/><circle cx="9" cy="10.5" r="1.6"/><path d="M4 17l5-4.5 3.5 3 3-2.5 4.5 4"/></symbol>
+  <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></symbol>
+  <symbol id="i-blinds" viewBox="0 0 24 24"><rect x="4" y="3.5" width="16" height="17" rx="1.5"/><path d="M4 7.5h16M4 11h16M4 14.5h16"/></symbol>
+  <symbol id="i-curtain" viewBox="0 0 24 24"><path d="M3.5 4.5h17"/><path d="M5.5 4.5c0 5 .5 10-1 15h6c-1.5-5-2-10-2-15M18.5 4.5c0 5-.5 10 1 15h-6c1.5-5 2-10 2-15"/></symbol>
+  <symbol id="i-tools" viewBox="0 0 24 24"><path d="M14.5 6.5a4 4 0 0 0-5 5L4 17l3 3 5.5-5.5a4 4 0 0 0 5-5l-2.5 2.5-2.5-.5-.5-2.5z"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3.5L6 13.5h5l-1 7 7-10h-5z"/></symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="4" y="5.5" width="16" height="14.5" rx="2"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11l8-6.5 8 6.5M6 9.5V19h12V9.5"/></symbol>
+  <symbol id="i-building" viewBox="0 0 24 24"><path d="M5 20V8l7-4 7 4v12M9 20v-5h6v5M5 20h14"/></symbol>
+  <symbol id="i-printer" viewBox="0 0 24 24"><path d="M7 9V4h10v5M7 17H5a1.5 1.5 0 0 1-1.5-1.5v-5A1.5 1.5 0 0 1 5 9h14a1.5 1.5 0 0 1 1.5 1.5v5A1.5 1.5 0 0 1 19 17h-2M7 14h10v6H7z"/></symbol>
+  <symbol id="i-external" viewBox="0 0 24 24"><path d="M14 4.5h5.5V10M19.5 4.5L11 13M18 14v4a1.5 1.5 0 0 1-1.5 1.5h-10A1.5 1.5 0 0 1 5 18V8a1.5 1.5 0 0 1 1.5-1.5H10"/></symbol>
+</svg>
+  <a class="skip-link" href="#main">Aller au contenu principal</a>
+  <header class="site-header" data-site-header>
+    <div class="container site-header__inner">
+      <a class="brand" href="index.html">
+        <span class="brand__name">Maison du Store AM</span>
+        <span class="brand__sub">Stores &amp; Rideaux sur Mesure</span>
+      </a>
+      <nav class="site-nav" aria-label="Navigation principale" id="site-nav">
+        <ul class="site-nav__list">
+          <li><a class="site-nav__link" data-nav-link href="index.html#accueil" aria-current="true">Accueil</a></li>
+          <li><a class="site-nav__link" data-nav-link href="index.html#catalogue">Stores</a></li>
+          <li><a class="site-nav__link" data-nav-link href="index.html#catalogue">Rideaux</a></li>
+          <li><a class="site-nav__link" data-nav-link href="index.html#realisations">Réalisations</a></li>
+          <li><a class="site-nav__link" data-nav-link href="index.html#processus">À propos</a></li>
+          <li><a class="site-nav__link" data-nav-link href="index.html#contact">Contact</a></li>
+        </ul>
+        <div class="site-nav__actions">
+          <a class="btn btn--outline" href="tel:+2250712449319">Nous appeler</a>
+          <a class="btn btn--gold" href="devis.html" data-action="quote">Demander un devis</a>
+        </div>
+      </nav>
+      <button type="button" class="menu-toggle" data-menu-toggle aria-controls="site-nav" aria-expanded="false">
+        <svg class="icon icon--menu" aria-hidden="true"><use href="#i-menu"/></svg>
+        <svg class="icon icon--close" aria-hidden="true"><use href="#i-close"/></svg>
+        <span class="visually-hidden">Ouvrir le menu</span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="accueil">
+      <div class="container hero__inner">
+        <div class="hero__content">
+          <p class="eyebrow">Artisans façonniers d’excellence</p>
+          <h1 class="hero__title">Stores &amp; Rideaux Sur Mesure</h1>
+          <p class="lead hero__text">L’élégance à votre fenêtre : confectionnés à Abidjan avec les plus beaux tissus et matières nobles pour sublimer durablement votre intérieur.</p>
+          <div class="hero__actions">
+            <a class="btn btn--gold" href="devis.html" data-action="quote">Demander un devis</a>
+            <button type="button" class="btn btn--outline" data-action="appointment">Prendre rendez-vous</button>
+          </div>
+          <p class="hero__meta"><svg class="icon" aria-hidden="true"><use href="#i-tools"/></svg> Pose professionnelle incluse par nos équipes à Abidjan</p>
+        </div>
+        <div class="hero__media">
+          <div class="image-placeholder image-placeholder--hero" aria-hidden="true"></div>
+        </div>
+      </div>
+    </section>
+    <section class="section section--alt" id="services">
+      <div class="container">
+        <div class="section-head section-head--center">
+          <p class="eyebrow">Notre savoir-faire</p>
+          <h2>Un service haut de gamme de bout en bout</h2>
+        </div>
+        <div class="service-grid">
+          <div class="service-card">
+            <span class="service-card__icon"><svg class="icon" aria-hidden="true"><use href="#i-blinds"/></svg></span>
+            <h3>Stores sur mesure</h3>
+            <p class="service-card__text">Enrouleurs, vénitiens, californiens ou occultants, conçus précisément pour vos baies et fenêtres.</p>
+          </div>
+          <div class="service-card">
+            <span class="service-card__icon"><svg class="icon" aria-hidden="true"><use href="#i-curtain"/></svg></span>
+            <h3>Rideaux sur mesure</h3>
+            <p class="service-card__text">Tissus choisis, confection soignée, adaptés au style et à la lumière de chaque pièce.</p>
+          </div>
+          <div class="service-card">
+            <span class="service-card__icon"><svg class="icon" aria-hidden="true"><use href="#i-tools"/></svg></span>
+            <h3>Pose professionnelle</h3>
+            <p class="service-card__text">Une installation minutieuse par nos poseurs qualifiés, pour un rendu impeccable.</p>
+          </div>
+          <div class="service-card">
+            <span class="service-card__icon"><svg class="icon" aria-hidden="true"><use href="#i-bolt"/></svg></span>
+            <h3>Motorisation intégrée</h3>
+            <p class="service-card__text">Confort du quotidien avec nos solutions motorisées, pilotables à distance.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="section" id="catalogue-stores">
+      <div class="container">
+        <div class="section-head section-head--split">
+          <div>
+            <p class="eyebrow">Protection, chaleur &amp; style</p>
+            <h2>Les Stores Intérieurs sur Mesure</h2>
+          </div>
+          <button type="button" class="btn btn--outline" data-action="catalogue" data-category="stores">Voir tous nos stores</button>
+        </div>
+        <div class="product-grid" data-featured="store" aria-live="polite"></div>
+      </div>
+    </section>
+    <section class="section section--alt" id="catalogue-rideaux">
+      <div class="container">
+        <div class="section-head section-head--split">
+          <div>
+            <p class="eyebrow">Confection d’Atelier</p>
+            <h2>Les Rideaux d’Atelier sur Mesure</h2>
+          </div>
+          <button type="button" class="btn btn--outline" data-action="catalogue" data-category="rideaux">Voir toutes nos confections</button>
+        </div>
+        <div class="product-grid" data-featured="rideau" aria-live="polite"></div>
+      </div>
+    </section>
+    <section class="section" id="catalogue">
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow">Toute notre collection</p>
+          <h2>Notre Catalogue de Créations</h2>
+          <p class="section-head__text">Recherchez, filtrez et comparez l’ensemble de nos stores et rideaux sur mesure.</p>
+        </div>
+
+        <div class="catalogue-toolbar" data-catalogue-toolbar>
+          <div class="chips" data-category-chips role="group" aria-label="Catégories"></div>
+          <form class="search" role="search" action="#catalogue">
+            <svg class="icon" aria-hidden="true"><use href="#i-search"/></svg>
+            <label class="visually-hidden" for="catalogue-search">Rechercher un store ou un rideau</label>
+            <input class="input search__input" type="search" id="catalogue-search" placeholder="Rechercher un modèle, une référence...">
+            <button type="button" class="search__clear" data-search-clear hidden aria-label="Effacer la recherche">
+              <svg class="icon icon--sm" aria-hidden="true"><use href="#i-close"/></svg>
+            </button>
+          </form>
+        </div>
+
+        <button type="button" class="btn btn--outline filters-toggle" data-filters-toggle aria-expanded="false" aria-controls="filters">
+          <svg class="icon icon--sm" aria-hidden="true"><use href="#i-sliders"/></svg> Filtres
+        </button>
+
+        <div class="catalogue-layout">
+          <aside class="filters" id="filters" aria-label="Filtrer les produits">
+            <div class="filters__head">
+              <h3 class="filters__title">Filtres</h3>
+              <button type="button" class="link-btn" data-filters-reset>Réinitialiser</button>
+            </div>
+            <div data-filters-body></div>
+          </aside>
+
+          <div class="catalogue-results">
+            <div class="catalogue-results__bar">
+              <p class="catalogue-count" id="catalogue-count" aria-live="polite">Chargement du catalogue…</p>
+            </div>
+            <div class="product-grid" id="catalogue-grid" aria-live="polite"></div>
+            <div class="empty-state" id="catalogue-empty" hidden>
+              <svg class="icon icon--lg" aria-hidden="true"><use href="#i-search"/></svg>
+              <h3>Aucune création ne correspond à votre recherche</h3>
+              <p class="empty-state__text">Essayez d’élargir vos critères ou réinitialisez les filtres pour retrouver l’ensemble de notre collection.</p>
+              <button type="button" class="btn btn--outline" data-catalogue-reset>Réinitialiser la recherche</button>
+            </div>
+            <nav class="pagination" id="catalogue-pagination" aria-label="Pages du catalogue"></nav>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="section section--alt" id="realisations">
+      <div class="container">
+        <div class="section-head section-head--center">
+          <p class="eyebrow">Portfolio</p>
+          <h2>Inspirations &amp; Réalisations d’Intérieur</h2>
+        </div>
+        <div class="gallery-grid">
+          <article class="gallery-item">
+            <div class="image-placeholder image-placeholder--wide" aria-hidden="true"></div>
+            <h3 class="gallery-item__title">Appartement Haussmannien</h3>
+            <p class="gallery-item__text">Voilages légers et rideaux tamisants en lin naturel.</p>
+          </article>
+          <article class="gallery-item">
+            <div class="image-placeholder image-placeholder--wide" aria-hidden="true"></div>
+            <h3 class="gallery-item__title">Villa Contemporaine</h3>
+            <p class="gallery-item__text">Stores californiens motorisés pour d’immenses baies vitrées.</p>
+          </article>
+          <article class="gallery-item">
+            <div class="image-placeholder image-placeholder--wide" aria-hidden="true"></div>
+            <h3 class="gallery-item__title">Chambre d’Hôtel Particulier</h3>
+            <p class="gallery-item__text">Rideaux occultants à doublure thermique et double tombé fluide.</p>
+          </article>
+          <article class="gallery-item">
+            <div class="image-placeholder image-placeholder--wide" aria-hidden="true"></div>
+            <h3 class="gallery-item__title">Bureau d’Anthracite</h3>
+            <p class="gallery-item__text">Stores intérieurs occultants gris anthracite tout en sobriété.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+    <section class="section" id="processus">
+      <div class="container">
+        <div class="section-head section-head--center process__intro">
+          <p class="eyebrow">Notre méthode</p>
+          <h2>Votre projet sur mesure en 4 étapes clés</h2>
+        </div>
+        <div class="steps">
+          <div class="step">
+            <p class="step__number">01</p>
+            <h3>Consultation à domicile</h3>
+            <p class="step__text">Conseils dédiés par nos spécialistes, présentation de nos catalogues de tissus et étude de lumière.</p>
+          </div>
+          <div class="step">
+            <p class="step__number">02</p>
+            <h3>Prise de mesures</h3>
+            <p class="step__text">Nos conseillers techniques se déplacent pour effectuer des relevés d’une précision absolue.</p>
+          </div>
+          <div class="step">
+            <p class="step__number">03</p>
+            <h3>Fabrication Sur Mesure</h3>
+            <p class="step__text">Façonnage minutieux au sein de notre atelier partenaire en France selon les règles de l’art.</p>
+          </div>
+          <div class="step">
+            <p class="step__number">04</p>
+            <h3>Installation Sur Mesure</h3>
+            <p class="step__text">Nos monteurs qualifiés assurent l’installation méticuleuse de vos nouveaux stores ou rideaux.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="section section--alt" id="rendez-vous">
+      <div class="container">
+        <div class="section-head section-head--center">
+          <p class="eyebrow">En consultation avec vous ou en showroom</p>
+          <h2>Prendre Rendez-vous</h2>
+          <p class="section-head__text">Nous vous accompagnons pas à pas dans la conception esthétique et technique de vos stores ou rideaux sur mesure. Sélectionnez vos préférences dans le formulaire ci-dessous.</p>
+        </div>
+
+        <div class="rdv-layout">
+          <form class="card rdv-form" id="appointment-form" novalidate>
+            <div class="rdv-block">
+              <h3 class="rdv-block__title"><span class="rdv-block__number">1</span> Vos coordonnées</h3>
+              <div class="form-grid">
+                <div class="field" data-field="lastName"><label class="field__label" for="rdv-lastName">Nom</label>
+                  <input class="input" id="rdv-lastName" name="lastName" type="text" placeholder="Dupont"></div>
+                <div class="field" data-field="firstName"><label class="field__label" for="rdv-firstName">Prénom</label>
+                  <input class="input" id="rdv-firstName" name="firstName" type="text" placeholder="Jean"></div>
+                <div class="field" data-field="phone"><label class="field__label" for="rdv-phone">Téléphone</label>
+                  <input class="input" id="rdv-phone" name="phone" type="tel" placeholder="07 12 34 56 78"></div>
+                <div class="field" data-field="email"><label class="field__label" for="rdv-email">Adresse e-mail</label>
+                  <input class="input" id="rdv-email" name="email" type="email" placeholder="jean.dupont@email.com"></div>
+              </div>
+            </div>
+
+            <div class="rdv-block">
+              <h3 class="rdv-block__title"><span class="rdv-block__number">2</span> Projet &amp; lieu de rencontre</h3>
+              <div class="form-grid">
+                <div class="field form-grid__full" data-field="project"><label class="field__label" for="rdv-project">Votre projet en quelques mots</label>
+                  <select class="select" id="rdv-project" name="project">
+                    <option value="">Sélectionnez votre projet</option>
+                    <option value="Conseil stores sur mesure">Conseil stores sur mesure</option>
+                    <option value="Conseil rideaux &amp; draperies">Conseil rideaux &amp; draperies</option>
+                    <option value="Prise de mesures">Prise de mesures</option>
+                    <option value="Suivi de commande">Suivi de commande</option>
+                  </select>
+                </div>
+                <div class="field form-grid__full" data-field="appointmentType"><span class="field__label">Type de rendez-vous souhaité</span>
+                  <div class="pill-group">
+                    <label class="pill"><input type="radio" name="appointmentType" value="showroom"><span><svg class="icon icon--sm" aria-hidden="true"><use href="#i-building"/></svg> Au showroom</span></label>
+                    <label class="pill"><input type="radio" name="appointmentType" value="domicile"><span><svg class="icon icon--sm" aria-hidden="true"><use href="#i-home"/></svg> À domicile</span></label>
+                    <label class="pill"><input type="radio" name="appointmentType" value="telephone"><span><svg class="icon icon--sm" aria-hidden="true"><use href="#i-phone"/></svg> Par téléphone ou visio</span></label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="rdv-block">
+              <h3 class="rdv-block__title"><span class="rdv-block__number">3</span> Date &amp; horaire</h3>
+              <div class="rdv-datetime">
+                <div class="field" data-field="date"><span class="field__label">Sélectionnez une date</span>
+                  <div data-calendar></div>
+                </div>
+                <div class="field" data-field="time"><span class="field__label">Créneaux disponibles</span>
+                  <div data-time-slots></div>
+                </div>
+              </div>
+              <div class="field" data-field="message"><label class="field__label" for="rdv-message">Précisez votre projet <small>(facultatif)</small></label>
+                <textarea class="textarea" id="rdv-message" name="message" placeholder="Ex. Je souhaite équiper 3 fenêtres de mon salon avec des rideaux occultants..."></textarea>
+              </div>
+            </div>
+
+            <div class="quote-nav" style="border-top:0;padding-top:0;justify-content:flex-end">
+              <button type="submit" class="btn btn--gold" data-rdv-submit>Confirmer le rendez-vous</button>
+            </div>
+          </form>
+
+          <aside class="card rdv-summary" data-rdv-summary aria-label="Résumé de votre rendez-vous">
+            <div data-rdv-summary-body>
+              <h3 class="rdv-summary__title">Votre rendez-vous</h3>
+              <dl class="summary-list">
+                <div class="summary-list__row"><dt>Conseiller</dt><dd>Conseiller Décor Atelier</dd></div>
+                <div class="summary-list__row"><dt>Client</dt><dd data-summary="client" class="is-empty">À renseigner</dd></div>
+                <div class="summary-list__row"><dt>Type</dt><dd data-summary="type" class="is-empty">À choisir</dd></div>
+                <div class="summary-list__row"><dt>Projet</dt><dd data-summary="project" class="is-empty">À préciser</dd></div>
+                <div class="summary-list__row"><dt>Date</dt><dd data-summary="date" class="is-empty">À choisir</dd></div>
+                <div class="summary-list__row"><dt>Heure</dt><dd data-summary="time" class="is-empty">À choisir</dd></div>
+              </dl>
+              <p class="rdv-summary__hint">Votre rendez-vous sera confirmé par un conseiller sous 24 h ouvrées.</p>
+            </div>
+            <div class="rdv-confirmation" data-rdv-confirmation hidden tabindex="-1">
+              <span class="confirmation__icon" aria-hidden="true"><svg class="icon icon--lg"><use href="#i-check-circle"/></svg></span>
+              <h3>Rendez-vous enregistré</h3>
+              <p data-rdv-confirmation-text></p>
+              <a class="btn btn--outline" data-rdv-mailto hidden href="#">Nous envoyer ma demande par e-mail</a>
+              <button type="button" class="link-btn" data-rdv-again>Prendre un autre rendez-vous</button>
+            </div>
+            <p class="notice" data-rdv-demo hidden><svg class="icon icon--sm" aria-hidden="true"><use href="#i-info"/></svg><span>Mode démonstration : cette demande n’a pas été transmise, aucun système de réservation n’est encore raccordé.</span></p>
+          </aside>
+        </div>
+      </div>
+    </section>
+    <section class="section" id="contact">
+      <div class="container contact__grid">
+        <div class="contact__info">
+          <p class="eyebrow">Nous rencontrer</p>
+          <h2>Concrétisons ensemble votre projet de décoration</h2>
+          <p class="lead">Prenez rendez-vous en ligne avec l’un de nos conseillers créatifs. Nous vous accompagnons pour le choix des textures, coloris et systèmes d’ouverture adaptés à vos ouvertures.</p>
+          <ul class="contact-list">
+            <li class="contact-item">
+              <span class="contact-item__icon"><svg class="icon" aria-hidden="true"><use href="#i-pin"/></svg></span>
+              <div><p class="contact-item__label">Showroom</p><p class="contact-item__value">Cocody — Marché Saint Jean, Abidjan, Côte d’Ivoire</p></div>
+            </li>
+            <li class="contact-item">
+              <span class="contact-item__icon"><svg class="icon" aria-hidden="true"><use href="#i-phone"/></svg></span>
+              <div><p class="contact-item__label">Téléphone</p><p class="contact-item__value">
+                <a href="tel:+2250712449319">07 12 44 93 19</a>
+                <a href="tel:+2250767495804">07 67 49 58 04</a>
+                <a href="tel:+2250173826376">01 73 82 63 76</a>
+              </p></div>
+            </li>
+            <li class="contact-item">
+              <span class="contact-item__icon"><svg class="icon" aria-hidden="true"><use href="#i-mail"/></svg></span>
+              <div><p class="contact-item__label">E-mail</p><p class="contact-item__value"><a href="mailto:maisondustore.ci@gmail.com">maisondustore.ci@gmail.com</a></p></div>
+            </li>
+          </ul>
+          <div class="contact__actions">
+            <a class="btn btn--gold" href="devis.html" data-action="quote">Demander un devis</a>
+            <button type="button" class="btn btn--outline" data-action="appointment">Prendre rendez-vous</button>
+          </div>
+        </div>
+        <div class="map-card">
+          <div class="image-placeholder image-placeholder--map" aria-hidden="true"></div>
+          <a class="btn btn--gold btn--sm map-card__link" href="https://www.google.com/maps/search/?api=1&amp;query=Marché+Saint+Jean+Cocody+Abidjan" target="_blank" rel="noopener">
+            <svg class="icon icon--sm" aria-hidden="true"><use href="#i-external"/></svg> Voir sur Google Maps
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer" id="contact-footer">
+    <div class="container">
+      <div class="site-footer__grid">
+        <div class="site-footer__brand">
+          <a class="brand" href="index.html">
+            <span class="brand__name">Maison du Store AM</span>
+            <span class="brand__sub">Stores &amp; Rideaux sur Mesure</span>
+          </a>
+          <p>Fabrication et pose de stores et rideaux sur mesure à Abidjan, du relevé de cotes à l’installation.</p>
+        </div>
+        <div>
+          <p class="site-footer__title">Navigation</p>
+          <ul class="site-footer__list">
+            <li><a href="index.html">Accueil</a></li>
+            <li><a href="index.html#catalogue" data-action="catalogue" data-category="stores">Stores sur mesure</a></li>
+            <li><a href="index.html#catalogue" data-action="catalogue" data-category="rideaux">Rideaux sur mesure</a></li>
+            <li><a href="index.html#realisations">Nos réalisations</a></li>
+            <li><a href="index.html#rendez-vous" data-action="appointment">Prendre rendez-vous</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="site-footer__title">Contact &amp; showroom</p>
+          <ul class="site-footer__list site-footer__contact">
+            <li><svg class="icon icon--sm" aria-hidden="true"><use href="#i-pin"/></svg><span>Cocody — Marché Saint Jean<br>Abidjan, Côte d’Ivoire</span></li>
+            <li><svg class="icon icon--sm" aria-hidden="true"><use href="#i-mail"/></svg><span><a href="mailto:maisondustore.ci@gmail.com">maisondustore.ci@gmail.com</a></span></li>
+            <li><svg class="icon icon--sm" aria-hidden="true"><use href="#i-phone"/></svg><span><a href="tel:+2250712449319">07 12 44 93 19</a><br><a href="tel:+2250767495804">07 67 49 58 04</a><br><a href="tel:+2250173826376">01 73 82 63 76</a></span></li>
+          </ul>
+        </div>
+        <div>
+          <p class="site-footer__title">Demande rapide</p>
+          <ul class="site-footer__list">
+            <li><a href="devis.html?type=store" data-action="quote" data-type="store">Devis Store</a></li>
+            <li><a href="devis.html?type=rideau" data-action="quote" data-type="rideau">Devis Rideau</a></li>
+            <li><a href="index.html#rendez-vous" data-action="appointment">Prendre rendez-vous</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="site-footer__bottom container" style="padding-inline:0">
+        <p>© 2026 Maison du Store AM. Tous droits réservés.</p>
+      </div>
+    </div>
+  </footer>
+
+  <div class="modal" id="product-modal" hidden>
+    <div class="modal__backdrop" data-modal-close></div>
+    <div class="modal__dialog modal__dialog--wide" role="dialog" aria-modal="true" aria-labelledby="product-modal-title">
+      <button type="button" class="modal__close" data-modal-close aria-label="Fermer">
+        <svg class="icon" aria-hidden="true"><use href="#i-close"/></svg>
+      </button>
+      <div data-product-detail></div>
+    </div>
+  </div>
+
+  <script src="js/utils/validation.js"></script>
+  <script src="js/utils/notifications.js"></script>
+  <script src="js/utils/modal.js"></script>
+  <script src="js/utils/api.js"></script>
+  <script src="js/navigation.js"></script>
+  <script src="js/mobile-menu.js"></script>
+  <script src="js/catalogue/products.js"></script>
+  <script src="js/catalogue/categories.js"></script>
+  <script src="js/catalogue/search.js"></script>
+  <script src="js/catalogue/filters.js"></script>
+  <script src="js/catalogue/catalogue.js"></script>
+  <script src="js/catalogue/product-details.js"></script>
+  <script src="js/rendez-vous/calendar.js"></script>
+  <script src="js/rendez-vous/time-slots.js"></script>
+  <script src="js/rendez-vous/appointment-validation.js"></script>
+  <script src="js/rendez-vous/appointment.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
