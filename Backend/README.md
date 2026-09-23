@@ -2,6 +2,8 @@
 
 Application Laravel 12 autonome, avec les vues Blade existantes et Vite. Les demandes sont réellement enregistrées en base. Ouvrir `index.html` à la racine continue de lancer la maquette statique : utiliser le serveur Laravel pour le backend.
 
+La préparation de production pour **www.maisondustoream.com** chez **Hostinger Web/Cloud** est décrite dans [le guide de déploiement](../deploy/hostinger/README.md). Il contient les environnements, la construction des archives, la publication SSH, les sauvegardes et le retour arrière.
+
 ## Démarrage sur cette machine
 
 Les dépendances, `.env`, la clé locale et SQLite ont été préparées pendant l’intervention. Depuis la racine du projet, dans PowerShell :
@@ -24,7 +26,7 @@ php artisan key:generate
 php artisan migrate --seed
 npm ci
 npm run build
-php artisan serve
+php artisan serve --no-reload
 ```
 
 Ne copier `.env.example` et ne créer SQLite que lors de la première installation. Le seed ajoute les 14 produits du catalogue original sans écraser les produits existants. Les prix restent « Prix ». SQLite est privé dans `database/`, hors de la racine web. MySQL est aussi configurable via `DB_CONNECTION=mysql` et les variables `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`.
@@ -67,3 +69,11 @@ PHPUnit utilise SQLite en mémoire et ne modifie pas les demandes locales. Tests
 Pointer le serveur web uniquement vers `Backend/public`. En production : `APP_ENV=production`, `APP_DEBUG=false`, URL HTTPS et `SESSION_SECURE_COOKIE=true`, puis `php artisan migrate --force` et compilation Vite. Conserver une clé APP_KEY stable et sauvegarder la base. Les dossiers `storage` et `bootstrap/cache` doivent être accessibles en écriture.
 
 Cette livraison couvre le contrat des formulaires et du catalogue. Il n’y a pas d’espace administrateur ni d’envoi automatique d’e-mails : les demandes sont persistées dans `quotes` et `appointments` pour traitement interne. Aucun envoi à un tiers n’est effectué. Le statut `pending` ne constitue pas une confirmation définitive de rendez-vous.
+## Résultat des vérifications de cette livraison
+
+- 9 tests PHPUnit : 58 assertions réussies.
+- 2 tests JavaScript réussis.
+- Compilation Vite réussie ; npm signale 0 vulnérabilité.
+- Pages, endpoints de lecture, CSS, JavaScript et favicon : HTTP 200.
+- Contrôle HTTP réel : POST sans CSRF refusé (419), POST invalide avec CSRF rejeté par la validation (422).
+- Sous Windows, le script utilise --no-reload pour conserver l’environnement nécessaire au serveur PHP.

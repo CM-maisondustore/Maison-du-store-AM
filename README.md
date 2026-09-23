@@ -1,5 +1,7 @@
 # Maison du Store AM — Stores &amp; Rideaux Sur Mesure
 
+**Production prévue :** `www.maisondustoream.com` sur Hostinger Web/Cloud. Voir [le guide Hostinger](deploy/hostinger/README.md) pour publier l’application Laravel et [Backend/README.md](Backend/README.md) pour le développement. Dépôt cible : `CM-maisondustore/maison-du-store-am`.
+
 > Le backend Laravel est désormais implémenté dans [Backend](Backend/README.md) : catalogue en base, devis et rendez-vous persistés, validation et protection CSRF. Pour l’utiliser sur cette machine, lancer `.\Backend\serve.ps1`, puis ouvrir http://127.0.0.1:8000. Les explications de mode démonstration ci-dessous concernent uniquement les pages HTML statiques.
 
 Site vitrine statique (HTML5 / CSS3 / JavaScript vanilla) pour Maison du

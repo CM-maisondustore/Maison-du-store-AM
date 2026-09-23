@@ -5,9 +5,14 @@ use App\Http\Controllers\CatalogueController;
 use App\Http\Controllers\QuoteController;
 use App\Http\Controllers\AppointmentController;
 
-/* Routes de présentation : à placer dans routes/web.php d'une installation Laravel. */
+/* Pages publiques servies par cette application Laravel. */
 Route::view('/', 'home')->name('home');
 Route::view('/devis', 'quote')->name('quote');
+Route::get('/health/ready', App\Http\Controllers\ReadinessController::class)->middleware('throttle:60,1');
+Route::get('/robots.txt', function () {
+    return response("User-agent: *\n".(config('deployment.indexing') ? "Allow: /\n" : "Disallow: /\n"), 200)
+        ->header('Content-Type', 'text/plain');
+});
 
 // Même origine et middleware web : sessions et CSRF restent actifs pour les POST.
 Route::prefix('api')->group(function () {

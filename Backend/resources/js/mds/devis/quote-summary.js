@@ -127,8 +127,9 @@
         '<p class="confirmation__text">' + (result.demo
           ? 'Votre demande a été enregistrée en mode démonstration : elle n\u2019a pas été transmise. Une fois le site raccordé à notre système, ' +
             'vous recevrez ici un accusé de réception avec le récapitulatif complet de votre configuration.'
-          : 'Vous recevrez un accusé de réception avec le récapitulatif de votre configuration. Un conseiller Maison du Store AM étudiera votre ' +
-            'projet et vous recontactera sous 24 h ouvrées.') + '</p>' +
+          : 'Votre demande est enregistrée. Un conseiller Maison du Store AM étudiera votre projet et vous recontactera.') + '</p>' +
+        (!result.demo && result.data && result.data.data
+          ? '<p class="confirmation__text">Référence : ' + esc(result.data.data.reference) + '</p>' : '') +
         (result.demo
           ? '<a class="btn btn--outline" data-confirmation-mailto href="#">Nous envoyer ma demande par e-mail</a>'
           : '') +

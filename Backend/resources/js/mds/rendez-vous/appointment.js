@@ -113,6 +113,9 @@
     els.confirmationText.textContent = result.demo
       ? data.firstName + ', votre demande est enregistrée pour le ' + when + '.'
       : data.firstName + ', votre demande a bien été envoyée pour le ' + when + '. Nous vous confirmerons ce rendez-vous rapidement.';
+    if (!result.demo && result.data && result.data.data) {
+      els.confirmationText.textContent += ' Référence : ' + result.data.data.reference;
+    }
 
     els.demo.hidden = !result.demo;
     if (result.demo && els.mailto) {
