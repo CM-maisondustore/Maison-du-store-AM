@@ -6,6 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
-    protected $fillable = ['reference', 'details'];
-    protected $casts = ['details' => 'array'];
+    protected $fillable = ['reference', 'details', 'published'];
+    protected $casts = ['details' => 'array', 'published' => 'boolean'];
 }

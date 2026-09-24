@@ -2,6 +2,8 @@
 
 **Production en ligne :** [www.maisondustoream.com](https://www.maisondustoream.com), sur Hostinger Web/Cloud avec MySQL. Les devis et rendez-vous sont enregistrés en base. Voir [le guide Hostinger](deploy/hostinger/README.md) pour les mises à jour et [Backend/README.md](Backend/README.md) pour le développement. Dépôt privé : [CM-maisondustore/Maison-du-store-AM](https://github.com/CM-maisondustore/Maison-du-store-AM).
 
+**Espace interne :** `/admin/connexion`, réservé aux rôles Admin-CM et Agent. Gestion du catalogue, des dossiers clients, devis, rendez-vous, prestations, factures et échanges commerciaux. Voir [le guide d’utilisation et de configuration](Backend/ADMIN.md). Aucun compte client public.
+
 > Le backend Laravel est désormais implémenté dans [Backend](Backend/README.md) : catalogue en base, devis et rendez-vous persistés, validation et protection CSRF. Pour l’utiliser sur cette machine, lancer `.\Backend\serve.ps1`, puis ouvrir http://127.0.0.1:8000. Les explications de mode démonstration ci-dessous concernent uniquement les pages HTML statiques.
 
 Site vitrine statique (HTML5 / CSS3 / JavaScript vanilla) pour Maison du

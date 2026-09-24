@@ -11,7 +11,7 @@ class ReadinessController
     public function __invoke(): JsonResponse
     {
         try {
-            foreach (['products', 'quotes', 'appointments'] as $table) {
+            foreach (['products', 'quotes', 'appointments', 'users', 'contacts', 'interventions', 'invoices', 'commercial_messages'] as $table) {
                 DB::table($table)->select('id')->limit(1)->get();
             }
             return response()->json(['status' => 'ok'])->header('Cache-Control', 'no-store');

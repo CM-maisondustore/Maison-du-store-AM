@@ -9,7 +9,7 @@ class CatalogueController
 {
     public function __invoke(): JsonResponse
     {
-        return response()->json(['data' => Product::orderBy('id')->get()->map(fn ($product) =>
+        return response()->json(['data' => Product::where('published', true)->orderBy('id')->get()->map(fn ($product) =>
             array_merge($product->details, ['id' => $product->id, 'reference' => $product->reference]))]);
     }
 }

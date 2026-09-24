@@ -1,0 +1,46 @@
+<?php
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Staff\{AuthController, DashboardController, ContactController, ProductController, QuoteController, AppointmentController, InterventionController, UserController, InvoiceController, MessageController};
+Route::prefix('admin')->group(function () {
+    Route::get('connexion', [AuthController::class, 'form'])->name('login');
+    Route::post('connexion', [AuthController::class, 'login'])->middleware('throttle:20,1')->name('staff.login');
+    Route::middleware(['auth', 'auth.session', 'staff'])->name('staff.')->group(function () {
+        Route::get('/', DashboardController::class)->name('dashboard');
+        Route::post('deconnexion', [AuthController::class, 'logout'])->name('logout');
+        Route::get('mot-de-passe', [AuthController::class, 'password'])->name('password');
+        Route::post('mot-de-passe', [AuthController::class, 'changePassword'])->middleware('throttle:5,1')->name('password.update');
+        Route::get('devis', [QuoteController::class, 'index'])->name('quotes.index');
+        Route::get('devis/{quote}', [QuoteController::class, 'show'])->name('quotes.show');
+        Route::put('devis/{quote}', [QuoteController::class, 'update'])->name('quotes.update');
+        Route::get('devis/{quote}/pdf', [QuoteController::class, 'pdf'])->name('quotes.pdf');
+        Route::get('rendez-vous', [AppointmentController::class, 'index'])->name('appointments.index');
+        Route::get('rendez-vous/{appointment}', [AppointmentController::class, 'show'])->name('appointments.show');
+        Route::get('prestations', [InterventionController::class, 'index'])->name('interventions.index');
+        Route::get('prestations/{intervention}', [InterventionController::class, 'show'])->name('interventions.show');
+        Route::put('prestations/{intervention}', [InterventionController::class, 'update'])->name('interventions.update');
+        Route::post('prestations/{intervention}/devis', [QuoteController::class, 'onsite'])->name('interventions.quote');
+        Route::middleware('admin')->group(function () {
+            Route::resource('contacts', ContactController::class)->only(['index', 'store', 'show', 'update']);
+            Route::resource('products', ProductController::class)->except(['show', 'destroy']);
+            Route::put('rendez-vous/{appointment}', [AppointmentController::class, 'update'])->name('appointments.update');
+            Route::post('prestations', [InterventionController::class, 'store'])->name('interventions.store');
+            Route::get('equipe', [UserController::class, 'index'])->name('users.index');
+            Route::post('equipe', [UserController::class, 'store'])->name('users.store');
+            Route::put('equipe/{user}', [UserController::class, 'update'])->name('users.update');
+            Route::get('factures', [InvoiceController::class, 'index'])->name('invoices.index');
+            Route::post('devis/{quote}/facture', [InvoiceController::class, 'create'])->name('invoices.create');
+            Route::get('factures/{invoice}', [InvoiceController::class, 'show'])->name('invoices.show');
+            Route::post('factures/{invoice}/emettre', [InvoiceController::class, 'issue'])->name('invoices.issue');
+            Route::post('factures/{invoice}/paiement', [InvoiceController::class, 'paid'])->name('invoices.paid');
+            Route::get('factures/{invoice}/pdf', [InvoiceController::class, 'pdf'])->name('invoices.pdf');
+            Route::get('messages', [MessageController::class, 'index'])->name('messages.index');
+            Route::get('messages/nouveau', [MessageController::class, 'create'])->name('messages.create');
+            Route::post('messages', [MessageController::class, 'store'])->name('messages.store');
+            Route::post('messages/synchroniser', [MessageController::class, 'sync'])->middleware('throttle:3,1')->name('messages.sync');
+            Route::get('messages/{message}', [MessageController::class, 'show'])->name('messages.show');
+            Route::put('messages/{message}', [MessageController::class, 'update'])->name('messages.update');
+            Route::get('messages/{message}/document', [MessageController::class, 'attachment'])->name('messages.attachment');
+            Route::post('messages/{message}/envoyer', [MessageController::class, 'send'])->middleware('throttle:10,1')->name('messages.send');
+        });
+    });
+});

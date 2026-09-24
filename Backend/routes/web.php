@@ -5,6 +5,8 @@ use App\Http\Controllers\CatalogueController;
 use App\Http\Controllers\QuoteController;
 use App\Http\Controllers\AppointmentController;
 
+require __DIR__.'/staff.php';
+
 /* Pages publiques servies par cette application Laravel. */
 Route::view('/', 'home')->name('home');
 Route::view('/devis', 'quote')->name('quote');
