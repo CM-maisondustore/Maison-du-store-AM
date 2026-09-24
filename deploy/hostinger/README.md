@@ -1,6 +1,10 @@
 # Déploiement Hostinger Web / Cloud
 
-Cible : **https://www.maisondustoream.com**, dépôt prévu **CM-maisondustore/maison-du-store-am**, branche `main`. Ce document prépare un déploiement PHP/MySQL sur hPanel. Il ne signifie pas que le site est déjà publié.
+Site en ligne : **https://www.maisondustoream.com**, dépôt privé **CM-maisondustore/Maison-du-store-AM**, branche `main`. Première publication effectuée le 24 septembre 2026 sur Hostinger Web/Cloud, avec PHP 8.3 et MySQL.
+
+Contrôles en production réussis : accueil et devis, ressources compilées, disponibilité MySQL, catalogue de 14 produits, création des deux types de devis et d’un rendez-vous, refus des créneaux déjà réservés, validation et protection CSRF. La persistance des trois demandes techniques a été vérifiée en base, puis ces seuls enregistrements ont été supprimés. Les fichiers privés sont inaccessibles par HTTP et les cookies de session utilisent Secure/HttpOnly.
+
+La page Hostinger initiale a été conservée dans `.mds/backups/public_html-default-20260924T102701Z`. Le lien `public_html -> .mds/current/public` fonctionne sur cette offre. La préproduction dispose d’un modèle de configuration et d’un environnement GitHub ; aucun site de préproduction n’a encore été déployé.
 
 ## Environnements
 
@@ -67,10 +71,14 @@ Depuis Windows, avec les paramètres SSH réels :
 .\deploy\hostinger\publish.ps1 `
   -SshHost HOTE_HOSTINGER -SshUser UTILISATEUR_HOSTINGER -Port 65002 `
   -DomainRoot /home/UTILISATEUR_HOSTINGER/domains/maisondustoream.com `
-  -Archive C:\chemin\hostinger-release.tar.gz
+  -Archive C:\chemin\hostinger-release.tar.gz `
+  -IdentityFile C:\chemin\cle_ssh_privee `
+  -KnownHostsFile C:\chemin\known_hosts
 ```
 
-Adapter le port à celui affiché par hPanel. La clé SSH doit déjà être autorisée ; l’envoi utilise `BatchMode=yes`. Le script vérifie l’empreinte de l’archive, exécute les contrôles de production, migre la base, ajoute le catalogue sans écraser les produits existants, prépare les caches puis active le lien de la nouvelle version. Il ne régénère jamais APP_KEY. Une activation échouée avant le changement de lien conserve le code courant ; les migrations déjà exécutées restent appliquées.
+Adapter le port à celui affiché par hPanel. La clé SSH doit déjà être autorisée ; l’envoi utilise `BatchMode=yes`. Les paramètres `IdentityFile` et `KnownHostsFile` sont optionnels : sur la machine de préparation, le script détecte respectivement `$env:USERPROFILE\.ssh\mds_hostinger` et `artifacts/ssh/known_hosts` s’ils existent. Ne jamais publier la clé privée. Le script vérifie l’empreinte de l’archive, exécute les contrôles de production, migre la base, ajoute le catalogue sans écraser les produits existants, prépare les caches puis active le lien de la nouvelle version. Il ne régénère jamais APP_KEY. Une activation échouée avant le changement de lien conserve le code courant ; les migrations déjà exécutées restent appliquées.
+
+Après extraction, le script rétablit les permissions de traversée des répertoires publics pour le serveur Web Hostinger. Le répertoire partagé reste privé (`700`), ainsi que `.env` et le cache de configuration (`600`).
 
 Les mêmes scripts s’appliquent à la préproduction avec sa racine et sa configuration propres. Tester d’abord la préproduction, puis publier en production une version validée.
 
@@ -97,17 +105,16 @@ Ce retour arrière change uniquement le code. Il ne restaure pas la base : toute
 
 ## Publication GitHub
 
-Le dépôt local est préparé pour `https://github.com/CM-maisondustore/maison-du-store-am.git`. La création distante exige une authentification autorisée sur **CM-maisondustore**. Le compte connecté au début de cette intervention (`maisondustoreci-oss`) n’est pas utilisé pour publier.
+Le dépôt privé existe à l’adresse `https://github.com/CM-maisondustore/Maison-du-store-AM`, avec `main` publiée et les environnements GitHub `staging` et `production`. Les tests PHP sur SQLite et MySQL, les tests JavaScript et la construction de l’archive passent dans GitHub Actions. Aucun secret de production n’est stocké dans Git.
 
-Avec GitHub CLI connecté au bon compte :
+Pour une mise à jour, avec GitHub CLI connecté au bon compte :
 
 ```powershell
 gh auth login --hostname github.com --git-protocol https --web
 gh api user --jq .login
-gh repo create CM-maisondustore/maison-du-store-am --private
-git push -u origin main
+git push origin main
 ```
 
-Si le dépôt existe déjà, ne pas le recréer ni forcer un push : examiner son historique d’abord. Si `CM-maisondustore` est une organisation, utiliser un compte membre autorisé. Dans GitHub, protéger `main`, exiger la CI et les revues utiles, puis créer les environnements `staging` et `production` pour la suite. Ne publier aucun secret dans le dépôt, les artefacts ou les journaux.
+Ne pas recréer le dépôt ni forcer un push. Dans GitHub, configurer la protection de `main` et les revues selon les possibilités de l’offre du compte. Ne publier aucun secret dans le dépôt, les artefacts ou les journaux.
 
 Documentation officielle : [Laravel sur Hostinger](https://www.hostinger.com/support/which-programming-languages-and-frameworks-are-supported-at-hostinger/), [Git dans hPanel](https://www.hostinger.com/support/1583302-how-to-deploy-a-git-repository-in-hostinger/), [déploiement Laravel](https://laravel.com/docs/12.x/deployment).

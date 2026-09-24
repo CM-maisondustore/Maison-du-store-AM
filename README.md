@@ -1,6 +1,6 @@
 # Maison du Store AM — Stores &amp; Rideaux Sur Mesure
 
-**Production prévue :** `www.maisondustoream.com` sur Hostinger Web/Cloud. Voir [le guide Hostinger](deploy/hostinger/README.md) pour publier l’application Laravel et [Backend/README.md](Backend/README.md) pour le développement. Dépôt cible : `CM-maisondustore/maison-du-store-am`.
+**Production en ligne :** [www.maisondustoream.com](https://www.maisondustoream.com), sur Hostinger Web/Cloud avec MySQL. Les devis et rendez-vous sont enregistrés en base. Voir [le guide Hostinger](deploy/hostinger/README.md) pour les mises à jour et [Backend/README.md](Backend/README.md) pour le développement. Dépôt privé : [CM-maisondustore/Maison-du-store-AM](https://github.com/CM-maisondustore/Maison-du-store-AM).
 
 > Le backend Laravel est désormais implémenté dans [Backend](Backend/README.md) : catalogue en base, devis et rendez-vous persistés, validation et protection CSRF. Pour l’utiliser sur cette machine, lancer `.\Backend\serve.ps1`, puis ouvrir http://127.0.0.1:8000. Les explications de mode démonstration ci-dessous concernent uniquement les pages HTML statiques.
 
@@ -68,7 +68,7 @@ cette règle reste vraie :
 
 ## Mode démonstration et backend Laravel
 
-Le site fonctionne aujourd'hui entièrement en local : le catalogue vient de
+La maquette HTML à la racine fonctionne entièrement en local : le catalogue vient de
 `js/catalogue/products.js`, et les formulaires (devis, rendez-vous)
 n'envoient rien — ils simulent un succès après un court délai et
 l'affichent clairement comme tel (« mode démonstration »), avec un lien

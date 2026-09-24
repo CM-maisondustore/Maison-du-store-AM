@@ -22,6 +22,12 @@ exec 9>"$private/deploy.lock"
 flock -n 9 || { echo 'Another deployment is running.' >&2; exit 1; }
 mkdir "$release"
 tar -xzf "$archive" -C "$release"
+# Extraction may restore a 750 mode on the release root. Hostinger's web
+# server needs traversal to public/, while shared configuration stays private.
+chmod 755 "$private" "$private/releases" "$release"
+chmod 700 "$shared"
+find "$release/public" -type d -exec chmod 755 {} +
+find "$release/public" -type f -exec chmod 644 {} +
 [[ "$(cat "$release/REVISION")" == "$revision" ]] || { echo 'Archive revision mismatch.' >&2; exit 1; }
 [[ -f "$release/public/build/manifest.json" && -f "$release/vendor/autoload.php" && ! -e "$release/.env" ]] || { echo 'Incomplete or unsafe release.' >&2; exit 1; }
 ln -s "$shared/.env" "$release/.env"
@@ -31,6 +37,7 @@ chmod 600 "$shared/.env"
 cd "$release"
 "$php_bin" vendor/composer/platform_check.php
 "$php_bin" artisan config:cache
+chmod 600 bootstrap/cache/config.php
 "$php_bin" deployment-check.php
 "$php_bin" artisan migrate --force
 "$php_bin" artisan db:seed --force
