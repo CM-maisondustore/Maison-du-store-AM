@@ -20,6 +20,11 @@ fi
 [[ ! -e "$release" ]] || { echo 'This revision is already extracted. Use rollback.sh or a new commit.' >&2; exit 1; }
 exec 9>"$private/deploy.lock"
 flock -n 9 || { echo 'Another deployment is running.' >&2; exit 1; }
+# Back up an existing installation before applying any new migration. Shell
+# mysqldump works on Hostinger even when PHP proc_open is disabled.
+if [[ -L "$private/current" ]]; then
+    bash "$(dirname "$0")/backup.sh" "$domain_root"
+fi
 mkdir "$release"
 tar -xzf "$archive" -C "$release"
 # Extraction may restore a 750 mode on the release root. Hostinger's web

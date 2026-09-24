@@ -54,7 +54,7 @@ jobs:
       - run: npm test
       - run: npm run build
       - name: Validate deployment shell scripts
-        run: bash -n ../deploy/hostinger/release.sh ../deploy/hostinger/rollback.sh
+        run: bash -n ../deploy/hostinger/release.sh ../deploy/hostinger/rollback.sh ../deploy/hostinger/backup.sh
       - name: Build production dependencies
         if: github.event_name != 'pull_request'
         run: composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
@@ -74,4 +74,6 @@ jobs:
             hostinger-release.tar.gz.sha256
             deploy/hostinger/release.sh
             deploy/hostinger/rollback.sh
+            deploy/hostinger/backup.sh
+            deploy/hostinger/backup-options.php
           retention-days: 14

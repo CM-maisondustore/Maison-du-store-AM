@@ -93,6 +93,10 @@ Les mêmes scripts s’appliquent à la préproduction avec sa racine et sa conf
 
 ## Mises à jour, sauvegardes et retour arrière
 
+Les mises à jour d’une installation existante déclenchent désormais `backup.sh` avant les migrations : export MySQL et copie de la configuration dans `.mds/backups/`, en permissions privées. Le déploiement s’arrête si la préparation, l’export ou la vérification du fichier échoue. L’export est lancé par SSH et reste compatible avec la désactivation de `proc_open` dans PHP chez Hostinger. Les paramètres MySQL temporaires sont supprimés à la fin ; aucun mot de passe n’est placé dans les arguments de commande. Prévoir une copie sécurisée hors serveur et une rotation de ces sauvegardes selon le quota.
+
+La première migration de l’espace interne change la réservation des créneaux tout en conservant les annulations. Un retour au code antérieur à cette migration nécessite une restauration compatible de la base ; le simple script de retour arrière ne suffit pas. Voir [Backend/ADMIN.md](../../Backend/ADMIN.md).
+
 Avant chaque mise à jour, conserver une sauvegarde MySQL récente avec hPanel. Activer les sauvegardes disponibles dans l’offre et vérifier périodiquement une restauration en préproduction. Sauvegarder aussi `.mds/shared/.env` et le stockage privé hors du serveur, de façon sécurisée.
 
 Pour réactiver le code précédent, en SSH :
