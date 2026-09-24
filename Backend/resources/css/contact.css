@@ -1,0 +1,85 @@
+/* ==========================================================================
+   contact.css : uniquement la section Contact (coordonnées et plan).
+   ========================================================================== */
+
+.contact__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  align-items: center;
+  gap: clamp(2rem, 5vw, 5rem);
+}
+
+.contact__info {
+  display: grid;
+  gap: var(--space-5);
+  justify-items: start;
+}
+
+.contact-list {
+  display: grid;
+  gap: var(--space-4);
+  width: 100%;
+}
+
+.contact-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-3);
+  align-items: start;
+}
+
+.contact-item__icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  background: var(--color-gold-tint);
+  border-radius: 50%;
+  color: var(--color-gold-text);
+}
+
+.contact-item__label {
+  font-family: var(--font-label);
+  font-size: var(--text-2xs);
+  font-weight: 500;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--color-text-soft);
+}
+
+.contact-item__value {
+  display: grid;
+  gap: 2px;
+  font-weight: 500;
+  color: var(--color-ink);
+}
+
+.contact-item__value a {
+  width: fit-content;
+  padding-block: 2px;
+  text-decoration: underline;
+  text-decoration-color: var(--color-line-strong);
+  text-underline-offset: 4px;
+}
+
+.contact-item__value a:hover {
+  text-decoration-color: var(--color-gold);
+}
+
+.contact__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.map-card {
+  position: relative;
+}
+
+.map-card__link {
+  position: absolute;
+  left: 50%;
+  bottom: var(--space-5);
+  transform: translateX(-50%);
+  box-shadow: var(--shadow-raised);
+}

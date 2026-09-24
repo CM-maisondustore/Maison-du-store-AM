@@ -1,0 +1,31 @@
+<?php
+
+return [
+    'accepted' => 'Le champ :attribute doit être accepté.',
+    'array' => 'Le champ :attribute doit être une liste valide.',
+    'date' => 'Le champ :attribute doit être une date valide.',
+    'date_format' => 'Le champ :attribute doit respecter le format :format.',
+    'distinct' => 'Le champ :attribute contient un doublon.',
+    'email' => 'Le champ :attribute doit être une adresse e-mail valide.',
+    'in' => 'La valeur du champ :attribute est invalide.',
+    'integer' => 'Le champ :attribute doit être un nombre entier.',
+    'numeric' => 'Le champ :attribute doit être un nombre.',
+    'required' => 'Le champ :attribute est obligatoire.',
+    'string' => 'Le champ :attribute doit être du texte.',
+    'between' => ['numeric' => 'Le champ :attribute doit être compris entre :min et :max.'],
+    'min' => ['string' => 'Le champ :attribute doit contenir au moins :min caractères.', 'array' => 'Le champ :attribute doit contenir au moins :min élément.'],
+    'max' => ['string' => 'Le champ :attribute ne doit pas dépasser :max caractères.', 'array' => 'Le champ :attribute ne doit pas dépasser :max éléments.'],
+    'attributes' => [
+        'contact.firstName' => 'prénom', 'contact.lastName' => 'nom', 'contact.email' => 'e-mail',
+        'contact.phone' => 'téléphone', 'contact.address' => 'adresse', 'contact.city' => 'ville',
+        'contact.civility' => 'civilité', 'contact.postalCode' => 'code postal',
+        'firstName' => 'prénom', 'lastName' => 'nom', 'email' => 'e-mail', 'phone' => 'téléphone',
+        'acceptTerms' => 'acceptation des conditions', 'product.model' => 'modèle',
+        'product.powerSource' => 'alimentation', 'product.color' => 'couleur',
+        'product.finish' => 'finition', 'product.mount' => 'pose', 'product.control' => 'commande',
+        'product.fabric' => 'tissu', 'product.pattern' => 'motif', 'product.lining' => 'doublure',
+        'product.hanging' => 'support', 'product.orderType' => 'type de commande',
+        'dimensions.*.width' => 'largeur', 'dimensions.*.height' => 'hauteur',
+        'dimensions.*.quantity' => 'quantité', 'time' => 'heure', 'date' => 'date',
+    ],
+];

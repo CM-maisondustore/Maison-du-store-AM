@@ -1,0 +1,705 @@
+/* ==========================================================================
+   devis.css
+   Uniquement : écran de sélection du type de devis, formulaire de devis
+   (barre de progression, étapes, cartes de choix), récapitulatif et
+   confirmation. Les composants génériques (champs, boutons) sont dans
+   global.css ; cette feuille couvre ce qui est propre au parcours devis.
+   ========================================================================== */
+
+/* --- En-tête de page « Configurez votre projet sur mesure » ------------------------ */
+.quote-header {
+  padding-block: var(--space-6);
+  border-bottom: 1px solid var(--color-line);
+}
+
+.quote-header__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.quote-header__title {
+  font-size: var(--text-xl);
+}
+
+.progress-text {
+  font-family: var(--font-label);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-label);
+  color: var(--color-text-soft);
+  white-space: nowrap;
+}
+
+.progress-bar {
+  display: flex;
+  gap: 6px;
+  margin-top: var(--space-4);
+}
+
+.progress-bar__item {
+  flex: 1;
+}
+
+.progress-bar__item span {
+  display: block;
+  height: 4px;
+  border-radius: var(--radius-pill);
+  background: var(--color-line);
+  transition: background-color var(--transition-base);
+}
+
+.progress-bar__item--done span,
+.progress-bar__item--current span {
+  background: var(--color-gold);
+}
+
+/* --- Écran d'introduction (choix Store / Rideau) ------------------------------------- */
+.quote-intro {
+  padding-block: var(--section-space);
+}
+
+.quote-intro__head {
+  max-width: 40rem;
+  margin-inline: auto;
+  margin-bottom: var(--space-7);
+  text-align: center;
+}
+
+.quote-type-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-5);
+  max-width: 64rem;
+  margin-inline: auto;
+}
+
+.quote-type-card {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  background: var(--color-white);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+  text-align: left;
+}
+
+.quote-type-card__text {
+  color: var(--color-text-soft);
+}
+
+/* --- Corps de l'assistant : étape + barre latérale ------------------------------------ */
+.quote-body {
+  padding-block: var(--space-7);
+}
+
+.quote-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 22rem;
+  gap: var(--space-6);
+  align-items: start;
+}
+
+.quote-step {
+  padding: var(--space-7);
+}
+
+.quote-step:focus {
+  outline: none;
+}
+
+.step__heading {
+  font-size: var(--text-xl);
+}
+
+.step__heading--sub {
+  margin-top: var(--space-6);
+  font-size: var(--text-lg);
+}
+
+.step__intro {
+  margin-top: var(--space-2);
+  margin-bottom: var(--space-6);
+  color: var(--color-text-soft);
+}
+
+.quote-step .form-grid {
+  margin-top: var(--space-2);
+}
+
+.quote-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--color-line);
+}
+
+/* --- Cartes de choix (modèle, doublure, commande...) ----------------------------------- */
+.choice-list {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.choice-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  background: var(--color-white);
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.choice-card input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.choice-card:hover {
+  border-color: var(--color-gold);
+}
+
+.choice-card.is-selected {
+  background: var(--color-gold-tint);
+  border-color: var(--color-gold);
+}
+
+.choice-card input:focus-visible ~ * {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.choice-card--compact {
+  grid-template-columns: auto 1fr auto;
+}
+
+.choice-card__media .image-placeholder {
+  width: 68px;
+  height: 68px;
+}
+
+.choice-card__icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--color-white);
+  border: 1px solid var(--color-line);
+  color: var(--color-gold-text);
+}
+
+.choice-card__body {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.choice-card__title {
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  font-weight: 500;
+  color: var(--color-ink);
+}
+
+.choice-card__text {
+  font-size: var(--text-sm);
+  color: var(--color-text-soft);
+}
+
+.choice-card__check {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  color: var(--color-white);
+  background: transparent;
+  transition: background-color var(--transition-fast);
+}
+
+.choice-card.is-selected .choice-card__check {
+  background: var(--color-gold);
+}
+
+/* --- Tuiles d'options (pose, alimentation, motif...) ------------------------------------ */
+.option-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.option-grid--compact {
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+}
+
+.option-tile {
+  position: relative;
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background: var(--color-white);
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  color: var(--color-ink);
+  transition: border-color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.option-tile input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.option-tile:hover {
+  border-color: var(--color-gold);
+}
+
+.option-tile.is-selected {
+  background: var(--color-gold-tint);
+  border-color: var(--color-gold);
+}
+
+.option-tile input:focus-visible ~ * {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.option-tile .icon {
+  color: var(--color-gold-text);
+}
+
+.option-tile__title {
+  font-weight: 600;
+  font-size: var(--text-sm);
+}
+
+.option-tile__text {
+  font-size: var(--text-xs);
+  color: var(--color-text-soft);
+}
+
+.option-tile--sm {
+  padding: var(--space-3);
+  gap: 2px;
+}
+
+/* --- Nuancier (couleurs, avec libellé) -------------------------------------------------- */
+.swatch-row--lg {
+  gap: var(--space-4);
+}
+
+.swatch-choice {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  width: 5.5rem;
+  cursor: pointer;
+}
+
+.swatch-choice input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.swatch-choice__dot {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--swatch, #ccc);
+  border: 1px solid var(--color-line-strong);
+  box-shadow: inset 0 0 0 3px var(--color-white);
+  transition: outline-color var(--transition-fast);
+}
+
+.swatch-choice input:checked ~ .swatch-choice__dot {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+.swatch-choice input:focus-visible ~ .swatch-choice__dot {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+.swatch-choice__label {
+  font-size: var(--text-xs);
+  text-align: center;
+  color: var(--color-text-soft);
+}
+
+/* --- Tissus (fiche avec vignette) ----------------------------------------------------- */
+.fabric-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.fabric-card {
+  position: relative;
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background: var(--color-white);
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.fabric-card input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.fabric-card:hover {
+  border-color: var(--color-gold);
+}
+
+.fabric-card input:checked ~ .image-placeholder {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+
+.fabric-card:has(input:checked) {
+  background: var(--color-gold-tint);
+  border-color: var(--color-gold);
+}
+
+.fabric-card input:focus-visible ~ * {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.fabric-card__title {
+  font-weight: 600;
+  font-size: var(--text-sm);
+  color: var(--color-ink);
+}
+
+.fabric-card__text {
+  font-size: var(--text-xs);
+  color: var(--color-text-soft);
+}
+
+/* --- Dimensions : liste de fenêtres ----------------------------------------------------- */
+.window-list {
+  display: grid;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.window-row {
+  padding: var(--space-4);
+  background: var(--color-bg-alt);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+}
+
+.window-row__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+
+.window-row__title {
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.window-row__remove {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--text-xs);
+  color: var(--color-error);
+}
+
+.window-row__fields {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.window-row .input {
+  background: var(--color-white);
+}
+
+.stepper {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--color-white);
+}
+
+.stepper button {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: var(--control-height);
+  font-size: var(--text-md);
+  color: var(--color-ink);
+}
+
+.stepper button:hover {
+  background: var(--color-bg-alt);
+}
+
+.stepper__value {
+  min-height: var(--control-height);
+  border: 0;
+  border-left: 1px solid var(--color-line-strong);
+  border-right: 1px solid var(--color-line-strong);
+  border-radius: 0;
+  text-align: center;
+  background: transparent;
+}
+
+.add-window {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0.65rem 1rem;
+  border: 1px dashed var(--color-line-strong);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-gold-text);
+}
+
+.add-window:hover {
+  border-color: var(--color-gold);
+  background: var(--color-gold-tint);
+}
+
+.window-suggestion {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--color-text-soft);
+}
+
+.window-suggestion .icon {
+  flex: none;
+  color: var(--color-gold-text);
+}
+
+/* --- Récapitulatif final ---------------------------------------------------------------- */
+.recap__title {
+  font-size: var(--text-xl);
+}
+
+.recap__intro {
+  margin-top: var(--space-2);
+  margin-bottom: var(--space-5);
+  color: var(--color-text-soft);
+}
+
+.recap-list {
+  display: grid;
+}
+
+.recap-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-block: var(--space-4);
+  border-top: 1px solid var(--color-line);
+}
+
+.recap-row__text dt {
+  font-family: var(--font-label);
+  font-size: var(--text-2xs);
+  font-weight: 500;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--color-text-soft);
+  margin-bottom: 2px;
+}
+
+.recap-row__text dd {
+  font-weight: 500;
+  color: var(--color-ink);
+}
+
+.recap__estimate {
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--space-5);
+}
+
+.recap__price {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.recap__accept {
+  margin-top: var(--space-5);
+}
+
+/* --- Barre latérale : Votre configuration ------------------------------------------------ */
+.config-card {
+  position: sticky;
+  top: calc(var(--header-height) + var(--space-5));
+  padding: var(--space-5);
+}
+
+.config-card__title {
+  font-size: var(--text-lg);
+  margin-bottom: var(--space-1);
+}
+
+.config-card__client {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-gold-text);
+  margin-bottom: var(--space-3);
+}
+
+.config-card__hint {
+  margin-top: var(--space-3);
+  font-size: var(--text-xs);
+  color: var(--color-text-soft);
+}
+
+.config-card__list {
+  display: grid;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+}
+
+.config-card__row {
+  display: grid;
+  gap: 2px;
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-line);
+}
+
+.config-card__row dt {
+  font-family: var(--font-label);
+  font-size: var(--text-2xs);
+  font-weight: 500;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--color-text-soft);
+}
+
+.config-card__row dd {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.config-card__row dd.is-empty {
+  font-weight: 400;
+  color: #8c877e;
+}
+
+.config-card__price {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-line);
+  font-size: var(--text-sm);
+  color: var(--color-text-soft);
+}
+
+.config-card__price strong {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  color: var(--color-ink);
+}
+
+/* --- Confirmation ------------------------------------------------------------------------ */
+.quote-confirmation {
+  max-width: 40rem;
+  margin-inline: auto;
+  padding: var(--space-7);
+  text-align: center;
+}
+
+.confirmation {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-4);
+}
+
+.confirmation:focus {
+  outline: none;
+}
+
+.confirmation__icon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--color-success-tint);
+  color: var(--color-success);
+}
+
+.confirmation__title {
+  font-size: var(--text-xl);
+}
+
+.confirmation__text {
+  color: var(--color-text-soft);
+}
+
+.confirmation__recap-title {
+  margin-top: var(--space-4);
+  font-size: var(--text-md);
+}
+
+.confirmation__list {
+  display: grid;
+  gap: var(--space-2);
+  width: 100%;
+  text-align: left;
+  padding: var(--space-4);
+  background: var(--color-bg-alt);
+  border-radius: var(--radius-md);
+}
+
+.confirmation__list > div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  font-size: var(--text-sm);
+}
+
+.confirmation__list dt {
+  color: var(--color-text-soft);
+}
+
+.confirmation__list dd {
+  font-weight: 600;
+  color: var(--color-ink);
+  text-align: right;
+}

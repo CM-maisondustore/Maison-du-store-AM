@@ -1,0 +1,77 @@
+name: Verify and package Hostinger release
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_DATABASE: mds_test
+          MYSQL_USER: mds_test
+          MYSQL_PASSWORD: ci-test-only
+          MYSQL_ROOT_PASSWORD: ci-root-test-only
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1"
+          --health-interval=10s --health-timeout=5s --health-retries=20
+    defaults:
+      run:
+        working-directory: Backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, intl, pdo_sqlite, pdo_mysql
+          coverage: none
+          tools: composer:v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: Backend/package-lock.json
+      - run: composer install --no-interaction --prefer-dist
+      - run: composer validate --no-check-publish
+      - run: composer test
+      - name: Test on MySQL as used on Hostinger
+        run: composer test
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: mds_test
+          DB_USERNAME: mds_test
+          DB_PASSWORD: ci-test-only
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - name: Validate deployment shell scripts
+        run: bash -n ../deploy/hostinger/release.sh ../deploy/hostinger/rollback.sh
+      - name: Build production dependencies
+        if: github.event_name != 'pull_request'
+        run: composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+      - name: Package exact source revision
+        if: github.event_name != 'pull_request'
+        run: |
+          printf '%s\n' "$GITHUB_SHA" > REVISION
+          tar --exclude='bootstrap/cache/*.php' -czf ../hostinger-release.tar.gz app bootstrap config database/data database/migrations database/seeders lang public resources/views routes vendor artisan composer.json composer.lock deployment-check.php REVISION
+          cd ..
+          sha256sum hostinger-release.tar.gz > hostinger-release.tar.gz.sha256
+      - uses: actions/upload-artifact@v4
+        if: github.event_name != 'pull_request'
+        with:
+          name: hostinger-${{ github.sha }}
+          path: |
+            hostinger-release.tar.gz
+            hostinger-release.tar.gz.sha256
+            deploy/hostinger/release.sh
+            deploy/hostinger/rollback.sh
+          retention-days: 14

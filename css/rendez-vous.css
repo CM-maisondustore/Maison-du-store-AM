@@ -1,0 +1,265 @@
+/* ==========================================================================
+   rendez-vous.css
+   Uniquement : formulaire de rendez-vous, calendrier, créneaux horaires et
+   carte de résumé.
+   ========================================================================== */
+
+.rdv-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 22rem;
+  gap: var(--space-5);
+  align-items: start;
+}
+
+.rdv-form {
+  display: grid;
+  gap: var(--space-6);
+  padding: var(--space-6);
+}
+
+.rdv-block {
+  display: grid;
+  gap: var(--space-4);
+  padding-bottom: var(--space-6);
+  border-bottom: 1px solid var(--color-line);
+}
+
+.rdv-block:last-of-type {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.rdv-block__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 500;
+  color: var(--color-ink);
+}
+
+.rdv-block__number {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--color-gold-tint);
+  font-family: var(--font-label);
+  font-size: var(--text-xs);
+  color: var(--color-gold-text);
+}
+
+/* --- Date et heure ------------------------------------------------------------ */
+.rdv-datetime {
+  display: grid;
+  grid-template-columns: minmax(0, 20rem) minmax(0, 1fr);
+  gap: var(--space-6);
+  align-items: start;
+}
+
+.calendar {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.calendar__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.calendar__title {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-transform: capitalize;
+  color: var(--color-ink);
+}
+
+.calendar__nav {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: var(--color-ink);
+  transition: background-color var(--transition-fast);
+}
+
+.calendar__nav:hover:not(:disabled) {
+  background: var(--color-bg-alt);
+}
+
+.calendar__nav:disabled {
+  opacity: 0.3;
+}
+
+.calendar__grid {
+  width: 100%;
+  table-layout: fixed;
+}
+
+.calendar__grid th {
+  padding-block: var(--space-2);
+  font-family: var(--font-label);
+  font-size: var(--text-2xs);
+  font-weight: 500;
+  text-transform: uppercase;
+  color: var(--color-text-soft);
+}
+
+.calendar__grid td {
+  padding: 2px;
+  text-align: center;
+}
+
+.calendar__day {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: 40px;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  color: var(--color-ink);
+  transition: background-color var(--transition-fast);
+}
+
+.calendar__day:hover:not(:disabled) {
+  background: var(--color-gold-tint);
+}
+
+.calendar__day.is-today {
+  box-shadow: inset 0 0 0 1px var(--color-line-strong);
+}
+
+.calendar__day.is-selected {
+  background: var(--color-gold);
+  color: var(--color-on-gold);
+  font-weight: 600;
+}
+
+.calendar__day.is-unavailable {
+  color: #b3ada2;
+  text-decoration: line-through;
+  text-decoration-color: rgba(0, 0, 0, 0.15);
+}
+
+.slots__title {
+  margin-bottom: var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--color-text-soft);
+}
+
+.slots__hint {
+  padding: var(--space-4);
+  background: var(--color-bg-alt);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  color: var(--color-text-soft);
+}
+
+.slots__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.slot {
+  min-height: 42px;
+  background: var(--color-white);
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink);
+  transition: background-color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.slot[data-state="available"]:hover {
+  border-color: var(--color-gold);
+  background: var(--color-gold-tint);
+}
+
+.slot[data-state="selected"] {
+  background: var(--color-ink);
+  border-color: var(--color-ink);
+  color: var(--color-white);
+}
+
+.slot[data-state="disabled"] {
+  background: var(--color-bg-alt);
+  border-color: var(--color-line);
+  color: #a9a397;
+  text-decoration: line-through;
+}
+
+/* --- Résumé ---------------------------------------------------------------------- */
+.rdv-summary {
+  position: sticky;
+  top: calc(var(--header-height) + var(--space-5));
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-6);
+}
+
+.rdv-summary__title {
+  font-size: var(--text-lg);
+}
+
+.summary-list {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.summary-list__row {
+  display: grid;
+  gap: 2px;
+}
+
+.summary-list dt {
+  font-family: var(--font-label);
+  font-size: var(--text-2xs);
+  font-weight: 500;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--color-text-soft);
+}
+
+.summary-list dd {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.summary-list dd.is-empty {
+  font-weight: 400;
+  color: #8c877e;
+}
+
+.rdv-summary__hint {
+  font-size: var(--text-xs);
+  color: var(--color-text-soft);
+  text-align: center;
+}
+
+.rdv-confirmation {
+  display: grid;
+  gap: var(--space-4);
+  justify-items: start;
+}
+
+.rdv-confirmation:focus {
+  outline: none;
+}
+
+.rdv-confirmation__icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--color-success-tint);
+  color: var(--color-success);
+}
