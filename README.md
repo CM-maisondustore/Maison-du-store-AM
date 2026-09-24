@@ -72,7 +72,7 @@ La maquette HTML à la racine fonctionne entièrement en local : le catalogue vi
 `js/catalogue/products.js`, et les formulaires (devis, rendez-vous)
 n'envoient rien — ils simulent un succès après un court délai et
 l'affichent clairement comme tel (« mode démonstration »), avec un lien
-`mailto:` de secours vers `maisondustore.ci@gmail.com`.
+`mailto:` de secours vers `contact@maisondustoream.com`.
 
 Pour utiliser le frontend statique avec une API Laravel :
 

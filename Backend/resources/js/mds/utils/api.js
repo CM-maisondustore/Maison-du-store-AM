@@ -27,7 +27,7 @@
     business: {
       timezone: 'Africa/Abidjan',
       name: 'Maison du Store AM',
-      email: 'maisondustore.ci@gmail.com',
+      email: 'contact@maisondustoream.com',
       phones: ['+225 07 12 44 93 19', '+225 07 67 49 58 04', '+225 01 73 82 63 76'],
       address: 'Cocody - Marché Saint Jean, Abidjan, Côte d\u2019Ivoire'
     },

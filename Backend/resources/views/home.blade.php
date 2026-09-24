@@ -361,7 +361,7 @@
             </li>
             <li class="contact-item">
               <span class="contact-item__icon"><svg class="icon" aria-hidden="true"><use href="#i-mail"/></svg></span>
-              <div><p class="contact-item__label">E-mail</p><p class="contact-item__value"><a href="mailto:maisondustore.ci@gmail.com">maisondustore.ci@gmail.com</a></p></div>
+              <div><p class="contact-item__label">E-mail</p><p class="contact-item__value"><a href="mailto:contact@maisondustoream.com">contact@maisondustoream.com</a></p></div>
             </li>
           </ul>
           <div class="contact__actions">
@@ -403,7 +403,7 @@
           <p class="site-footer__title">Contact &amp; showroom</p>
           <ul class="site-footer__list site-footer__contact">
             <li><svg class="icon icon--sm" aria-hidden="true"><use href="#i-pin"/></svg><span>Cocody — Marché Saint Jean<br>Abidjan, Côte d’Ivoire</span></li>
-            <li><svg class="icon icon--sm" aria-hidden="true"><use href="#i-mail"/></svg><span><a href="mailto:maisondustore.ci@gmail.com">maisondustore.ci@gmail.com</a></span></li>
+            <li><svg class="icon icon--sm" aria-hidden="true"><use href="#i-mail"/></svg><span><a href="mailto:contact@maisondustoream.com">contact@maisondustoream.com</a></span></li>
             <li><svg class="icon icon--sm" aria-hidden="true"><use href="#i-phone"/></svg><span><a href="tel:+2250712449319">07 12 44 93 19</a><br><a href="tel:+2250767495804">07 67 49 58 04</a><br><a href="tel:+2250173826376">01 73 82 63 76</a></span></li>
           </ul>
         </div>
