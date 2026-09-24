@@ -68,10 +68,10 @@ PHPUnit utilise SQLite en mémoire et ne modifie pas les demandes locales. Tests
 
 Pointer le serveur web uniquement vers `Backend/public`. En production : `APP_ENV=production`, `APP_DEBUG=false`, URL HTTPS et `SESSION_SECURE_COOKIE=true`, puis `php artisan migrate --force` et compilation Vite. Conserver une clé APP_KEY stable et sauvegarder la base. Les dossiers `storage` et `bootstrap/cache` doivent être accessibles en écriture.
 
-Cette livraison couvre le contrat des formulaires et du catalogue. Il n’y a pas d’espace administrateur ni d’envoi automatique d’e-mails : les demandes sont persistées dans `quotes` et `appointments` pour traitement interne. Aucun envoi à un tiers n’est effectué. Le statut `pending` ne constitue pas une confirmation définitive de rendez-vous.
+L’espace interne est accessible à `/admin/connexion` : rôles Admin-CM et Agent, dossiers clients sans compte public, catalogue, devis PDF, rendez-vous, prestations, factures et messagerie Hostinger. Voir [le guide de l’administration](ADMIN.md) pour la création du premier compte, les droits, les paramètres SMTP/IMAP et les parcours métier. Les messages sont envoyés explicitement après relecture ; aucune campagne automatique n’est déclenchée. Le statut `pending` ne constitue pas une confirmation définitive de rendez-vous.
 ## Résultat des vérifications de cette livraison
 
-- 9 tests PHPUnit : 58 assertions réussies.
+- Tests PHPUnit sur SQLite et MySQL dans GitHub Actions, avec contrôle des droits et des parcours administratifs.
 - 2 tests JavaScript réussis.
 - Compilation Vite réussie ; npm signale 0 vulnérabilité.
 - Pages, endpoints de lecture, CSS, JavaScript et favicon : HTTP 200.

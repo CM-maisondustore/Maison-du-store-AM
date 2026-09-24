@@ -19,7 +19,7 @@ class AppointmentSchedule
 
     public function unavailable(string $date): array
     {
-        $booked = Appointment::where('date', $date)->pluck('time')->all();
+        $booked = Appointment::where('date', $date)->where('status', '!=', 'cancelled')->pluck('time')->all();
         return array_values(array_filter(config('appointments.slots'), fn ($time) =>
             !$this->isOpen($date, $time) || in_array($time, $booked, true)));
     }

@@ -13,6 +13,7 @@
 /.vscode/
 /backups/
 /artifacts/
+Backend/storage/framework/cache/*.json
 *.pem
 *.key
 *.pfx

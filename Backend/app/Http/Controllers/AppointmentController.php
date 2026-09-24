@@ -17,11 +17,12 @@ class AppointmentController
     {
         $data = $request->validated();
         try {
-            $appointment = Appointment::create([
+            $appointment = \Illuminate\Support\Facades\DB::transaction(fn () => Appointment::create([
+                'contact_id' => app(\App\Services\ContactArchive::class)->capture($data)->id,
                 'reference' => (string) Str::uuid(),
                 'date' => $data['date'], 'time' => $data['time'],
                 'details' => collect($data)->except(['date', 'time', 'submittedAt'])->all(),
-            ]);
+            ]));
         } catch (UniqueConstraintViolationException $exception) {
             // La contrainte SQL protège aussi deux requêtes simultanées.
             throw ValidationException::withMessages(['time' => 'Ce créneau vient d’être réservé. Choisissez une autre heure.']);
