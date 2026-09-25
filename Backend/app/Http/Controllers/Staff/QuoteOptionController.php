@@ -1,0 +1,20 @@
+<?php
+namespace App\Http\Controllers\Staff;
+use App\Models\{QuoteOption,Product};
+use App\Services\Audit;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
+class QuoteOptionController
+{
+    public function index() { return view('staff.quote-options',['options'=>QuoteOption::orderBy('category')->orderBy('kind')->orderBy('label')->get(),'products'=>Product::select('id','reference','details')->get()]); }
+    private function data(Request $r): array
+    {
+        $data=$r->validate(['label'=>'required|string|max:150','kind'=>'required|in:material,finish','category'=>'required|in:store,rideau','motorization'=>'required|in:any,yes,no','active'=>'required|boolean','product_ids'=>'nullable|array|max:100','product_ids.*'=>'integer|distinct|exists:products,id']);
+        $data['product_ids']=array_map('intval',$data['product_ids'] ?? []);
+        if (Product::whereIn('id',$data['product_ids'])->where('details->type','!=',$data['category'])->exists()) throw ValidationException::withMessages(['product_ids'=>'Tous les types sélectionnés doivent appartenir à la catégorie choisie.']);
+        return $data;
+    }
+    public function store(Request $r) { $o=QuoteOption::create([...$this->data($r),'code'=>(string)Str::uuid()]); Audit::record('option_devis_creee',$o); return back()->with('success','Option enregistrée.'); }
+    public function update(Request $r,QuoteOption $option) { $option->update($this->data($r)); Audit::record('option_devis_modifiee',$option); return back()->with('success','Option enregistrée. Les devis existants conservent leurs descriptions.'); }
+}

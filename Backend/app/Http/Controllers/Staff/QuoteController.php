@@ -29,19 +29,24 @@ class QuoteController
             $job->update(['quote_id' => $quote->id]); Audit::record('devis_sur_place_cree', $quote);
             return $quote;
         });
-        return redirect()->route('staff.quotes.show', $quote);
+        return redirect()->route(in_array($quote->status,['pending','draft']) ? 'staff.quotes.edit' : 'staff.quotes.show', $quote);
     }
     public function update(Request $r, Quote $quote)
     {
         $this->access($r, $quote);
+        $r->validate(['edit_version'=>'sometimes|required|integer|min:0']);
         $data = [...Pricing::validate($r), ...$r->validate(['internal_notes' => 'nullable|string|max:10000', 'valid_until' => 'required|date_format:Y-m-d', 'dimensions' => 'nullable|array|max:8', 'dimensions.*.label' => 'required|string|max:100', 'dimensions.*.width' => 'required|numeric|min:20|max:400', 'dimensions.*.height' => 'required|numeric|min:20|max:400', 'dimensions.*.quantity' => 'required|integer|min:1|max:20'])];
         if ($r->user()->isAdmin()) $data += $r->validate(['status' => 'required|in:pending,draft,approved,accepted,rejected,cancelled', 'agent_id' => ['nullable', Rule::exists('users', 'id')->where('role', 'agent')->where('active', true)]]);
         DB::transaction(function () use ($quote, $r, $data) {
             $locked = Quote::whereKey($quote->id)->lockForUpdate()->firstOrFail();
             $this->access($r, $locked);
+            if ($r->has('edit_version') && $locked->edit_version!==(int)$r->input('edit_version')) throw \Illuminate\Validation\ValidationException::withMessages(['edit_version'=>'Ce devis a été modifié. Rechargez-le avant d’enregistrer.']);
             abort_unless(in_array($locked->status, ['pending', 'draft']) || $r->user()->isAdmin(), 403);
             abort_if($locked->status === 'accepted' || \App\Models\Invoice::where('quote_id', $locked->id)->exists(), 409, 'Devis accepté ou facturé : document verrouillé.');
-            $locked->update($data); Audit::record('devis_modifie', $locked);
+            if ($locked->configuration) unset($data['dimensions']);
+            if ($locked->receivedAmount()>Pricing::totals($data['lines'],$data['tax_basis_points'])['total']) throw \Illuminate\Validation\ValidationException::withMessages(['lines'=>'Le total ne peut pas être inférieur aux paiements reçus.']);
+            if ($locked->deposit_amount>Pricing::totals($data['lines'],$data['tax_basis_points'])['total']) throw \Illuminate\Validation\ValidationException::withMessages(['lines'=>'Le total ne peut pas être inférieur à l’avance prévue. Modifiez les conditions dans le formulaire complet.']);
+            $locked->update([...$data,'edit_version'=>$locked->edit_version+1]); Audit::record('devis_modifie', $locked);
         });
         return back()->with('success', 'Devis enregistré.');
     }

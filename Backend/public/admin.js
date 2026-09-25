@@ -3,7 +3,8 @@ document.addEventListener('click', event => {
   if (add) {
     const container = document.getElementById(add.dataset.add);
     const template = document.getElementById(add.dataset.add + '-template');
-    const index = Number(container.dataset.next || container.children.length);
+    const indexes = [...container.querySelectorAll('[name]')].map(input => Number(input.name.match(/\[(\d+)\]/)?.[1] ?? -1));
+    const index = Number(container.dataset.next || Math.max(-1,...indexes) + 1);
     const fragment = template.content.cloneNode(true);
     fragment.querySelectorAll('[name]').forEach(input => { input.name = input.name.replace('__INDEX__', index); });
     container.appendChild(fragment); container.dataset.next = index + 1;

@@ -17,5 +17,6 @@ class DatabaseSeeder extends Seeder
             // Un nouveau seed ne remplace pas les modifications du catalogue en base.
             Product::firstOrCreate(['reference' => $reference], ['details' => $product]);
         }
+        $this->call(QuoteOptionSeeder::class);
     }
 }

@@ -1,7 +1,7 @@
 
 @extends('staff.layout')
 @section('title','Devis')
-@section('content')<div class="panel">
+@section('content')<div class="actions"><a class="button" href="{{ route('staff.quotes.create') }}">Nouveau devis</a>@if(auth()->user()->isAdmin())<a href="{{ route('staff.quote-options.index') }}">Matériaux & finitions</a>@endif</div><div class="panel">
 <form class="actions">
 <label>État<select name="status">
 <option value="">Tous les devis</option>
@@ -26,7 +26,7 @@
 <a href="{{ route('staff.quotes.show',$quote) }}">{{ $quote->contact['firstName'] ?? '' }} {{ $quote->contact['lastName'] ?? '' }}</a>
 <small>{{ $quote->contact['email'] ?? '' }}</small>
 </td>
-<td>{{ ucfirst($quote->type) }} · {{ $quote->source === 'site' ? 'Site' : 'Sur place' }}<small>{{ $quote->created_at->format('d/m/Y') }} · {{ substr($quote->reference,0,8) }}</small>
+<td>{{ ucfirst($quote->type) }} · {{ ['site'=>'Site','interne'=>'Espace interne','sur_place'=>'Sur place'][$quote->source] ?? $quote->source }}<small>{{ $quote->created_at->format('d/m/Y') }} · {{ substr($quote->reference,0,8) }}</small>
 </td>
 <td>{{ $quote->agent?->name ?? 'Non affecté' }}</td>
 <td>

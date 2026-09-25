@@ -10,6 +10,11 @@ Route::prefix('admin')->group(function () {
         Route::get('mot-de-passe', [AuthController::class, 'password'])->name('password');
         Route::post('mot-de-passe', [AuthController::class, 'changePassword'])->middleware('throttle:5,1')->name('password.update');
         Route::get('devis', [QuoteController::class, 'index'])->name('quotes.index');
+        Route::get('devis/nouveau', [App\Http\Controllers\Staff\QuoteFormController::class, 'create'])->name('quotes.create');
+        Route::post('devis', [App\Http\Controllers\Staff\QuoteFormController::class, 'store'])->name('quotes.store');
+        Route::get('devis/{quote}/formulaire', [App\Http\Controllers\Staff\QuoteFormController::class, 'edit'])->name('quotes.edit');
+        Route::put('devis/{quote}/formulaire', [App\Http\Controllers\Staff\QuoteFormController::class, 'update'])->name('quotes.form.update');
+        Route::post('devis/{quote}/paiements', [App\Http\Controllers\Staff\QuoteFormController::class, 'receipt'])->name('quotes.receipt');
         Route::get('devis/{quote}', [QuoteController::class, 'show'])->name('quotes.show');
         Route::put('devis/{quote}', [QuoteController::class, 'update'])->name('quotes.update');
         Route::get('devis/{quote}/pdf', [QuoteController::class, 'pdf'])->name('quotes.pdf');
@@ -20,6 +25,10 @@ Route::prefix('admin')->group(function () {
         Route::put('prestations/{intervention}', [InterventionController::class, 'update'])->name('interventions.update');
         Route::post('prestations/{intervention}/devis', [QuoteController::class, 'onsite'])->name('interventions.quote');
         Route::middleware('admin')->group(function () {
+            Route::post('devis/{quote}/paiements/{payment}/annuler', [App\Http\Controllers\Staff\QuoteFormController::class, 'voidReceipt'])->name('quotes.receipt.void');
+            Route::get('options-devis', [App\Http\Controllers\Staff\QuoteOptionController::class, 'index'])->name('quote-options.index');
+            Route::post('options-devis', [App\Http\Controllers\Staff\QuoteOptionController::class, 'store'])->name('quote-options.store');
+            Route::put('options-devis/{option}', [App\Http\Controllers\Staff\QuoteOptionController::class, 'update'])->name('quote-options.update');
             Route::resource('contents', App\Http\Controllers\Staff\SiteContentController::class)->except(['show', 'destroy']);
             Route::get('media/{media}', [App\Http\Controllers\MediaController::class, 'preview'])->whereNumber('media')->name('media.preview');
             Route::resource('contacts', ContactController::class)->only(['index', 'store', 'show', 'update']);

@@ -35,6 +35,22 @@ Dans **Catalogue**, rechercher un produit par nom ou référence et filtrer sa v
 
 La migration additive `2026_09_25_000003` ajoute les montants et leurs unités à `products`, sans modifier les produits existants. Le seed ne remplace pas les réglages saisis dans l’administration.
 
+## Formulaire de devis interne
+
+Dans **Devis → Nouveau devis**, Admin-CM et les agents disposent du même formulaire de préparation. Les agents créent des devis qui leur sont affectés ; Admin-CM peut choisir l’agent. Un devis se sauvegarde en brouillon, puis reste modifiable avant sa validation. Les devis acceptés ou facturés sont verrouillés. Les interventions sur place ouvrent aussi ce formulaire.
+
+1. Saisir le client : nom ou raison sociale, prénom facultatif, téléphone, adresse et e-mail facultatif. L’enregistrement crée ou rattache un dossier client sans compte utilisateur et sans écraser les coordonnées déjà vérifiées dans le CRM.
+2. Choisir la catégorie, un type du catalogue en base, la motorisation oui/non, le matériau et la finition. Les produits masqués du site restent utilisables en interne. **Matériaux & finitions**, accessible à Admin-CM depuis Devis, permet de gérer les options et leurs compatibilités par catégorie, type et motorisation.
+3. Ajouter jusqu’à 30 fenêtres avec largeur et hauteur en cm, quantité et notes. Les choix communs s’appliquent aux fenêtres qui les utilisent ; décocher cette option ou changer une sélection personnalise uniquement la fenêtre concernée. Un devis peut ainsi contenir des fenêtres de catégories différentes.
+4. Renseigner les lignes de vente en FCFA, la taxe, la date du devis, la validité, la livraison et la pose prévues. Le chiffrage commercial est saisi librement ; les coûts internes du catalogue ne sont pas automatiquement transformés en prix de vente. Les dates prévisionnelles ne créent pas d’intervention dans le planning.
+5. Choisir avance puis solde ou paiement intégral. Les montants déjà reçus se saisissent séparément avec date, moyen, référence et confirmation de réception. Seul le bouton **Enregistrer le devis** écrit la saisie en base ; aucune sauvegarde automatique dans le navigateur n’est utilisée.
+
+Les choix par fenêtre et leurs libellés sont conservés avec le devis et apparaissent dans le PDF. Les modifications ultérieures des options ne réécrivent pas les devis enregistrés. Une option devenue incompatible doit être remplacée lors de la prochaine modification du formulaire. La mise à jour du formulaire remet un devis en brouillon pour vérification ; Admin-CM conserve la validation et l’acceptation depuis la fiche.
+
+Les versements sont historisés dans `quote_payments` avec l’auteur, sans déclencher de débit. Après sauvegarde, ajouter les nouveaux versements dans **Dates et paiements**. Un paiement ne se modifie pas silencieusement : Admin-CM peut annuler une erreur de saisie avec un motif ; la trace reste consultable. Une annulation de saisie n’est pas un remboursement bancaire. Les cumuls ne peuvent pas dépasser le total, et le total ne peut pas être abaissé sous les montants déjà reçus. Ce suivi reste distinct du statut de règlement des factures.
+
+La migration `2026_09_25_000005` ajoute les options, configurations, dates et versements sans transformer les anciennes demandes. Le seed initialise les options une seule fois. Les jetons d’envoi préviennent les doublons de devis et de paiements ; un contrôle de version signale une modification concurrente du formulaire.
+
 ## Images et portfolio
 
 **Images & portfolio** permet de modifier le titre, la description, l’image et la visibilité du hero de l’accueil, des réalisations et de l’illustration de contact. **Ajouter une réalisation** crée une fiche masquée par défaut ; l’ordre numérique détermine sa place dans le portfolio. Les images des produits se modifient dans leur fiche **Catalogue**.

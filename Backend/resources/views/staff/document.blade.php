@@ -12,6 +12,10 @@
 @endif<p>Établi le {{ $date }} · {{ $title==='Devis' ? 'Validité' : 'Échéance' }} : {{ $due }}</p>
 <h2>{{ $customer['firstName'] ?? '' }} {{ $customer['lastName'] ?? '' }}</h2>
 <p class="address">{{ $customer['address'] ?? '' }} {{ $customer['city'] ?? '' }}<br>{{ $customer['email'] ?? '' }}<br>{{ $customer['phone'] ?? '' }}</p>
+@if(!empty($windows))<h2>Fenêtres et configurations</h2>
+@foreach($windows as $window)<p><strong>{{ $window['label'] }}</strong> · {{ $window['width'] }} × {{ $window['height'] }} cm · Qté {{ $window['quantity'] }}<br>{{ $window['product_name'] }} · {{ $window['material_name'] }} · {{ $window['finish_name'] }} · Motorisé : {{ $window['motorized'] ? 'Oui' : 'Non' }}<br>{{ $window['notes'] ?? '' }}</p>@endforeach
+@endif
+@if(!empty($schedule['delivery']) || !empty($schedule['installation']))<p>Livraison prévue : {{ $schedule['delivery'] ?: 'À préciser' }} · Pose prévue : {{ $schedule['installation'] ?: 'À préciser' }}</p>@endif
 <table>
 <thead>
 <tr>
@@ -33,6 +37,7 @@
 <p class="total">Sous-total : {{ number_format($totals['subtotal'],0,',',' ') }} FCFA<br>Taxe ({{ $tax_basis_points / 100 }} %) : {{ number_format($totals['tax'],0,',',' ') }} FCFA<br>
 <strong>Total : {{ number_format($totals['total'],0,',',' ') }} FCFA</strong>
 </p>
+@if(!empty($payment_plan['mode']))<p>Conditions : {{ $payment_plan['mode']==='full' ? 'Paiement intégral' : 'Avance de '.number_format($payment_plan['deposit'],0,',',' ').' FCFA puis solde' }}.<br>Versements reçus enregistrés à l’édition : {{ number_format($payment_plan['received'],0,',',' ') }} FCFA · Reste à recevoir : {{ number_format($totals['total']-$payment_plan['received'],0,',',' ') }} FCFA.</p>@endif
 <div class="footer">{{ $issuer['tax_note'] }}<br>{{ $issuer['payment_terms'] }}<br>Pour toute question : {{ $issuer['email'] }}</div>
 </body>
 </html>

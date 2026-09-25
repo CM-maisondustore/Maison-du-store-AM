@@ -3,6 +3,7 @@
 @section('title','Devis '.substr($quote->reference,0,8))
 @section('content')<div class="actions">
 @include('staff.status',['status'=>$quote->status])<a class="button secondary" href="{{ route('staff.quotes.pdf',$quote) }}">Télécharger le PDF</a>
+@if($quote->status!=='accepted' && (auth()->user()->isAdmin() || in_array($quote->status,['pending','draft'])))<a class="button" href="{{ route('staff.quotes.edit',$quote) }}">Ouvrir le formulaire complet</a>@endif
 @if(auth()->user()->isAdmin())<a class="button" href="{{ route('staff.messages.create',['quote_id'=>$quote->id]) }}">Préparer l’envoi du devis</a>
 @endif</div>
 <div class="grid">
@@ -27,7 +28,12 @@
 </div>
 <form class="panel" method="post" action="{{ route('staff.quotes.update',$quote) }}">
 @csrf
-@method('PUT')<h2>Mesures</h2>
+@method('PUT')
+<input type="hidden" name="edit_version" value="{{ $quote->edit_version }}">
+@if($quote->configuration)
+@include('staff.quote-windows-summary')
+@else
+<h2>Mesures</h2>
 <div id="dimensions">
 @foreach(old('dimensions',$quote->dimensions ?? []) as $index=>$line)
 @include('staff.dimension-line')
@@ -35,6 +41,7 @@
 <template id="dimensions-template">
 @include('staff.dimension-line',['index'=>'__INDEX__','line'=>[]])</template>
 <button type="button" class="secondary" data-add="dimensions">Ajouter une mesure</button>
+@endif
 <h2>Chiffrage</h2>
 <div id="lines">
 @foreach(old('lines',$quote->lines ?: [['description'=>'','quantity'=>1,'unit_price'=>0]]) as $index=>$line)
@@ -65,6 +72,7 @@
 <button @disabled($quote->status==='accepted' || (!auth()->user()->isAdmin() && !in_array($quote->status,['pending','draft'])))>Enregistrer le devis</button>
 </div>
 </form>
+@include('staff.quote-payments')
 @if(auth()->user()->isAdmin() && $quote->status==='accepted')<form class="panel" method="post" action="{{ route('staff.invoices.create',$quote) }}">
 @csrf<h2>Facturation</h2>
 <label>Date d’échéance<input type="date" name="due_date" required value="{{ now()->addDays(30)->format('Y-m-d') }}">
