@@ -22,6 +22,7 @@
   let modal = null;
   let content = null;
   let products = [];
+  let productsReady = Promise.resolve();
   let currentId = null;
 
   function byId(id) {
@@ -128,7 +129,9 @@
   }
 
   /** Ouvre (ou met à jour) le détail d'un produit. */
-  function open(id) {
+  async function open(id) {
+    // A card may be visible before the detail request has finished.
+    await productsReady;
     const product = byId(id);
     if (!product || !modal) return;
     currentId = product.id;
@@ -150,7 +153,9 @@
     content = modal && modal.querySelector('[data-product-detail]');
     if (!modal || !content) return;
 
-    MDS.api.getProducts().then(function (list) { products = list; });
+    productsReady = MDS.api.getProducts().then(function (list) { products = list; }).catch(function () {
+      if (MDS.notifications) MDS.notifications.error('Impossible de charger les fiches produits. Rechargez la page.');
+    });
 
     document.addEventListener('click', function (event) {
       const trigger = event.target.closest('[data-product-open]');
