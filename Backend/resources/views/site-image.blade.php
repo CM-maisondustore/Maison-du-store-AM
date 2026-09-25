@@ -1,0 +1,1 @@
+<img class="site-image site-image--{{ $format }}" src="{{ $entry->media->url() }}" alt="{{ $entry->image_alt ?: $entry->title }}" width="{{ $entry->media->width }}" height="{{ $entry->media->height }}" @if($format==='hero') fetchpriority="high" @else loading="lazy" @endif decoding="async">

@@ -10,6 +10,14 @@
    conteneur : le ratio et les coins arrondis sont conservés.
    ========================================================================== */
 
+.site-image { display:block; width:100%; height:auto; object-fit:cover; border-radius:var(--radius-md); }
+.site-image--hero { aspect-ratio:4/3.15; border-radius:var(--radius-lg); }
+.site-image--wide { aspect-ratio:7/4; }
+.site-image--map { aspect-ratio:5/3; }
+.site-image--card { aspect-ratio:16/10; border-radius:0; }
+.site-image--gallery { aspect-ratio:4/3; }
+.gallery-item__text { white-space:pre-line; overflow-wrap:anywhere; }
+
 .image-placeholder {
   position: relative;
   display: grid;

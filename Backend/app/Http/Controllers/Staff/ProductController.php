@@ -41,6 +41,7 @@ class ProductController
     {
         $product = DB::transaction(function () use ($request) {
             $product = Product::create($request->productData());
+            \App\Services\MediaStorage::apply($product, $request);
             Audit::record('produit_cree', $product);
             return $product;
         });
@@ -52,6 +53,7 @@ class ProductController
         DB::transaction(function () use ($request, $product) {
             $locked = Product::whereKey($product->id)->lockForUpdate()->firstOrFail();
             $locked->update($request->productData());
+            \App\Services\MediaStorage::apply($locked, $request);
             Audit::record('produit_modifie', $locked);
         });
         return redirect()->route('staff.products.edit', $product)->with('success', 'Produit, disponibilité, visibilité et coûts enregistrés.');

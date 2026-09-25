@@ -18,7 +18,7 @@
 <nav aria-label="Navigation interne">
 @php($menu = ['dashboard' => 'Vue d’ensemble', 'quotes.index' => 'Devis', 'appointments.index' => 'Rendez-vous', 'interventions.index' => 'Prestations'])
 @if(auth()->user()->isAdmin())
-@php($menu += ['contacts.index' => 'Clients & contacts', 'products.index' => 'Catalogue', 'invoices.index' => 'Factures', 'messages.index' => 'Messagerie', 'users.index' => 'Équipe'])
+@php($menu += ['contacts.index' => 'Clients & contacts', 'products.index' => 'Catalogue', 'contents.index' => 'Images & portfolio', 'invoices.index' => 'Factures', 'messages.index' => 'Messagerie', 'users.index' => 'Équipe'])
 @endif
 @foreach($menu as $route => $label)<a class="{{ request()->routeIs('staff.'.explode('.', $route)[0].'*') ? 'current' : '' }}" href="{{ route('staff.'.$route) }}">{{ $label }}</a>
 @endforeach

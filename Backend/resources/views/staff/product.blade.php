@@ -2,7 +2,7 @@
 @section('title', $product->exists ? 'Modifier le produit' : 'Nouveau produit')
 @section('content')
 <div class="actions"><a href="{{ route('staff.products.index') }}">← Retour au catalogue</a></div>
-<form method="post" action="{{ $product->exists ? route('staff.products.update',$product) : route('staff.products.store') }}">
+<form method="post" enctype="multipart/form-data" action="{{ $product->exists ? route('staff.products.update',$product) : route('staff.products.store') }}">
 @csrf
 @if($product->exists) @method('PUT') @endif
 <section class="panel">
@@ -52,6 +52,7 @@
 </div></div>
 <label>Fiche technique (une ligne « Libellé : valeur » par caractéristique)<textarea name="specs_text" maxlength="3000">{{ old('specs_text',collect($product->details['specs'] ?? [])->map(fn($s)=>$s['label'].' : '.$s['value'])->implode("\n")) }}</textarea></label>
 </section>
+<section class="panel">@include('staff.image-fields',['owner'=>$product])</section>
 <div class="actions"><button>Enregistrer le produit et les coûts</button><a href="{{ route('staff.products.index') }}">Retour au catalogue</a></div>
 </form>
 @endsection

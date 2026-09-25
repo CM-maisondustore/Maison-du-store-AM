@@ -73,8 +73,8 @@
       <div class="container hero__inner">
         <div class="hero__content">
           <p class="eyebrow">Artisans façonniers d’excellence</p>
-          <h1 class="hero__title">Stores &amp; Rideaux Sur Mesure</h1>
-          <p class="lead hero__text">L’élégance à votre fenêtre : confectionnés à Abidjan avec les plus beaux tissus et matières nobles pour sublimer durablement votre intérieur.</p>
+          <h1 class="hero__title">{{ $hero?->title ?? 'Stores & Rideaux Sur Mesure' }}</h1>
+          <p class="lead hero__text">{{ $hero?->description ?? 'L’élégance à votre fenêtre : confectionnés à Abidjan avec les plus beaux tissus et matières nobles pour sublimer durablement votre intérieur.' }}</p>
           <div class="hero__actions">
             <a class="btn btn--gold" href="{{ url('/devis') }}" data-action="quote">Demander un devis</a>
             <button type="button" class="btn btn--outline" data-action="appointment">Prendre rendez-vous</button>
@@ -82,7 +82,11 @@
           <p class="hero__meta"><svg class="icon" aria-hidden="true"><use href="#i-tools"/></svg> Pose professionnelle incluse par nos équipes à Abidjan</p>
         </div>
         <div class="hero__media">
+          @if($hero?->media)
+          @include('site-image',['entry'=>$hero,'format'=>'hero'])
+          @else
           <div class="image-placeholder image-placeholder--hero" aria-hidden="true"></div>
+          @endif
         </div>
       </div>
     </section>
@@ -196,26 +200,17 @@
           <h2>Inspirations &amp; Réalisations d’Intérieur</h2>
         </div>
         <div class="gallery-grid">
+          @foreach($portfolio as $entry)
           <article class="gallery-item">
+            @if($entry->media)
+            @include('site-image',['entry'=>$entry,'format'=>'wide'])
+            @else
             <div class="image-placeholder image-placeholder--wide" aria-hidden="true"></div>
-            <h3 class="gallery-item__title">Appartement Haussmannien</h3>
-            <p class="gallery-item__text">Voilages légers et rideaux tamisants en lin naturel.</p>
+            @endif
+            <h3 class="gallery-item__title">{{ $entry->title }}</h3>
+            <p class="gallery-item__text">{{ $entry->description }}</p>
           </article>
-          <article class="gallery-item">
-            <div class="image-placeholder image-placeholder--wide" aria-hidden="true"></div>
-            <h3 class="gallery-item__title">Villa Contemporaine</h3>
-            <p class="gallery-item__text">Stores californiens motorisés pour d’immenses baies vitrées.</p>
-          </article>
-          <article class="gallery-item">
-            <div class="image-placeholder image-placeholder--wide" aria-hidden="true"></div>
-            <h3 class="gallery-item__title">Chambre d’Hôtel Particulier</h3>
-            <p class="gallery-item__text">Rideaux occultants à doublure thermique et double tombé fluide.</p>
-          </article>
-          <article class="gallery-item">
-            <div class="image-placeholder image-placeholder--wide" aria-hidden="true"></div>
-            <h3 class="gallery-item__title">Bureau d’Anthracite</h3>
-            <p class="gallery-item__text">Stores intérieurs occultants gris anthracite tout en sobriété.</p>
-          </article>
+          @endforeach
         </div>
       </div>
     </section>
@@ -370,7 +365,13 @@
           </div>
         </div>
         <div class="map-card">
+          @if($contactIllustration?->media)
+          @include('site-image',['entry'=>$contactIllustration,'format'=>'map'])
+          <h3>{{ $contactIllustration->title }}</h3>
+          <p>{{ $contactIllustration->description }}</p>
+          @else
           <div class="image-placeholder image-placeholder--map" aria-hidden="true"></div>
+          @endif
           <a class="btn btn--gold btn--sm map-card__link" href="https://www.google.com/maps/search/?api=1&amp;query=Marché+Saint+Jean+Cocody+Abidjan" target="_blank" rel="noopener">
             <svg class="icon icon--sm" aria-hidden="true"><use href="#i-external"/></svg> Voir sur Google Maps
           </a>

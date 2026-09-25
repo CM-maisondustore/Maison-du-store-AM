@@ -13,6 +13,7 @@ class ProductRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
+            ...\App\Services\MediaStorage::rules(),
             'reference' => ['required', 'string', 'max:50', Rule::unique('products')->ignore($this->route('product'))],
             'name' => 'required|string|max:150', 'type' => 'required|in:store,rideau',
             'category' => 'required|string|max:150', 'description' => 'required|string|max:3000',

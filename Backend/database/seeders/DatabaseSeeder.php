@@ -9,6 +9,7 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        $this->call(SiteContentSeeder::class);
         $products = json_decode(file_get_contents(database_path('data/products.json')), true, 512, JSON_THROW_ON_ERROR);
         foreach ($products as $product) {
             $reference = $product['reference'];

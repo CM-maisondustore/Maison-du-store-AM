@@ -8,7 +8,8 @@ use App\Http\Controllers\AppointmentController;
 require __DIR__.'/staff.php';
 
 /* Pages publiques servies par cette application Laravel. */
-Route::view('/', 'home')->name('home');
+Route::get('/', App\Http\Controllers\HomeController::class)->name('home');
+Route::get('/media/{media}/{hash}', [App\Http\Controllers\MediaController::class, 'show'])->whereNumber('media')->where('hash', '[a-f0-9]{64}')->name('media.show');
 Route::view('/devis', 'quote')->name('quote');
 Route::get('/health/ready', App\Http\Controllers\ReadinessController::class)->middleware('throttle:60,1');
 Route::get('/robots.txt', function () {

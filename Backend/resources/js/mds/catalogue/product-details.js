@@ -93,10 +93,7 @@
     content.innerHTML =
       '<div class="product-detail">' +
         '<div class="product-detail__gallery">' +
-          '<div class="image-placeholder image-placeholder--gallery" aria-hidden="true"></div>' +
-          '<div class="product-detail__thumbs" aria-hidden="true">' +
-            '<div class="image-placeholder image-placeholder--tiny"></div>'.repeat(4) +
-          '</div>' +
+          (product.imageUrl ? '<img class="site-image site-image--gallery" src="' + esc(product.imageUrl) + '" alt="' + esc(product.imageAlt || product.name) + '">' : '<div class="image-placeholder image-placeholder--gallery" aria-hidden="true"></div>') +
         '</div>' +
         '<div class="product-detail__info">' +
           '<p class="eyebrow">' + esc(type.label) + ' · ' + esc(product.category) + '</p>' +

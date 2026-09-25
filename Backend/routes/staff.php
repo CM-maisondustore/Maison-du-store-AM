@@ -20,6 +20,8 @@ Route::prefix('admin')->group(function () {
         Route::put('prestations/{intervention}', [InterventionController::class, 'update'])->name('interventions.update');
         Route::post('prestations/{intervention}/devis', [QuoteController::class, 'onsite'])->name('interventions.quote');
         Route::middleware('admin')->group(function () {
+            Route::resource('contents', App\Http\Controllers\Staff\SiteContentController::class)->except(['show', 'destroy']);
+            Route::get('media/{media}', [App\Http\Controllers\MediaController::class, 'preview'])->whereNumber('media')->name('media.preview');
             Route::resource('contacts', ContactController::class)->only(['index', 'store', 'show', 'update']);
             Route::resource('products', ProductController::class)->except(['show', 'destroy']);
             Route::patch('products/{product}/visibility', [ProductController::class, 'visibility'])->name('products.visibility');

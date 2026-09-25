@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
+    public function media() { return $this->belongsTo(MediaAsset::class, 'media_asset_id')->select(['id', 'sha256', 'width', 'height']); }
     public const COSTS = ['material' => 'Matériel', 'making' => 'Confection', 'delivery' => 'Livraison', 'installation' => 'Pose'];
     public const COST_UNITS = ['item' => 'Par article', 'sqm' => 'Par m²', 'metre' => 'Par mètre linéaire', 'flat' => 'Au forfait'];
     protected $attributes = [

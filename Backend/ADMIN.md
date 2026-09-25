@@ -35,6 +35,16 @@ Dans **Catalogue**, rechercher un produit par nom ou référence et filtrer sa v
 
 La migration additive `2026_09_25_000003` ajoute les montants et leurs unités à `products`, sans modifier les produits existants. Le seed ne remplace pas les réglages saisis dans l’administration.
 
+## Images et portfolio
+
+**Images & portfolio** permet de modifier le titre, la description, l’image et la visibilité du hero de l’accueil, des réalisations et de l’illustration de contact. **Ajouter une réalisation** crée une fiche masquée par défaut ; l’ordre numérique détermine sa place dans le portfolio. Les images des produits se modifient dans leur fiche **Catalogue**.
+
+Importer des fichiers JPG, PNG ou WebP de 2 Mo maximum, avec au plus 6000 pixels par côté. Le formulaire permet de remplacer ou retirer une image et de renseigner son texte alternatif. Après une erreur de validation, sélectionner de nouveau le fichier. L’enregistrement du texte et du fichier est atomique.
+
+Les fichiers sont réellement stockés dans MySQL (`media_assets.payload`, encodage base64), et non dans le répertoire public : les sauvegardes MySQL incluent donc les images. La page et l’API ne chargent que leurs métadonnées et leurs URL ; les octets sont servis par une route dédiée. Les images de contenus masqués ne sont pas accessibles publiquement, tandis qu’Admin-CM dispose d’un aperçu protégé. Les remplacements et retraits suppriment les anciens fichiers devenus inutilisés.
+
+La migration `2026_09_25_000004` ajoute ces tables et le lien des images produits. Le seed importe le hero existant et les quatre descriptions initiales une seule fois ; les déploiements suivants préservent toutes les modifications. Le site public de production est rendu par Laravel ; `index.html` reste la maquette statique locale.
+
 ## Messagerie Hostinger Email
 
 Expéditeur et adresse de réponse : `contact@maisondustoream.com`.
