@@ -1,30 +1,46 @@
-
 @extends('staff.layout')
 @section('title', 'Catalogue')
-@section('content')<div class="actions">
-<a class="button" href="{{ route('staff.products.create') }}">Ajouter un produit</a>
+@section('content')
+<div class="stats">@foreach($counts as $label=>$count)<div class="stat"><strong>{{ $count }}</strong><span>{{ $label }}</span></div>@endforeach</div>
+<div class="actions"><a class="button" href="{{ route('staff.products.create') }}">Ajouter un produit</a></div>
+<form class="panel" method="get" action="{{ route('staff.products.index') }}">
+<div class="grid">
+<label>Rechercher<input name="q" maxlength="150" placeholder="Nom ou référence" value="{{ request('q') }}"></label>
+<label>Visibilité<select name="published"><option value="">Toutes</option>@foreach(['1'=>'Visible sur le site','0'=>'Masqué'] as $value=>$label)<option value="{{ $value }}" @selected((string)request('published')===(string)$value)>{{ $label }}</option>@endforeach</select></label>
+<label>Disponibilité<select name="available"><option value="">Toutes</option>@foreach(['1'=>'Disponible','0'=>'Sur commande'] as $value=>$label)<option value="{{ $value }}" @selected((string)request('available')===(string)$value)>{{ $label }}</option>@endforeach</select></label>
+<label>Type<select name="type"><option value="">Tous</option>@foreach(['store'=>'Store','rideau'=>'Rideau'] as $value=>$label)<option value="{{ $value }}" @selected(request('type')===$value)>{{ $label }}</option>@endforeach</select></label>
 </div>
-<div class="panel table-wrap">
-<table>
-<thead>
-<tr>
-<th>Référence</th>
-<th>Produit</th>
-<th>Disponibilité</th>
-<th>Publication</th>
-</tr>
-</thead>
-<tbody>
-@foreach($products as $product)<tr>
-<td>{{ $product->reference }}</td>
-<td>
-<a href="{{ route('staff.products.edit',$product) }}">{{ $product->details['name'] }}</a>
-<small>{{ $product->details['category'] }}</small>
-</td>
-<td>{{ $product->details['available'] ? 'Disponible' : 'Indisponible' }}</td>
-<td>{{ $product->published ? 'Visible sur le site' : 'Masqué' }}</td>
-</tr>
-@endforeach</tbody>
-</table>
+<div class="actions"><button>Filtrer</button><a href="{{ route('staff.products.index') }}">Réinitialiser</a></div>
+</form>
+<p class="muted">{{ $products->total() }} résultat(s). Les coûts restent internes ; les prix publics sont sur devis.</p>
+@forelse($products as $product)
+<article class="panel">
+<h2><a href="{{ route('staff.products.edit',$product) }}">{{ $product->details['name'] ?? $product->reference }}</a></h2>
+<p class="muted">{{ $product->reference }} · {{ $product->details['category'] ?? '' }}</p>
+<div class="grid">
+<div>
+<span class="badge">{{ $product->published ? 'Visible sur le site' : 'Masqué' }}</span>
+<span class="badge">{{ ($product->details['available'] ?? false) ? 'Disponible' : 'Sur commande' }}</span>
+<form method="post" action="{{ route('staff.products.visibility',$product) }}">
+@csrf @method('PATCH')
+<input type="hidden" name="published" value="0">
+<label class="check"><input type="checkbox" name="published" value="1" @checked($product->published)>Visible sur le site</label>
+<input type="hidden" name="available" value="0">
+<label class="check"><input type="checkbox" name="available" value="1" @checked($product->details['available'] ?? false)>Disponible</label>
+<div class="actions"><button class="secondary">Enregistrer les statuts</button></div>
+</form>
 </div>
+<dl class="detail-list">
+@foreach(\App\Models\Product::COSTS as $cost=>$label)
+<dt>{{ $label }}</dt>
+<dd>@if($product->{$cost.'_cost'}===null)Non renseigné@else{{ number_format($product->{$cost.'_cost'},0,',',' ') }} FCFA · {{ \App\Models\Product::COST_UNITS[$product->{$cost.'_cost_unit'}] }}@endif</dd>
+@endforeach
+</dl>
+</div>
+<div class="actions"><a class="button" href="{{ route('staff.products.edit',$product) }}">Modifier la fiche et les coûts</a></div>
+</article>
+@empty
+<div class="panel empty">Aucun produit ne correspond à ces critères.</div>
+@endforelse
+@include('staff.pagination',['paginator'=>$products])
 @endsection

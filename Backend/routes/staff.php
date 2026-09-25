@@ -22,6 +22,7 @@ Route::prefix('admin')->group(function () {
         Route::middleware('admin')->group(function () {
             Route::resource('contacts', ContactController::class)->only(['index', 'store', 'show', 'update']);
             Route::resource('products', ProductController::class)->except(['show', 'destroy']);
+            Route::patch('products/{product}/visibility', [ProductController::class, 'visibility'])->name('products.visibility');
             Route::put('rendez-vous/{appointment}', [AppointmentController::class, 'update'])->name('appointments.update');
             Route::post('prestations', [InterventionController::class, 'store'])->name('interventions.store');
             Route::get('equipe', [UserController::class, 'index'])->name('users.index');

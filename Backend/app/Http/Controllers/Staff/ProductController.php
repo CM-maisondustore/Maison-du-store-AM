@@ -1,21 +1,72 @@
 <?php
+
 namespace App\Http\Controllers\Staff;
+
+use App\Http\Requests\ProductRequest;
 use App\Models\Product;
 use App\Services\Audit;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
+
 class ProductController
 {
-    public function index() { return view('staff.products', ['products' => Product::orderBy('id')->get()]); }
+    public function index(Request $request)
+    {
+        $filters = $request->validate([
+            'q' => 'nullable|string|max:150', 'published' => 'nullable|in:0,1',
+            'available' => 'nullable|in:0,1', 'type' => 'nullable|in:store,rideau',
+        ]);
+        $query = Product::query();
+        if (!empty($filters['q'])) {
+            $query->where(fn ($q) => $q->where('reference', 'like', '%'.$filters['q'].'%')
+                ->orWhere('details->name', 'like', '%'.$filters['q'].'%'));
+        }
+        if ($request->filled('published')) $query->where('published', $request->boolean('published'));
+        if ($request->filled('available')) $query->where('details->available', $request->boolean('available'));
+        if ($request->filled('type')) $query->where('details->type', $filters['type']);
+        return view('staff.products', [
+            'products' => $query->orderBy('id')->paginate(20)->withQueryString(),
+            'counts' => [
+                'Produits' => Product::count(),
+                'Visibles sur le site' => Product::where('published', true)->count(),
+                'Disponibles' => Product::where('details->available', true)->count(),
+            ],
+        ]);
+    }
+
     public function create() { return view('staff.product', ['product' => new Product(['details' => []])]); }
     public function edit(Product $product) { return view('staff.product', compact('product')); }
-    public function store(Request $r) { $product = Product::create($this->data($r)); Audit::record('produit_cree', $product); return redirect()->route('staff.products.edit', $product)->with('success', 'Produit créé.'); }
-    public function update(Request $r, Product $product) { $product->update($this->data($r, $product)); Audit::record('produit_modifie', $product); return back()->with('success', 'Catalogue enregistré.'); }
-    private function data(Request $r, ?Product $product = null): array
+
+    public function store(ProductRequest $request)
     {
-        $data = $r->validate(['reference' => ['required', 'string', 'max:50', Rule::unique('products')->ignore($product)], 'name' => 'required|string|max:150', 'type' => 'required|in:store,rideau', 'category' => 'required|string|max:150', 'description' => 'required|string|max:3000', 'quoteModel' => 'required|string|max:150', 'features' => 'nullable|array', 'features.*' => 'in:occultant,tamisant,motorise,decoratif', 'colors' => 'nullable|array', 'colors.*' => 'in:blanc,ecru,beige,taupe,gris,anthracite,bleu,vert,bordeaux', 'specs_text' => 'nullable|string|max:3000', 'published' => 'nullable|boolean', 'available' => 'nullable|boolean', 'featured' => 'nullable|boolean']);
-        $specs = [];
-        foreach (preg_split('/\R/', $data['specs_text'] ?? '') as $line) if (str_contains($line, ':')) { [$label, $value] = explode(':', $line, 2); $specs[] = ['label' => trim($label), 'value' => trim($value)]; }
-        return ['reference' => $data['reference'], 'published' => $r->boolean('published'), 'details' => [...collect($data)->only(['name', 'type', 'category', 'description', 'quoteModel'])->all(), 'features' => $data['features'] ?? [], 'colors' => $data['colors'] ?? [], 'specs' => $specs, 'available' => $r->boolean('available'), 'featured' => $r->boolean('featured'), 'price' => 'Prix']];
+        $product = DB::transaction(function () use ($request) {
+            $product = Product::create($request->productData());
+            Audit::record('produit_cree', $product);
+            return $product;
+        });
+        return redirect()->route('staff.products.edit', $product)->with('success', 'Produit et coûts enregistrés.');
+    }
+
+    public function update(ProductRequest $request, Product $product)
+    {
+        DB::transaction(function () use ($request, $product) {
+            $locked = Product::whereKey($product->id)->lockForUpdate()->firstOrFail();
+            $locked->update($request->productData());
+            Audit::record('produit_modifie', $locked);
+        });
+        return redirect()->route('staff.products.edit', $product)->with('success', 'Produit, disponibilité, visibilité et coûts enregistrés.');
+    }
+
+    public function visibility(Request $request, Product $product)
+    {
+        $request->validate(['published' => 'required|boolean', 'available' => 'required|boolean']);
+        DB::transaction(function () use ($request, $product) {
+            $locked = Product::whereKey($product->id)->lockForUpdate()->firstOrFail();
+            $details = $locked->details;
+            $details['available'] = $request->boolean('available');
+            $locked->update(['published' => $request->boolean('published'), 'details' => $details]);
+            Audit::record('disponibilite_visibilite_modifiees', $locked);
+        });
+        return back()->with('success', 'Disponibilité et visibilité enregistrées.');
     }
 }

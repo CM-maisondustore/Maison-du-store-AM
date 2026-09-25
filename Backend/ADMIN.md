@@ -23,6 +23,18 @@ Les restrictions sont vérifiées sur le serveur, y compris les téléchargement
 5. **Factures** : préparer depuis un devis accepté, vérifier le PDF, puis émettre. L’émission fige les coordonnées de l’entreprise et du client, les montants et la taxe. Les numéros `MDS-0000001` sont uniques, issus de l’identifiant de la facture et ne sont jamais réutilisés. Enregistrer ensuite le paiement intégral reçu. Les acomptes, paiements partiels, avoirs et intégrations fiscales externes ne sont pas inclus dans cette première version.
 6. **Archives** : archiver un dossier masque son utilisation dans les nouvelles affectations sans effacer ses devis, rendez-vous, prestations, factures et messages. Aucun effacement métier n’est exposé dans cette interface.
 
+## Catalogue
+
+Dans **Catalogue**, rechercher un produit par nom ou référence et filtrer sa visibilité, sa disponibilité ou son type. Les statuts se modifient directement dans la liste avec **Enregistrer les statuts** ; la fiche complète permet de modifier les caractéristiques et les coûts.
+
+- **Visible sur le site** : inclut le produit dans le catalogue public. Un produit masqué reste dans la base interne. Les nouveaux produits sont masqués par défaut jusqu’à leur publication explicite.
+- **Disponible** : indique la disponibilité indépendamment de la publication. Un produit visible mais non disponible apparaît sur commande.
+- **Coûts internes** : matériel, confection, livraison et pose, en FCFA entiers. Chaque poste possède son unité : article, m², mètre linéaire ou forfait. Un montant vide signifie « non renseigné », tandis que 0 représente un coût nul. Aucun total automatique ne mélange des unités différentes.
+
+**Enregistrer le produit et les coûts** sauvegarde les informations en base MySQL ; elles sont rechargées à la réouverture. Les coûts ne sont accessibles qu’à Admin-CM et ne figurent jamais dans l’API publique. Les prix du site restent sur devis. Les coûts constituent des références internes ; ils ne recalculent pas automatiquement les devis existants. Les changements de statuts préservent les coûts et les caractéristiques enregistrés.
+
+La migration additive `2026_09_25_000003` ajoute les montants et leurs unités à `products`, sans modifier les produits existants. Le seed ne remplace pas les réglages saisis dans l’administration.
+
 ## Messagerie Hostinger Email
 
 Expéditeur et adresse de réponse : `contact@maisondustoream.com`.
