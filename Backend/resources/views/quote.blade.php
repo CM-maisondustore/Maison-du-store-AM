@@ -49,8 +49,10 @@
       <nav class="site-nav" aria-label="Navigation principale" id="site-nav">
         <ul class="site-nav__list">
           <li><a class="site-nav__link" data-nav-link href="{{ url('/') }}#accueil">Accueil</a></li>
+          @if($catalogueVisible)
           <li><a class="site-nav__link" data-nav-link href="{{ url('/') }}#catalogue">Stores</a></li>
           <li><a class="site-nav__link" data-nav-link href="{{ url('/') }}#catalogue">Rideaux</a></li>
+          @endif
           <li><a class="site-nav__link" data-nav-link href="{{ url('/') }}#realisations">Réalisations</a></li>
           <li><a class="site-nav__link" data-nav-link href="{{ url('/') }}#processus">À propos</a></li>
           <li><a class="site-nav__link" data-nav-link href="{{ url('/') }}#contact">Contact</a></li>
@@ -138,8 +140,10 @@
           <p class="site-footer__title">Navigation</p>
           <ul class="site-footer__list">
             <li><a href="{{ url('/') }}">Accueil</a></li>
+            @if($catalogueVisible)
             <li><a href="{{ url('/') }}#catalogue" data-action="catalogue" data-category="stores">Stores sur mesure</a></li>
             <li><a href="{{ url('/') }}#catalogue" data-action="catalogue" data-category="rideaux">Rideaux sur mesure</a></li>
+            @endif
             <li><a href="{{ url('/') }}#realisations">Nos réalisations</a></li>
             <li><a href="{{ url('/') }}#rendez-vous" data-action="appointment">Prendre rendez-vous</a></li>
           </ul>

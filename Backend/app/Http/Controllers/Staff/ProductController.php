@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Staff;
 
 use App\Http\Requests\ProductRequest;
 use App\Models\Product;
+use App\Models\SiteSetting;
 use App\Services\Audit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -24,11 +25,13 @@ class ProductController
         if ($request->filled('published')) $query->where('published', $request->boolean('published'));
         if ($request->filled('available')) $query->where('details->available', $request->boolean('available'));
         if ($request->filled('type')) $query->where('details->type', $filters['type']);
+        $catalogueVisible = SiteSetting::catalogueVisible();
         return view('staff.products', [
+            'catalogueVisible' => $catalogueVisible,
             'products' => $query->orderBy('id')->paginate(20)->withQueryString(),
             'counts' => [
                 'Produits' => Product::count(),
-                'Visibles sur le site' => Product::where('published', true)->count(),
+                'Visibles sur le site' => $catalogueVisible ? Product::where('published', true)->count() : 0,
                 'Disponibles' => Product::where('details->available', true)->count(),
             ],
         ]);
@@ -36,6 +39,18 @@ class ProductController
 
     public function create() { return view('staff.product', ['product' => new Product(['details' => []])]); }
     public function edit(Product $product) { return view('staff.product', compact('product')); }
+
+    public function catalogueVisibility(Request $request)
+    {
+        $request->validate(['visible' => 'required|boolean']);
+        DB::transaction(function () use ($request) {
+            $setting = SiteSetting::updateOrCreate(['key' => 'catalogue_visible'], ['enabled' => $request->boolean('visible')]);
+            Audit::record($setting->enabled ? 'catalogue_affiche' : 'catalogue_masque', $setting);
+        });
+        return redirect()->route('staff.products.index')->with('success', $request->boolean('visible')
+            ? 'Catalogue affiché sur le site. Les visibilités individuelles des produits sont conservées.'
+            : 'Catalogue masqué sur le site. Les produits restent disponibles dans l’espace pro.');
+    }
 
     public function store(ProductRequest $request)
     {

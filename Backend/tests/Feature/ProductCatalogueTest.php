@@ -95,4 +95,51 @@ class ProductCatalogueTest extends TestCase
         $this->get('/admin/products?'.http_build_query(['q' => $product->reference, 'published' => 0, 'available' => 0, 'type' => $product->details['type']]))->assertOk()->assertSee('32 100 FCFA');
         $this->get('/admin/products?'.http_build_query(['q' => $product->reference, 'available' => 1]))->assertOk()->assertSee('Aucun produit');
     }
+
+    public function test_global_visibility_hides_public_catalogue_and_restores_individual_choices(): void
+    {
+        $this->withoutVite();
+        $this->seed();
+        $hidden = Product::firstOrFail();
+        $hidden->update(['published' => false]);
+        $snapshot = Product::orderBy('id')->get()->toJson();
+        $visibleCount = Product::where('published', true)->count();
+        $this->get('/')->assertOk()->assertSee('id="catalogue"', false);
+        $this->getJson('/api/products')->assertJsonCount($visibleCount, 'data');
+
+        $this->actingAs($this->staff())->get('/admin/products')->assertOk()->assertSee('Masquer le catalogue');
+        $this->patch('/admin/catalogue/visibilite', ['visible' => 0])->assertRedirect('/admin/products')->assertSessionHasNoErrors();
+        $this->assertDatabaseHas('site_settings', ['key' => 'catalogue_visible', 'enabled' => false]);
+        $this->assertDatabaseHas('audit_events', ['action' => 'catalogue_masque']);
+        $this->get('/')->assertOk()->assertDontSee('id="catalogue', false)->assertDontSee('data-featured=', false)->assertDontSee('#catalogue', false)->assertSee('id="realisations"', false);
+        $this->get('/devis')->assertOk()->assertDontSee('#catalogue', false);
+        $this->getJson('/api/products')->assertExactJson(['data' => []]);
+        $this->get('/admin/products')->assertOk()->assertSee('Afficher le catalogue')->assertSee('Masqué avec le catalogue');
+        $this->get('/admin/devis/nouveau')->assertOk()->assertSee($hidden->reference);
+        $this->assertSame($snapshot, Product::orderBy('id')->get()->toJson());
+
+        $this->seed();
+        $this->getJson('/api/products')->assertExactJson(['data' => []]);
+        $this->patch('/admin/catalogue/visibilite', ['visible' => 1])->assertSessionHasNoErrors();
+        $this->get('/')->assertOk()->assertSee('id="catalogue"', false);
+        $this->get('/devis')->assertOk()->assertSee('#catalogue', false);
+        $this->getJson('/api/products')->assertJsonCount($visibleCount, 'data');
+        $this->assertFalse($hidden->fresh()->published);
+        $this->assertDatabaseHas('audit_events', ['action' => 'catalogue_affiche']);
+    }
+
+    public function test_global_visibility_is_admin_only(): void
+    {
+        $this->patch('/admin/catalogue/visibilite', ['visible' => 0])->assertRedirect('/admin/connexion');
+        $this->actingAs($this->staff('agent'))->patch('/admin/catalogue/visibilite', ['visible' => 0])->assertForbidden();
+        $this->assertDatabaseCount('site_settings', 0);
+    }
+
+    public function test_global_visibility_validates_input(): void
+    {
+        $this->actingAs($this->staff());
+        $this->patchJson('/admin/catalogue/visibilite', [])->assertUnprocessable();
+        $this->patchJson('/admin/catalogue/visibilite', ['visible' => 'invalid'])->assertUnprocessable();
+        $this->assertDatabaseCount('site_settings', 0);
+    }
 }

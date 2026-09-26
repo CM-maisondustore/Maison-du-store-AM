@@ -25,6 +25,7 @@ Route::prefix('admin')->group(function () {
         Route::put('prestations/{intervention}', [InterventionController::class, 'update'])->name('interventions.update');
         Route::post('prestations/{intervention}/devis', [QuoteController::class, 'onsite'])->name('interventions.quote');
         Route::middleware('admin')->group(function () {
+            Route::patch('catalogue/visibilite', [ProductController::class, 'catalogueVisibility'])->name('catalogue.visibility');
             Route::post('devis/{quote}/paiements/{payment}/annuler', [App\Http\Controllers\Staff\QuoteFormController::class, 'voidReceipt'])->name('quotes.receipt.void');
             Route::get('options-devis', [App\Http\Controllers\Staff\QuoteOptionController::class, 'index'])->name('quote-options.index');
             Route::post('options-devis', [App\Http\Controllers\Staff\QuoteOptionController::class, 'store'])->name('quote-options.store');

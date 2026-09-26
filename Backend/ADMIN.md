@@ -25,6 +25,8 @@ Les restrictions sont vérifiées sur le serveur, y compris les téléchargement
 
 ## Catalogue
 
+En haut de **Catalogue**, Admin-CM peut choisir **Masquer le catalogue** ou **Afficher le catalogue**. Le réglage est enregistré dans `site_settings` et retire les sections produits, leurs liens de navigation et les résultats de l’API publique. Le catalogue reste disponible dans l’espace interne et les formulaires de devis ; les visibilités individuelles des produits sont conservées à la réactivation. Par défaut, le catalogue reste affiché. Les changements sont inscrits dans le journal d’audit.
+
 Dans **Catalogue**, rechercher un produit par nom ou référence et filtrer sa visibilité, sa disponibilité ou son type. Les statuts se modifient directement dans la liste avec **Enregistrer les statuts** ; la fiche complète permet de modifier les caractéristiques et les coûts.
 
 - **Visible sur le site** : inclut le produit dans le catalogue public. Un produit masqué reste dans la base interne. Les nouveaux produits sont masqués par défaut jusqu’à leur publication explicite.

@@ -78,6 +78,11 @@ class SiteContentTest extends TestCase
         $this->put('/admin/products/'.$product->id,$data)->assertSessionHasNoErrors();
         $this->assertSame($asset->id,$product->fresh()->media_asset_id);
         $this->get($asset->url())->assertOk();
+        $this->patch('/admin/catalogue/visibilite', ['visible' => 0])->assertSessionHasNoErrors();
+        $this->get($asset->url())->assertNotFound();
+        $this->get('/admin/media/'.$asset->id)->assertOk();
+        $this->patch('/admin/catalogue/visibilite', ['visible' => 1])->assertSessionHasNoErrors();
+        $this->get($asset->url())->assertOk();
         $this->patch('/admin/products/'.$product->id.'/visibility',['published'=>0,'available'=>1])->assertSessionHasNoErrors();
         $this->get($asset->url())->assertNotFound();
     }
