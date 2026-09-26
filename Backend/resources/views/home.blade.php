@@ -238,7 +238,7 @@
           <div class="step">
             <p class="step__number">03</p>
             <h3>Fabrication Sur Mesure</h3>
-            <p class="step__text">Façonnage minutieux au sein de notre atelier partenaire en France selon les règles de l’art.</p>
+            <p class="step__text">Façonnage minutieux au sein de notre atelier partenaire en Côte d'Ivoire selon les règles de l’art.</p>
           </div>
           <div class="step">
             <p class="step__number">04</p>
@@ -376,7 +376,7 @@
           @else
           <div class="image-placeholder image-placeholder--map" aria-hidden="true"></div>
           @endif
-          <a class="btn btn--gold btn--sm map-card__link" href="https://www.google.com/maps/search/?api=1&amp;query=Marché+Saint+Jean+Cocody+Abidjan" target="_blank" rel="noopener">
+          <a class="btn btn--gold btn--sm map-card__link" href="https://www.google.com/maps/search/?api=1&amp;query=Maison+du+Store+AM" target="_blank" rel="noopener">
             <svg class="icon icon--sm" aria-hidden="true"><use href="#i-external"/></svg> Voir sur Google Maps
           </a>
         </div>
