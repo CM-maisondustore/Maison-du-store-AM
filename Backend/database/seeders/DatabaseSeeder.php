@@ -19,5 +19,6 @@ class DatabaseSeeder extends Seeder
             Product::firstOrCreate(['reference' => $reference], ['details' => $product]);
         }
         $this->call(QuoteOptionSeeder::class);
+        $this->call(QuoteTariffSeeder::class);
     }
 }

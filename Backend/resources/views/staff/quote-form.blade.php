@@ -14,6 +14,7 @@
 @csrf @if($quote->exists) @method('PUT') @endif
 <input type="hidden" name="submission_token" value="{{ old('submission_token',$quote->submission_token ?: (string)\Illuminate\Support\Str::uuid()) }}">
 <input type="hidden" name="edit_version" value="{{ old('edit_version',$quote->edit_version ?? 0) }}">
+<input type="hidden" name="calculation_token" value="{{ old('calculation_token',!empty($quote->configuration['calculation']) ? \App\Services\QuoteCosting::token($quote->configuration['calculation']) : '') }}">
 <section class="panel"><h2>Client</h2><div class="grid">
 @foreach(['firstName'=>'Prénom','lastName'=>'Nom / raison sociale','phone'=>'Téléphone','email'=>'E-mail','address'=>'Adresse de livraison et de pose','city'=>'Ville'] as $key=>$label)
 <label>{{ $label }}<input name="contact[{{ $key }}]" type="{{ $key==='email' ? 'email' : 'text' }}" @required(in_array($key,['lastName','phone','address'])) maxlength="{{ $key==='address' ? 1000 : ($key==='email' ? 255 : ($key==='phone' ? 50 : 100)) }}" value="{{ old('contact.'.$key,$quote->contact[$key] ?? '') }}"></label>
@@ -27,7 +28,10 @@
 <div id="quote-windows">@foreach($windows as $index=>$window) @include('staff.quote-window') @endforeach</div>
 <template id="quote-window-template">@include('staff.quote-window',['index'=>'__INDEX__','window'=>['inherit_defaults'=>true]])</template>
 <div class="actions"><button type="button" class="secondary" id="add-quote-window">Ajouter une fenêtre</button><span class="muted">30 fenêtres maximum</span></div>
-<section class="panel"><h2>Chiffrage du devis</h2><p class="muted">Renseignez les prestations, quantités et prix de vente en FCFA.</p>
+<section class="panel"><h2>Chiffrage du devis</h2><p class="muted">Calculez les lignes depuis le catalogue, puis ajustez librement les prix et descriptions avant d’enregistrer. Un nouveau calcul remplace les lignes de chiffrage actuelles.</p>
+<label>Mode de chiffrage<select name="use_catalogue"><option value="1" @selected(old('use_catalogue',!$quote->exists || !empty($quote->configuration['calculation']) ? '1' : '0')==='1')>À partir du catalogue</option><option value="0" @selected((string)old('use_catalogue',$quote->exists && empty($quote->configuration['calculation']) ? '0' : '1')==='0')>Saisie entièrement manuelle des lignes</option></select></label>
+<button type="button" id="calculate-quote" data-url="{{ route('staff.quotes.calculate') }}">Calculer depuis le catalogue</button>
+<p role="status" id="calculation-status">@if(!empty($quote->configuration['calculation']['pending']))Prix à définir : {{ implode(' ; ',$quote->configuration['calculation']['pending']) }}@endif</p>
 <div id="lines">@foreach(old('lines',$quote->lines ?: [['description'=>'Fourniture, confection et installation','quantity'=>1,'unit_price'=>0]]) as $index=>$line) @include('staff.price-line') @endforeach</div>
 <template id="lines-template">@include('staff.price-line',['index'=>'__INDEX__','line'=>[]])</template>
 <button type="button" class="secondary" data-add="lines">Ajouter une ligne</button>

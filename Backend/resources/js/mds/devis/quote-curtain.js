@@ -61,6 +61,13 @@
     return item ? (item.label || item.name) : '';
   }
 
+  const curtainChoices = Array.isArray(MDS.quoteOptions) ? MDS.quoteOptions.filter(o => o.category === 'rideau') : [
+    ...[['occultant-100','Tissu occultant 100 %'],['occultant-80','Tissu occultant 80 %'],['occultant-60','Tissu occultant 60 %'],['voilage-transparent','Voilage transparent'],['voilage-luxe','Voilage luxe']].map(([id,label]) => ({id,label,kind:'material'})),
+    ...[['wave-manuel','Wave manuel'],['wave-electric','Wave électrique'],['barre-fer','Barre de fer'],['reflete-manuel','Reflète manuelle']].map(([id,label]) => ({id,label,kind:'finish'})),
+    ...[['rail-double','Rail double','reflete-manuel'],['rail-simple','Rail simple','reflete-manuel'],['rail-wave-electric','Rail Wave électrique','wave-electric'],['rail-wave-manuel','Rail Wave manuel','wave-manuel'],['barre-double','Barre de fer double','barre-fer'],['barre-simple','Barre de fer simple','barre-fer']].map(([id,label,finish]) => ({id,label,kind:'support',finish_codes:[finish]}))
+  ];
+  [[FABRICS,'material'],[FINISHES,'finish'],[HANGINGS,'support']].forEach(([list,kind]) => list.splice(0,list.length,...curtainChoices.filter(o=>o.kind===kind).map(o=>({text:'À confirmer avec votre conseiller.',icon:'i-curtain',...o}))));
+
   function renderChoiceList(name, options, selected, withIcon) {
     return '<div class="choice-list" role="radiogroup">' + options.map(function (o) {
       const checked = selected === o.id;
@@ -191,11 +198,13 @@
   /* --- Étape 6 : pose & support ---------------------------------------------------- */
 
   function renderHanging(container, state) {
+    const compatible = HANGINGS.filter(h=>!h.finish_codes?.length || h.finish_codes.includes(state.curtain.finish));
+    if (!compatible.some(h=>h.id===state.curtain.hanging)) state.curtain.hanging='';
     container.innerHTML =
       '<h2 class="step__heading">Mode de pose &amp; support</h2>' +
       '<p class="step__intro">Choisissez le support adapté à votre mur ou plafond. Nos équipes ajustent l\u2019effort de pose.</p>' +
       '<div class="option-grid" role="radiogroup" aria-label="Mode de pose">' +
-      HANGINGS.map(function (h) {
+      compatible.map(function (h) {
         const checked = state.curtain.hanging === h.id;
         return (
           '<label class="option-tile' + (checked ? ' is-selected' : '') + '">' +
@@ -207,7 +216,7 @@
         );
       }).join('') + '</div>' +
       '<div class="notice"><svg class="icon" aria-hidden="true"><use href="#i-tools"/></svg>' +
-      '<span>Installation professionnelle incluse dans votre service Atelier : nos monteurs qualifiés s\u2019occupent de la levée, du transport et de la pose pour une finition impeccable.</span></div>';
+      '<span>Le prix de la pose des rideaux sera défini dans votre devis après étude de votre installation.</span></div>';
   }
   function collectHanging(container) {
     const c = container.querySelector('input[name="curtain-hanging"]:checked');

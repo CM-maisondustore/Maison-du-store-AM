@@ -2,6 +2,24 @@
 
 Accès : `/admin/connexion`. Aucun compte client ni inscription publique.
 
+## Chiffrage depuis le catalogue
+
+Dans **Catalogue → Tarifs, matériaux et finitions des devis**, Admin-CM modifie les libellés, prix en FCFA, unités, compatibilités et disponibilités. Les matériaux, finitions et supports cochés « demande de devis publique » alimentent le formulaire public sans exposer leurs prix. Les coûts généraux d'une fiche produit restent distincts de cette grille de chiffrage par composant.
+
+Les tarifs initiaux ajoutés par `QuoteTariffSeeder` sont conservés en base : occultants 100/80/60 % à 12 000/9 000/7 000 FCFA/m, voilages transparent/luxe à 4 000/14 000 FCFA/m, rails double/simple/Wave électrique/Wave manuel à 10 000/5 000/22 000/7 000 FCFA/m, barres double/simple à 7 000/4 000 FCFA/m, reflètes 4 files/3 files/Wave à 900/500/1 500 FCFA/m, accroches à 2 000 FCFA le lot de 100, confection à 1 000 FCFA/m, stores lourd/léger à 25 000/18 000 FCFA/m², kit moteur store à 100 000 FCFA/pièce et pose store à Abidjan à 5 000 FCFA/ouverture. Les anciens choix sont conservés. Relancer le seed n'écrase aucun tarif modifié.
+
+Dans le formulaire de devis Admin-CM/Agent :
+
+- Saisir chaque fenêtre, puis les quantités **pour une ouverture**. La quantité de fenêtres identiques multiplie ces postes. Le tissu, les supports, les reflètes et la confection sont métrés manuellement. Aucun coefficient de plis n'est supposé.
+- Pour les matériaux au m², la surface est largeur × hauteur en cm / 10 000. Les accroches se saisissent en lots entiers de 100.
+- Choisir les composants compatibles avec la finition. La motorisation des stores exige le kit moteur. Le rail Wave électrique des rideaux est facturé au mètre ; aucun kit store n'est ajouté aux rideaux.
+- Saisir le prix de pose des rideaux dans chaque devis. Hors Abidjan, la pose des stores doit aussi être chiffrée explicitement. Un prix vide est **à définir**, pas zéro. Un brouillon incomplet est conservable mais ne peut pas être validé ; le PDF signale les postes non inclus.
+- Cliquer **Calculer depuis le catalogue** : cela remplace les lignes actuelles après confirmation. Les montants sont arrondis au FCFA par poste et ouverture, puis multipliés par le nombre d'ouvertures. Les prix unitaires des lignes représentent ainsi le poste complet pour une ouverture ; le détail du métrage et du tarif apparaît dans la désignation.
+- Ajuster librement les lignes commerciales, puis enregistrer. Tout changement de mesures, composants ou quantités exige un nouveau calcul. Les tarifs utilisés, les quantités et le calcul initial sont archivés dans `quotes.configuration`, distincts des lignes commerciales ajustées. Un changement ultérieur du catalogue ne recalcule pas les devis enregistrés.
+- Le mode **Saisie entièrement manuelle** reste disponible pour les dossiers particuliers et anciens devis : l'opérateur renseigne alors toutes les prestations, dont la pose, dans les lignes.
+
+Le calcul est effectué côté serveur, sans sauvegarde de dossier pendant la préparation. Un résultat signé empêche de modifier silencieusement le détail calculé ; les lignes commerciales restent volontairement éditables. Les devis acceptés/facturés restent verrouillés.
+
 ## Rôles
 
 | Fonction | Admin-CM | Agent |

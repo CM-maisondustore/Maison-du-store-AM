@@ -21,6 +21,7 @@
 @endif
 @if(!empty($schedule['delivery']) || !empty($schedule['installation']))<p>Livraison prévue : {{ $schedule['delivery'] ?: 'À préciser' }} · Pose prévue : {{ $schedule['installation'] ?: 'À préciser' }}</p>@endif
 <table>
+@if(!empty($pending_costs))<caption>Chiffrage provisoire — postes non inclus, à définir : {{ implode(' ; ',$pending_costs) }}</caption>@endif
 <thead>
 <tr>
 <th>Désignation</th>

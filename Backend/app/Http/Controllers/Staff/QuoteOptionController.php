@@ -5,12 +5,16 @@ use App\Services\Audit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\Rule;
 class QuoteOptionController
 {
     public function index() { return view('staff.quote-options',['options'=>QuoteOption::orderBy('category')->orderBy('kind')->orderBy('label')->get(),'products'=>Product::select('id','reference','details')->get()]); }
     private function data(Request $r): array
     {
-        $data=$r->validate(['label'=>'required|string|max:150','kind'=>'required|in:material,finish','category'=>'required|in:store,rideau','motorization'=>'required|in:any,yes,no','active'=>'required|boolean','product_ids'=>'nullable|array|max:100','product_ids.*'=>'integer|distinct|exists:products,id']);
+        $data=$r->validate(['label'=>'required|string|max:150','kind'=>['required',Rule::in(array_keys(QuoteOption::KINDS))],'category'=>'required|in:store,rideau','motorization'=>'required|in:any,yes,no','active'=>'required|boolean','product_ids'=>'nullable|array|max:100','product_ids.*'=>'integer|distinct|exists:products,id',
+            'public_choice'=>'sometimes|boolean','unit_price'=>'sometimes|nullable|integer|min:0|max:100000000','unit'=>['sometimes','required',Rule::in(array_keys(QuoteOption::UNITS))],
+            'finish_codes'=>'sometimes|nullable|array|max:100','finish_codes.*'=>['string','distinct',Rule::exists('quote_options','code')->where('kind','finish')->where('category',$r->input('category'))]]);
+        if ($r->has('tariff_form')) $data['finish_codes']=$data['finish_codes'] ?? [];
         $data['product_ids']=array_map('intval',$data['product_ids'] ?? []);
         if (Product::whereIn('id',$data['product_ids'])->where('details->type','!=',$data['category'])->exists()) throw ValidationException::withMessages(['product_ids'=>'Tous les types sélectionnés doivent appartenir à la catégorie choisie.']);
         return $data;

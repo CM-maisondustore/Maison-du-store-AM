@@ -12,7 +12,7 @@ class Documents
     {
         $presentation=CommunicationTemplates::presentation('quote');
         return ['presentation'=>$presentation, 'title' => 'Devis', 'number' => $quote->reference, 'draft' => !in_array($quote->status, ['approved', 'accepted']), 'date' => $quote->quote_date ? \Carbon\Carbon::parse($quote->quote_date)->format('d/m/Y') : $quote->created_at->format('d/m/Y'), 'due' => $quote->valid_until, 'issuer' => CommunicationTemplates::issuer($presentation), 'customer' => $quote->contact, 'lines' => $quote->lines ?? [], 'tax_basis_points' => $quote->tax_basis_points,
-            'windows'=>$quote->configuration ? $quote->dimensions : [], 'schedule'=>['delivery'=>$quote->delivery_date,'installation'=>$quote->installation_date],
+            'windows'=>$quote->configuration ? $quote->dimensions : [], 'pending_costs'=>$quote->configuration['calculation']['pending'] ?? [], 'schedule'=>['delivery'=>$quote->delivery_date,'installation'=>$quote->installation_date],
             'payment_plan'=>['mode'=>$quote->payment_mode,'deposit'=>$quote->deposit_amount,'received'=>$quote->receivedAmount()]];
     }
     public function invoice(Invoice $invoice): string

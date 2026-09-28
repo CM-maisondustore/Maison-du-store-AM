@@ -21,6 +21,10 @@ class QuoteFormController
         return view('staff.quote-form',['quote'=>$quote,'catalogue'=>StaffQuoteData::catalogue(),'agents'=>User::where('role','agent')->where('active',true)->get()]);
     }
     public function create() { return $this->form(new Quote(['contact'=>[],'dimensions'=>[],'edit_version'=>0,'submission_token'=>(string)Str::uuid()])); }
+    public function calculate(Request $r) {
+        $data=\App\Services\QuoteCosting::calculate($r);
+        return response()->json(['lines'=>$data['lines'],'pending'=>$data['pending'],'token'=>\App\Services\QuoteCosting::token($data)]);
+    }
     public function edit(Request $r,Quote $quote) { $this->access($r,$quote,true); return $this->form($quote); }
     private function contact(array $data,?Quote $quote=null): Contact
     {

@@ -55,6 +55,9 @@
     return item ? (item.label || item.name) : '';
   }
 
+  const storeMaterials=Array.isArray(MDS.quoteOptions) ? MDS.quoteOptions.filter(o=>o.category==='store' && o.kind==='material') : [{id:'store-lourd',label:'Store lourd',text:'Toile lourde sur mesure.'},{id:'store-leger',label:'Store léger',text:'Toile légère sur mesure.'}];
+  FINISHES.splice(0,FINISHES.length,...storeMaterials);
+
   /* --- Étape 1 : modèle de store ------------------------------------------- */
 
   function renderModel(container, state) {

@@ -10,7 +10,7 @@
 <button>{{ $catalogueVisible ? 'Masquer le catalogue' : 'Afficher le catalogue' }}</button>
 </form>
 <div class="stats">@foreach($counts as $label=>$count)<div class="stat"><strong>{{ $count }}</strong><span>{{ $label }}</span></div>@endforeach</div>
-<div class="actions"><a class="button" href="{{ route('staff.products.create') }}">Ajouter un produit</a></div>
+<div class="actions"><a class="button" href="{{ route('staff.products.create') }}">Ajouter un produit</a><a class="button" href="{{ route('staff.quote-options.index') }}">Tarifs, matériaux et finitions des devis</a></div>
 <form class="panel" method="get" action="{{ route('staff.products.index') }}">
 <div class="grid">
 <label>Rechercher<input name="q" maxlength="150" placeholder="Nom ou référence" value="{{ request('q') }}"></label>

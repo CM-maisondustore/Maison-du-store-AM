@@ -173,6 +173,7 @@
 
   <script>
     window.MDS = {
+      quoteOptions: @json(\App\Services\PublicQuoteChoices::data()),
       config: {
         business: { timezone: @json(config('app.timezone')) },
         routes: { home: @json(url('/')), quote: @json(url('/devis')) },

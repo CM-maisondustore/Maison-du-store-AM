@@ -46,6 +46,11 @@ class QuoteRequest extends FormRequest
             'hanging' => ['tringle', 'rail-chemin', 'rail-wave', 'sans'],
         ];
         $colors = ['blanc', 'ecru', 'beige', 'taupe', 'gris', 'anthracite'];
+        $options=\App\Services\PublicQuoteChoices::options()->where('category',$store ? 'store' : 'rideau');
+        foreach (($store ? ['finish'=>'material'] : ['fabric'=>'material','finish'=>'finish','hanging'=>'support']) as $field=>$kind) {
+            $codes=$options->where('kind',$kind)->pluck('code')->all();
+            $choices[$field]=array_values(array_unique([...$choices[$field],...$codes]));
+        }
         $choices['color'] = $store ? $colors : [...$colors, 'bleu', 'vert', 'bordeaux'];
         $keys = array_keys($choices);
         if ($store) $keys[] = 'powerSource';
@@ -79,5 +84,15 @@ class QuoteRequest extends FormRequest
             $rules['product.powerSource'] = ['exclude_unless:product.control,motorisee', 'required', Rule::in(['filaire', 'batterie', 'solaire'])];
         }
         return $rules;
+    }
+    public function after(): array
+    {
+        return [function (\Illuminate\Validation\Validator $validator) {
+            if ($validator->errors()->isNotEmpty() || $this->routeIs('quotes.stores')) return;
+            $options=\App\Services\PublicQuoteChoices::options();
+            $finish=$options->firstWhere('code',$this->input('product.finish'));
+            $support=$options->firstWhere('code',$this->input('product.hanging'));
+            if ($support && (($support->finish_codes && !in_array($finish?->code,$support->finish_codes,true)) || ($finish && $support->motorization!=='any' && $finish->motorization!=='any' && $support->motorization!==$finish->motorization))) $validator->errors()->add('product.hanging','Le support ne correspond pas à la finition choisie.');
+        }];
     }
 }

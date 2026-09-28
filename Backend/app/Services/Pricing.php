@@ -10,7 +10,7 @@ class Pricing
             $r->merge(['tax_basis_points' => (int) round((float) $r->input('tax_rate') * 100)]);
         }
         $data = $r->validate([
-            'lines' => 'required|array|min:1|max:30', 'lines.*.description' => 'required|string|max:250',
+            'lines' => 'required|array|min:1|max:300', 'lines.*.description' => 'required|string|max:250',
             'lines.*.quantity' => 'required|integer|min:1|max:1000', 'lines.*.unit_price' => 'required|integer|min:0|max:100000000',
             'tax_basis_points' => 'required|integer|min:0|max:10000',
         ]);

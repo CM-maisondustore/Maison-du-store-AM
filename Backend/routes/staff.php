@@ -12,6 +12,7 @@ Route::prefix('admin')->group(function () {
         Route::get('devis', [QuoteController::class, 'index'])->name('quotes.index');
         Route::get('devis/nouveau', [App\Http\Controllers\Staff\QuoteFormController::class, 'create'])->name('quotes.create');
         Route::post('devis', [App\Http\Controllers\Staff\QuoteFormController::class, 'store'])->name('quotes.store');
+        Route::post('devis/chiffrer', [App\Http\Controllers\Staff\QuoteFormController::class, 'calculate'])->middleware('throttle:60,1')->name('quotes.calculate');
         Route::get('devis/{quote}/formulaire', [App\Http\Controllers\Staff\QuoteFormController::class, 'edit'])->name('quotes.edit');
         Route::put('devis/{quote}/formulaire', [App\Http\Controllers\Staff\QuoteFormController::class, 'update'])->name('quotes.form.update');
         Route::post('devis/{quote}/paiements', [App\Http\Controllers\Staff\QuoteFormController::class, 'receipt'])->name('quotes.receipt');

@@ -9,7 +9,7 @@ class StaffQuoteData
     public static function catalogue(): array
     {
         return ['products'=>Product::select('id','reference','details','published')->get()->map(fn($p)=>['id'=>$p->id,'name'=>$p->details['name'],'category'=>$p->details['type'],'reference'=>$p->reference,'published'=>$p->published])->all(),
-            'options'=>QuoteOption::orderBy('label')->get(['id','kind','category','label','product_ids','motorization','active'])->toArray()];
+            'options'=>QuoteOption::orderByRaw('CASE WHEN unit_price IS NULL THEN 1 ELSE 0 END')->orderBy('label')->get(['id','code','kind','category','label','product_ids','motorization','active','unit_price','unit','finish_codes'])->toArray()];
     }
     public static function validate(Request $r): array
     {
@@ -28,14 +28,19 @@ class StaffQuoteData
         if (!empty($data['delivery_date']) && !empty($data['installation_date']) && $data['installation_date']<$data['delivery_date']) throw ValidationException::withMessages(['installation_date'=>'La pose doit être prévue à partir de la livraison.']);
         $defaults=self::selection($data['defaults'],'defaults'); $dimensions=[];
         foreach ($data['windows'] as $i=>$window) $dimensions[]=[...self::selection(!empty($window['inherit_defaults']) ? $data['defaults'] : $window,'windows.'.$i),'inherit_defaults'=>(bool)($window['inherit_defaults'] ?? false),'label'=>$window['label'],'width'=>(float)$window['width'],'height'=>(float)$window['height'],'quantity'=>(int)$window['quantity'],'notes'=>$window['notes'] ?? ''];
+        $calculation=QuoteCosting::saved($r);
+        if ($calculation) {
+            foreach ($dimensions as $i=>&$dimension) $dimension['costing']=$calculation['windows'][$i]['costing'];
+            unset($dimension);
+        }
         $total=Pricing::totals($pricing['lines'],$pricing['tax_basis_points'])['total'];
         if ($data['deposit_amount']>$total) throw ValidationException::withMessages(['deposit_amount'=>'L’avance prévue ne peut pas dépasser le total du devis.']);
         return [...collect($data)->only(['quote_date','valid_until','delivery_date','installation_date','internal_notes','payment_mode','agent_id'])->all(),...$pricing,
             'deposit_amount'=>$data['payment_mode']==='full' ? 0 : (int)$data['deposit_amount'],
             'contact'=>collect($data['contact'])->only(['firstName','lastName','email','phone','address','city'])->all(),
-            'type'=>$defaults['category'],'configuration'=>['defaults'=>$defaults], 'product'=>['model'=>$defaults['product_name'],'fabric'=>$defaults['material_name'],'finish'=>$defaults['finish_name'],'control'=>$defaults['motorized'] ? 'Motorisée' : 'Manuelle'], 'dimensions'=>$dimensions];
+            'type'=>$defaults['category'],'configuration'=>['defaults'=>$defaults,'calculation'=>$calculation], 'product'=>['model'=>$defaults['product_name'],'fabric'=>$defaults['material_name'],'finish'=>$defaults['finish_name'],'control'=>$defaults['motorized'] ? 'Motorisée' : 'Manuelle'], 'dimensions'=>$dimensions];
     }
-    private static function selection(array $value,string $prefix): array
+    public static function selection(array $value,string $prefix): array
     {
         $p=Product::find($value['product_id']);
         if (!$p || ($p->details['type'] ?? '')!==$value['category']) throw ValidationException::withMessages([$prefix.'.product_id'=>'Sélectionnez un type de la catégorie choisie.']);
