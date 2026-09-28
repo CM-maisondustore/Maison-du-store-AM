@@ -5,9 +5,13 @@
 <style>body{font-family:DejaVu Sans,sans-serif;font-size:11px;color:#243831}h1{font-size:26px}h2{font-size:15px}.muted{color:#667368}table{width:100%;border-collapse:collapse;margin-top:25px}th,td{padding:10px 7px;border-bottom:1px solid #ddd;text-align:left}.total{text-align:right;font-size:17px;margin-top:20px}.draft{padding:12px;background:#fff0dc;font-size:18px}.footer{margin-top:35px;font-size:10px;white-space:pre-wrap}.address{white-space:pre-wrap}</style>
 </head>
 <body>
+@php($presentation = $presentation ?? [])
+<style>h1,h2,th{color:{{ preg_match('/^#[0-9a-fA-F]{6}$/',$presentation['accent'] ?? '') ? $presentation['accent'] : '#243831' }}}.document-logo{max-width:180px;max-height:90px}.document-text{white-space:pre-wrap}</style>
+@if(!empty($presentation['logo']))<img class="document-logo" src="{{ $presentation['logo'] }}" alt="Logo">@endif
 <h2>{{ $issuer['name'] }}</h2>
 <p class="address">{{ $issuer['address'] }}<br>{{ $issuer['registration'] }}<br>{{ $issuer['email'] }}</p>
 <h1>{{ $title }} {{ $number }}</h1>
+@if(!empty($presentation['introduction']))<p class="document-text">{{ $presentation['introduction'] }}</p>@endif
 @if($draft)<p class="draft">BROUILLON — non émis</p>
 @endif<p>Établi le {{ $date }} · {{ $title==='Devis' ? 'Validité' : 'Échéance' }} : {{ $due }}</p>
 <h2>{{ $customer['firstName'] ?? '' }} {{ $customer['lastName'] ?? '' }}</h2>
@@ -39,5 +43,7 @@
 </p>
 @if(!empty($payment_plan['mode']))<p>Conditions : {{ $payment_plan['mode']==='full' ? 'Paiement intégral' : 'Avance de '.number_format($payment_plan['deposit'],0,',',' ').' FCFA puis solde' }}.<br>Versements reçus enregistrés à l’édition : {{ number_format($payment_plan['received'],0,',',' ') }} FCFA · Reste à recevoir : {{ number_format($totals['total']-$payment_plan['received'],0,',',' ') }} FCFA.</p>@endif
 <div class="footer">{{ $issuer['tax_note'] }}<br>{{ $issuer['payment_terms'] }}<br>Pour toute question : {{ $issuer['email'] }}</div>
+@if(!empty($presentation['footer']))<p class="footer">{{ $presentation['footer'] }}</p>@endif
+@if(!empty($presentation['signature']))<p class="footer">{{ $presentation['signature'] }}</p>@endif
 </body>
 </html>

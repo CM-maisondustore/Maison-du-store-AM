@@ -11,6 +11,7 @@ class Appointment extends Model
     protected static function booted(): void
     {
         static::saving(function (Appointment $appointment) {
+            if ($appointment->status==='confirmed' && $appointment->isDirty(['status','date','time'])) $appointment->confirmed_at=now();
             $appointment->reserved_slot = $appointment->status === 'cancelled' ? null : $appointment->date.' '.$appointment->time;
         });
     }

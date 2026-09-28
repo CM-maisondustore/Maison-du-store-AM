@@ -5,6 +5,8 @@
 @unless($configured)<div class="notice">Connexion Hostinger Email à activer. Vous pouvez déjà préparer des brouillons et consulter l’historique enregistré.</div>
 @endunless<div class="actions">
 <a class="button" href="{{ route('staff.messages.create') }}">Nouveau message</a>
+<a class="button secondary" href="{{ route('staff.messages.create',['channel'=>'whatsapp']) }}">Nouveau WhatsApp</a>
+<a href="{{ route('staff.communications.index') }}">Modèles & automatisations</a>
 <a href="{{ route('staff.messages.index',['direction'=>'incoming']) }}">Reçus</a>
 <a href="{{ route('staff.messages.index',['direction'=>'outgoing']) }}">Brouillons & envois</a>
 <a href="https://mail.hostinger.com" target="_blank" rel="noopener">Ouvrir le webmail</a>
@@ -31,6 +33,7 @@
 @forelse($messages as $message)<tr>
 <td>
 <a href="{{ route('staff.messages.show',$message) }}">{{ $message->subject ?: '(sans objet)' }}</a>
+<small>{{ $message->channel==='whatsapp' ? 'WhatsApp manuel' : 'E-mail' }}</small>
 @if($message->direction==='incoming' && !$message->read_at)<small>Non lu</small>
 @endif</td>
 <td>{{ $message->direction==='incoming' ? $message->sender : $message->recipient }}<small>{{ $message->contact?->name }}</small>

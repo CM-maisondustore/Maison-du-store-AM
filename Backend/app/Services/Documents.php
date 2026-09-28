@@ -10,17 +10,20 @@ class Documents
     }
     public function quoteData(Quote $quote): array
     {
-        return ['title' => 'Devis', 'number' => $quote->reference, 'draft' => !in_array($quote->status, ['approved', 'accepted']), 'date' => $quote->quote_date ? \Carbon\Carbon::parse($quote->quote_date)->format('d/m/Y') : $quote->created_at->format('d/m/Y'), 'due' => $quote->valid_until, 'issuer' => config('workspace.issuer'), 'customer' => $quote->contact, 'lines' => $quote->lines ?? [], 'tax_basis_points' => $quote->tax_basis_points,
+        $presentation=CommunicationTemplates::presentation('quote');
+        return ['presentation'=>$presentation, 'title' => 'Devis', 'number' => $quote->reference, 'draft' => !in_array($quote->status, ['approved', 'accepted']), 'date' => $quote->quote_date ? \Carbon\Carbon::parse($quote->quote_date)->format('d/m/Y') : $quote->created_at->format('d/m/Y'), 'due' => $quote->valid_until, 'issuer' => CommunicationTemplates::issuer($presentation), 'customer' => $quote->contact, 'lines' => $quote->lines ?? [], 'tax_basis_points' => $quote->tax_basis_points,
             'windows'=>$quote->configuration ? $quote->dimensions : [], 'schedule'=>['delivery'=>$quote->delivery_date,'installation'=>$quote->installation_date],
             'payment_plan'=>['mode'=>$quote->payment_mode,'deposit'=>$quote->deposit_amount,'received'=>$quote->receivedAmount()]];
     }
     public function invoice(Invoice $invoice): string
     {
+        if ($archive=\App\Models\DocumentArchive::where('invoice_id',$invoice->id)->first()) return $archive->contents();
         return $this->render($this->invoiceData($invoice));
     }
     public function invoiceData(Invoice $invoice): array
     {
-        return [...$invoice->snapshot, 'title' => 'Facture', 'number' => $invoice->number ?? 'BROUILLON-'.$invoice->id, 'draft' => !$invoice->issued_at, 'date' => ($invoice->issued_at ?? $invoice->created_at)->format('d/m/Y'), 'due' => $invoice->due_date->format('d/m/Y')];
+        $presentation=$invoice->issued_at ? ($invoice->snapshot['presentation'] ?? []) : CommunicationTemplates::presentation('invoice');
+        return [...$invoice->snapshot, 'issuer'=>$invoice->issued_at ? $invoice->snapshot['issuer'] : CommunicationTemplates::issuer($presentation), 'presentation'=>$presentation, 'title' => 'Facture', 'number' => $invoice->number ?? 'BROUILLON-'.$invoice->id, 'draft' => !$invoice->issued_at, 'date' => ($invoice->issued_at ?? $invoice->created_at)->format('d/m/Y'), 'due' => $invoice->due_date->format('d/m/Y')];
     }
     public function render(array $data): string
     {

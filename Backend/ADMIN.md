@@ -65,6 +65,28 @@ La migration `2026_09_25_000004` ajoute ces tables et le lien des images produit
 
 ## Messagerie Hostinger Email
 
+### Documents & automatisations
+
+Admin-CM dispose de `/admin/communications`. Les modèles PDF, e-mail et WhatsApp sont enregistrés dans `communication_templates`, avec version et contrôle des modifications concurrentes. L’aperçu utilise des données fictives et ne sauvegarde ni n’envoie rien. Le logo PDF accepte PNG/JPEG de 512 Ko maximum et 2000 pixels par côté ; les textes sont échappés, aucun HTML ou code de modèle n’est exécuté. La couleur, l’introduction, la signature, le pied de page et les coordonnées/conditions de l’émetteur sont modifiables. Les montants restent calculés depuis les données métier.
+
+Les factures nouvellement émises et les PDF joints aux nouveaux e-mails sont archivés dans `document_archives` (octets en base64, taille, SHA-256). Le téléchargement restitue le fichier exact. Les anciens messages ne disposant que d’un instantané de données restent téléchargeables avec la mention « reconstitué » ; aucun fichier historiquement envoyé n’est inventé rétroactivement. Les archives entrent dans la sauvegarde MySQL habituelle.
+
+Le formulaire de message propose un canal et un modèle. Modifier un brouillon programmé le repasse en envoi manuel. Si les coordonnées ou les données du document ont changé depuis la préparation, l’envoi est bloqué et un nouveau brouillon doit être préparé. Les brouillons annulés restent dans l’historique. Les promotions nécessitent le consentement enregistré et ne font pas partie des règles automatiques.
+
+Les cinq règles e-mail couvrent l’accusé de réception d’une demande du site, le devis validé, la facture émise, le rendez-vous confirmé et son rappel. Elles sont **désactivées par défaut**. Modes disponibles : désactivée, brouillon à valider, envoi automatique. L’envoi automatique exige une connexion SMTP vérifiée depuis cette page (authentification sans envoi). Un changement de configuration invalide le contrôle. Une erreur de transport marque l’envoi « à vérifier » et suspend les envois automatiques jusqu’à un nouveau contrôle ; aucun renvoi aveugle n’est effectué.
+
+Les nouvelles demandes/validations sont prises en compte à partir de l’activation de la règle ; les rappels concernent les rendez-vous à venir dans le délai choisi (1 à 168 heures). Aucun rappel n’est envoyé pour un rendez-vous annulé ou passé. Une clé unique empêche les doublons par document/événement ou créneau. Une replanification permet un nouveau rappel pour le nouveau créneau. Un devis déjà traité automatiquement n’est pas renvoyé automatiquement à chacune de ses modifications : préparer explicitement un nouveau brouillon.
+
+Sur Hostinger, ajouter dans **hPanel → Tâches cron → Personnalisée/Autre** une exécution toutes les cinq minutes (`*/5 * * * *`) de :
+
+```text
+/usr/bin/flock -n /home/u254587528/domains/maisondustoream.com/.mds/communications.lock /usr/bin/php /home/u254587528/domains/maisondustoream.com/.mds/current/artisan communications:process --limit=100
+```
+
+Le chemin `.mds/current` suit les déploiements. `flock` empêche deux traitements planifiés simultanés. L’espace pro affiche le dernier passage ; le bouton **Exécuter les règles actives maintenant** permet un traitement ponctuel avec confirmation. La commande n’envoie rien tant que les règles restent désactivées ou en mode brouillon. Elle n’affiche que des compteurs, jamais le contenu des messages.
+
+WhatsApp est préparé pour le numéro professionnel **+2250712449319**. Un brouillon ouvre `wa.me` avec le numéro du client et le texte ; le PDF est à joindre manuellement depuis la fiche. L’application WhatsApp connectée doit être celle du compte professionnel. « Marquer comme partagé » enregistre une déclaration de l’opérateur, pas une preuve de livraison. Aucun envoi API WhatsApp ni suivi de lecture n’est activé ; cette étape nécessite la connexion Business Platform Meta.
+
 Expéditeur et adresse de réponse : `contact@maisondustoream.com`.
 
 Dans le fichier privé de l’environnement, configurer :

@@ -22,12 +22,15 @@ class InvoiceController
     public function show(Invoice $invoice) { return view('staff.invoice', ['invoice' => $invoice, 'totals' => Pricing::totals($invoice->snapshot['lines'], $invoice->snapshot['tax_basis_points'])]); }
     public function issue(Invoice $invoice)
     {
-        foreach (['name', 'address', 'registration', 'tax_note', 'payment_terms'] as $key) if (!config('workspace.issuer.'.$key)) throw ValidationException::withMessages(['issuer' => 'Complétez les informations de facturation dans la configuration privée avant émission.']);
+        $issuer=\App\Services\CommunicationTemplates::issuer(\App\Services\CommunicationTemplates::presentation('invoice'));
+        foreach (['name', 'address', 'registration', 'tax_note', 'payment_terms'] as $key) if (empty($issuer[$key])) throw ValidationException::withMessages(['issuer' => 'Complétez les informations de facturation dans Documents & automatisations, modèle Facture PDF, avant émission.']);
         DB::transaction(function () use ($invoice) {
             $locked = Invoice::whereKey($invoice->id)->lockForUpdate()->firstOrFail();
             abort_unless($locked->status === 'draft', 409);
-            $snapshot = $locked->snapshot; $snapshot['issuer'] = config('workspace.issuer');
+            $snapshot = $locked->snapshot; $snapshot['presentation']=\App\Services\CommunicationTemplates::presentation('invoice');
+            $snapshot['issuer'] = \App\Services\CommunicationTemplates::issuer($snapshot['presentation']);
             $locked->update(['number' => 'MDS-'.str_pad((string) $locked->id, 7, '0', STR_PAD_LEFT), 'snapshot' => $snapshot, 'status' => 'issued', 'issued_at' => now()]);
+            \App\Models\DocumentArchive::capture(app(Documents::class)->render(app(Documents::class)->invoiceData($locked)),['invoice_id'=>$locked->id]);
             Audit::record('facture_emise', $locked);
         });
         return back()->with('success', 'Facture émise et verrouillée.');

@@ -3,6 +3,7 @@
 @section('title',$message->subject ?: '(sans objet)')
 @section('content')<section class="panel">
 @include('staff.status',['status'=>$message->status])<dl class="detail-list">
+<dt>Canal</dt><dd>{{ $message->channel==='whatsapp' ? 'WhatsApp manuel' : 'E-mail' }}</dd>
 <dt>De</dt>
 <dd>{{ $message->sender }}</dd>
 <dt>À</dt>
@@ -13,6 +14,8 @@
 <div class="divider">
 </div>
 <div class="prose">{{ $message->body }}</div>
+@if($message->automation_event)<p class="muted">Préparé par une règle : {{ \App\Services\CommunicationTemplates::LABELS[$message->automation_event] ?? $message->automation_event }}. {{ $message->auto_send && $message->status==='draft' ? 'En attente d’envoi automatique si la règle et la connexion restent actives.' : 'Relecture et envoi manuels.' }}</p>@endif
+@if($message->status==='shared')<p>Partage déclaré manuellement ; réception non vérifiée par WhatsApp.</p>@endif
 @if($message->direction==='outgoing' && $message->status==='draft')
 <details><summary>Modifier le brouillon</summary>
 <form method="post" action="{{ route('staff.messages.update',$message) }}">
@@ -22,14 +25,21 @@
 <div class="actions"><button class="secondary">Enregistrer les modifications</button></div>
 </form></details>
 @endif
-@if($message->document_snapshot)<p><a href="{{ route('staff.messages.attachment',$message) }}">Télécharger le document archivé lors de l’envoi</a></p>@endif
-@if($message->invoice_id || $message->quote_id)<p>Pièce jointe prévue : {{ $message->invoice_id ? 'facture.pdf' : 'devis.pdf' }}</p>
+@if($message->document_snapshot)<p><a href="{{ route('staff.messages.attachment',$message) }}">{{ $message->archive ? 'Télécharger le PDF exact archivé' : 'Télécharger le PDF reconstitué depuis les données historiques' }}</a></p>@endif
+@if(($message->invoice_id || $message->quote_id) && $message->automation_event!=='quote_received')<p>Document : {{ $message->invoice_id ? 'facture.pdf' : 'devis.pdf' }}</p>
+@if($message->channel==='whatsapp')<p><a href="{{ $message->invoice_id ? route('staff.invoices.pdf',$message->invoice_id) : route('staff.quotes.pdf',$message->quote_id) }}">Télécharger le PDF à joindre manuellement dans WhatsApp</a></p>@endif
 @endif<div class="actions">
 @if($message->direction==='incoming')<a class="button" href="{{ route('staff.messages.create',['reply'=>$message->id]) }}">Répondre</a>
+@elseif($message->status==='draft' && $message->channel==='whatsapp')
+<a class="button" href="{{ route('staff.messages.whatsapp',$message) }}" target="_blank" rel="noopener">Ouvrir le message dans WhatsApp</a>
+<form method="post" action="{{ route('staff.messages.shared',$message) }}" data-confirm="Confirmez-vous avoir partagé ce message manuellement ?">@csrf<button class="secondary">Marquer comme partagé</button></form>
 @elseif($message->status==='draft')<form method="post" action="{{ route('staff.messages.send',$message) }}" data-confirm="Envoyer ce message à {{ $message->recipient }} ?">
 @csrf<button>Envoyer depuis contact@maisondustoream.com</button>
 </form>
 @endif</div>
+@if($message->direction==='outgoing' && $message->status==='draft')<div class="actions">
+<a href="{{ route('staff.messages.create',array_filter(['channel'=>$message->channel,'contact_id'=>$message->contact_id,'quote_id'=>$message->quote_id,'invoice_id'=>$message->invoice_id,'appointment_id'=>$message->appointment_id,'template_key'=>$message->template_snapshot['key'] ?? null])) }}">Préparer un nouveau brouillon avec les données actuelles</a>
+<form method="post" action="{{ route('staff.messages.cancel',$message) }}">@csrf<button class="secondary">Annuler ce brouillon</button></form></div>@endif
 @if(in_array($message->status,['uncertain','sending']))<div class="notice">L’état d’envoi doit être vérifié dans Hostinger avant tout nouvel envoi. Aucun renvoi automatique n’est effectué.</div>
 @endif</section>
 @endsection

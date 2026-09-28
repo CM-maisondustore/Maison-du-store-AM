@@ -11,22 +11,32 @@ class CommercialMail
     {
         return config('workspace.mail_enabled') && config('mail.default') === 'smtp' && (bool) config('mail.mailers.smtp.password');
     }
-    public function send(CommercialMessage $message): void
+    public function send(CommercialMessage $message, bool $automatic=false): void
     {
         if (!$this->configured()) throw ValidationException::withMessages(['mail' => 'La connexion Hostinger Email doit être activée dans la configuration privée.']);
         // Claim once before contacting SMTP: double clicks cannot send twice.
-        $claimed = DB::transaction(function () use ($message) {
+        $claimed = DB::transaction(function () use ($message,$automatic) {
             $m = CommercialMessage::whereKey($message->id)->lockForUpdate()->firstOrFail();
             abort_unless($m->direction === 'outgoing' && $m->status === 'draft', 409, 'Ce message a déjà été envoyé ou son envoi est en cours de vérification.');
+            abort_unless($m->channel==='email',422,'Ce brouillon doit être partagé depuis WhatsApp.');
+            if ($automatic) {
+                $rule=\App\Models\CommunicationRule::where('key',$m->automation_event)->lockForUpdate()->first();
+                abort_unless($m->auto_send && $rule?->mode==='automatic' && app(MailConnection::class)->verified(),409);
+            }
+            app(CommunicationAutomation::class)->validateMessage($m);
             if ($m->kind === 'promotion' && (!$m->contact?->marketing_consent_at || $m->contact->archived_at || mb_strtolower($m->recipient) !== mb_strtolower($m->contact->email ?? ''))) throw ValidationException::withMessages(['mail' => 'Le destinataire doit avoir un consentement commercial actif.']);
-            if ($m->quote_id && !in_array($m->quote->status, ['approved', 'accepted'])) throw ValidationException::withMessages(['mail' => 'Validez le devis avant envoi.']);
+            if ($m->quote_id && $m->automation_event!=='quote_received' && !in_array($m->quote->status, ['approved', 'accepted'])) throw ValidationException::withMessages(['mail' => 'Validez le devis avant envoi.']);
             if ($m->invoice_id && !$m->invoice->issued_at) throw ValidationException::withMessages(['mail' => 'Émettez la facture avant envoi.']);
             $documents = app(Documents::class);
-            $snapshot = $m->invoice_id ? $documents->invoiceData($m->invoice) : ($m->quote_id ? $documents->quoteData($m->quote) : null);
+            $snapshot = $m->invoice_id ? $documents->invoiceData($m->invoice) : ($m->quote_id && $m->automation_event!=='quote_received' ? $documents->quoteData($m->quote) : null);
+            if ($snapshot) {
+                $pdf=$m->invoice_id ? $documents->invoice($m->invoice) : $documents->render($snapshot);
+                \App\Models\DocumentArchive::capture($pdf,['commercial_message_id'=>$m->id]);
+            }
             $m->update(['status' => 'sending', 'document_snapshot' => $snapshot]); return $m;
         });
         try {
-            $pdf = $claimed->document_snapshot ? app(Documents::class)->render($claimed->document_snapshot) : null;
+            $pdf = $claimed->archive?->contents();
             Mail::mailer('smtp')->raw($claimed->body, function ($mail) use ($claimed, $pdf) {
                 $mail->to($claimed->recipient)->subject($claimed->subject)->replyTo(config('mail.from.address'));
                 if ($pdf) $mail->attachData($pdf, $claimed->invoice_id ? 'facture.pdf' : 'devis.pdf', ['mime' => 'application/pdf']);
@@ -35,6 +45,7 @@ class CommercialMail
         } catch (\Throwable $e) {
             // SMTP may have accepted the message even if the final response was lost.
             $claimed->update(['status' => 'uncertain']);
+            \App\Models\CommunicationCheck::where('key','smtp')->update(['successful'=>false]);
             throw ValidationException::withMessages(['mail' => 'Envoi non confirmé. Vérifiez la boîte Hostinger avant de préparer un nouvel envoi pour éviter un doublon.']);
         }
     }

@@ -25,6 +25,13 @@ Route::prefix('admin')->group(function () {
         Route::put('prestations/{intervention}', [InterventionController::class, 'update'])->name('interventions.update');
         Route::post('prestations/{intervention}/devis', [QuoteController::class, 'onsite'])->name('interventions.quote');
         Route::middleware('admin')->group(function () {
+            Route::get('communications', [App\Http\Controllers\Staff\CommunicationController::class,'index'])->name('communications.index');
+            Route::get('communications/modeles/{template}', [App\Http\Controllers\Staff\CommunicationController::class,'edit'])->name('communications.edit');
+            Route::post('communications/modeles/{template}', [App\Http\Controllers\Staff\CommunicationController::class,'update'])->name('communications.update');
+            Route::post('communications/modeles/{template}/apercu', [App\Http\Controllers\Staff\CommunicationController::class,'preview'])->name('communications.preview');
+            Route::put('communications/regles/{rule}', [App\Http\Controllers\Staff\CommunicationController::class,'rule'])->name('communications.rule');
+            Route::post('communications/connexion', [App\Http\Controllers\Staff\CommunicationController::class,'connection'])->middleware('throttle:3,1')->name('communications.connection');
+            Route::post('communications/executer', [App\Http\Controllers\Staff\CommunicationController::class,'process'])->middleware('throttle:3,1')->name('communications.process');
             Route::patch('catalogue/visibilite', [ProductController::class, 'catalogueVisibility'])->name('catalogue.visibility');
             Route::post('devis/{quote}/paiements/{payment}/annuler', [App\Http\Controllers\Staff\QuoteFormController::class, 'voidReceipt'])->name('quotes.receipt.void');
             Route::get('options-devis', [App\Http\Controllers\Staff\QuoteOptionController::class, 'index'])->name('quote-options.index');
@@ -54,6 +61,9 @@ Route::prefix('admin')->group(function () {
             Route::put('messages/{message}', [MessageController::class, 'update'])->name('messages.update');
             Route::get('messages/{message}/document', [MessageController::class, 'attachment'])->name('messages.attachment');
             Route::post('messages/{message}/envoyer', [MessageController::class, 'send'])->middleware('throttle:10,1')->name('messages.send');
+            Route::get('messages/{message}/whatsapp', [MessageController::class,'whatsapp'])->name('messages.whatsapp');
+            Route::post('messages/{message}/partage', [MessageController::class,'shared'])->name('messages.shared');
+            Route::post('messages/{message}/annuler', [MessageController::class,'cancel'])->name('messages.cancel');
         });
     });
 });

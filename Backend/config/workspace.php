@@ -1,5 +1,6 @@
 <?php
 return [
+    'whatsapp_number' => '+2250712449319',
     'labels' => ['civility' => 'Civilité', 'firstName' => 'Prénom', 'lastName' => 'Nom', 'email' => 'E-mail', 'phone' => 'Téléphone', 'address' => 'Adresse', 'city' => 'Ville', 'model' => 'Modèle', 'mount' => 'Pose', 'orderType' => 'Prestation', 'control' => 'Commande', 'powerSource' => 'Alimentation', 'color' => 'Couleur', 'finish' => 'Finition', 'fabric' => 'Tissu', 'pattern' => 'Motif', 'lining' => 'Doublure', 'hanging' => 'Fixation', 'appointmentType' => 'Type de rendez-vous', 'project' => 'Projet', 'message' => 'Message'],
     'mail_enabled' => (bool) env('COMMERCIAL_MAIL_ENABLED', false),
     'imap_host' => env('IMAP_HOST', 'imap.hostinger.com'),
