@@ -24,6 +24,21 @@ class CommunicationsTest extends TestCase
         config(['workspace.mail_enabled'=>true,'mail.default'=>'smtp','mail.mailers.smtp.password'=>'test']);
         CommunicationCheck::create(['key'=>'smtp','successful'=>true,'fingerprint'=>app(MailConnection::class)->fingerprint(),'checked_at'=>now()]);
     }
+    public function test_whatsapp_draft_without_email_and_validation_return_keep_the_channel(): void
+    {
+        $this->seed(); $this->actingAs($this->admin());
+        $q=$this->quote(); $q->update(['contact'=>[...$q->contact,'email'=>null]]); $q->customer->update(['email'=>null]);
+        $url='/admin/messages/nouveau?quote_id='.$q->id;
+        $this->get($url)->assertOk()->assertSee('data-whatsapp="+2250700000000"',false);
+        $data=['channel'=>'whatsapp','template_key'=>'quote','recipient'=>'+2250700000000','subject'=>'Devis','body'=>'Bonjour','kind'=>'devis','quote_id'=>$q->id];
+        $this->from($url)->post('/admin/messages',[...$data,'subject'=>''])->assertSessionHasErrors('subject');
+        $this->get($url)->assertOk()->assertSee('name="recipient" type="tel"',false)->assertSee('name="channel" value="whatsapp"',false);
+        $this->post('/admin/messages',$data)->assertSessionHasNoErrors();
+        $m=CommercialMessage::firstOrFail(); $this->assertSame('whatsapp',$m->channel); $this->assertSame('2250700000000',$m->recipient); $this->assertSame('draft',$m->status);
+        $this->post('/admin/messages',[...$data,'recipient'=>'0700000000'])->assertSessionHasErrors(['recipient'=>'Indiquez un numéro WhatsApp avec indicatif pays, par exemple +2250700000000.']);
+        $this->post('/admin/messages',[...$data,'channel'=>'email'])->assertSessionHasErrors('recipient');
+        $this->assertDatabaseCount('commercial_messages',1);
+    }
     public function test_template_edit_preview_variables_and_concurrent_update(): void
     {
         $this->seed(); $this->actingAs($this->admin());

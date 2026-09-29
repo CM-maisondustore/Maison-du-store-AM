@@ -28,10 +28,9 @@ class MessageController
         $key=$r->input('template_key',match($draft['kind']){'devis'=>'quote','facture'=>'invoice','rendez_vous'=>'appointment',default=>'commercial'});
         if (!$r->filled('reply')) $draft=[...$draft,...\App\Services\CommunicationTemplates::draft($key,\App\Services\CommunicationTemplates::context($record,$contact),$channel)];
         if (!$record && $key==='promotion') $draft['kind']='promotion';
-        if ($channel==='whatsapp') {
-            $c=$record instanceof Quote ? $record->contact : ($record instanceof Invoice ? $record->snapshot['customer'] : ($record?->details ?? []));
-            $draft['recipient']=$c['phone'] ?? $contact?->phone ?? '';
-        }
+        $c=$record instanceof Quote ? $record->contact : ($record instanceof Invoice ? $record->snapshot['customer'] : ($record?->details ?? []));
+        $draft['recipients']=['email'=>$draft['recipient'],'whatsapp'=>$c['phone'] ?? $contact?->phone ?? ''];
+        $draft['recipient']=$draft['recipients'][$channel];
         $draft['channel']=$channel; $draft['template_key']=$key;
         return view('staff.compose', ['draft' => $draft, 'contacts' => Contact::orderBy('name')->get()]);
     }
@@ -40,7 +39,7 @@ class MessageController
         $r->validate(['channel'=>'sometimes|in:email,whatsapp','template_key'=>'sometimes|in:'.implode(',',array_keys(\App\Services\CommunicationTemplates::LABELS))]);
         $channel=$r->input('channel','email');
         $recipientRules=$channel==='whatsapp' ? ['required','string','regex:/^\+?[1-9][0-9\s()-]{7,24}$/'] : ['required','email','max:200'];
-        $data = $r->validate(['recipient' => $recipientRules, 'subject' => 'required|string|max:200|not_regex:/[\r\n]/', 'body' => 'required|string|max:'.($channel==='whatsapp' ? '3000':'30000'), 'kind' => 'required|in:commercial,promotion,devis,rendez_vous,facture', 'contact_id' => 'nullable|exists:contacts,id', 'quote_id' => 'nullable|exists:quotes,id', 'appointment_id' => 'nullable|exists:appointments,id', 'invoice_id' => 'nullable|exists:invoices,id']);
+        $data = $r->validate(['recipient' => $recipientRules, 'subject' => 'required|string|max:200|not_regex:/[\r\n]/', 'body' => 'required|string|max:'.($channel==='whatsapp' ? '3000':'30000'), 'kind' => 'required|in:commercial,promotion,devis,rendez_vous,facture', 'contact_id' => 'nullable|exists:contacts,id', 'quote_id' => 'nullable|exists:quotes,id', 'appointment_id' => 'nullable|exists:appointments,id', 'invoice_id' => 'nullable|exists:invoices,id'], ['recipient.required'=>$channel==='whatsapp' ? 'Indiquez le numéro WhatsApp du client avec son indicatif pays.' : 'Indiquez l’adresse e-mail du destinataire.', 'recipient.regex'=>'Indiquez un numéro WhatsApp avec indicatif pays, par exemple +2250700000000.', 'recipient.email'=>'Indiquez une adresse e-mail valide ou choisissez le canal WhatsApp.']);
         $data['channel']=$channel;
         if ($channel==='whatsapp') {
             $data['recipient']=preg_replace('/\D/','',$data['recipient']);
