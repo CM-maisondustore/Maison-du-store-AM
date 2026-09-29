@@ -33,12 +33,14 @@ Les neuf anciens matériaux (lin, coton, polyester, velours, voilage générique
 | Fonction | Admin-CM | Agent |
 | --- | --- | --- |
 | Catalogue, contacts et archives | Gestion complète | Aucun accès global |
-| Devis | Affectation, chiffrage, validation, acceptation | Lecture et préparation des devis affectés, avant validation |
+| Devis | Affectation, chiffrage, validation, acceptation | Préparation des devis affectés avant validation ; consultation technique des devis liés à ses prestations non annulées |
 | Rendez-vous | Confirmation, déplacement, annulation, affectation | Lecture des rendez-vous affectés |
 | Prestations | Planification et affectation | Consignes, coordonnées du client, avancement, compte rendu de ses prestations |
 | Factures, messagerie, comptes | Gestion complète | Aucun accès |
 
 Les restrictions sont vérifiées sur le serveur, y compris les téléchargements PDF. Les comptes sont désactivables ; les mots de passe temporaires doivent être remplacés à la première connexion. Le changement de mot de passe invalide les autres sessions via `auth.session`. Les tentatives de connexion sont limitées et les pages internes ne sont ni indexables ni mises en cache.
+
+Un agent peut ouvrir le devis lié à sa prestation même si le devis est affecté à un autre agent ou à aucun agent. Cet accès porte uniquement sur les informations techniques, sans prix ni PDF chiffré, et n’autorise pas la modification du devis. Le lien doit concerner le même client. Réaffecter ou annuler la prestation retire cet accès indirect ; l’affectation propre du devis conserve ses droits habituels.
 
 ## Parcours quotidien
 

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 class Quote extends Model
 {
@@ -18,4 +19,16 @@ class Quote extends Model
     public function receivedAmount(): int { return (int)$this->payments()->whereNull('voided_at')->sum('amount'); }
     public function customer() { return $this->belongsTo(Contact::class, 'contact_id'); }
     public function agent() { return $this->belongsTo(User::class, 'agent_id'); }
+    public function scopeVisibleTo(Builder $query, User $user): Builder
+    {
+        if ($user->isAdmin()) return $query;
+        return $query->where(fn (Builder $q) => $q->where('agent_id',$user->id)->orWhereExists(fn ($jobs) => $jobs
+            ->selectRaw('1')->from('interventions')->whereColumn('interventions.quote_id','quotes.id')
+            ->whereColumn('interventions.contact_id','quotes.contact_id')->where('interventions.agent_id',$user->id)
+            ->where('interventions.status','!=','cancelled')));
+    }
+    public function canBeViewedBy(User $user): bool
+    {
+        return static::visibleTo($user)->whereKey($this->id)->exists();
+    }
 }

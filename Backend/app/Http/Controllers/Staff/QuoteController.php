@@ -8,11 +8,10 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 class QuoteController
 {
-    private function access(Request $r, Quote $quote): void { abort_unless($r->user()->isAdmin() || $quote->agent_id === $r->user()->id, 403); }
+    private function access(Request $r, Quote $quote): void { abort_unless($quote->canBeViewedBy($r->user()), 403); }
     public function index(Request $r)
     {
-        $query = Quote::with('agent')->latest();
-        if (!$r->user()->isAdmin()) $query->where('agent_id', $r->user()->id);
+        $query = Quote::with('agent')->visibleTo($r->user())->latest();
         if ($r->filled('status')) $query->where('status', $r->string('status')->toString());
         return view('staff.quotes', ['quotes' => $query->paginate(25)->withQueryString()]);
     }
@@ -23,13 +22,16 @@ class QuoteController
         $r->validate(['type' => 'required|in:store,rideau']);
         $quote = DB::transaction(function () use ($intervention, $r) {
             $job = Intervention::whereKey($intervention->id)->lockForUpdate()->firstOrFail();
+            abort_unless($r->user()->isAdmin() || $job->agent_id === $r->user()->id,403);
             if ($job->quote_id) return Quote::findOrFail($job->quote_id);
             $contact = $job->contact;
             $quote = Quote::create(['reference' => (string) Str::uuid(), 'type' => $r->input('type'), 'source' => 'sur_place', 'status' => 'draft', 'contact_id' => $contact->id, 'agent_id' => $job->agent_id, 'contact' => ['firstName' => $contact->name, 'lastName' => '', 'email' => $contact->email, 'phone' => $contact->phone, 'address' => $contact->address], 'product' => [], 'dimensions' => []]);
             $job->update(['quote_id' => $quote->id]); Audit::record('devis_sur_place_cree', $quote);
             return $quote;
         });
-        return redirect()->route(in_array($quote->status,['pending','draft']) ? 'staff.quotes.edit' : 'staff.quotes.show', $quote);
+        $this->access($r,$quote);
+        $canEdit=($r->user()->isAdmin() || $quote->agent_id===$r->user()->id) && in_array($quote->status,['pending','draft']);
+        return redirect()->route($canEdit ? 'staff.quotes.edit' : 'staff.quotes.show', $quote);
     }
     public function update(Request $r, Quote $quote)
     {

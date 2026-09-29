@@ -87,6 +87,35 @@ class WorkspaceTest extends TestCase
         $this->post('/admin/prestations',$data)->assertSessionHasErrors('scheduled_at');
         $quote=$this->quote(); $data['quote_id']=$quote->id; $this->post('/admin/prestations',$data)->assertSessionHasErrors('quote_id');
     }
+    public function test_agent_can_read_linked_mission_quote_without_pricing_or_edit_rights(): void
+    {
+        $agent=$this->user('agent'); $owner=$this->user('agent'); $q=$this->quote($owner);
+        $q->update(['status'=>'draft','internal_notes'=>'PRIVATE-ADMIN-NOTE']);
+        $job=Intervention::create(['contact_id'=>$q->contact_id,'quote_id'=>$q->id,'agent_id'=>$agent->id,'kind'=>'installation','scheduled_at'=>now()->addDay(),'duration_minutes'=>60,'address'=>'Abidjan']);
+        $this->actingAs($agent);
+        $this->get('/admin/prestations/'.$job->id)->assertOk()->assertSee(route('staff.quotes.show',$q));
+        $this->get('/admin/devis/'.$q->id)->assertOk()->assertDontSee('PRIVATE-ADMIN-NOTE')->assertDontSee('FCFA')->assertDontSee('Modifier les choix et mesures');
+        $this->get('/admin/devis')->assertOk()->assertSee(route('staff.quotes.show',$q));
+        // Sharing the client is insufficient: only this intervention's exact quote is readable.
+        $unrelated=$q->replicate(); $unrelated->reference=(string)Str::uuid(); $unrelated->save();
+        $this->get('/admin/devis/'.$unrelated->id)->assertForbidden();
+        $this->get('/admin/devis')->assertOk()->assertDontSee(route('staff.quotes.show',$unrelated));
+        $this->get('/admin/devis?status=approved')->assertOk()->assertDontSee(route('staff.quotes.show',$q));
+        $this->get('/admin/devis/'.$q->id.'/formulaire')->assertForbidden();
+        $this->put('/admin/devis/'.$q->id.'/formulaire',[])->assertForbidden();
+        $this->get('/admin/devis/'.$q->id.'/pdf')->assertForbidden();
+        $this->post('/admin/prestations/'.$job->id.'/devis',['type'=>'store'])->assertRedirect('/admin/devis/'.$q->id);
+        $this->assertDatabaseCount('quotes',2); $this->assertSame($owner->id,$q->fresh()->agent_id);
+        $q->update(['agent_id'=>null]); $this->get('/admin/devis/'.$q->id)->assertOk();
+        $job->update(['agent_id'=>$owner->id]); $this->get('/admin/devis/'.$q->id)->assertForbidden();
+        $this->get('/admin/devis')->assertOk()->assertDontSee(route('staff.quotes.show',$q));
+        $job->update(['agent_id'=>$agent->id,'status'=>'cancelled']); $this->get('/admin/devis/'.$q->id)->assertForbidden();
+        $job->update(['status'=>'completed']); $this->get('/admin/devis/'.$q->id)->assertOk();
+        $job->update(['contact_id'=>$this->contact()->id]); $this->get('/admin/devis/'.$q->id)->assertForbidden();
+        auth()->logout(); session()->flush();
+        $this->actingAs($owner); $this->get('/admin/devis/'.$q->id)->assertForbidden();
+        $q->update(['agent_id'=>$owner->id]); $this->get('/admin/devis/'.$q->id.'/formulaire')->assertOk();
+    }
     public function test_planning_html_form_creates_and_reschedules_with_string_duration(): void
     {
         $agent=$this->user('agent'); $contact=$this->contact(); $this->actingAs($this->user());
