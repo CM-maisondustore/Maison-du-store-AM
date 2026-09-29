@@ -87,6 +87,23 @@ class WorkspaceTest extends TestCase
         $this->post('/admin/prestations',$data)->assertSessionHasErrors('scheduled_at');
         $quote=$this->quote(); $data['quote_id']=$quote->id; $this->post('/admin/prestations',$data)->assertSessionHasErrors('quote_id');
     }
+    public function test_planning_html_form_creates_and_reschedules_with_string_duration(): void
+    {
+        $agent=$this->user('agent'); $contact=$this->contact(); $this->actingAs($this->user());
+        $data=['contact_id'=>(string)$contact->id,'agent_id'=>(string)$agent->id,'kind'=>'installation','scheduled_at'=>'2026-10-05T09:00','duration_minutes'=>'60','address'=>'Abidjan test','quote_id'=>'','appointment_id'=>''];
+        $response=$this->post('/admin/prestations',$data)->assertSessionHasNoErrors();
+        $job=Intervention::firstOrFail(); $response->assertRedirect('/admin/prestations/'.$job->id);
+        $this->assertSame(60,$job->duration_minutes); $this->get('/admin/prestations/'.$job->id)->assertOk();
+        $data['scheduled_at']='2026-10-05T10:00'; $data['duration_minutes']='90';
+        $this->put('/admin/prestations/'.$job->id,[...$data,'status'=>'planned'])->assertRedirect()->assertSessionHasNoErrors();
+        $this->assertSame(90,$job->fresh()->duration_minutes);
+        $this->assertSame('2026-10-05T10:00',$job->fresh()->scheduled_at->format('Y-m-d\TH:i'));
+        $this->post('/admin/prestations',[...$data,'scheduled_at'=>'2026-10-05T11:00'])->assertSessionHasErrors('scheduled_at');
+        $this->post('/admin/prestations',[...$data,'scheduled_at'=>'2026-10-05T11:30','duration_minutes'=>'30'])->assertRedirect()->assertSessionHasNoErrors();
+        $this->assertDatabaseCount('interventions',2);
+        $this->post('/admin/prestations',[...$data,'duration_minutes'=>'15.5'])->assertSessionHasErrors('duration_minutes');
+        $this->assertDatabaseCount('interventions',2);
+    }
     public function test_unpublished_products_stay_in_archive_and_leave_public_catalogue(): void
     {
         $this->seedProducts(); $product=Product::firstOrFail(); $product->update(['published'=>false]); $this->seedProducts();

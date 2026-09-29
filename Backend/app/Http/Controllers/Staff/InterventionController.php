@@ -45,7 +45,10 @@ class InterventionController
     }
     private function planning(Request $r): array
     {
-        return $r->validate(['agent_id' => ['required', Rule::exists('users', 'id')->where('active', true)->where('role', 'agent')], 'scheduled_at' => 'required|date_format:Y-m-d\TH:i', 'duration_minutes' => 'required|integer|min:15|max:480', 'address' => 'required|string|max:1000', 'instructions' => 'nullable|string|max:10000']);
+        $data = $r->validate(['agent_id' => ['required', Rule::exists('users', 'id')->where('active', true)->where('role', 'agent')], 'scheduled_at' => 'required|date_format:Y-m-d\TH:i', 'duration_minutes' => 'required|integer|min:15|max:480', 'address' => 'required|string|max:1000', 'instructions' => 'nullable|string|max:10000']);
+        // HTML form values remain strings after validation; Carbon requires a number.
+        $data['duration_minutes'] = (int) $data['duration_minutes'];
+        return $data;
     }
     private function checkSlot(array $data, ?int $except = null): void
     {
