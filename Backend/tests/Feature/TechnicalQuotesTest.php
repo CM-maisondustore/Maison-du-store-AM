@@ -42,6 +42,7 @@ class TechnicalQuotesTest extends TestCase
         $this->seed();$this->login('agent');$data=$this->data();$this->post('/admin/devis',$data)->assertSessionHasNoErrors();$q=Quote::firstOrFail();
         $lines=[['description'=>'Admin chiffrage confidentiel','quantity'=>1,'unit_price'=>9876543]];
         $q->update(['lines'=>$lines,'tax_basis_points'=>1800,'deposit_amount'=>1234567,'internal_notes'=>'ADMIN-PRIVATE-NOTE']);
+        $lines=$q->fresh()->lines; // Compare the database snapshot; MySQL canonicalizes JSON object key order.
         foreach (['','/formulaire'] as $path) {
             $html=$this->get('/admin/devis/'.$q->id.$path)->assertOk()->getContent();
             foreach (['9876543','1234567','ADMIN-PRIVATE-NOTE','Admin chiffrage confidentiel','unit_price'] as $secret) $this->assertStringNotContainsString($secret,$html);
