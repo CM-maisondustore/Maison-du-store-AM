@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
 <title>@yield('title', 'Espace interne') — Maison du Store AM</title>
-<link rel="stylesheet" href="{{ asset('admin.css') }}">
+<link rel="stylesheet" href="{{ asset('admin.css') }}?v={{ filemtime(public_path('admin.css')) }}">
 <script src="{{ asset('admin.js') }}?v={{ filemtime(public_path('admin.js')) }}" defer>
 </script>
 </head>
