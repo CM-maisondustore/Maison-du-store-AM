@@ -12,9 +12,13 @@ class QuoteOptionController
     private function data(Request $r): array
     {
         $data=$r->validate(['label'=>'required|string|max:150','kind'=>['required',Rule::in(array_keys(QuoteOption::KINDS))],'category'=>'required|in:store,rideau','motorization'=>'required|in:any,yes,no','active'=>'required|boolean','product_ids'=>'nullable|array|max:100','product_ids.*'=>'integer|distinct|exists:products,id',
-            'public_choice'=>'sometimes|boolean','unit_price'=>'sometimes|nullable|integer|min:0|max:100000000','unit'=>['sometimes','required',Rule::in(array_keys(QuoteOption::UNITS))],
+            'fabric_group'=>'nullable|in:rideau,voilage,store','public_choice'=>'sometimes|boolean','unit_price'=>'sometimes|nullable|integer|min:0|max:100000000','unit'=>['sometimes','required',Rule::in(array_keys(QuoteOption::UNITS))],
             'finish_codes'=>'sometimes|nullable|array|max:100','finish_codes.*'=>['string','distinct',Rule::exists('quote_options','code')->where('kind','finish')->where('category',$r->input('category'))]]);
         if ($r->has('tariff_form')) $data['finish_codes']=$data['finish_codes'] ?? [];
+        if ($data['kind']==='material') {
+            $data['fabric_group']=$data['fabric_group'] ?? $data['category'];
+            if (($data['fabric_group']==='store')!==($data['category']==='store')) throw ValidationException::withMessages(['fabric_group'=>'Le groupe de tissu doit correspondre à la catégorie.']);
+        } else $data['fabric_group']=null;
         $data['product_ids']=array_map('intval',$data['product_ids'] ?? []);
         if (Product::whereIn('id',$data['product_ids'])->where('details->type','!=',$data['category'])->exists()) throw ValidationException::withMessages(['product_ids'=>'Tous les types sélectionnés doivent appartenir à la catégorie choisie.']);
         return $data;

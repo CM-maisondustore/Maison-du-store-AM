@@ -26,8 +26,7 @@
     if (!v.isRequired(data.firstName)) errors.firstName = 'Indiquez votre prénom.';
     else if (!v.isValidText(data.firstName, { min: 2, max: 60 })) errors.firstName = 'Votre prénom doit contenir entre 2 et 60 caractères.';
 
-    if (!v.isRequired(data.email)) errors.email = 'Indiquez votre adresse e-mail.';
-    else if (!v.isEmail(data.email)) errors.email = v.messages.email;
+    if (v.isRequired(data.email) && !v.isEmail(data.email)) errors.email = v.messages.email;
 
     if (!v.isRequired(data.phone)) errors.phone = 'Indiquez votre numéro de téléphone.';
     else if (!v.isPhone(data.phone)) errors.phone = v.messages.phone;

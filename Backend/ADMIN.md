@@ -8,7 +8,13 @@ Dans **Catalogue → Tarifs, matériaux et finitions des devis**, Admin-CM modif
 
 Les tarifs initiaux ajoutés par `QuoteTariffSeeder` sont conservés en base : occultants 100/80/60 % à 12 000/9 000/7 000 FCFA/m, voilages transparent/luxe à 4 000/14 000 FCFA/m, rails double/simple/Wave électrique/Wave manuel à 10 000/5 000/22 000/7 000 FCFA/m, barres double/simple à 7 000/4 000 FCFA/m, reflètes 4 files/3 files/Wave à 900/500/1 500 FCFA/m, accroches à 2 000 FCFA le lot de 100, confection à 1 000 FCFA/m, stores lourd/léger à 25 000/18 000 FCFA/m², kit moteur store à 100 000 FCFA/pièce et pose store à Abidjan à 5 000 FCFA/ouverture. Les anciens choix sont conservés. Relancer le seed n'écrase aucun tarif modifié.
 
-Dans le formulaire de devis Admin-CM/Agent :
+Les 14 fiches produits initiales ont été retirées du catalogue par la migration `2026_09_29_000010` (archivage `deleted_at`). Le seed ne les recrée plus. Les dossiers, devis et images historiques sont conservés. Les sélections de devis utilisent directement les matériaux et finitions, sans dépendre de ces fiches.
+
+Dans le formulaire de devis, l’agent sélectionne séparément le tissu rideau et le voilage, ou un store. Les fournitures se choisissent par cases à cocher, avec leurs quantités et les finitions compatibles. Admin-CM gère les groupes de tissus dans **Tarifs, matériaux et finitions**. L’e-mail client est facultatif, y compris sur la demande publique.
+
+Les agents préparent uniquement les mesures, choix, dates et notes de terrain. Les tarifs, lignes de vente, totaux, paiements, notes internes et PDF chiffrés sont réservés à Admin-CM, avec contrôle serveur. Une modification technique par un agent conserve les montants précédents et exige une nouvelle vérification du formulaire par Admin-CM avant validation.
+
+Pour le chiffrage réservé à Admin-CM :
 
 - Saisir chaque fenêtre, puis les quantités **pour une ouverture**. La quantité de fenêtres identiques multiplie ces postes. Le tissu, les supports, les reflètes et la confection sont métrés manuellement. Aucun coefficient de plis n'est supposé.
 - Pour les matériaux au m², la surface est largeur × hauteur en cm / 10 000. Les accroches se saisissent en lots entiers de 100.
@@ -62,10 +68,10 @@ La migration additive `2026_09_25_000003` ajoute les montants et leurs unités �
 Dans **Devis → Nouveau devis**, Admin-CM et les agents disposent du même formulaire de préparation. Les agents créent des devis qui leur sont affectés ; Admin-CM peut choisir l’agent. Un devis se sauvegarde en brouillon, puis reste modifiable avant sa validation. Les devis acceptés ou facturés sont verrouillés. Les interventions sur place ouvrent aussi ce formulaire.
 
 1. Saisir le client : nom ou raison sociale, prénom facultatif, téléphone, adresse et e-mail facultatif. L’enregistrement crée ou rattache un dossier client sans compte utilisateur et sans écraser les coordonnées déjà vérifiées dans le CRM.
-2. Choisir la catégorie, un type du catalogue en base, la motorisation oui/non, le matériau et la finition. Les produits masqués du site restent utilisables en interne. **Matériaux & finitions**, accessible à Admin-CM depuis Devis, permet de gérer les options et leurs compatibilités par catégorie, type et motorisation.
+2. Choisir la catégorie, puis cocher séparément un tissu rideau et/ou un voilage, ou un matériau de store. Sélectionner la motorisation, la finition et les fournitures compatibles. **Matériaux & finitions**, accessible à Admin-CM, permet de modifier ces choix en base.
 3. Ajouter jusqu’à 30 fenêtres avec largeur et hauteur en cm, quantité et notes. Les choix communs s’appliquent aux fenêtres qui les utilisent ; décocher cette option ou changer une sélection personnalise uniquement la fenêtre concernée. Un devis peut ainsi contenir des fenêtres de catégories différentes.
-4. Renseigner les lignes de vente en FCFA, la taxe, la date du devis, la validité, la livraison et la pose prévues. Le chiffrage commercial est saisi librement ; les coûts internes du catalogue ne sont pas automatiquement transformés en prix de vente. Les dates prévisionnelles ne créent pas d’intervention dans le planning.
-5. Choisir avance puis solde ou paiement intégral. Les montants déjà reçus se saisissent séparément avec date, moyen, référence et confirmation de réception. Seul le bouton **Enregistrer le devis** écrit la saisie en base ; aucune sauvegarde automatique dans le navigateur n’est utilisée.
+4. Renseigner la date du devis, la validité, la livraison et la pose prévues. Admin-CM calcule ou saisit les lignes de vente et la taxe. Les dates prévisionnelles ne créent pas d’intervention dans le planning.
+5. Admin-CM choisit avance puis solde ou paiement intégral et consigne les montants reçus avec date, moyen, référence et confirmation. L’agent ne voit pas ces informations. Seul **Enregistrer le devis** écrit la saisie en base.
 
 Les choix par fenêtre et leurs libellés sont conservés avec le devis et apparaissent dans le PDF. Les modifications ultérieures des options ne réécrivent pas les devis enregistrés. Une option devenue incompatible doit être remplacée lors de la prochaine modification du formulaire. La mise à jour du formulaire remet un devis en brouillon pour vérification ; Admin-CM conserve la validation et l’acceptation depuis la fiche.
 

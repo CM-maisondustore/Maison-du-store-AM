@@ -85,10 +85,10 @@ class ProductCatalogueTest extends TestCase
 
     public function test_filters_and_reseeding_preserve_catalogue_changes(): void
     {
-        $this->seed();
+        $this->seedProducts();
         $product = Product::firstOrFail();
         $product->update(['material_cost' => 32100, 'material_cost_unit' => 'sqm', 'published' => false, 'details' => [...$product->details, 'available' => false]]);
-        $this->seed();
+        $this->seedProducts();
         $this->assertSame(32100, $product->fresh()->material_cost);
         $this->assertFalse($product->fresh()->published);
         $this->actingAs($this->staff());
@@ -99,7 +99,7 @@ class ProductCatalogueTest extends TestCase
     public function test_global_visibility_hides_public_catalogue_and_restores_individual_choices(): void
     {
         $this->withoutVite();
-        $this->seed();
+        $this->seedProducts();
         $hidden = Product::firstOrFail();
         $hidden->update(['published' => false]);
         $snapshot = Product::orderBy('id')->get()->toJson();
@@ -115,10 +115,10 @@ class ProductCatalogueTest extends TestCase
         $this->get('/devis')->assertOk()->assertDontSee('#catalogue', false);
         $this->getJson('/api/products')->assertExactJson(['data' => []]);
         $this->get('/admin/products')->assertOk()->assertSee('Afficher le catalogue')->assertSee('Masqué avec le catalogue');
-        $this->get('/admin/devis/nouveau')->assertOk()->assertSee($hidden->reference);
+        $this->get('/admin/devis/nouveau')->assertOk()->assertSee('Voilages')->assertDontSee('name="defaults[product_id]"', false);
         $this->assertSame($snapshot, Product::orderBy('id')->get()->toJson());
 
-        $this->seed();
+        $this->seedProducts();
         $this->getJson('/api/products')->assertExactJson(['data' => []]);
         $this->patch('/admin/catalogue/visibilite', ['visible' => 1])->assertSessionHasNoErrors();
         $this->get('/')->assertOk()->assertSee('id="catalogue"', false);

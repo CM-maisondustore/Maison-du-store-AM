@@ -4,6 +4,8 @@
 
 **Espace interne :** `/admin/connexion`, réservé aux rôles Admin-CM et Agent. Gestion du catalogue, des dossiers clients, devis, rendez-vous, prestations, factures et échanges commerciaux. Voir [le guide d’utilisation et de configuration](Backend/ADMIN.md). Aucun compte client public.
 
+**Préparation des devis :** rideaux et voilages sélectionnés séparément, stores, fournitures à cocher et finitions modifiables en base. L’agent relève les mesures et prépare les choix ; Admin-CM seul consulte et modifie les montants et les PDF chiffrés. L’e-mail client est facultatif. Les 14 anciens produits sont archivés et ne sont plus proposés.
+
 **Modifier l’accueil en ligne :** les textes fixes et les liens se trouvent dans [Backend/resources/views/home.blade.php](Backend/resources/views/home.blade.php). `index.html` est la maquette locale : ses modifications doivent être reportées dans cette vue, puis publiées avec la procédure Hostinger. Les images et textes du hero et du portfolio se modifient dans l’espace pro.
 
 > Le backend Laravel est désormais implémenté dans [Backend](Backend/README.md) : catalogue en base, devis et rendez-vous persistés, validation et protection CSRF. Pour l’utiliser sur cette machine, lancer `.\Backend\serve.ps1`, puis ouvrir http://127.0.0.1:8000. Les explications de mode démonstration ci-dessous concernent uniquement les pages HTML statiques.

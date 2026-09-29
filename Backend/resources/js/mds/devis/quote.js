@@ -52,7 +52,7 @@
       '<div class="form-grid">' +
         field('lastName', 'Nom', c.lastName, 'text', 'Dupont') +
         field('firstName', 'Prénom', c.firstName, 'text', 'Jean') +
-        field('email', 'Adresse e-mail', c.email, 'email', 'jean.dupont@email.com') +
+        field('email', 'Adresse e-mail (facultatif)', c.email, 'email', 'jean.dupont@email.com') +
         field('phone', 'Téléphone', c.phone, 'tel', '07 12 34 56 78') +
         field('address', 'Adresse (rue et numéro)', c.address, 'text', '14 Rue de la Paix', true) +
         field('postalCode', 'Code postal', c.postalCode, 'text', 'Facultatif') +

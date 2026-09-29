@@ -16,7 +16,7 @@ class QuoteController
         if ($r->filled('status')) $query->where('status', $r->string('status')->toString());
         return view('staff.quotes', ['quotes' => $query->paginate(25)->withQueryString()]);
     }
-    public function show(Request $r, Quote $quote) { $this->access($r, $quote); return view('staff.quote', ['quote' => $quote, 'agents' => User::where('role', 'agent')->where('active', true)->get()]); }
+    public function show(Request $r, Quote $quote) { $this->access($r, $quote); return view($r->user()->isAdmin() ? 'staff.quote' : 'staff.quote-technical', ['quote' => $quote, 'agents' => User::where('role', 'agent')->where('active', true)->get()]); }
     public function onsite(Request $r, Intervention $intervention)
     {
         abort_unless($r->user()->isAdmin() || $intervention->agent_id === $r->user()->id, 403);
@@ -33,6 +33,7 @@ class QuoteController
     }
     public function update(Request $r, Quote $quote)
     {
+        abort_unless($r->user()->isAdmin(),403);
         $this->access($r, $quote);
         $r->validate(['edit_version'=>'sometimes|required|integer|min:0']);
         $data = [...Pricing::validate($r), ...$r->validate(['internal_notes' => 'nullable|string|max:10000', 'valid_until' => 'required|date_format:Y-m-d', 'dimensions' => 'nullable|array|max:8', 'dimensions.*.label' => 'required|string|max:100', 'dimensions.*.width' => 'required|numeric|min:20|max:400', 'dimensions.*.height' => 'required|numeric|min:20|max:400', 'dimensions.*.quantity' => 'required|integer|min:1|max:20'])];
@@ -44,6 +45,7 @@ class QuoteController
             abort_unless(in_array($locked->status, ['pending', 'draft']) || $r->user()->isAdmin(), 403);
             abort_if($locked->status === 'accepted' || \App\Models\Invoice::where('quote_id', $locked->id)->exists(), 409, 'Devis accepté ou facturé : document verrouillé.');
             if ($locked->configuration) unset($data['dimensions']);
+            if (in_array($data['status'] ?? '',['approved','accepted']) && !empty($locked->configuration['pricing_review_required'])) throw \Illuminate\Validation\ValidationException::withMessages(['status'=>'Les choix techniques ont changé. Vérifiez le chiffrage dans le formulaire complet avant validation.']);
             if (in_array($data['status'] ?? '',['approved','accepted']) && !empty($locked->configuration['calculation']['pending'])) throw \Illuminate\Validation\ValidationException::withMessages(['status'=>'Des prix restent à définir (notamment la pose). Complétez puis recalculez le devis dans le formulaire complet avant validation.']);
             if ($locked->receivedAmount()>Pricing::totals($data['lines'],$data['tax_basis_points'])['total']) throw \Illuminate\Validation\ValidationException::withMessages(['lines'=>'Le total ne peut pas être inférieur aux paiements reçus.']);
             if ($locked->deposit_amount>Pricing::totals($data['lines'],$data['tax_basis_points'])['total']) throw \Illuminate\Validation\ValidationException::withMessages(['lines'=>'Le total ne peut pas être inférieur à l’avance prévue. Modifiez les conditions dans le formulaire complet.']);
@@ -51,5 +53,5 @@ class QuoteController
         });
         return back()->with('success', 'Devis enregistré.');
     }
-    public function pdf(Request $r, Quote $quote, Documents $documents) { $this->access($r, $quote); return response($documents->quote($quote))->header('Content-Type', 'application/pdf')->header('Content-Disposition', 'attachment; filename="devis-'.$quote->reference.'.pdf"'); }
+    public function pdf(Request $r, Quote $quote, Documents $documents) { abort_unless($r->user()->isAdmin(),403); $this->access($r, $quote); return response($documents->quote($quote))->header('Content-Type', 'application/pdf')->header('Content-Disposition', 'attachment; filename="devis-'.$quote->reference.'.pdf"'); }
 }

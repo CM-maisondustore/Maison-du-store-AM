@@ -1,0 +1,114 @@
+(() => {
+  'use strict';
+  const form=document.getElementById('staff-quote-form'); if(!form)return;
+  const data=JSON.parse(document.getElementById('quote-catalogue-data').textContent);
+  const defaults=document.querySelector('#quote-defaults [data-selection]'),windows=document.getElementById('quote-windows');
+  const keys=['category','motorized','curtain_id','sheer_id','store_id','finish_id'];
+  const field=(root,key)=>root.querySelector('[data-choice="'+key+'"]');
+  const values=root=>Object.fromEntries(keys.map(key=>[key,field(root,key).value]));
+  const units={m:'mètre(s)',m2:'m²',piece:'pièce(s)',lot100:'lot(s) de 100',opening:'ouverture(s)',flat:'forfait(s)'};
+  const compatible=(o,v)=>o.active&&o.category===v.category&&(o.motorization==='any'||o.motorization===(v.motorized==='1'?'yes':'no'));
+  const label=o=>o.label+(Object.hasOwn(o,'unit_price')?' — '+(o.unit_price===null?'à définir':o.unit_price.toLocaleString('fr-FR')+' FCFA / '+units[o.unit]):'');
+  function checkbox(container,o,checked,key,attribute){
+    const el=document.createElement('label');el.className='check';
+    const input=document.createElement('input');input.type='checkbox';input.value=o.id;input.checked=checked;input.dataset[attribute]=key;
+    el.append(input,document.createTextNode(label(o)));container.append(el);
+  }
+  function refresh(root,current=values(root)){
+    keys.forEach(key=>field(root,key).value=String(current[key]??''));
+    const v=values(root);v.category=v.category||'rideau';v.motorized=v.motorized||'0';field(root,'category').value=v.category;field(root,'motorized').value=v.motorized;
+    for(const [key,group] of Object.entries({curtain_id:'rideau',sheer_id:'voilage',store_id:'store'})){
+      const box=root.querySelector('[data-fabric-group="'+key+'"]'),list=box.querySelector('[data-fabric-list]');
+      box.hidden=(group==='store')!==(v.category==='store');list.replaceChildren();
+      const options=box.hidden?[]:data.options.filter(o=>o.kind==='material'&&(o.fabric_group||o.category)===group&&compatible(o,v));
+      if(!options.some(o=>String(o.id)===field(root,key).value))field(root,key).value='';
+      options.forEach(o=>checkbox(list,o,String(o.id)===field(root,key).value,key,'fabric'));
+    }
+    const select=field(root,'finish_id'),selected=current.finish_id;
+    select.replaceChildren(new Option('Sélectionner une finition…',''));
+    data.options.filter(o=>o.kind==='finish'&&compatible(o,v)).forEach(o=>select.add(new Option(o.label,String(o.id))));
+    select.value=String(selected??'');if(select.selectedIndex<0)select.value='';
+  }
+  function init(root){
+    const initial=Object.fromEntries(keys.map(key=>[key,field(root,key).dataset.value]));
+    if(!initial.curtain_id&&!initial.sheer_id&&!initial.store_id){
+      const material=data.options.find(o=>String(o.id)===root.dataset.material);
+      if(material)initial[({rideau:'curtain_id',voilage:'sheer_id',store:'store_id'})[material.fabric_group||material.category]]=material.id;
+    }
+    refresh(root,initial);
+  }
+  function inherit(row){if(row.querySelector('[data-inherit]').checked)refresh(row.querySelector('[data-selection]'),values(defaults));}
+  function components(row,initial=false){
+    const v=values(row.querySelector('[data-selection]')),finish=data.options.find(o=>o.id===Number(v.finish_id));
+    const material=data.options.find(o=>o.id===Number(v.category==='store'?v.store_id:(v.curtain_id||v.sheer_id)));
+    const meters=row.querySelector('[data-material-quantity]');meters.disabled=material?.unit==='m2';meters.placeholder=meters.disabled?'Surface calculée à partir des mesures':'Quantité en '+(units[material?.unit]||'mètres');
+    row.querySelectorAll('[data-component]').forEach(input=>{
+      const kind=input.dataset.component,part=input.closest('[data-cost-part]'),list=part.querySelector('[data-component-list]');
+      let selected=initial?input.dataset.value:input.value;
+      if(initial&&!selected&&row.querySelector('[data-costing]').dataset.costingSaved==='1')input.dataset.userChoice='1';
+      let options=data.options.filter(o=>o.kind===(kind==='secondary_material'?'material':kind)&&compatible(o,v)&&(!o.finish_codes?.length||o.finish_codes.includes(finish?.code)));
+      if(kind==='secondary_material'){
+        selected=v.category==='rideau'&&v.curtain_id?v.sheer_id:'';options=options.filter(o=>String(o.id)===selected);
+      }
+      if(!options.some(o=>String(o.id)===String(selected)))selected='';
+      if(!selected&&!input.dataset.userChoice&&['sewing','installation','motor'].includes(kind)&&options.length===1)selected=String(options[0].id);
+      input.value=selected||'';part.hidden=options.length===0;list.replaceChildren();
+      if(kind==='secondary_material')list.textContent=options[0]?.label||'';
+      else options.forEach(o=>checkbox(list,o,String(o.id)===input.value,kind,'part'));
+      const chosen=options.find(o=>String(o.id)===input.value);
+      part.querySelector('[data-unit-label]').textContent=chosen?'('+units[chosen.unit]+')':'';
+    });
+  }
+  function buttons(){document.getElementById('add-quote-window').disabled=windows.children.length>=30;windows.querySelectorAll('[data-remove-window]').forEach(b=>b.disabled=windows.children.length<=1);}
+  init(defaults);windows.querySelectorAll('[data-window]').forEach(row=>{
+    const root=row.querySelector('[data-selection]');init(root);inherit(row);
+    const legacy=data.options.find(o=>String(o.id)===row.querySelector('[data-component="secondary_material"]').dataset.value);
+    if(legacy?.fabric_group==='voilage'&&field(root,'curtain_id').value&&!field(root,'sheer_id').value){field(root,'sheer_id').value=String(legacy.id);row.querySelector('[data-inherit]').checked=false;refresh(root);}
+    components(row,true);
+  });buttons();
+  let dirty=false,revision=0,calculating=false;
+  form.addEventListener('input',()=>{dirty=true;revision++;totals();});
+  form.addEventListener('change',event=>{
+    dirty=true;revision++;const target=event.target,root=target.closest('[data-selection]');
+    if(target.dataset.fabric)field(root,target.dataset.fabric).value=target.checked?target.value:'';
+    if(root){if(root!==defaults)root.closest('[data-window]').querySelector('[data-inherit]').checked=false;refresh(root);if(root===defaults)windows.querySelectorAll('[data-window]').forEach(inherit);}
+    if(target.matches('[data-inherit]'))inherit(target.closest('[data-window]'));
+    if(target.dataset.part){const input=target.closest('[data-cost-part]').querySelector('[data-component]');input.value=target.checked?target.value:'';input.dataset.userChoice='1';}
+    if(root||target.matches('[data-inherit]')||target.dataset.part)windows.querySelectorAll('[data-window]').forEach(row=>components(row));
+    if(target.name==='payment_mode'&&target.value==='full')form.elements.deposit_amount.value=0;
+  });
+  let next=Math.max(-1,...[...windows.querySelectorAll('[name]')].map(el=>Number(el.name.match(/^windows\[(\d+)\]/)?.[1]??-1)))+1;
+  document.getElementById('add-quote-window').addEventListener('click',()=>{
+    if(windows.children.length>=30)return;
+    const fragment=document.getElementById('quote-window-template').content.cloneNode(true);fragment.querySelectorAll('[name]').forEach(el=>el.name=el.name.replace('__INDEX__',next));next++;
+    const row=fragment.querySelector('[data-window]');windows.append(fragment);init(row.querySelector('[data-selection]'));inherit(row);components(row,true);buttons();dirty=true;revision++;
+  });
+  windows.addEventListener('click',event=>{const b=event.target.closest('[data-remove-window]');if(b&&windows.children.length>1){b.closest('[data-window]').remove();buttons();dirty=true;revision++;}});
+  function totals(){
+    const output=form.querySelector('[data-quote-total]');if(!output)return;
+    let subtotal=0;form.querySelectorAll('#lines .line-row').forEach(row=>subtotal+=Number(row.querySelector('[name$="[quantity]"]').value)*Number(row.querySelector('[name$="[unit_price]"]').value));
+    const total=subtotal+Math.round(subtotal*Math.round(Number(form.elements.tax_rate.value)*100)/10000);output.textContent=Number.isFinite(total)?total.toLocaleString('fr-FR'):'À vérifier';
+  }
+  const lines=document.getElementById('lines');if(lines)new MutationObserver(()=>{dirty=true;totals();}).observe(lines,{childList:true});totals();
+  const calculate=document.getElementById('calculate-quote'),status=document.getElementById('calculation-status');
+  calculate?.addEventListener('click',async()=>{
+    if(calculating)return;
+    if([...lines.querySelectorAll('[name$="[unit_price]"]')].some(el=>Number(el.value)>0)&&!confirm('Remplacer les lignes actuelles par le calcul du catalogue ?'))return;
+    calculating=true;calculate.disabled=true;const requestedRevision=revision;status.textContent='Calcul en cours…';
+    try{
+      const payload=new FormData(form);payload.delete('_method');
+      const response=await fetch(calculate.dataset.url,{method:'POST',body:payload,headers:{Accept:'application/json'},credentials:'same-origin'}),result=await response.json();
+      if(!response.ok)throw new Error(Object.values(result.errors||{}).flat().join(' ')||'Calcul indisponible.');
+      if(revision!==requestedRevision)throw new Error('Le formulaire a changé. Relancez le calcul.');
+      lines.replaceChildren();lines.dataset.next=String(result.lines.length);
+      result.lines.forEach((line,index)=>{const fragment=document.getElementById('lines-template').content.cloneNode(true);fragment.querySelectorAll('[name]').forEach(el=>{el.name=el.name.replace('__INDEX__',index);el.value=line[el.name.match(/\[([^\]]+)\]$/)[1]];});lines.append(fragment);});
+      form.elements.calculation_token.value=result.token;form.elements.use_catalogue.value='1';
+      status.textContent=result.pending.length?'Total provisoire. À définir : '+result.pending.join(' ; '):'Chiffrage préparé.';dirty=true;totals();
+    }catch(error){status.textContent=error.message;}finally{calculating=false;calculate.disabled=false;}
+  });
+  form.addEventListener('submit',event=>{
+    if(calculate&&(calculating||(form.elements.use_catalogue.value==='1'&&!form.elements.calculation_token.value))){event.preventDefault();status.textContent='Calculez le chiffrage avant enregistrement.';status.scrollIntoView({block:'center'});}
+    if(!event.defaultPrevented)dirty=false;
+  });
+  window.addEventListener('beforeunload',event=>{if(dirty){event.preventDefault();event.returnValue='';}});
+})();

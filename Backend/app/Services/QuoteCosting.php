@@ -11,6 +11,7 @@ class QuoteCosting
 
     public static function input(Request $r): array
     {
+        QuoteSelections::prepare($r);
         $windows=$r->input('windows',[]);
         if (is_array($windows)) foreach ($windows as &$w) {
             if (!is_array($w)) continue;
@@ -27,6 +28,7 @@ class QuoteCosting
             'windows.*.costing'=>'required|array','windows.*.costing.material_quantity'=>'nullable|numeric|min:0.001|max:1000',
             'windows.*.costing.zone'=>'required|in:abidjan,other'];
         foreach (['defaults','windows.*'] as $prefix) $rules += [$prefix.'.category'=>'required|in:rideau,store',$prefix.'.product_id'=>'required|integer',$prefix.'.material_id'=>'required|integer',$prefix.'.finish_id'=>'required|integer',$prefix.'.motorized'=>'required|boolean'];
+        foreach (['defaults','windows.*'] as $prefix) foreach (['curtain_id','sheer_id','store_id'] as $key) $rules[$prefix.'.'.$key]='nullable|integer';
         foreach (self::PARTS as $kind) {
             $rules['windows.*.costing.'.$kind.'.option_id']='nullable|integer';
             $rules['windows.*.costing.'.$kind.'.quantity']='nullable|numeric|min:0.001|max:1000';
@@ -46,7 +48,25 @@ class QuoteCosting
     }
     private static function choice(array $v): array
     {
-        return ['category'=>$v['category'],'product_id'=>(int)$v['product_id'],'material_id'=>(int)$v['material_id'],'finish_id'=>(int)$v['finish_id'],'motorized'=>(bool)$v['motorized']];
+        $choice=['category'=>$v['category'],'product_id'=>0,'material_id'=>(int)$v['material_id'],'finish_id'=>(int)$v['finish_id'],'motorized'=>(bool)$v['motorized']];
+        foreach (['curtain_id','sheer_id','store_id'] as $key) if (array_key_exists($key,$v)) $choice[$key]=!empty($v[$key]) ? (int)$v[$key] : null;
+        return $choice;
+    }
+    public static function technical(Request $r): array {
+        $data=self::input($r);
+        foreach ($data['windows'] as $i=>&$w) {
+            StaffQuoteData::selection($w,'windows.'.$i);
+            $finish=QuoteOption::findOrFail($w['finish_id']); $w['components']=[];
+            foreach (self::PARTS as $kind) {
+                $part=$w['costing'][$kind]; if (!$part['option_id']) continue;
+                $o=QuoteOption::find($part['option_id']);
+                if (!$o || $o->kind!==($kind==='secondary_material' ? 'material' : $kind) || !$o->compatible($w['category'],0,$w['motorized']) || ($o->finish_codes && !in_array($finish->code,$o->finish_codes,true))) self::invalid($i,$kind.'.option_id','Fourniture incompatible avec cette sélection.');
+                if (in_array($o->unit,['piece','lot100','opening','flat']) && $part['quantity']!==null && floor($part['quantity'])!=$part['quantity']) self::invalid($i,$kind.'.quantity','Renseignez une quantité entière.');
+                $w['components'][]=['label'=>$o->label,'quantity'=>$part['quantity'],'unit'=>$o->unit];
+            }
+            unset($w['costing']['installation']['unit_price']);
+        }
+        unset($w); return $data;
     }
     public static function calculate(Request $r): array
     {

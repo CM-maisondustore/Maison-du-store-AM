@@ -36,7 +36,8 @@ class QuoteTariffSeeder extends Seeder
             ['pose-store-abidjan','installation','store','Installation de store à Abidjan',5000,'opening'],
         ] as $row) {
             [$code,$kind,$category,$label,$price,$unit]=$row;
-            QuoteOption::firstOrCreate(['code'=>$code],['kind'=>$kind,'category'=>$category,'label'=>$label,'unit_price'=>$price,'unit'=>$unit,'motorization'=>$row[6] ?? 'any','finish_codes'=>$row[7] ?? [],'active'=>true,'public_choice'=>in_array($kind,['material','finish','support'])]);
+            QuoteOption::firstOrCreate(['code'=>$code],['kind'=>$kind,'category'=>$category,'label'=>$label,'unit_price'=>$price,'unit'=>$unit,'motorization'=>$row[6] ?? 'any','finish_codes'=>$row[7] ?? [],'active'=>true,'public_choice'=>in_array($kind,['material','finish','support']),
+                'fabric_group'=>$kind==='material' ? (str_starts_with($code,'voilage-') ? 'voilage' : $category) : null]);
         }
     }
 }

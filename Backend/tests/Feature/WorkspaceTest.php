@@ -56,7 +56,7 @@ class WorkspaceTest extends TestCase
     {
         $this->actingAs($this->user()); $quote = $this->quote();
         foreach (['','/contacts','/products','/products/create','/devis','/devis/'.$quote->id,'/rendez-vous','/prestations','/factures','/messages','/messages/nouveau','/equipe','/contacts/'.$quote->contact_id] as $path) $this->get('/admin'.$path)->assertOk()->assertHeader('X-Robots-Tag','noindex, nofollow');
-        $this->seed(); $this->get('/admin/products/'.Product::first()->id.'/edit')->assertOk();
+        $this->seedProducts(); $this->get('/admin/products/'.Product::first()->id.'/edit')->assertOk();
         $job = $this->job($this->user('agent')); $this->get('/admin/prestations/'.$job->id)->assertOk();
         $appointment = Appointment::create(['reference'=>(string)Str::uuid(),'date'=>'2026-10-01','time'=>'09:00','details'=>['firstName'=>'Client','lastName'=>'Test','appointmentType'=>'showroom']]);
         $this->get('/admin/rendez-vous/'.$appointment->id)->assertOk();
@@ -67,9 +67,9 @@ class WorkspaceTest extends TestCase
         $this->post('/admin/prestations/'.$job->id.'/devis',['type'=>'store'])->assertRedirect();
         $quote = Quote::firstOrFail(); $this->assertNull($quote->terms_accepted_at);
         $this->post('/admin/prestations/'.$job->id.'/devis',['type'=>'rideau'])->assertRedirect(); $this->assertDatabaseCount('quotes',1);
-        $this->put('/admin/devis/'.$quote->id, ['status'=>'accepted','agent_id'=>999,'contact_id'=>999,'valid_until'=>'2026-12-31','tax_basis_points'=>0,'lines'=>[['description'=>'Pose','quantity'=>1,'unit_price'=>45000]]])->assertRedirect();
+        $this->put('/admin/devis/'.$quote->id, ['status'=>'accepted','agent_id'=>999,'contact_id'=>999,'valid_until'=>'2026-12-31','tax_basis_points'=>0,'lines'=>[['description'=>'Pose','quantity'=>1,'unit_price'=>45000]]])->assertForbidden();
         $this->assertSame('draft',$quote->fresh()->status); $this->assertSame($agent->id,$quote->fresh()->agent_id);
-        $this->get('/admin/devis/'.$quote->id.'/pdf')->assertOk()->assertHeader('Content-Type','application/pdf');
+        $this->get('/admin/devis/'.$quote->id.'/pdf')->assertForbidden();
     }
     public function test_cancelled_appointment_releases_slot_without_losing_history(): void
     {
@@ -89,7 +89,7 @@ class WorkspaceTest extends TestCase
     }
     public function test_unpublished_products_stay_in_archive_and_leave_public_catalogue(): void
     {
-        $this->seed(); $product=Product::firstOrFail(); $product->update(['published'=>false]); $this->seed();
+        $this->seedProducts(); $product=Product::firstOrFail(); $product->update(['published'=>false]); $this->seedProducts();
         $this->getJson('/api/products')->assertJsonCount(13,'data'); $this->assertDatabaseCount('products',14);
     }
     public function test_invoice_requires_accepted_quote_and_locks_issued_snapshot(): void

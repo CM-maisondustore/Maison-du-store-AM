@@ -7,10 +7,10 @@
 </div>
 @foreach(\App\Services\QuoteCosting::PARTS as $kind)
 <div class="grid" data-cost-part="{{ $kind }}">
-<label>{{ \App\Models\QuoteOption::KINDS[$kind] ?? 'Tissu / voilage complémentaire' }}<select data-component="{{ $kind }}" data-value="{{ $window['costing'][$kind]['option_id'] ?? '' }}" name="windows[{{ $index }}][costing][{{ $kind }}][option_id]"><option value="">Non sélectionné</option></select></label>
+<div><h4>{{ \App\Models\QuoteOption::KINDS[$kind] ?? 'Voilage sélectionné — métrage séparé' }}</h4><input type="hidden" data-component="{{ $kind }}" data-value="{{ $window['costing'][$kind]['option_id'] ?? '' }}" name="windows[{{ $index }}][costing][{{ $kind }}][option_id]"><div data-component-list></div></div>
 <label>Quantité <span data-unit-label></span><input inputmode="decimal" data-component-quantity name="windows[{{ $index }}][costing][{{ $kind }}][quantity]" value="{{ $window['costing'][$kind]['quantity'] ?? (in_array($kind,['motor','installation']) ? 1 : '') }}"></label>
-@if($kind==='installation')<label>Prix de pose à définir (FCFA / unité)<input type="number" min="0" max="100000000" step="1" name="windows[{{ $index }}][costing][installation][unit_price]" value="{{ $window['costing']['installation']['unit_price'] ?? '' }}" placeholder="Rideaux / hors Abidjan : à définir"></label>@endif
+@if($kind==='installation' && auth()->user()->isAdmin())<label>Prix de pose à définir (FCFA / unité)<input type="number" min="0" max="100000000" step="1" name="windows[{{ $index }}][costing][installation][unit_price]" value="{{ $window['costing']['installation']['unit_price'] ?? '' }}" placeholder="Rideaux / hors Abidjan : à définir"></label>@endif
 </div>
 @endforeach
-<p class="muted">Accroches : nombre de lots complets de 100. Les supports et reflètes proposés dépendent de la finition. La pose des rideaux reste à définir, même si un tarif de référence existe au catalogue.</p>
+<p class="muted">Accroches : nombre de lots complets de 100. Les supports et reflètes proposés dépendent de la finition.</p>
 </div>

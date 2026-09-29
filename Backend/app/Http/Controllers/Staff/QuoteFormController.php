@@ -18,10 +18,11 @@ class QuoteFormController
     }
     private function form(Quote $quote)
     {
-        return view('staff.quote-form',['quote'=>$quote,'catalogue'=>StaffQuoteData::catalogue(),'agents'=>User::where('role','agent')->where('active',true)->get()]);
+        return view('staff.quote-form',['quote'=>$quote,'catalogue'=>StaffQuoteData::catalogue(auth()->user()->isAdmin()),'agents'=>User::where('role','agent')->where('active',true)->get()]);
     }
     public function create() { return $this->form(new Quote(['contact'=>[],'dimensions'=>[],'edit_version'=>0,'submission_token'=>(string)Str::uuid()])); }
     public function calculate(Request $r) {
+        abort_unless($r->user()->isAdmin(),403);
         $data=\App\Services\QuoteCosting::calculate($r);
         return response()->json(['lines'=>$data['lines'],'pending'=>$data['pending'],'token'=>\App\Services\QuoteCosting::token($data)]);
     }
@@ -37,34 +38,37 @@ class QuoteFormController
     }
     public function store(Request $r)
     {
-        $data=StaffQuoteData::validate($r); $payment=QuoteReceipts::validate($r);
+        $data=StaffQuoteData::validate($r); $payment=$r->user()->isAdmin() ? QuoteReceipts::validate($r) : null;
         $token=$r->input('submission_token');
         $previous=Quote::where('submission_token',$token)->first();
         if ($previous) { abort_unless($previous->created_by===$r->user()->id,403); return redirect()->route('staff.quotes.show',$previous); }
         try {
             $quote=DB::transaction(function () use ($r,$data,$payment,$token) {
                 $quote=Quote::create([...$data,'contact_id'=>$this->contact($data['contact'])->id,'reference'=>(string)Str::uuid(),'source'=>'interne','status'=>'draft','submission_token'=>$token,'created_by'=>$r->user()->id,'agent_id'=>$r->user()->isAdmin() ? ($data['agent_id'] ?? null) : $r->user()->id]);
-                QuoteReceipts::record($quote,$payment,$r->user()->id); Audit::record('devis_interne_cree',$quote); return $quote;
+                if ($payment) QuoteReceipts::record($quote,$payment,$r->user()->id); Audit::record('devis_interne_cree',$quote); return $quote;
             });
         } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {
             $quote=Quote::where('submission_token',$token)->where('created_by',$r->user()->id)->first(); if (!$quote) throw $e;
         }
-        return redirect()->route('staff.quotes.show',$quote)->with('success','Devis enregistré en brouillon avec ses fenêtres et ses paiements.');
+        return redirect()->route('staff.quotes.show',$quote)->with('success','Devis enregistré en brouillon.');
     }
     public function update(Request $r,Quote $quote)
     {
-        $this->access($r,$quote,true); $data=StaffQuoteData::validate($r); $payment=QuoteReceipts::validate($r);
+        $this->access($r,$quote,true); $data=StaffQuoteData::validate($r); $payment=$r->user()->isAdmin() ? QuoteReceipts::validate($r) : null;
         DB::transaction(function () use ($r,$quote,$data,$payment) {
             $locked=Quote::whereKey($quote->id)->lockForUpdate()->firstOrFail(); $this->access($r,$locked,true);
             if ($locked->edit_version!==(int)$r->input('edit_version')) throw ValidationException::withMessages(['edit_version'=>'Ce devis a été modifié dans une autre fenêtre. Rechargez-le avant de reprendre la saisie.']);
-            if ($locked->receivedAmount()>Pricing::totals($data['lines'],$data['tax_basis_points'])['total']) throw ValidationException::withMessages(['lines'=>'Le total ne peut pas être inférieur aux montants déjà reçus.']);
+            if ($r->user()->isAdmin() && $locked->receivedAmount()>Pricing::totals($data['lines'],$data['tax_basis_points'])['total']) throw ValidationException::withMessages(['lines'=>'Le total ne peut pas être inférieur aux montants déjà reçus.']);
+            if (!$r->user()->isAdmin()) $data['configuration']['calculation']=$locked->configuration['calculation'] ?? null;
+            elseif (!$r->has('field_notes')) $data['configuration']['field_notes']=$locked->configuration['field_notes'] ?? '';
             $locked->fill([...$data,'contact_id'=>$this->contact($data['contact'],$locked)->id,'status'=>'draft','edit_version'=>$locked->edit_version+1]);
-            $locked->save(); QuoteReceipts::record($locked,$payment,$r->user()->id); Audit::record('formulaire_devis_modifie',$locked);
+            $locked->save(); if ($payment) QuoteReceipts::record($locked,$payment,$r->user()->id); Audit::record('formulaire_devis_modifie',$locked);
         });
-        return redirect()->route('staff.quotes.show',$quote)->with('success','Devis et paiements enregistrés.');
+        return redirect()->route('staff.quotes.show',$quote)->with('success','Devis enregistré.');
     }
     public function receipt(Request $r,Quote $quote)
     {
+        abort_unless($r->user()->isAdmin(),403);
         $this->access($r,$quote); $r->validate(['receipt_amount'=>'required|integer|min:1']); $data=QuoteReceipts::validate($r);
         DB::transaction(function () use ($r,$quote,$data) {
             $locked=Quote::whereKey($quote->id)->lockForUpdate()->firstOrFail(); $this->access($r,$locked);

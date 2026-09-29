@@ -35,9 +35,9 @@ class ApiTest extends TestCase
 
     public function test_catalogue_is_seeded_and_idempotent(): void
     {
-        $this->seed();
+        $this->seedProducts();
         $count = count(json_decode(file_get_contents(database_path('data/products.json')), true));
-        $this->seed();
+        $this->seedProducts();
         $this->assertDatabaseCount('products', $count);
         $this->getJson('/api/products')->assertOk()->assertJsonCount($count, 'data')->assertJsonPath('data.0.price', 'Prix');
     }

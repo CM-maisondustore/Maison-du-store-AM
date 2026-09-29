@@ -39,7 +39,7 @@ class QuoteCostingTest extends TestCase
         $this->postJson('/admin/devis/chiffrer',$bad)->assertUnprocessable()->assertJsonValidationErrors('windows.0.costing.material_quantity');
     }
     public function test_store_area_motor_and_abidjan_installation_and_other_zone(): void {
-        $this->seed(); $this->login('agent'); $data=$this->data('store');
+        $this->seed(); $this->login(); $data=$this->data('store');
         $data['defaults']['motorized']=1;
         $data['windows'][0]['costing']['motor']=['option_id'=>$this->id('kit-moteur'),'quantity'=>1];
         $r=$this->postJson('/admin/devis/chiffrer',$data)->assertOk();
@@ -112,13 +112,13 @@ class QuoteCostingTest extends TestCase
         $data['product']['fabric']='voilage-luxe'; $data['product']['hanging']='barre-simple';
         $this->postJson('/api/quotes/curtains',$data)->assertUnprocessable()->assertJsonValidationErrors('product.hanging');
     }
-    public function test_only_admin_can_edit_costs_and_agents_can_calculate(): void {
+    public function test_only_admin_can_edit_costs_and_calculate(): void {
         $this->seed(); $this->login(); $o=QuoteOption::where('code','rail-wave-manuel')->firstOrFail();
         $data=['label'=>$o->label,'kind'=>$o->kind,'category'=>$o->category,'motorization'=>'no','active'=>1,'unit_price'=>8000,'unit'=>'m','finish_codes'=>['wave-manuel']];
         $this->get('/admin/options-devis')->assertOk()->assertSee('Prix unitaire');
         $this->put('/admin/options-devis/'.$o->id,$data)->assertSessionHasNoErrors(); $this->assertSame(8000,$o->fresh()->unit_price);
         auth()->logout(); session()->flush(); $this->login('agent');
         $this->put('/admin/options-devis/'.$o->id,$data)->assertForbidden();
-        $this->postJson('/admin/devis/chiffrer',$this->data())->assertOk();
+        $this->postJson('/admin/devis/chiffrer',$this->data())->assertForbidden();
     }
 }

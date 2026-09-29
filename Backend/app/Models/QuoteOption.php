@@ -11,7 +11,7 @@ class QuoteOption extends Model
     protected $casts=['product_ids'=>'array','active'=>'boolean','finish_codes'=>'array','unit_price'=>'integer','public_choice'=>'boolean'];
     public function compatible(string $category, int $product, bool $motorized): bool
     {
-        return $this->active && $this->category===$category && (!$this->product_ids || in_array($product,$this->product_ids,true))
+        return $this->active && $this->category===$category && ($product===0 || !$this->product_ids || in_array($product,$this->product_ids,true))
             && ($this->motorization==='any' || $this->motorization===($motorized ? 'yes' : 'no'));
     }
 }

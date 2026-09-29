@@ -59,7 +59,7 @@ class QuoteRequest extends FormRequest
             'contact.civility' => ['required', Rule::in(['m', 'mme'])],
             'contact.lastName' => ['required', 'string', 'min:2', 'max:60'],
             'contact.firstName' => ['required', 'string', 'min:2', 'max:60'],
-            'contact.email' => ['required', 'email', 'max:254'],
+            'contact.email' => ['nullable', 'email', 'max:254'],
             'contact.phone' => ['required', 'string', 'max:30', new Phone],
             'contact.address' => ['required', 'string', 'min:4', 'max:120'],
             'contact.city' => ['required', 'string', 'min:2', 'max:60'],
