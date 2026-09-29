@@ -12,7 +12,7 @@ class StaffQuoteFormTest extends TestCase
     private function selection(string $category='rideau'): array
     {
         $product=$category==='store' ? Product::where('reference','ST-003')->firstOrFail() : Product::where('details->type','rideau')->firstOrFail();
-        return ['category'=>$category,'product_id'=>$product->id,'motorized'=>0,'material_id'=>QuoteOption::where('code',$category==='store' ? 'aluminium' : 'lin')->value('id'),'finish_id'=>QuoteOption::where('code',$category==='store' ? 'standard' : 'wave')->value('id')];
+        return ['category'=>$category,'product_id'=>$product->id,'motorized'=>0,'material_id'=>QuoteOption::where('code',$category==='store' ? 'store-lourd' : 'occultant-100')->value('id'),'finish_id'=>QuoteOption::where('code',$category==='store' ? 'standard' : 'wave')->value('id')];
     }
     private function data(): array
     {
@@ -35,7 +35,7 @@ class StaffQuoteFormTest extends TestCase
             $this->assertSame('draft',$quote->status); $this->assertSame($user->id,$quote->created_by);
             $this->assertSame($role==='agent' ? $user->id : null,$quote->agent_id);
             $this->assertSame(120.5,$quote->dimensions[0]['width']);
-            $this->assertSame('Wave',$quote->dimensions[0]['finish_name']); $this->assertSame('Aluminium',$quote->dimensions[1]['material_name']);
+            $this->assertSame('Wave',$quote->dimensions[0]['finish_name']); $this->assertSame('Store lourd',$quote->dimensions[1]['material_name']);
             $this->assertSame('store',$quote->dimensions[1]['category']); $this->assertNotNull($quote->contact_id);
             $this->assertSame(20000,$quote->receivedAmount());
             $this->get('/admin/devis/'.$quote->id)->assertOk()->assertSee('Wave')->assertSee('20 000');
@@ -78,7 +78,7 @@ class StaffQuoteFormTest extends TestCase
         $this->put('/admin/devis/'.$quote->id.'/formulaire',$edit)->assertSessionHasErrors('lines');
         $this->assertSame(100000,$quote->fresh()->lines[0]['unit_price']);
         $this->put('/admin/devis/'.$quote->id,['lines'=>$data['lines'],'tax_rate'=>0,'valid_until'=>$data['valid_until'],'status'=>'approved'])->assertSessionHasNoErrors();
-        $this->assertSame('Aluminium',$quote->fresh()->dimensions[1]['material_name']);
+        $this->assertSame('Store lourd',$quote->fresh()->dimensions[1]['material_name']);
     }
     public function test_agents_cannot_read_or_edit_other_quotes_or_void_receipts_and_accepted_quotes_stay_locked(): void
     {

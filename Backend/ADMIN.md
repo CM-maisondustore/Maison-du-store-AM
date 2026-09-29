@@ -20,6 +20,8 @@ Dans le formulaire de devis Admin-CM/Agent :
 
 Le calcul est effectué côté serveur, sans sauvegarde de dossier pendant la préparation. Un résultat signé empêche de modifier silencieusement le détail calculé ; les lignes commerciales restent volontairement éditables. Les devis acceptés/facturés restent verrouillés.
 
+Les neuf anciens matériaux (lin, coton, polyester, velours, voilage générique, toile textile, toile screen, aluminium, bois) ont été retirés du catalogue et des choix de devis par la migration `2026_09_29_000009`. Leurs entrées sont archivées via `deleted_at` ; les descriptions et tarifs enregistrés sur les devis restent inchangés. Le seed ne les recrée plus. Les finitions et les matériaux de la nouvelle grille sont conservés.
+
 ## Rôles
 
 | Fonction | Admin-CM | Agent |
