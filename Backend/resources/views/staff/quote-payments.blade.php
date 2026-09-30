@@ -1,4 +1,4 @@
-@php($quoteTotals=\App\Services\Pricing::totals($quote->lines ?? [],$quote->tax_basis_points))
+@php($quoteTotals=\App\Services\Quotes\QuoteFinancials::forQuote($quote))
 <section class="panel"><h2>Dates et paiements</h2>
 <p>Devis : {{ $quote->quote_date ?? $quote->created_at->format('Y-m-d') }} · Livraison prévue : {{ $quote->delivery_date ?: 'À préciser' }} · Pose prévue : {{ $quote->installation_date ?: 'À préciser' }}</p>
 <p>Conditions : {{ $quote->payment_mode==='full' ? 'Paiement intégral' : ($quote->payment_mode==='advance' ? 'Avance de '.number_format($quote->deposit_amount,0,',',' ').' FCFA puis solde' : 'À préciser') }}</p>

@@ -24,7 +24,9 @@ class QuoteFormController
     public function calculate(Request $r) {
         abort_unless($r->user()->isAdmin(),403);
         $data=\App\Services\QuoteCosting::calculate($r);
-        return response()->json(['lines'=>$data['lines'],'pending'=>$data['pending'],'token'=>\App\Services\QuoteCosting::token($data)]);
+        return response()->json(['lines'=>$data['lines'],'pending'=>$data['pending'],'financial'=>$data['financial'] ?? null,
+            'summary'=>isset($data['financial']) ? view('staff.quote-financial-summary',['financial'=>$data['financial']])->render() : null,
+            'token'=>\App\Services\QuoteCosting::token($data)]);
     }
     public function edit(Request $r,Quote $quote) { $this->access($r,$quote,true); return $this->form($quote); }
     private function contact(array $data,?Quote $quote=null): Contact
@@ -58,7 +60,7 @@ class QuoteFormController
         DB::transaction(function () use ($r,$quote,$data,$payment) {
             $locked=Quote::whereKey($quote->id)->lockForUpdate()->firstOrFail(); $this->access($r,$locked,true);
             if ($locked->edit_version!==(int)$r->input('edit_version')) throw ValidationException::withMessages(['edit_version'=>'Ce devis a été modifié dans une autre fenêtre. Rechargez-le avant de reprendre la saisie.']);
-            if ($r->user()->isAdmin() && $locked->receivedAmount()>Pricing::totals($data['lines'],$data['tax_basis_points'])['total']) throw ValidationException::withMessages(['lines'=>'Le total ne peut pas être inférieur aux montants déjà reçus.']);
+            if ($r->user()->isAdmin() && $locked->receivedAmount()>($data['configuration']['calculation']['financial']['total'] ?? Pricing::totals($data['lines'],$data['tax_basis_points'])['total'])) throw ValidationException::withMessages(['lines'=>'Le total ne peut pas être inférieur aux montants déjà reçus.']);
             if (!$r->user()->isAdmin()) $data['configuration']['calculation']=$locked->configuration['calculation'] ?? null;
             elseif (!$r->has('field_notes')) $data['configuration']['field_notes']=$locked->configuration['field_notes'] ?? '';
             $locked->fill([...$data,'contact_id'=>$this->contact($data['contact'],$locked)->id,'status'=>'draft','edit_version'=>$locked->edit_version+1]);

@@ -26,6 +26,7 @@ Route::prefix('admin')->group(function () {
         Route::put('prestations/{intervention}', [InterventionController::class, 'update'])->name('interventions.update');
         Route::post('prestations/{intervention}/devis', [QuoteController::class, 'onsite'])->name('interventions.quote');
         Route::middleware('admin')->group(function () {
+            Route::post('devis/{quote}/avancement', [App\Http\Controllers\Staff\QuoteWorkflowController::class,'update'])->name('quotes.workflow');
             Route::get('communications', [App\Http\Controllers\Staff\CommunicationController::class,'index'])->name('communications.index');
             Route::get('communications/modeles/{template}', [App\Http\Controllers\Staff\CommunicationController::class,'edit'])->name('communications.edit');
             Route::post('communications/modeles/{template}', [App\Http\Controllers\Staff\CommunicationController::class,'update'])->name('communications.update');

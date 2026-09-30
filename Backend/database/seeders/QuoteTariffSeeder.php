@@ -13,6 +13,7 @@ class QuoteTariffSeeder extends Seeder
             ['occultant-60','material','rideau','Tissu occultant 60 %',7000,'m'],
             ['voilage-transparent','material','rideau','Voilage transparent',4000,'m'],
             ['voilage-luxe','material','rideau','Voilage luxe',14000,'m'],
+            ['voilage-lourd','material','rideau','Voilage lourd',11000,'m'],
             ['store-lourd','material','store','Store lourd',25000,'m2'],
             ['store-leger','material','store','Store léger',18000,'m2'],
             ['store-standard','finish','store','Finition standard',0,'flat'],
@@ -33,6 +34,7 @@ class QuoteTariffSeeder extends Seeder
             ['confection','sewing','rideau','Confection',1000,'m'],
             ['pose-rideaux','installation','rideau','Pose des rideaux — à définir',null,'opening'],
             ['kit-moteur','motor','store','Kit moteur',100000,'piece','yes'],
+            ['kit-moteur-rideau','motor','rideau','Kit moteur rideau',100000,'piece','yes'],
             ['pose-store-abidjan','installation','store','Installation de store à Abidjan',5000,'opening'],
         ] as $row) {
             [$code,$kind,$category,$label,$price,$unit]=$row;

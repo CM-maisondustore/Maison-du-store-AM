@@ -26,6 +26,11 @@ class StaffQuoteData
         foreach (['defaults','windows.*'] as $prefix) $rules += [$prefix.'.category'=>'required|in:store,rideau',$prefix.'.material_id'=>'required|integer',$prefix.'.finish_id'=>'required|integer',$prefix.'.motorized'=>'required|boolean', $prefix.'.curtain_id'=>'nullable|integer',$prefix.'.sheer_id'=>'nullable|integer',$prefix.'.store_id'=>'nullable|integer'];
         if ($admin) $rules += ['payment_mode'=>'required|in:advance,full','deposit_amount'=>'required|integer|min:0|max:1000000000000','internal_notes'=>'nullable|string|max:10000'];
         else foreach (['lines','tax_rate','tax_basis_points','payment_mode','deposit_amount','internal_notes','calculation_token','receipt_amount','windows.*.costing.installation.unit_price'] as $field) $rules[$field]='prohibited';
+        if (!$admin) {
+            $rules['pricing']='prohibited';
+            foreach (QuoteCosting::PARTS as $kind) $rules['windows.*.costing.'.$kind.'.unit_price']='prohibited';
+            foreach (['material_unit_price','finish_unit_price'] as $key) $rules['windows.*.costing.'.$key]='prohibited';
+        }
         if ($r->user()->isAdmin()) $rules['agent_id']=['nullable',Rule::exists('users','id')->where('role','agent')->where('active',true)];
         $data=$r->validate($rules); $pricing=$admin ? Pricing::validate($r) : [];
         if (!empty($data['delivery_date']) && !empty($data['installation_date']) && $data['installation_date']<$data['delivery_date']) throw ValidationException::withMessages(['installation_date'=>'La pose doit être prévue à partir de la livraison.']);
@@ -41,10 +46,15 @@ class StaffQuoteData
             foreach ($dimensions as $i=>&$dimension) $dimension['costing']=$calculation['windows'][$i]['costing'];
             unset($dimension);
         }
-        $total=$admin ? Pricing::totals($pricing['lines'],$pricing['tax_basis_points'])['total'] : 0;
+        if (!empty($calculation['financial'])) {
+            $pricing=['lines'=>$calculation['lines'],'tax_basis_points'=>$calculation['financial']['taxBasisPoints']];
+            $data['deposit_amount']=$calculation['financial']['deposit'];
+            $data['payment_mode']=$calculation['financial']['depositPercent']==='100' ? 'full' : 'advance';
+        }
+        $total=$admin ? ($calculation['financial']['total'] ?? Pricing::totals($pricing['lines'],$pricing['tax_basis_points'])['total']) : 0;
         if ($admin && $data['deposit_amount']>$total) throw ValidationException::withMessages(['deposit_amount'=>'L’avance prévue ne peut pas dépasser le total du devis.']);
         return [...collect($data)->only(['quote_date','valid_until','delivery_date','installation_date','internal_notes','payment_mode','agent_id'])->all(),...$pricing,
-            ...($admin ? ['deposit_amount'=>$data['payment_mode']==='full' ? 0 : (int)$data['deposit_amount']] : []),
+            ...($admin ? ['deposit_amount'=>!empty($calculation['financial']) ? $calculation['financial']['deposit'] : ($data['payment_mode']==='full' ? 0 : (int)$data['deposit_amount'])] : []),
             'contact'=>collect($data['contact'])->only(['firstName','lastName','email','phone','address','city'])->all(),
             'type'=>$defaults['category'],'configuration'=>['defaults'=>$defaults,'calculation'=>$calculation,'field_notes'=>$data['field_notes'] ?? '', 'pricing_review_required'=>!$admin], 'product'=>['model'=>$defaults['product_name'],'fabric'=>$defaults['material_name'],'finish'=>$defaults['finish_name'],'control'=>$defaults['motorized'] ? 'Motorisée' : 'Manuelle'], 'dimensions'=>$dimensions];
     }

@@ -43,15 +43,21 @@
 <button type="button" class="secondary" data-add="dimensions">Ajouter une mesure</button>
 @endif
 <h2>Chiffrage</h2>
+@if(!empty($quote->configuration['calculation']['financial']))
+@include('staff.quote-financial-summary',['financial'=>$quote->configuration['calculation']['financial']])
+<p>Pour modifier les quantités, prix, frais ou remises, ouvrez le formulaire complet.</p>
+@endif
+<div @if(!empty($quote->configuration['calculation']['financial'])) hidden @endif>
 <div id="lines">
 @foreach(old('lines',$quote->lines ?: [['description'=>'','quantity'=>1,'unit_price'=>0]]) as $index=>$line)
-@include('staff.price-line')
+@include(!empty($quote->configuration['calculation']['financial']) ? 'staff.quote-calculated-line' : 'staff.price-line')
 @endforeach</div>
 <template id="lines-template">
 @include('staff.price-line',['index'=>'__INDEX__','line'=>[]])</template>
 <button type="button" class="secondary" data-add="lines">Ajouter une ligne</button>
+</div>
 <div class="grid">
-<label>Taux de taxe (%)<input type="number" name="tax_rate" min="0" max="100" step="0.01" required value="{{ old('tax_rate',$quote->tax_basis_points / 100) }}">
+<label>Taux de taxe (%)<input type="number" name="tax_rate" min="0" max="100" step="0.01" required @readonly(!empty($quote->configuration['calculation']['financial'])) value="{{ old('tax_rate',$quote->tax_basis_points / 100) }}">
 </label>
 <label>Valable jusqu’au<input type="date" name="valid_until" required value="{{ old('valid_until',$quote->valid_until ?? now()->addDays(30)->format('Y-m-d')) }}">
 </label>
@@ -73,6 +79,12 @@
 </div>
 </form>
 @include('staff.quote-payments')
+@if(!empty($quote->configuration['calculation']['financial']))
+@php($workflow=\App\Services\Quotes\QuoteWorkflow::state($quote))
+<section class="panel"><h2>Fabrication et suivi</h2><p>État : {{ \App\Services\Quotes\QuoteWorkflow::STAGES[$workflow] ?? ['draft'=>'Brouillon','sent'=>'Validé pour envoi','accepted'=>'Accord client reçu','deposit_pending'=>'Acompte attendu','deposit_paid'=>'Acompte reçu — démarrage autorisé','cancelled'=>'Annulé'][$workflow] ?? $workflow }}</p>
+@if($quote->status==='accepted')<form method="post" action="{{ route('staff.quotes.workflow',$quote) }}">@csrf<input type="hidden" name="edit_version" value="{{ $quote->edit_version }}"><label>Avancement<select name="stage">@foreach(\App\Services\Quotes\QuoteWorkflow::STAGES as $key=>$label)<option value="{{ $key }}" @selected($workflow===$key)>{{ $label }}</option>@endforeach</select></label><button>Enregistrer l’avancement</button></form>@endif
+</section>
+@endif
 @if(auth()->user()->isAdmin() && $quote->status==='accepted')<form class="panel" method="post" action="{{ route('staff.invoices.create',$quote) }}">
 @csrf<h2>Facturation</h2>
 <label>Date d’échéance<input type="date" name="due_date" required value="{{ now()->addDays(30)->format('Y-m-d') }}">

@@ -26,7 +26,7 @@ class TechnicalQuotesTest extends TestCase
         $q=Quote::create(['reference'=>Str::uuid(),'type'=>'rideau','contact'=>[],'product'=>['model'=>$old->details['name']],'dimensions'=>[]]); $before=$q->fresh()->getAttributes();
         $m=require database_path('migrations/2026_09_29_000010_separate_quote_fabrics.php');$m->retireProducts();$this->seed();
         $this->assertSame(14,Product::onlyTrashed()->count());$this->assertSame(1,Product::count());$this->assertSame($before,$q->fresh()->getAttributes());
-        $this->assertSame(7,QuoteOption::where('kind','material')->count());
+        $this->assertSame(8,QuoteOption::where('kind','material')->count());
     }
     public function test_agent_saves_separate_curtains_and_sheers_without_email_or_prices(): void {
         $this->seed(); $this->login('agent'); $data=$this->data();

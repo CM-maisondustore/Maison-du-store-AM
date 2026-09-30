@@ -14,12 +14,13 @@ class InvoiceController
         $invoice = DB::transaction(function () use ($quote, $data) {
             $q = Quote::whereKey($quote->id)->lockForUpdate()->firstOrFail();
             abort_unless($q->status === 'accepted' && $q->contact_id && count($q->lines ?? []), 422, 'Un devis accepté et chiffré est requis.');
-            return Invoice::firstOrCreate(['quote_id' => $q->id], ['contact_id' => $q->contact_id, 'due_date' => $data['due_date'], 'snapshot' => ['issuer' => config('workspace.issuer'), 'customer' => $q->contact, 'lines' => $q->lines, 'tax_basis_points' => $q->tax_basis_points]]);
+            return Invoice::firstOrCreate(['quote_id' => $q->id], ['contact_id' => $q->contact_id, 'due_date' => $data['due_date'], 'snapshot' => ['issuer' => config('workspace.issuer'), 'customer' => $q->contact, 'lines' => $q->lines, 'tax_basis_points' => $q->tax_basis_points,
+                'financial'=>\App\Services\Quotes\QuoteFinancials::forQuote($q), 'windows'=>$q->dimensions, 'payment_plan'=>['mode'=>$q->payment_mode,'deposit'=>$q->deposit_amount,'received'=>$q->receivedAmount()]]]);
         });
         Audit::record('facture_preparee', $invoice);
         return redirect()->route('staff.invoices.show', $invoice);
     }
-    public function show(Invoice $invoice) { return view('staff.invoice', ['invoice' => $invoice, 'totals' => Pricing::totals($invoice->snapshot['lines'], $invoice->snapshot['tax_basis_points'])]); }
+    public function show(Invoice $invoice) { return view('staff.invoice', ['invoice' => $invoice, 'totals' => \App\Services\Quotes\QuoteFinancials::forSnapshot($invoice->snapshot)]); }
     public function issue(Invoice $invoice)
     {
         $issuer=\App\Services\CommunicationTemplates::issuer(\App\Services\CommunicationTemplates::presentation('invoice'));

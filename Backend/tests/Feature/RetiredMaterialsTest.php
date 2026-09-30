@@ -28,7 +28,7 @@ class RetiredMaterialsTest extends TestCase
         $this->assertSame(9,QuoteOption::withTrashed()->whereIn('code',$codes)->count());
         $this->assertSame(0,QuoteOption::whereIn('code',$codes)->count());
         $this->assertNotNull(QuoteOption::find($custom->id));
-        $this->assertSame(7,QuoteOption::where('kind','material')->where('code','!=','custom-kept')->count());
+        $this->assertSame(8,QuoteOption::where('kind','material')->where('code','!=','custom-kept')->count());
         $this->assertSame($snapshot,$quote->fresh()->getAttributes());
         $this->assertNotContains($old->id,array_column(StaffQuoteData::catalogue()['options'],'id'));
         $this->assertNotContains('lin',array_column(PublicQuoteChoices::data(),'id'));

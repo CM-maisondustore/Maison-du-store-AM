@@ -66,6 +66,8 @@ PHPUnit utilise SQLite en mémoire et ne modifie pas les demandes locales. Tests
 
 ## Exploitation
 
+Le [guide du chiffrage](QUOTE-PRICING.md) décrit le calcul par ouverture, les tarifs personnalisés, frais, remises, acomptes et règles de fabrication.
+
 Pointer le serveur web uniquement vers `Backend/public`. En production : `APP_ENV=production`, `APP_DEBUG=false`, URL HTTPS et `SESSION_SECURE_COOKIE=true`, puis `php artisan migrate --force` et compilation Vite. Conserver une clé APP_KEY stable et sauvegarder la base. Les dossiers `storage` et `bootstrap/cache` doivent être accessibles en écriture.
 
 L’espace interne est accessible à `/admin/connexion` : rôles Admin-CM et Agent, dossiers clients sans compte public, catalogue, devis PDF, rendez-vous, prestations, factures et messagerie Hostinger. Voir [le guide de l’administration](ADMIN.md) pour la création du premier compte, les droits, les paramètres SMTP/IMAP et les parcours métier. Les messages sont envoyés explicitement après relecture ; aucune campagne automatique n’est déclenchée. Le statut `pending` ne constitue pas une confirmation définitive de rendez-vous.

@@ -17,7 +17,7 @@ class QuoteReceipts
         if (empty($data['receipt_amount'])) return;
         $existing=QuotePayment::where('token',$data['receipt_token'])->first();
         if ($existing) { abort_unless($existing->quote_id===$quote->id,409); return; }
-        $total=Pricing::totals($quote->lines ?? [],$quote->tax_basis_points)['total'];
+        $total=Quotes\QuoteFinancials::forQuote($quote)['total'];
         if ($quote->receivedAmount()+$data['receipt_amount']>$total) throw ValidationException::withMessages(['receipt_amount'=>'Les montants reçus ne peuvent pas dépasser le total du devis.']);
         $receipt=$quote->payments()->create(['recorded_by'=>$userId,'token'=>$data['receipt_token'],'amount'=>$data['receipt_amount'],'received_on'=>$data['receipt_date'],'method'=>$data['receipt_method'],'reference'=>$data['receipt_reference'] ?? null]);
         Audit::record('paiement_devis_enregistre',$receipt);

@@ -6,7 +6,7 @@ class QuoteOption extends Model
 {
     use SoftDeletes;
     protected $guarded=['id'];
-    public const KINDS = ['material'=>'Tissu / matériau','finish'=>'Finition','support'=>'Rail / barre','tape'=>'Reflète','hooks'=>'Accroches','motor'=>'Motorisation','sewing'=>'Confection','installation'=>'Installation'];
+    public const KINDS = ['material'=>'Tissu / matériau','finish'=>'Finition','support'=>'Rail / barre','tape'=>'Reflète','hooks'=>'Accroches','motor'=>'Motorisation','sewing'=>'Confection','installation'=>'Installation','delivery'=>'Livraison','transport'=>'Transport','travel'=>'Déplacement','combined'=>'Pose et livraison'];
     public const UNITS = ['m'=>'Mètre linéaire','m2'=>'Mètre carré','piece'=>'Pièce','lot100'=>'Lot de 100 pièces','opening'=>'Ouverture','flat'=>'Forfait'];
     protected $casts=['product_ids'=>'array','active'=>'boolean','finish_codes'=>'array','unit_price'=>'integer','public_choice'=>'boolean'];
     public function compatible(string $category, int $product, bool $motorized): bool

@@ -13,7 +13,7 @@
 @csrf @if($quote->exists) @method('PUT') @endif
 <input type="hidden" name="submission_token" value="{{ old('submission_token',$quote->submission_token ?: (string)\Illuminate\Support\Str::uuid()) }}">
 <input type="hidden" name="edit_version" value="{{ old('edit_version',$quote->edit_version ?? 0) }}">
-@if(auth()->user()->isAdmin())<input type="hidden" name="calculation_token" value="{{ old('calculation_token',!empty($quote->configuration['calculation']) ? \App\Services\QuoteCosting::token($quote->configuration['calculation']) : '') }}">@endif
+@if(auth()->user()->isAdmin())<input type="hidden" name="calculation_token" value="{{ old('calculation_token',!empty($quote->configuration['calculation']['financial']) ? \App\Services\QuoteCosting::token($quote->configuration['calculation']) : '') }}">@endif
 <section class="panel"><h2>Client</h2><div class="grid">
 @foreach(['firstName'=>'Prénom','lastName'=>'Nom / raison sociale','phone'=>'Téléphone','email'=>'E-mail (facultatif)','address'=>'Adresse de livraison et de pose','city'=>'Ville'] as $key=>$label)
 <label>{{ $label }}<input name="contact[{{ $key }}]" type="{{ $key==='email' ? 'email' : 'text' }}" @required(in_array($key,['lastName','phone','address'])) maxlength="{{ $key==='address' ? 1000 : ($key==='email' ? 255 : ($key==='phone' ? 50 : 100)) }}" value="{{ old('contact.'.$key,$quote->contact[$key] ?? '') }}"></label>
@@ -28,16 +28,15 @@
 <template id="quote-window-template">@include('staff.quote-window',['index'=>'__INDEX__','window'=>['inherit_defaults'=>true]])</template>
 <div class="actions"><button type="button" class="secondary" id="add-quote-window">Ajouter une fenêtre</button><span class="muted">30 fenêtres maximum</span></div>
 @if(auth()->user()->isAdmin())
-<section class="panel"><h2>Chiffrage du devis</h2><p class="muted">Calculez les lignes depuis le catalogue, puis ajustez librement les prix et descriptions avant d’enregistrer. Un nouveau calcul remplace les lignes de chiffrage actuelles.</p>
+<section class="panel"><h2>Chiffrage du devis</h2><p class="muted">Ajustez les quantités et les prix dans chaque ouverture. Un champ prix vide reprend le catalogue ; vos prix saisis sont conservés lors du recalcul. Les remises s’appliquent au total sans modifier les fournitures.</p>
 @if(!empty($quote->configuration['pricing_review_required']))<p class="notice">Les choix de l’agent sont à vérifier avant validation du chiffrage.</p>@endif
-<label>Mode de chiffrage<select name="use_catalogue"><option value="1" @selected(old('use_catalogue',!$quote->exists || !empty($quote->configuration['calculation']) ? '1' : '0')==='1')>À partir du catalogue</option><option value="0" @selected((string)old('use_catalogue',$quote->exists && empty($quote->configuration['calculation']) ? '0' : '1')==='0')>Saisie entièrement manuelle des lignes</option></select></label>
+@include('staff.quote-pricing-settings')
 <button type="button" id="calculate-quote" data-url="{{ route('staff.quotes.calculate') }}">Calculer depuis le catalogue</button>
 <p role="status" id="calculation-status">@if(!empty($quote->configuration['calculation']['pending']))Prix à définir : {{ implode(' ; ',$quote->configuration['calculation']['pending']) }}@endif</p>
-<div id="lines">@foreach(old('lines',$quote->lines ?: [['description'=>'Fourniture, confection et installation','quantity'=>1,'unit_price'=>0]]) as $index=>$line) @include('staff.price-line') @endforeach</div>
-<template id="lines-template">@include('staff.price-line',['index'=>'__INDEX__','line'=>[]])</template>
-<button type="button" class="secondary" data-add="lines">Ajouter une ligne</button>
+<div id="lines" hidden>@foreach(old('lines',$quote->lines ?: [['description'=>'Fourniture, confection et installation','quantity'=>1,'unit_price'=>0]]) as $index=>$line) @include('staff.quote-calculated-line') @endforeach</div>
+<template id="lines-template">@include('staff.quote-calculated-line',['index'=>'__INDEX__','line'=>[]])</template>
 <label>Taux de taxe (%)<input type="number" name="tax_rate" min="0" max="100" step="0.01" required value="{{ old('tax_rate',($quote->tax_basis_points ?? 0)/100) }}"></label>
-<p class="total" aria-live="polite">Total : <strong data-quote-total>0</strong> FCFA</p>
+<div id="quote-financial-result" aria-live="polite">@if(!empty($quote->configuration['calculation']['financial'])) @include('staff.quote-financial-summary',['financial'=>$quote->configuration['calculation']['financial']]) @elseif($quote->exists)<p class="notice">Le chiffrage historique est conservé jusqu’à l’enregistrement. Vérifiez chaque poste avant de le remplacer par un nouveau calcul.</p>@endif</div>
 </section>
 @endif
 <section class="panel"><h2>Dates et affectation</h2><div class="grid">
@@ -47,8 +46,8 @@
 @if(auth()->user()->isAdmin())<label>Agent<select name="agent_id"><option value="">Non affecté</option>@foreach($agents as $agent)<option value="{{ $agent->id }}" @selected(old('agent_id',$quote->agent_id)==$agent->id)>{{ $agent->name }}</option>@endforeach</select></label>@endif
 </div><p class="muted">Ces dates sont prévisionnelles. La planification d’une intervention se fait dans Prestations.</p></section>
 @if(auth()->user()->isAdmin())<section class="panel"><h2>Conditions de paiement prévues</h2><div class="grid">
-<label>Modalité<select name="payment_mode"><option value="advance" @selected(old('payment_mode',$quote->payment_mode)==='advance')>Avance puis solde</option><option value="full" @selected(old('payment_mode',$quote->payment_mode)==='full')>Paiement intégral</option></select></label>
-<label>Avance prévue (FCFA)<input required name="deposit_amount" type="number" min="0" max="1000000000000" step="1" value="{{ old('deposit_amount',$quote->deposit_amount ?? 0) }}"></label>
+<input type="hidden" name="payment_mode" value="advance"><input type="hidden" name="deposit_amount" value="{{ old('deposit_amount',$quote->deposit_amount ?? 0) }}">
+<p>L’acompte et le solde sont calculés sur le montant définitif après remise. Le pourcentage d’acompte se règle dans le chiffrage ci-dessus.</p>
 </div><p class="muted">Déjà reçu : {{ number_format($quote->exists ? $quote->receivedAmount() : 0,0,',',' ') }} FCFA</p>
 <h3>Nouveau paiement déjà reçu</h3>@include('staff.quote-receipt-fields')
 </section>

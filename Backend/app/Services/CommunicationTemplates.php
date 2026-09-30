@@ -5,7 +5,7 @@ use Illuminate\Validation\ValidationException;
 class CommunicationTemplates
 {
     public const LABELS = ['quote_received'=>'Demande de devis reçue','quote'=>'Envoi du devis','invoice'=>'Envoi de facture','appointment'=>'Confirmation de rendez-vous','reminder'=>'Rappel de rendez-vous','commercial'=>'Échange commercial','promotion'=>'Offre et promotion'];
-    public const VARIABLES = ['prenom','nom','reference','montant','acompte','date','heure','adresse','entreprise','statut'];
+    public const VARIABLES = ['prenom','nom','reference','montant','acompte','solde','remise','total_avant_remise','conditions_paiement','date','heure','adresse','entreprise','statut'];
     public static function defaults(string $key): array
     {
         return match($key) {
@@ -48,8 +48,10 @@ class CommunicationTemplates
             $lines=$record instanceof Quote ? ($record->lines ?? []) : $record->snapshot['lines'];
             $tax=$record instanceof Quote ? $record->tax_basis_points : $record->snapshot['tax_basis_points'];
             $data['reference']=$record instanceof Quote ? $record->reference : ($record->number ?? 'BROUILLON');
-            $data['montant']=number_format(Pricing::totals($lines,$tax ?? 0)['total'],0,',',' ');
-            if ($record instanceof Quote) $data['acompte']=number_format($record->deposit_amount ?? 0,0,',',' ');
+            $financial=$record instanceof Quote ? Quotes\QuoteFinancials::forQuote($record) : Quotes\QuoteFinancials::forSnapshot($record->snapshot);
+            $data['montant']=number_format($financial['total'],0,',',' ');
+            foreach (['acompte'=>'deposit','solde'=>'balance','remise'=>'discountAmount','total_avant_remise'=>'grossTotal'] as $variable=>$key) $data[$variable]=number_format($financial[$key] ?? 0,0,',',' ');
+            if (isset($financial['depositPercent'])) $data['conditions_paiement']='Un acompte de '.$financial['depositPercent'].' % est obligatoire avant le démarrage des travaux. Le solde est payable à la fin de la prestation.';
         }
         if ($record instanceof Appointment) {
             $data['date']=\Carbon\Carbon::parse($record->date)->format('d/m/Y'); $data['heure']=$record->time;

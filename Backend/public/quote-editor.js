@@ -41,12 +41,13 @@
   function components(row,initial=false){
     const v=values(row.querySelector('[data-selection]')),finish=data.options.find(o=>o.id===Number(v.finish_id));
     const material=data.options.find(o=>o.id===Number(v.category==='store'?v.store_id:(v.curtain_id||v.sheer_id)));
-    const meters=row.querySelector('[data-material-quantity]');meters.disabled=material?.unit==='m2';meters.placeholder=meters.disabled?'Surface calculée à partir des mesures':'Quantité en '+(units[material?.unit]||'mètres');
+    const meters=row.querySelector('[data-material-quantity]');meters.disabled=material?.unit==='m2'&&row.querySelector('[data-material-mode]').value!=='manual_override';meters.placeholder=meters.disabled?'Surface calculée à partir des mesures':'Quantité en '+(units[material?.unit]||'mètres');
     row.querySelectorAll('[data-component]').forEach(input=>{
       const kind=input.dataset.component,part=input.closest('[data-cost-part]'),list=part.querySelector('[data-component-list]');
       let selected=initial?input.dataset.value:input.value;
       if(initial&&!selected&&row.querySelector('[data-costing]').dataset.costingSaved==='1')input.dataset.userChoice='1';
-      let options=data.options.filter(o=>o.kind===(kind==='secondary_material'?'material':kind)&&compatible(o,v)&&(!o.finish_codes?.length||o.finish_codes.includes(finish?.code)));
+      const optionKind=({secondary_material:'material',extra_support:'support',extra_tape:'tape'})[kind]||kind;
+      let options=data.options.filter(o=>o.kind===optionKind&&(compatible(o,v)||(kind==='extra_support'&&compatible(o,{...v,motorized:'0'})))&&(kind==='extra_support'||!o.finish_codes?.length||o.finish_codes.includes(finish?.code)));
       if(kind==='secondary_material'){
         selected=v.category==='rideau'&&v.curtain_id?v.sheer_id:'';options=options.filter(o=>String(o.id)===selected);
       }
@@ -67,33 +68,34 @@
     components(row,true);
   });buttons();
   let dirty=false,revision=0,calculating=false;
-  form.addEventListener('input',()=>{dirty=true;revision++;totals();});
+  function invalidate(target){
+    if(!form.elements.calculation_token)return;
+    if(target.closest('[data-window],#quote-defaults')||/^(pricing\[|tax_rate|lines\[)/.test(target.name||'')){
+      form.elements.calculation_token.value='';
+      document.getElementById('calculation-status').textContent='Des paramètres ont changé. Recalculez pour actualiser les montants affichés.';
+    }
+  }
+  form.addEventListener('input',event=>{dirty=true;revision++;invalidate(event.target);});
   form.addEventListener('change',event=>{
-    dirty=true;revision++;const target=event.target,root=target.closest('[data-selection]');
+    dirty=true;revision++;const target=event.target,root=target.closest('[data-selection]');invalidate(target);
     if(target.dataset.fabric)field(root,target.dataset.fabric).value=target.checked?target.value:'';
     if(root){if(root!==defaults)root.closest('[data-window]').querySelector('[data-inherit]').checked=false;refresh(root);if(root===defaults)windows.querySelectorAll('[data-window]').forEach(inherit);}
     if(target.matches('[data-inherit]'))inherit(target.closest('[data-window]'));
     if(target.dataset.part){const input=target.closest('[data-cost-part]').querySelector('[data-component]');input.value=target.checked?target.value:'';input.dataset.userChoice='1';}
-    if(root||target.matches('[data-inherit]')||target.dataset.part)windows.querySelectorAll('[data-window]').forEach(row=>components(row));
+    if(root||target.matches('[data-inherit],[data-material-mode]')||target.dataset.part)windows.querySelectorAll('[data-window]').forEach(row=>components(row));
     if(target.name==='payment_mode'&&target.value==='full')form.elements.deposit_amount.value=0;
   });
   let next=Math.max(-1,...[...windows.querySelectorAll('[name]')].map(el=>Number(el.name.match(/^windows\[(\d+)\]/)?.[1]??-1)))+1;
   document.getElementById('add-quote-window').addEventListener('click',()=>{
     if(windows.children.length>=30)return;
     const fragment=document.getElementById('quote-window-template').content.cloneNode(true);fragment.querySelectorAll('[name]').forEach(el=>el.name=el.name.replace('__INDEX__',next));next++;
-    const row=fragment.querySelector('[data-window]');windows.append(fragment);init(row.querySelector('[data-selection]'));inherit(row);components(row,true);buttons();dirty=true;revision++;
+    const row=fragment.querySelector('[data-window]');windows.append(fragment);init(row.querySelector('[data-selection]'));inherit(row);components(row,true);buttons();dirty=true;revision++;invalidate(row);
   });
-  windows.addEventListener('click',event=>{const b=event.target.closest('[data-remove-window]');if(b&&windows.children.length>1){b.closest('[data-window]').remove();buttons();dirty=true;revision++;}});
-  function totals(){
-    const output=form.querySelector('[data-quote-total]');if(!output)return;
-    let subtotal=0;form.querySelectorAll('#lines .line-row').forEach(row=>subtotal+=Number(row.querySelector('[name$="[quantity]"]').value)*Number(row.querySelector('[name$="[unit_price]"]').value));
-    const total=subtotal+Math.round(subtotal*Math.round(Number(form.elements.tax_rate.value)*100)/10000);output.textContent=Number.isFinite(total)?total.toLocaleString('fr-FR'):'À vérifier';
-  }
-  const lines=document.getElementById('lines');if(lines)new MutationObserver(()=>{dirty=true;totals();}).observe(lines,{childList:true});totals();
+  windows.addEventListener('click',event=>{const b=event.target.closest('[data-remove-window]');if(b&&windows.children.length>1){invalidate(b);b.closest('[data-window]').remove();buttons();dirty=true;revision++;}});
+  const lines=document.getElementById('lines');
   const calculate=document.getElementById('calculate-quote'),status=document.getElementById('calculation-status');
   calculate?.addEventListener('click',async()=>{
     if(calculating)return;
-    if([...lines.querySelectorAll('[name$="[unit_price]"]')].some(el=>Number(el.value)>0)&&!confirm('Remplacer les lignes actuelles par le calcul du catalogue ?'))return;
     calculating=true;calculate.disabled=true;const requestedRevision=revision;status.textContent='Calcul en cours…';
     try{
       const payload=new FormData(form);payload.delete('_method');
@@ -103,7 +105,9 @@
       lines.replaceChildren();lines.dataset.next=String(result.lines.length);
       result.lines.forEach((line,index)=>{const fragment=document.getElementById('lines-template').content.cloneNode(true);fragment.querySelectorAll('[name]').forEach(el=>{el.name=el.name.replace('__INDEX__',index);el.value=line[el.name.match(/\[([^\]]+)\]$/)[1]];});lines.append(fragment);});
       form.elements.calculation_token.value=result.token;form.elements.use_catalogue.value='1';
-      status.textContent=result.pending.length?'Total provisoire. À définir : '+result.pending.join(' ; '):'Chiffrage préparé.';dirty=true;totals();
+      if(result.summary)document.getElementById('quote-financial-result').innerHTML=result.summary;
+      if(result.financial){form.elements.deposit_amount.value=result.financial.deposit;form.elements.payment_mode.value=result.financial.depositPercent==='100'?'full':'advance';}
+      status.textContent=result.pending.length?'Total provisoire. À définir : '+result.pending.join(' ; '):'Chiffrage préparé. Vos quantités et prix personnalisés ont été conservés.';dirty=true;
     }catch(error){status.textContent=error.message;}finally{calculating=false;calculate.disabled=false;}
   });
   form.addEventListener('submit',event=>{

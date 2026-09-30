@@ -5,6 +5,9 @@
 @include('staff.status',['status'=>$invoice->status])<h2>{{ $invoice->snapshot['customer']['firstName'] ?? '' }} {{ $invoice->snapshot['customer']['lastName'] ?? '' }}</h2>
 <p>{{ $invoice->snapshot['customer']['email'] ?? '' }} · Échéance {{ $invoice->due_date->format('d/m/Y') }}</p>
 <div class="table-wrap">
+@if(!empty($totals['openings']))
+@include('staff.quote-financial-summary',['financial'=>$totals])
+@else
 <table>
 <thead>
 <tr>
@@ -23,6 +26,7 @@
 </tr>
 @endforeach</tbody>
 </table>
+@endif
 </div>
 <p class="total">{{ number_format($totals['total'],0,',',' ') }} FCFA</p>
 <p class="muted">Dont taxe : {{ number_format($totals['tax'],0,',',' ') }} FCFA</p>

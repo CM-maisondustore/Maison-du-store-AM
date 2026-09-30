@@ -47,10 +47,14 @@ class QuoteController
             abort_unless(in_array($locked->status, ['pending', 'draft']) || $r->user()->isAdmin(), 403);
             abort_if($locked->status === 'accepted' || \App\Models\Invoice::where('quote_id', $locked->id)->exists(), 409, 'Devis accepté ou facturé : document verrouillé.');
             if ($locked->configuration) unset($data['dimensions']);
+            if (!empty($locked->configuration['calculation']['financial'])) {
+                if ($data['lines']!=$locked->lines || $data['tax_basis_points']!==$locked->tax_basis_points) throw \Illuminate\Validation\ValidationException::withMessages(['lines'=>'Modifiez le chiffrage dans le formulaire complet afin de conserver les remises et les acomptes cohérents.']);
+            }
             if (in_array($data['status'] ?? '',['approved','accepted']) && !empty($locked->configuration['pricing_review_required'])) throw \Illuminate\Validation\ValidationException::withMessages(['status'=>'Les choix techniques ont changé. Vérifiez le chiffrage dans le formulaire complet avant validation.']);
             if (in_array($data['status'] ?? '',['approved','accepted']) && !empty($locked->configuration['calculation']['pending'])) throw \Illuminate\Validation\ValidationException::withMessages(['status'=>'Des prix restent à définir (notamment la pose). Complétez puis recalculez le devis dans le formulaire complet avant validation.']);
-            if ($locked->receivedAmount()>Pricing::totals($data['lines'],$data['tax_basis_points'])['total']) throw \Illuminate\Validation\ValidationException::withMessages(['lines'=>'Le total ne peut pas être inférieur aux paiements reçus.']);
-            if ($locked->deposit_amount>Pricing::totals($data['lines'],$data['tax_basis_points'])['total']) throw \Illuminate\Validation\ValidationException::withMessages(['lines'=>'Le total ne peut pas être inférieur à l’avance prévue. Modifiez les conditions dans le formulaire complet.']);
+            $total=$locked->configuration['calculation']['financial']['total'] ?? Pricing::totals($data['lines'],$data['tax_basis_points'])['total'];
+            if ($locked->receivedAmount()>$total) throw \Illuminate\Validation\ValidationException::withMessages(['lines'=>'Le total ne peut pas être inférieur aux paiements reçus.']);
+            if ($locked->deposit_amount>$total) throw \Illuminate\Validation\ValidationException::withMessages(['lines'=>'Le total ne peut pas être inférieur à l’avance prévue. Modifiez les conditions dans le formulaire complet.']);
             $locked->update([...$data,'edit_version'=>$locked->edit_version+1]); Audit::record('devis_modifie', $locked);
         });
         return back()->with('success', 'Devis enregistré.');
