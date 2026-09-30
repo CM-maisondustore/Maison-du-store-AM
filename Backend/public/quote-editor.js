@@ -60,7 +60,23 @@
       part.querySelector('[data-unit-label]').textContent=chosen?'('+units[chosen.unit]+')':'';
     });
   }
-  function buttons(){document.getElementById('add-quote-window').disabled=windows.children.length>=30;windows.querySelectorAll('[data-remove-window]').forEach(b=>b.disabled=windows.children.length<=1);}
+  function selectionValidity(report=false){
+    const usesDefaults=[...windows.querySelectorAll('[data-inherit]')].some(input=>input.checked);
+    field(defaults,'finish_id').required=usesDefaults;
+    const roots=[defaults,...windows.querySelectorAll('[data-selection]')];
+    let valid=true;
+    for(const root of roots){
+      const used=root!==defaults||usesDefaults,v=values(root),category=field(root,'category'),finish=field(root,'finish_id');
+      const material=v.category==='store'?v.store_id:(v.curtain_id||v.sheer_id);
+      category.setCustomValidity(used&&!material?'Sélectionnez un tissu rideau, un voilage ou un matériau de store.':'');
+      if(used&&(!category.checkValidity()||!finish.checkValidity())){
+        if(report&&valid){const missing=!category.checkValidity()?category:finish;missing.reportValidity();missing.focus();}
+        valid=false;
+      }
+    }
+    return valid;
+  }
+  function buttons(){document.getElementById('add-quote-window').disabled=windows.children.length>=30;windows.querySelectorAll('[data-remove-window]').forEach(b=>b.disabled=windows.children.length<=1);selectionValidity();}
   init(defaults);windows.querySelectorAll('[data-window]').forEach(row=>{
     const root=row.querySelector('[data-selection]');init(root);inherit(row);
     const legacy=data.options.find(o=>String(o.id)===row.querySelector('[data-component="secondary_material"]').dataset.value);
@@ -83,6 +99,7 @@
     if(target.matches('[data-inherit]'))inherit(target.closest('[data-window]'));
     if(target.dataset.part){const input=target.closest('[data-cost-part]').querySelector('[data-component]');input.value=target.checked?target.value:'';input.dataset.userChoice='1';}
     if(root||target.matches('[data-inherit],[data-material-mode]')||target.dataset.part)windows.querySelectorAll('[data-window]').forEach(row=>components(row));
+    selectionValidity();
     if(target.name==='payment_mode'&&target.value==='full')form.elements.deposit_amount.value=0;
   });
   let next=Math.max(-1,...[...windows.querySelectorAll('[name]')].map(el=>Number(el.name.match(/^windows\[(\d+)\]/)?.[1]??-1)))+1;
@@ -96,6 +113,7 @@
   const calculate=document.getElementById('calculate-quote'),status=document.getElementById('calculation-status');
   calculate?.addEventListener('click',async()=>{
     if(calculating)return;
+    if(!selectionValidity(true)){status.textContent='Complétez les tissus / matériaux et les finitions des fenêtres. Les choix communs sont nécessaires uniquement pour les fenêtres qui les utilisent.';return;}
     calculating=true;calculate.disabled=true;const requestedRevision=revision;status.textContent='Calcul en cours…';
     try{
       const payload=new FormData(form);payload.delete('_method');

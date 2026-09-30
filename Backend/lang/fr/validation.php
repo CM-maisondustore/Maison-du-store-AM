@@ -1,6 +1,12 @@
 <?php
 
 return [
+    'custom' => [
+        'defaults.material_id' => ['required'=>'Choix communs : sélectionnez un tissu rideau, un voilage ou un matériau de store, ou personnalisez chaque fenêtre.'],
+        'defaults.finish_id' => ['required'=>'Choix communs : sélectionnez une finition, ou personnalisez chaque fenêtre.'],
+        'windows.*.material_id' => ['required'=>'Sélectionnez un tissu ou un matériau pour chaque fenêtre.'],
+        'windows.*.finish_id' => ['required'=>'Sélectionnez une finition pour chaque fenêtre.'],
+    ],
     'accepted' => 'Le champ :attribute doit être accepté.',
     'array' => 'Le champ :attribute doit être une liste valide.',
     'date' => 'Le champ :attribute doit être une date valide.',

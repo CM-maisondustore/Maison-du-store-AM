@@ -80,6 +80,35 @@ class QuotePricingIntegrationTest extends TestCase
         $bad=$data;$bad['windows'][0]['costing']['material_unit_price']=1;$this->post('/admin/devis',$bad)->assertSessionHasErrors('calculation_token');
         $this->assertDatabaseCount('quotes',0);
     }
+    public function test_individual_openings_do_not_require_unused_common_choices_for_calculation_or_save(): void
+    {
+        $this->seed();$this->login();$data=$this->payload();
+        $data['defaults']=['category'=>'store','motorized'=>0,'curtain_id'=>null,'sheer_id'=>null,'store_id'=>null,'finish_id'=>null];
+        foreach ($data['windows'] as &$window) $window['inherit_defaults']=0;
+        unset($window);
+        $q=$this->save($data);$this->assertSame(271875,QuoteFinancials::forQuote($q)['total']);
+        $this->assertSame('rideau',$q->type);
+        foreach ($q->dimensions as $window) $this->assertFalse($window['inherit_defaults']);
+        // Agents can also save their independent technical selections without common choices.
+        $agent=$this->login('agent');unset($data['pricing'],$data['tax_rate'],$data['payment_mode'],$data['deposit_amount'],$data['receipt_token']);
+        $data['submission_token']=(string)Str::uuid();
+        $this->post('/admin/devis',$data)->assertSessionHasNoErrors();
+        $technical=Quote::latest('id')->firstOrFail();$this->assertSame($agent->id,$technical->agent_id);$this->assertTrue($technical->configuration['pricing_review_required']);
+    }
+    public function test_used_common_choices_still_require_material_and_finish_with_clear_messages(): void
+    {
+        $this->seed();$this->login();$data=$this->payload();
+        $data['defaults']['curtain_id']=null;$data['defaults']['finish_id']=null;
+        $r=$this->postJson('/admin/devis/chiffrer',$data)->assertUnprocessable()->assertJsonValidationErrors(['defaults.material_id','defaults.finish_id']);
+        $this->assertStringContainsString('Choix communs : sélectionnez',$r->json('errors')['defaults.material_id'][0]);
+    }
+    public function test_inherited_choices_are_resolved_on_server_even_without_duplicate_window_fields(): void
+    {
+        $this->seed();$this->login();$data=$this->payload();
+        foreach ($data['windows'] as &$window) foreach (['category','motorized','curtain_id','sheer_id','store_id','finish_id','material_id'] as $key) unset($window[$key]);
+        unset($window);
+        $q=$this->save($data);$this->assertSame(271875,QuoteFinancials::forQuote($q)['total']);
+    }
     public function test_catalogue_global_fee_is_frozen_until_explicit_recalculation(): void
     {
         $this->seed();$this->login();$data=$this->payload();

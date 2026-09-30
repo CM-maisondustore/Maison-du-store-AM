@@ -20,7 +20,7 @@
 @endforeach
 </div></section>
 <section class="panel" id="quote-defaults"><h2>Choix communs</h2>
-<p class="muted">Sélectionnez séparément les tissus rideaux et les voilages, ou choisissez un store. Vous pourrez personnaliser chaque fenêtre.</p>
+<p class="muted">Sélectionnez séparément les tissus rideaux et les voilages, ou choisissez un store. Ces choix sont facultatifs si vous personnalisez chaque fenêtre ; ils restent nécessaires pour les fenêtres utilisant les choix communs.</p>
 @include('staff.quote-selection',['prefix'=>'defaults','selection'=>$defaults])
 </section>
 <h2>Mesures fenêtre par fenêtre</h2><p class="muted">Mesures en centimètres, de 1 à 2000 cm. Ajoutez une fenêtre pour chaque configuration différente.</p>
