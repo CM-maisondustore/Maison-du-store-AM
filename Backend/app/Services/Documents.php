@@ -28,7 +28,38 @@ class Documents
     public function render(array $data): string
     {
         $options = new Options(['isRemoteEnabled' => false, 'isPhpEnabled' => false, 'defaultFont' => 'DejaVu Sans', 'tempDir' => storage_path('framework/cache'), 'fontCache' => storage_path('framework/cache')]);
-        $pdf = new Dompdf($options); $pdf->loadHtml(view('staff.document', [...$data, 'totals' => Pricing::totals($data['lines'], $data['tax_basis_points'])])->render());
-        $pdf->setPaper('A4'); $pdf->render(); return $pdf->output();
+        $html=view('staff.document', [...$data, 'totals' => Pricing::totals($data['lines'], $data['tax_basis_points'])])->render();
+        $pdf = new Dompdf($options); $pdf->loadHtml($html);
+        $pdf->setPaper('A4'); $pdf->render();
+        $presentation=$data['presentation'] ?? [];
+        if (empty($presentation['letterhead_enabled'])) return $pdf->output();
+        // Count with the final text margins, then paint each background BEFORE its text.
+        // The identical layout in both passes keeps pagination stable, including the last page.
+        $pages=$pdf->getCanvas()->get_page_count(); unset($pdf); gc_collect_cycles();
+        $images=[]; $paths=[];
+        try {
+            foreach (PdfLetterhead::IMAGES as $key) {
+                $image=PdfLetterhead::decode($presentation[$key] ?? null);
+                if (!$image) throw new \RuntimeException('Fond de page PDF absent ou invalide. Vérifiez le modèle.');
+                $path=tempnam(storage_path('framework/cache'),'letterhead-');
+                if ($path===false) throw new \RuntimeException('Impossible de préparer le fond de page PDF.');
+                $paths[]=$path;
+                if (file_put_contents($path,$image['bytes'])===false) throw new \RuntimeException('Impossible d’écrire le fond de page PDF.');
+                $images[$key]=['path'=>$path,'width'=>$image['width'],'height'=>$image['height']];
+            }
+            $pdf=new Dompdf($options); $pdf->loadHtml($html); $pdf->setPaper('A4');
+            $opacity=max(10,min(100,(int)($presentation['letterhead_opacity'] ?? 100)))/100;
+            $pdf->setCallbacks([['event'=>'begin_page_render','f'=>function ($frame,$canvas) use ($images,$pages,$opacity) {
+                $key=$canvas->get_page_number()===$pages ? 'letterhead_standard' : 'letterhead_continuation';
+                $image=$images[$key]; $scale=min($canvas->get_width()/$image['width'],$canvas->get_height()/$image['height']);
+                $width=$image['width']*$scale; $height=$image['height']*$scale;
+                $canvas->save(); $canvas->set_opacity($opacity);
+                $canvas->image($image['path'],($canvas->get_width()-$width)/2,($canvas->get_height()-$height)/2,$width,$height);
+                $canvas->restore(); $canvas->set_opacity(1);
+            }]]);
+            $pdf->render(); return $pdf->output();
+        } finally {
+            foreach ($paths as $path) if (is_file($path)) unlink($path);
+        }
     }
 }

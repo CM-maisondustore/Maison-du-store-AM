@@ -37,7 +37,7 @@ class CommunicationController
                 if (!$size || !in_array($size['mime'],['image/png','image/jpeg'])) throw ValidationException::withMessages(['logo'=>'Utilisez une image PNG ou JPEG.']);
                 $options['logo']='data:'.$size['mime'].';base64,'.base64_encode($bytes);
             }
-            $data['options']=$options;
+            $data['options']=[...$options,...\App\Services\PdfLetterhead::options($r,$template->options ?? [])];
         }
         return $data;
     }
@@ -55,10 +55,14 @@ class CommunicationController
     {
         $data=$this->data($r,$template);
         if ($template->channel==='pdf') {
+            $r->validate(['preview_length'=>'sometimes|in:short,long']);
+            $lines=$r->input('preview_length')==='long'
+                ? array_map(fn($i)=>['description'=>'Fenêtre '.$i.' — confection, fournitures et installation sur mesure (exemple)','quantity'=>1,'unit_price'=>25000],range(1,45))
+                : [['description'=>'Confection et pose sur mesure — exemple','quantity'=>2,'unit_price'=>25000]];
             $presentation=[...$data['options'],'introduction'=>$data['body']];
             return response($documents->render(['presentation'=>$presentation,'issuer'=>CommunicationTemplates::issuer($presentation),'title'=>$template->key==='quote'?'Devis':'Facture','number'=>'APERÇU','draft'=>true,'date'=>now()->format('d/m/Y'),'due'=>now()->addDays(30)->format('d/m/Y'),
                 'customer'=>['firstName'=>'Client','lastName'=>'Exemple','address'=>'Adresse de démonstration','email'=>'exemple@example.invalid'],
-                'lines'=>[['description'=>'Confection et pose sur mesure — exemple','quantity'=>2,'unit_price'=>25000]],'tax_basis_points'=>0]))->header('Content-Type','application/pdf')->header('Content-Disposition','inline; filename="apercu.pdf"');
+                'lines'=>$lines,'tax_basis_points'=>0]))->header('Content-Type','application/pdf')->header('Content-Disposition','inline; filename="apercu.pdf"');
         }
         $values=['prenom'=>'Awa','nom'=>'Awa Exemple','reference'=>'DEV-EXEMPLE','montant'=>'50 000','acompte'=>'25 000','date'=>now()->addDay()->format('d/m/Y'),'heure'=>'10:00','adresse'=>'Adresse de démonstration, Abidjan','entreprise'=>'Maison du Store AM','statut'=>'confirmé'];
         return view('staff.communication-preview',['subject'=>CommunicationTemplates::render($data['subject'],$values),'body'=>CommunicationTemplates::render($data['body'],$values)]);

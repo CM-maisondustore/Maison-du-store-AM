@@ -16,7 +16,7 @@ Puis ouvrir http://127.0.0.1:8000. Le script utilise PHP du PATH ou, à défaut,
 
 ## Installation sur une autre machine
 
-Prérequis : PHP 8.2+ (extensions PDO SQLite, mbstring, fileinfo, OpenSSL, DOM/XML), Composer 2, Node.js 22.12+ ou 24 LTS avec npm. Depuis `Backend` :
+Prérequis : PHP 8.2+ (extensions PDO SQLite, mbstring, fileinfo, OpenSSL, DOM/XML, GD pour les fonds PNG/JPEG des PDF), Composer 2, Node.js 22.12+ ou 24 LTS avec npm. Depuis `Backend` :
 
 ```powershell
 composer install

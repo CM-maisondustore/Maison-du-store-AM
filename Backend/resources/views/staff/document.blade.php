@@ -6,6 +6,10 @@
 </head>
 <body>
 @php($presentation = $presentation ?? [])
+@if(!empty($presentation['letterhead_enabled']))
+@php($margins=\App\Services\PdfLetterhead::margins($presentation))
+<style>@page{margin:{{ $margins['top'] }}mm {{ $margins['right'] }}mm {{ $margins['bottom'] }}mm {{ $margins['left'] }}mm}body{margin:0}td,p,.address,.document-text{overflow-wrap:break-word}</style>
+@endif
 <style>h1,h2,th{color:{{ preg_match('/^#[0-9a-fA-F]{6}$/',$presentation['accent'] ?? '') ? $presentation['accent'] : '#243831' }}}.document-logo{max-width:180px;max-height:90px}.document-text{white-space:pre-wrap}</style>
 @if(!empty($presentation['logo']))<img class="document-logo" src="{{ $presentation['logo'] }}" alt="Logo">@endif
 <h2>{{ $issuer['name'] }}</h2>
