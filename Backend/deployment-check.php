@@ -16,9 +16,11 @@ if (config('database.default') !== 'mysql') $failures[] = 'Hostinger deployment 
 if (!is_writable(storage_path('framework/sessions'))) $failures[] = 'Storage is not writable.';
 if (in_array('--database', $argv, true)) {
     try {
-        foreach (['products', 'quotes', 'appointments', 'users', 'contacts', 'interventions', 'invoices', 'commercial_messages', 'site_contents', 'media_assets', 'quote_options', 'quote_payments', 'site_settings','communication_templates','communication_rules','communication_checks','document_archives'] as $table) {
+        foreach (['products', 'quotes', 'appointments', 'users', 'contacts', 'interventions', 'invoices', 'commercial_messages', 'site_contents', 'media_assets', 'quote_options', 'quote_payments', 'site_settings','communication_templates','communication_rules','communication_checks','document_archives','document_template_revisions','document_issues'] as $table) {
             Illuminate\Support\Facades\DB::table($table)->select('id')->limit(1)->get();
         }
+        Illuminate\Support\Facades\DB::table('communication_templates')->select('layout_draft','published_version')->limit(1)->get();
+        Illuminate\Support\Facades\DB::table('quotes')->select('document_metadata')->limit(1)->get();
     } catch (Throwable $exception) {
         $failures[] = 'Database or expected tables unavailable.';
     }

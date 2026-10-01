@@ -14,6 +14,7 @@ class CommunicationController
     }
     public function edit(CommunicationTemplate $template)
     {
+        if ($template->channel==='pdf' && (in_array($template->key,['global','receipt']) || (CommunicationTemplates::presentation($template->key)['renderer_version'] ?? 1)===2)) return redirect()->route('staff.layouts.edit',$template->key);
         return view('staff.communication-template',compact('template'));
     }
     private function data(Request $r, CommunicationTemplate $template): array
@@ -43,11 +44,15 @@ class CommunicationController
     }
     public function update(Request $r, CommunicationTemplate $template)
     {
+        if ($template->channel==='pdf' && (CommunicationTemplates::presentation($template->key)['renderer_version'] ?? 1)===2) throw ValidationException::withMessages(['version'=>'Utilisez Mise en page pour modifier ce modèle publié.']);
         $data=$this->data($r,$template);
         DB::transaction(function () use($template,$data) {
             $locked=CommunicationTemplate::whereKey($template->id)->lockForUpdate()->firstOrFail();
             if ($locked->version !== (int)$data['version']) throw ValidationException::withMessages(['version'=>'Ce modèle a été modifié. Rechargez la page avant d’enregistrer.']);
-            $locked->update([...$data,'version'=>$locked->version+1]); Audit::record('modele_modifie',$locked);
+            if ($locked->channel==='pdf') \App\Services\DocumentLayout::revision($locked);
+            $locked->update([...$data,'version'=>$locked->version+1,...($locked->channel==='pdf'?['published_version'=>$locked->version+1]:[])]);
+            if ($locked->channel==='pdf') \App\Services\DocumentLayout::revision($locked);
+            Audit::record('modele_modifie',$locked);
         });
         return back()->with('success','Modèle enregistré. Les documents déjà archivés restent inchangés.');
     }

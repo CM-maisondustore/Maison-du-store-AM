@@ -1,6 +1,7 @@
 @extends('staff.layout')
 @section('title',$template->name.' · '.strtoupper($template->channel))
 @section('content')
+@if($template->channel==='pdf')<p><a class="button" href="{{ route('staff.layouts.edit',$template->key) }}">Ouvrir l’éditeur Mise en page : aperçu A4, brouillons et versions publiées</a></p>@endif
 <div class="actions"><a href="{{ route('staff.communications.index') }}">← Documents & automatisations</a></div>
 <form method="post" enctype="multipart/form-data" action="{{ route('staff.communications.update',$template) }}">
 @csrf<input type="hidden" name="version" value="{{ $template->version }}">

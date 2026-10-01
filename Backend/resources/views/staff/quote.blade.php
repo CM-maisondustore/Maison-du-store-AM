@@ -6,6 +6,7 @@
 @if($quote->status!=='accepted' && (auth()->user()->isAdmin() || in_array($quote->status,['pending','draft'])))<a class="button" href="{{ route('staff.quotes.edit',$quote) }}">Ouvrir le formulaire complet</a>@endif
 @if(auth()->user()->isAdmin())<a class="button" href="{{ route('staff.messages.create',['quote_id'=>$quote->id]) }}">Préparer l’envoi du devis</a>
 @endif</div>
+@include('staff.document-history')
 <div class="grid">
 <section class="panel">
 <h2>Client</h2>

@@ -67,13 +67,12 @@ class CommunicationTemplates
     }
     public static function presentation(string $key): array
     {
-        $t=self::get('pdf',$key);
-        return [...($t->options ?? []),'introduction'=>$t->exists ? $t->body : '', 'template_version'=>$t->version];
+        return DocumentLayout::presentation($key);
     }
     public static function issuer(array $presentation): array
     {
         $issuer=config('workspace.issuer');
-        foreach (['name','address','registration','tax_note','payment_terms'] as $key) if (array_key_exists('issuer_'.$key,$presentation)) $issuer[$key]=$presentation['issuer_'.$key];
+        foreach (['name','address','registration','tax_note','payment_terms','email'] as $key) if (array_key_exists('issuer_'.$key,$presentation)) $issuer[$key]=$presentation['issuer_'.$key];
         return $issuer;
     }
 }

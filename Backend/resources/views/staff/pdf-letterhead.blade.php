@@ -2,7 +2,7 @@
 <h2>Fonds de page / filigranes</h2>
 <input type="hidden" name="letterhead_enabled" value="0">
 <label class="check"><input type="checkbox" name="letterhead_enabled" value="1" @checked(old('letterhead_enabled',$options['letterhead_enabled'] ?? false))>Activer les fonds de page pour ce modèle PDF</label>
-<p>La page unique ou la dernière page utilise l’image standard avec en-tête et pied de page. Les pages précédentes utilisent l’image avec en-tête seul. Ces images sont enregistrées en base avec le modèle.</p>
+<p>La page unique ou la dernière page utilise l’image standard avec en-tête et pied de page. Les pages précédentes utilisent l’image avec en-tête seul. Les images sont conservées avec les versions du modèle.</p>
 <p class="muted">Importez deux images de page entière au format A4 portrait, idéalement 1 240 × 1 754 px. PNG ou JPEG, 2 Mo maximum par image, au plus 2 500 × 3 600 px. L’image est centrée et ajustée à la page sans déformation.</p>
 <div class="grid">
 @foreach(['letterhead_standard'=>'Page standard — en-tête et pied de page','letterhead_continuation'=>'Pages précédentes — en-tête seul'] as $key=>$label)

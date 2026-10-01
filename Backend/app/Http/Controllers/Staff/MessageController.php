@@ -92,6 +92,13 @@ class MessageController
             $m=CommercialMessage::whereKey($message->id)->lockForUpdate()->firstOrFail();
             abort_unless($m->channel==='whatsapp' && $m->direction==='outgoing' && $m->status==='draft',409);
             app(\App\Services\CommunicationAutomation::class)->validateMessage($m);
+            $documents=app(\App\Services\Documents::class);
+            if ($m->invoice_id) {
+                $snapshot=$documents->invoiceData($m->invoice); $pdf=$documents->invoice($m->invoice);
+            } elseif ($m->quote_id && $m->automation_event!=='quote_received') {
+                $issue=\App\Services\DocumentIssues::quote($m->quote,$documents); $snapshot=$issue->snapshot; $pdf=$issue->archive->contents();
+            }
+            if (isset($snapshot)) { \App\Models\DocumentArchive::capture($pdf,['commercial_message_id'=>$m->id]); $m->document_snapshot=$snapshot; }
             $m->update(['status'=>'shared','sent_at'=>now()]); Audit::record('whatsapp_partage_manuellement',$m);
         });
         return back()->with('success','Partage déclaré. La livraison n’est pas vérifiée par WhatsApp.');

@@ -14,6 +14,7 @@
 /backups/
 /artifacts/
 Backend/storage/framework/cache/*.json
+Backend/storage/app/private/document-assets/
 *.pem
 *.key
 *.pfx

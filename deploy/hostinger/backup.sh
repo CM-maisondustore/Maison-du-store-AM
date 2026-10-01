@@ -20,5 +20,11 @@ mysqldump --defaults-extra-file="$options" --single-transaction --skip-lock-tabl
 [[ -s "$destination.pending" ]] || { echo 'Empty database dump'; exit 1; }
 mv -- "$destination.pending" "$destination"
 cp "$private/shared/.env" "$private/backups/configuration-$stamp.env"
+if [[ -d "$private/shared/storage/app" ]]; then
+    tar -czf "$private/backups/assets-$stamp.tar.gz.pending" -C "$private/shared/storage" app
+    tar -tzf "$private/backups/assets-$stamp.tar.gz.pending" > /dev/null
+    mv -- "$private/backups/assets-$stamp.tar.gz.pending" "$private/backups/assets-$stamp.tar.gz"
+    chmod 600 "$private/backups/assets-$stamp.tar.gz"
+fi
 chmod 600 "$destination" "$private/backups/configuration-$stamp.env"
-echo 'Private MySQL and environment backups completed.'
+echo 'Private MySQL (including PDF archives), environment and storage assets backups completed.'

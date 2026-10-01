@@ -26,6 +26,13 @@ Route::prefix('admin')->group(function () {
         Route::put('prestations/{intervention}', [InterventionController::class, 'update'])->name('interventions.update');
         Route::post('prestations/{intervention}/devis', [QuoteController::class, 'onsite'])->name('interventions.quote');
         Route::middleware('admin')->group(function () {
+            Route::get('mise-en-page/{type?}', [App\Http\Controllers\Staff\DocumentLayoutController::class,'edit'])->name('layouts.edit');
+            Route::post('mise-en-page/{type}', [App\Http\Controllers\Staff\DocumentLayoutController::class,'save'])->name('layouts.save');
+            Route::post('mise-en-page/{type}/apercu', [App\Http\Controllers\Staff\DocumentLayoutController::class,'preview'])->middleware('throttle:60,1')->name('layouts.preview');
+            Route::post('mise-en-page/{type}/versions/{revision}', [App\Http\Controllers\Staff\DocumentLayoutController::class,'restore'])->name('layouts.restore');
+            Route::get('documents/{issue}/archive', [App\Http\Controllers\Staff\DocumentLayoutController::class,'archive'])->name('layouts.archive');
+            Route::post('devis/{quote}/presentation', [App\Http\Controllers\Staff\DocumentLayoutController::class,'metadata'])->name('layouts.metadata');
+            Route::get('devis/{quote}/paiements/{payment}/recu', [App\Http\Controllers\Staff\DocumentLayoutController::class,'receipt'])->name('layouts.receipt');
             Route::post('devis/{quote}/avancement', [App\Http\Controllers\Staff\QuoteWorkflowController::class,'update'])->name('quotes.workflow');
             Route::get('communications', [App\Http\Controllers\Staff\CommunicationController::class,'index'])->name('communications.index');
             Route::get('communications/modeles/{template}', [App\Http\Controllers\Staff\CommunicationController::class,'edit'])->name('communications.edit');

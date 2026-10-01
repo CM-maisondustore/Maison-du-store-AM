@@ -30,7 +30,8 @@ class CommercialMail
             $documents = app(Documents::class);
             $snapshot = $m->invoice_id ? $documents->invoiceData($m->invoice) : ($m->quote_id && $m->automation_event!=='quote_received' ? $documents->quoteData($m->quote) : null);
             if ($snapshot) {
-                $pdf=$m->invoice_id ? $documents->invoice($m->invoice) : $documents->render($snapshot);
+                if ($m->invoice_id) $pdf=$documents->invoice($m->invoice);
+                else { $issue=DocumentIssues::quote($m->quote,$documents); $snapshot=$issue->snapshot; $pdf=$issue->archive->contents(); }
                 \App\Models\DocumentArchive::capture($pdf,['commercial_message_id'=>$m->id]);
             }
             $m->update(['status' => 'sending', 'document_snapshot' => $snapshot]); return $m;

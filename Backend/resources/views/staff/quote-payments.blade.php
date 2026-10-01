@@ -5,6 +5,7 @@
 <p><strong>Reçu : {{ number_format($quote->receivedAmount(),0,',',' ') }} FCFA · Reste à recevoir : {{ number_format($quoteTotals['total']-$quote->receivedAmount(),0,',',' ') }} FCFA</strong></p>
 @forelse($quote->payments()->with('recorder')->orderBy('received_on')->get() as $payment)
 <div class="panel"><p>{{ $payment->received_on->format('d/m/Y') }} · {{ number_format($payment->amount,0,',',' ') }} FCFA · {{ \App\Models\QuotePayment::METHODS[$payment->method] }} · {{ $payment->reference }}<br><small>Saisi par {{ $payment->recorder?->name }}</small></p>
+@if(auth()->user()->isAdmin() && !$payment->voided_at)<a href="{{ route('staff.layouts.receipt',[$quote,$payment]) }}">Télécharger le reçu PDF</a>@endif
 @if($payment->voided_at)<p>Saisie annulée : {{ $payment->void_reason }}</p>
 @elseif(auth()->user()->isAdmin())<details><summary>Corriger une erreur de saisie</summary><form method="post" action="{{ route('staff.quotes.receipt.void',[$quote,$payment]) }}">@csrf<label>Motif d’annulation de cette saisie<input name="void_reason" required minlength="5" maxlength="1000"></label><button class="secondary">Annuler cette saisie de paiement</button></form></details>@endif
 </div>

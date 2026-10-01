@@ -15,6 +15,7 @@ class InvoiceController
             $q = Quote::whereKey($quote->id)->lockForUpdate()->firstOrFail();
             abort_unless($q->status === 'accepted' && $q->contact_id && count($q->lines ?? []), 422, 'Un devis accepté et chiffré est requis.');
             return Invoice::firstOrCreate(['quote_id' => $q->id], ['contact_id' => $q->contact_id, 'due_date' => $data['due_date'], 'snapshot' => ['issuer' => config('workspace.issuer'), 'customer' => $q->contact, 'lines' => $q->lines, 'tax_basis_points' => $q->tax_basis_points,
+                'quote_reference'=>$q->reference,...($q->document_metadata ?? []),
                 'financial'=>\App\Services\Quotes\QuoteFinancials::forQuote($q), 'windows'=>$q->dimensions, 'payment_plan'=>['mode'=>$q->payment_mode,'deposit'=>$q->deposit_amount,'received'=>$q->receivedAmount()]]]);
         });
         Audit::record('facture_preparee', $invoice);
@@ -29,6 +30,11 @@ class InvoiceController
             $locked = Invoice::whereKey($invoice->id)->lockForUpdate()->firstOrFail();
             abort_unless($locked->status === 'draft', 409);
             $snapshot = $locked->snapshot; $snapshot['presentation']=\App\Services\CommunicationTemplates::presentation('invoice');
+            $source=Quote::whereKey($locked->quote_id)->lockForUpdate()->first();
+            if ($source) {
+                $snapshot['quote_reference']=$snapshot['quote_reference'] ?? $source->reference;
+                $snapshot['payment_plan']=[...($snapshot['payment_plan'] ?? []),'received'=>$source->receivedAmount()];
+            }
             $snapshot['issuer'] = \App\Services\CommunicationTemplates::issuer($snapshot['presentation']);
             $locked->update(['number' => 'MDS-'.str_pad((string) $locked->id, 7, '0', STR_PAD_LEFT), 'snapshot' => $snapshot, 'status' => 'issued', 'issued_at' => now()]);
             \App\Models\DocumentArchive::capture(app(Documents::class)->render(app(Documents::class)->invoiceData($locked)),['invoice_id'=>$locked->id]);
