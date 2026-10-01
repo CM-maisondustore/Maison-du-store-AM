@@ -1,6 +1,5 @@
 @if(!empty($totals['fees']))<h2>FRAIS ET PRESTATIONS COMPLÉMENTAIRES</h2>
-@php($documentLines=array_map(fn($fee)=>['label'=>$fee['label'],'displayQuantity'=>$fee['quantity'],'unit'=>'','unitPrice'=>$fee['unitPrice'],'displayAmount'=>$fee['amount']],$totals['fees']))
-@include('documents.partials.table')@endif
+@include('documents.partials.table',['documentLines'=>$fee_rows])@endif
 <table class="totals"><tr><th>Sous-total</th><td class="number">{{ \App\Services\DocumentViewModel::money($totals['subtotal']) }}</td></tr>
 @if($totals['tax'])<tr><th>Taxes</th><td class="number">{{ \App\Services\DocumentViewModel::money($totals['tax']) }}</td></tr>@endif
 @if(!empty($totals['discountAmount']))<tr><th>TOTAL AVANT REMISE</th><td class="number">{{ \App\Services\DocumentViewModel::money($totals['grossTotal']) }}</td></tr><tr class="discount"><th>REMISE COMMERCIALE</th><td class="number">−{{ \App\Services\DocumentViewModel::money($totals['discountAmount']) }}</td></tr>@endif

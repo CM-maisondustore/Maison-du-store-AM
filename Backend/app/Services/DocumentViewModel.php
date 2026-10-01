@@ -6,6 +6,11 @@ use App\Services\Quotes\{QuoteFinancials,CatalogueCalculator};
 final class DocumentViewModel
 {
     public static function money(mixed $value): string { return number_format((int)$value,0,',',' ').' F CFA'; }
+    private static function lineLabel(array $line): string
+    {
+        if (!empty($line['commercialLabel'])) return $line['commercialLabel'];
+        return CatalogueCalculator::clientLabel($line['description'] ?? $line['label'] ?? 'Prestation');
+    }
     public static function prepare(array $data): array
     {
         $data=QuoteFinancials::document($data);
@@ -18,7 +23,7 @@ final class DocumentViewModel
             foreach ($display as $row) {
                 $row['room']=$data['rooms'][$index] ?? $data['windows'][$index]['room'] ?? '';
                 $row['dimensions']='L '.QuoteFinancials::quantity($opening['width']).' m × H '.QuoteFinancials::quantity($opening['height']).' m';
-                foreach ($row['lines'] as &$line) $line['label']=!empty($line['commercialLabel']) ? $line['commercialLabel'] : CatalogueCalculator::clientLabel($line['label']);
+                foreach ($row['lines'] as &$line) $line['label']=self::lineLabel($line);
                 unset($line); $rows[]=$row;
             }
         }
@@ -26,6 +31,7 @@ final class DocumentViewModel
         $groups=[];
         foreach ($rows as $row) $groups[$row['room']][]=$row;
         $data['opening_groups']=$groups; $data['opening_count']=$openingCount ?: count($data['windows'] ?? []);
+        $data['fee_rows']=array_map(fn($fee)=>['label'=>self::lineLabel($fee),'displayQuantity'=>$fee['quantity'],'unit'=>'','unitPrice'=>$fee['unitPrice'],'displayAmount'=>$fee['amount']],$data['totals']['fees'] ?? []);
         $data['document_title']=match($data['kind']) {'invoice'=>'FACTURE','receipt'=>'REÇU DE PAIEMENT',default=>'DEVIS PROFESSIONNEL'};
         $data['conditions']=$data['style']['issuer_payment_terms'] ?? $data['issuer']['payment_terms'] ?? '';
         if (isset($data['totals']['depositPercent'])) {

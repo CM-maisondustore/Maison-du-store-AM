@@ -24,6 +24,45 @@ class DocumentLayoutsTest extends TestCase
         return Quote::create(['reference'=>'LAYOUT-TEST','type'=>'rideau','status'=>'approved','contact'=>$data['customer'],'product'=>[],'dimensions'=>[],
             'configuration'=>['calculation'=>['financial'=>$data['financial']]],'lines'=>[],'tax_basis_points'=>0,'deposit_amount'=>190313,'payment_mode'=>'advance','valid_until'=>'2026-12-01']);
     }
+    public function test_whatsapp_manual_pdf_accepts_catalogue_descriptions_for_lines_and_fees(): void
+    {
+        $this->seed(); $this->actingAs($this->admin());
+        CommunicationTemplate::where('channel','pdf')->where('key','quote')->first()->update(['options'=>DocumentLayout::defaults()]);
+        $quote=$this->quote();
+        $config=$quote->configuration;
+        // CatalogueCalculator saves description; earlier preview fixtures used label.
+        foreach ($config['calculation']['financial']['openings'] as &$opening) {
+            foreach ($opening['lines'] as &$line) {
+                $line['description']='Tissu occultant 80 %'; unset($line['label']);
+            }
+            unset($line);
+        }
+        unset($opening);
+        foreach ($config['calculation']['financial']['fees'] as &$fee) {
+            $fee['description']='Pose et livraison'; unset($fee['label']);
+        }
+        unset($fee);
+        $quote->update(['configuration'=>$config]); $quote->refresh(); $before=$quote->configuration;
+        $message=CommercialMessage::create(['channel'=>'whatsapp','direction'=>'outgoing','status'=>'draft','kind'=>'devis','quote_id'=>$quote->id,'sender'=>'2250700000000','recipient'=>'2250700000001','subject'=>'Devis','body'=>'Votre devis']);
+        $url=route('staff.quotes.pdf',$quote);
+        $this->get(route('staff.messages.show',$message))->assertOk()->assertSee($url,false);
+        $pdf=$this->get($url)->assertOk()->assertHeader('Content-Type','application/pdf')->getContent();
+        $this->assertStringStartsWith('%PDF',$pdf);
+        $this->get($url)->assertOk()->assertContent($pdf);
+        $data=app(Documents::class)->quoteData($quote);
+        foreach (['quote','invoice'] as $kind) {
+            $view=DocumentViewModel::prepare([...$data,'kind'=>$kind]);
+            $html=view('documents.pdf',$view)->render();
+            $this->assertStringContainsString('Tissu occultant',$html);
+            $this->assertStringNotContainsString('80 %',$html);
+            $this->assertStringContainsString('Pose et livraison',$html);
+            $this->assertStringContainsString('271 875 F CFA',$html);
+            $this->assertSame($data['financial'],$view['totals']);
+        }
+        $this->assertSame($before,$quote->fresh()->configuration);
+        $this->assertDatabaseCount('document_issues',1);
+        $this->assertSame('draft',$message->fresh()->status);
+    }
     public function test_draft_preview_publish_and_version_conflicts(): void
     {
         $this->seed(); $this->actingAs($this->admin()); $t=CommunicationTemplate::where('key','quote')->where('channel','pdf')->firstOrFail();
