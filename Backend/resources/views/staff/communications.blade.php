@@ -14,7 +14,14 @@
 <h2>Modèles</h2>
 @foreach($templates->groupBy('channel') as $channel=>$group)
 <section class="panel"><h3>{{ ['pdf'=>'Devis, factures et reçus PDF','email'=>'E-mails','whatsapp'=>'WhatsApp'][$channel] }}</h3>
-<div class="grid">@foreach($group as $template)<div><a href="{{ route('staff.communications.edit',$template) }}">{{ $template->name }}</a><p class="muted">Version {{ $template->channel==='pdf'?($template->published_version ?? $template->version):$template->version }}@if($template->layout_draft) · brouillon en cours@endif</p></div>@endforeach</div></section>
+<div class="grid">
+@foreach($group as $template)
+<div><a href="{{ route('staff.communications.edit',$template) }}">{{ $template->name }}</a>
+<p class="muted">Version {{ $template->channel==='pdf'?($template->published_version ?? $template->version):$template->version }}
+@if($template->layout_draft) · brouillon en cours @endif
+</p></div>
+@endforeach
+</div></section>
 @endforeach
 <h2>Règles d’automatisation — e-mail</h2>
 <p>« Brouillon à valider » prépare le message sans l’envoyer. « Envoi automatique » autorise son envoi sans nouvelle validation. Les demandes et validations antérieures à l’activation ne sont pas reprises ; les rappels concernent les rendez-vous à venir. Une règle s’exécute au plus une fois par document ou créneau.</p>

@@ -41,6 +41,11 @@ jobs:
       - run: composer install --no-interaction --prefer-dist
       - run: composer validate --no-check-publish
       - run: composer test
+      - name: Compile and lint all Blade views
+        run: |
+          php artisan view:cache
+          php -r 'foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator("storage/framework/views")) as $file) if ($file->isFile() && $file->getExtension() === "php") token_get_all(file_get_contents($file->getPathname()), TOKEN_PARSE);'
+          php artisan view:clear
       - name: Test on MySQL as used on Hostinger
         run: composer test
         env:

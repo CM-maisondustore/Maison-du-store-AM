@@ -113,4 +113,17 @@ class DocumentLayoutsTest extends TestCase
         $this->assertStringStartsWith('data:image/png;base64,',DocumentAssets::resolve($t->layout_draft['options'])['logo']);
         $this->assertDatabaseCount('commercial_messages',0);
     }
+    public function test_old_validated_quotes_keep_the_baseline_but_unissued_drafts_use_the_published_model(): void
+    {
+        $this->seed(); $quote=$this->quote();
+        $draft=$quote->replicate(); $draft->reference='DRAFT-BEFORE-LAYOUT'; $draft->status='draft'; $draft->save();
+        $this->travel(1)->minutes();
+        $template=CommunicationTemplate::where('channel','pdf')->where('key','quote')->first();
+        DocumentLayout::revision($template);
+        $template->update(['options'=>DocumentLayout::defaults(),'version'=>2,'published_version'=>2]);
+        $documents=app(Documents::class);
+        $this->assertSame(1,$documents->quoteData($quote)['presentation']['renderer_version'] ?? 1);
+        $this->assertSame(2,$documents->quoteData($draft)['presentation']['renderer_version']);
+        $this->assertDatabaseCount('document_archives',0);
+    }
 }

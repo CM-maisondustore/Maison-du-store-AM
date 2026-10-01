@@ -10,7 +10,7 @@ return new class extends Migration {
         Schema::table('quotes', function (Blueprint $t) { $t->json('document_metadata')->nullable(); });
         Schema::create('document_template_revisions', function (Blueprint $t) {
             $t->id(); $t->foreignId('communication_template_id')->constrained(); $t->unsignedInteger('version');
-            $t->json('snapshot'); $t->timestamp('created_at'); $t->unique(['communication_template_id','version']);
+            $t->json('snapshot'); $t->timestamp('created_at'); $t->unique(['communication_template_id','version'],'document_template_version_unique');
         });
         foreach (DB::table('communication_templates')->where('channel','pdf')->get() as $template) {
             DB::table('communication_templates')->where('id',$template->id)->update(['published_version'=>$template->version]);

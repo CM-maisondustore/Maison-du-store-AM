@@ -12,10 +12,10 @@ class Documents
     public function quoteData(Quote $quote): array
     {
         $presentation=CommunicationTemplates::presentation('quote');
-        // Unmodified pre-refactor quotes without an archive keep the baseline renderer/settings.
+        // Unmodified pre-refactor validated quotes keep the baseline. Unissued drafts use the active model.
         $baseline=\Illuminate\Support\Facades\DB::table('document_template_revisions')->join('communication_templates','communication_templates.id','=','document_template_revisions.communication_template_id')
             ->where('communication_templates.channel','pdf')->where('communication_templates.key','quote')->orderBy('document_template_revisions.id')->select('document_template_revisions.*')->first();
-        if ($baseline && $quote->updated_at && $quote->updated_at->lt($baseline->created_at)) {
+        if ($baseline && in_array($quote->status,['approved','accepted']) && $quote->updated_at && $quote->updated_at->lt($baseline->created_at)) {
             $old=json_decode($baseline->snapshot,true,512,JSON_THROW_ON_ERROR);
             $presentation=[...($old['options'] ?? []),'introduction'=>$old['body'] ?? '', 'template_version'=>$baseline->version];
         }
