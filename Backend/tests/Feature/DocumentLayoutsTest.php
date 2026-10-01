@@ -77,7 +77,8 @@ class DocumentLayoutsTest extends TestCase
         $message=CommercialMessage::create(['sender'=>'contact@maisondustoream.com','recipient'=>'example@example.invalid','subject'=>'Ancien devis','body'=>'Test','quote_id'=>$quote->id,'status'=>'sent','document_snapshot'=>$snapshot]);
         $archive=DocumentArchive::capture('%PDF-existing-original',['commercial_message_id'=>$message->id]);
         $this->assertSame($archive->contents(),$documents->quote($quote));
-        $before=$quote->configuration;
+        // Read the persisted JSON before comparing: MySQL normalizes object key order.
+        $before=$quote->fresh()->configuration;
         $this->post('/admin/devis/'.$quote->id.'/presentation',['edit_version'=>$quote->fresh()->edit_version,'object'=>'Projet salon','rooms'=>['Salon','Salon','Chambre','Chambre']])->assertSessionHasNoErrors();
         $this->assertSame($before,$quote->fresh()->configuration);
         $this->assertSame('Projet salon',$quote->fresh()->document_metadata['object']);
@@ -125,5 +126,25 @@ class DocumentLayoutsTest extends TestCase
         $this->assertSame(1,$documents->quoteData($quote)['presentation']['renderer_version'] ?? 1);
         $this->assertSame(2,$documents->quoteData($draft)['presentation']['renderer_version']);
         $this->assertDatabaseCount('document_archives',0);
+    }
+    public function test_rollback_keeps_published_versions_and_archives_and_restores_legacy_image_format(): void
+    {
+        $this->seed();
+        $image=UploadedFile::fake()->image('rollback.png',40,40);
+        $options=DocumentAssets::store([...DocumentLayout::defaults(),'logo'=>'data:image/png;base64,'.base64_encode($image->get())]);
+        $global=CommunicationTemplate::where('channel','pdf')->where('key','global')->first();
+        $global->update(['body'=>'Introduction commune','options'=>$options,'version'=>2,'published_version'=>2]); DocumentLayout::revision($global);
+        $quote=CommunicationTemplate::where('channel','pdf')->where('key','quote')->first();
+        $quote->update(['options'=>['inherit_global'=>true],'version'=>2,'published_version'=>2]); DocumentLayout::revision($quote);
+        $archive=DocumentArchive::capture('%PDF-existing-archive',[]);
+        DocumentLayout::prepareRollback();
+        $this->assertSame('%PDF-existing-archive',$archive->fresh()->contents());
+        $this->assertSame(1,$quote->fresh()->options['renderer_version']);
+        $this->assertStringStartsWith('data:image/png;base64,',$quote->fresh()->options['logo']);
+        $this->assertSame('Introduction commune',$quote->fresh()->body);
+        $saved=json_decode(DB::table('document_template_revisions')->where('communication_template_id',$global->id)->where('version',2)->value('snapshot'),true);
+        $this->assertSame(2,$saved['options']['renderer_version']);
+        $this->assertStringStartsWith('asset:',$saved['options']['logo']);
+        $this->assertStringStartsWith('data:image/png;base64,',DocumentAssets::resolve($saved['options'])['logo']);
     }
 }

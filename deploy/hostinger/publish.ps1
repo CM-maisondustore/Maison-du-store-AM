@@ -36,7 +36,7 @@ if ($KnownHostsFile) {
 }
 & ssh @sshOptions $target "mkdir -p '$incoming'"
 if ($LASTEXITCODE -ne 0) { throw 'SSH failed. Configure the SSH key and verify the Hostinger host fingerprint first.' }
-& scp @scpOptions $Archive "$Archive.sha256" "$PSScriptRoot/release.sh" "$PSScriptRoot/backup.sh" "$PSScriptRoot/backup-options.php" "${target}:$incoming/"
+& scp @scpOptions $Archive "$Archive.sha256" "$PSScriptRoot/release.sh" "$PSScriptRoot/rollback.sh" "$PSScriptRoot/backup.sh" "$PSScriptRoot/backup-options.php" "${target}:$incoming/"
 if ($LASTEXITCODE -ne 0) { throw 'Upload failed.' }
 & ssh @sshOptions $target "cd '$incoming' && sha256sum -c hostinger-release.tar.gz.sha256 && bash release.sh '$DomainRoot' '$incoming/hostinger-release.tar.gz' '$revision'"
 if ($LASTEXITCODE -ne 0) { throw 'Remote release failed. Read the reported error; the script preserves existing releases.' }

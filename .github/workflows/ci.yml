@@ -67,7 +67,7 @@ jobs:
         if: github.event_name != 'pull_request'
         run: |
           printf '%s\n' "$GITHUB_SHA" > REVISION
-          tar --exclude='bootstrap/cache/*.php' -czf ../hostinger-release.tar.gz app bootstrap config database/data database/migrations database/seeders lang public resources/views routes vendor artisan composer.json composer.lock deployment-check.php REVISION
+          tar --exclude='bootstrap/cache/*.php' -czf ../hostinger-release.tar.gz app bootstrap config database/data database/migrations database/seeders lang public resources/views routes vendor artisan composer.json composer.lock deployment-check.php prepare-document-rollback.php REVISION
           cd ..
           sha256sum hostinger-release.tar.gz > hostinger-release.tar.gz.sha256
       - uses: actions/upload-artifact@v4

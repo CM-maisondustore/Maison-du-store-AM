@@ -8,6 +8,9 @@ flock -n 9 || { echo 'Another deployment is running.' >&2; exit 1; }
 previous=$(readlink -f "$private/previous")
 case "$previous" in "$private/releases/"*) ;; *) echo 'Invalid previous target.' >&2; exit 1 ;; esac
 [[ -f "$previous/public/index.php" ]] || exit 1
+if [[ -f "$private/current/prepare-document-rollback.php" && ! -f "$previous/prepare-document-rollback.php" ]]; then
+    "${PHP_BIN:-php}" "$private/current/prepare-document-rollback.php"
+fi
 ln -s "$previous" "$private/current.rollback"
 mv -Tf "$private/current.rollback" "$private/current"
 echo 'Previous application restored. Database has NOT been rolled back; migrations must remain backward compatible.'

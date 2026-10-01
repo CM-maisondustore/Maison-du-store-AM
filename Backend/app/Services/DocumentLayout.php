@@ -69,4 +69,22 @@ final class DocumentLayout
         }
         return [...$options,'introduction'=>$introduction,'template_version'=>$t->published_version ?? $t->version];
     }
+    /** Keep all versions/assets, but make active settings readable by the preceding release. */
+    public static function prepareRollback(): void
+    {
+        DB::transaction(function () {
+            $templates=CommunicationTemplate::where('channel','pdf')->orderBy('id')->lockForUpdate()->get(); $effective=[];
+            foreach ($templates as $template) {
+                $effective[$template->id]=self::presentation($template->key);
+                self::revision($template);
+            }
+            foreach ($templates as $template) {
+                $presentation=$effective[$template->id];
+                if (($presentation['renderer_version'] ?? 1)!==2) continue;
+                $options=[...DocumentAssets::resolve($presentation),'renderer_version'=>1,'inherit_global'=>false];
+                $template->update(['body'=>$presentation['introduction'],'options'=>$options,'version'=>$template->version+1,'published_version'=>$template->version+1]);
+                self::revision($template);
+            }
+        });
+    }
 }
