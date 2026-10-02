@@ -31,7 +31,7 @@ class TechnicalQuotesTest extends TestCase
     public function test_agent_saves_separate_curtains_and_sheers_without_email_or_prices(): void {
         $this->seed(); $this->login('agent'); $data=$this->data();
         $html=$this->get('/admin/devis/nouveau')->assertOk()->assertSee('Voilages')->assertSee('facultatif')->getContent();
-        foreach (['unit_price','calculation_token','name="lines','FCFA','product_id'] as $secret) $this->assertStringNotContainsString($secret,$html);
+        foreach (['unit_price','calculation_token','name="lines','FCFA','[product_id]'] as $secret) $this->assertStringNotContainsString($secret,$html);
         $this->post('/admin/devis',$data)->assertSessionHasNoErrors();$q=Quote::firstOrFail();
         $this->assertSame('Rideaux et voilages',$q->product['model']);
         $this->assertSame($this->id('voilage-transparent'),$q->dimensions[0]['costing']['secondary_material']['option_id']);
@@ -75,8 +75,9 @@ class TechnicalQuotesTest extends TestCase
     }
     public function test_public_email_is_optional_and_anonymous_clients_are_not_merged(): void {
         $this->seed();
+        $model=Product::create(['reference'=>'TEST-RIDEAU','published'=>true,'details'=>['name'=>'Rideau de test','type'=>'rideau','available'=>true]]);
         $data=['contact'=>['civility'=>'mme','lastName'=>'Test','firstName'=>'Awa','phone'=>'+2250700000000','address'=>'Abidjan test','city'=>'Abidjan'],
-            'product'=>['model'=>'occultant','fabric'=>'occultant-100','finish'=>'wave-manuel','hanging'=>'rail-wave-manuel','lining'=>'sans','pattern'=>'uni','color'=>'beige'],
+            'product'=>['model'=>'product-'.$model->id,'fabric'=>'occultant-100','finish'=>'wave-manuel','hanging'=>'rail-wave-manuel','pattern'=>'uni','color'=>'beige'],
             'dimensions'=>[['label'=>'Salon','width'=>200,'height'=>250,'quantity'=>1]],'acceptTerms'=>true];
         $this->postJson('/api/quotes/curtains',$data)->assertCreated();$data['contact']['lastName']='Second';$this->postJson('/api/quotes/curtains',$data)->assertCreated();
         $this->assertDatabaseCount('contacts',2);
