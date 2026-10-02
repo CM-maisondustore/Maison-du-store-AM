@@ -62,7 +62,6 @@
           '<span class="suggestion__category">' + esc(p.category) + '</span>' +
           '<span class="suggestion__name">' + esc(p.name) + '</span>' +
         '</span>' +
-        '<span class="suggestion__price">' + esc(p.price) + '</span>' +
       '</button></li>'
     );
   }
@@ -106,7 +105,6 @@
           '<dl class="spec-list">' + specs + '</dl>' +
           (colors ? '<h3 class="product-detail__heading">Couleurs disponibles</h3><ul class="swatch-list">' + colors + '</ul>' : '') +
           '<div class="product-detail__buy">' +
-            '<div class="product-detail__price"><span class="product-detail__price-label">Tarif</span><strong>' + esc(product.price) + '</strong></div>' +
             '<div class="product-detail__cta">' +
               '<a class="btn btn--gold" href="' + href + '" data-action="quote" data-type="' + esc(product.type) +
                 '" data-product-id="' + esc(product.id) + '">Demander un devis</a>' +

@@ -703,3 +703,8 @@
   color: var(--color-ink);
   text-align: right;
 }
+
+/* Catalogue illustrations fitted to the existing quote placeholders. */
+.quote-image{display:block;max-width:100%;object-fit:cover;object-position:center;border-radius:var(--radius-sm)}
+.quote-image--thumb{width:68px;height:68px;flex-shrink:0}
+.quote-image--fabric,.quote-image--choice{width:100%;aspect-ratio:16/9;height:auto}

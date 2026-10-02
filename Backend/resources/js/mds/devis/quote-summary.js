@@ -49,13 +49,13 @@
     if (windows.length) rows += row('Dimensions', MDS.dimensions.formatWindows(windows));
 
     if (state.type === 'store') {
+      if (l.fabric) rows += row('Toile', l.fabric);
       if (l.mount) rows += row('Pose', l.mount);
-      if (l.control) rows += row('Commande', l.control + (l.powerSource ? ' \u2014 ' + l.powerSource : ''));
+      if (l.control) rows += row('Commande', l.control);
       if (l.color) rows += row('Couleur', l.color + (l.finish ? ' \u2014 ' + l.finish : ''));
     } else {
       if (l.fabric) rows += row('Tissu', l.fabric);
       if (l.color) rows += row('Coloris', l.color + (l.pattern ? ' \u2014 ' + l.pattern : ''));
-      if (l.lining) rows += row('Doublure', l.lining);
       if (l.finish) rows += row('Finition', l.finish + (l.hanging ? ' \u2014 ' + l.hanging : ''));
     }
 
@@ -93,11 +93,11 @@
       recapRow('Dimensions saisies', MDS.dimensions.formatWindows(state.dimensions), 'dimensions');
 
     if (state.type === 'store') {
-      rows += recapRow('Pose et commande', [l.mount, l.orderType, l.control, l.powerSource].filter(Boolean).join(' \u2014 '), 'store-mount');
-      rows += recapRow('Matière et finition', [l.color, l.finish].filter(Boolean).join(' \u2014 '), 'store-finish');
+      rows += recapRow('Pose et commande', [l.mount, l.orderType, l.control].filter(Boolean).join(' \u2014 '), 'store-mount');
+      rows += recapRow('Matière et finition', [l.fabric, l.color, l.finish].filter(Boolean).join(' \u2014 '), 'store-finish');
     } else {
       rows += recapRow('Tissu et coloris', [l.fabric, l.color, l.pattern].filter(Boolean).join(' \u2014 '), 'curtain-fabric');
-      rows += recapRow('Doublure et finition', [l.lining, l.finish].filter(Boolean).join(' \u2014 '), 'curtain-lining');
+      rows += recapRow('Finition', l.finish, 'curtain-finish');
       rows += recapRow('Pose et support', l.hanging, 'curtain-hanging');
     }
     if (contact.notes) rows += recapRow('Précisions sur le projet', contact.notes, 'contact');

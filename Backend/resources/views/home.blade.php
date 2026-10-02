@@ -58,7 +58,7 @@
           <li><a class="site-nav__link" data-nav-link href="{{ url('/') }}#contact">Contact</a></li>
         </ul>
         <div class="site-nav__actions">
-          <a class="btn btn--outline" href="tel:+2250712449319">Nous appeler</a>
+          <a class="btn btn--outline" href="https://wa.me/2250712449319" target="_blank" rel="noopener">Nous contacter</a>
           <a class="btn btn--gold" href="{{ url('/devis') }}" data-action="quote">Demander un devis</a>
         </div>
       </nav>

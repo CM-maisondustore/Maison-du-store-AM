@@ -32,28 +32,31 @@ class QuoteRequest extends FormRequest
     {
         $store = $this->routeIs('quotes.stores');
         $choices = $store ? [
-            'model' => ['enrouleur', 'venitien', 'californien', 'plisse', 'bateau'],
+            'model' => [],
             'mount' => ['murale', 'plafond', 'encastree', 'inconnu'],
             'orderType' => ['installation', 'remplacement', 'renovation'],
             'control' => ['manuelle', 'motorisee', 'inconnu'],
-            'finish' => ['voile', 'oxford', 'technique'],
+            'fabric' => [], 'finish' => [],
         ] : [
-            'model' => ['occultant', 'voilage', 'double', 'automatique'],
-            'fabric' => ['voile-tulle', 'lin-sauvage', 'coton-satine', 'polyester-recycle', 'velours-double', 'metisse-lin-coton'],
+            'model' => [],
+            'fabric' => [],
             'pattern' => ['uni', 'rayures', 'floral', 'geometrique', 'texture'],
-            'lining' => ['sans', 'thermique', 'occultante', 'acoustique'],
-            'finish' => ['oeillets', 'pattes', 'plis-flamands', 'plis-simples', 'ruban-fronceur'],
-            'hanging' => ['tringle', 'rail-chemin', 'rail-wave', 'sans'],
+            'finish' => [],
+            'hanging' => [],
         ];
         $colors = ['blanc', 'ecru', 'beige', 'taupe', 'gris', 'anthracite'];
         $options=\App\Services\PublicQuoteChoices::options()->where('category',$store ? 'store' : 'rideau');
-        foreach (($store ? ['finish'=>'material'] : ['fabric'=>'material','finish'=>'finish','hanging'=>'support']) as $field=>$kind) {
+        $models=\App\Services\PublicQuoteChoices::models();
+        $choices['model']=array_column(array_values(array_filter($models,fn($p)=>$p['category']===($store?'store':'rideau'))),'id');
+        $productId=(int)str_replace('product-','',(string)$this->input('product.model',''));
+        $options=$options->filter(fn($o)=>!$o->product_ids || in_array($productId,$o->product_ids,true));
+        if ($store && $this->input('product.control')!=='inconnu') $options=$options->filter(fn($o)=>$o->motorization==='any' || $o->motorization===($this->input('product.control')==='motorisee'?'yes':'no'));
+        foreach (['fabric'=>'material','finish'=>'finish',...($store?[]:['hanging'=>'support'])] as $field=>$kind) {
             $codes=$options->where('kind',$kind)->pluck('code')->all();
-            $choices[$field]=array_values(array_unique([...$choices[$field],...$codes]));
+            $choices[$field]=$codes;
         }
         $choices['color'] = $store ? $colors : [...$colors, 'bleu', 'vert', 'bordeaux'];
         $keys = array_keys($choices);
-        if ($store) $keys[] = 'powerSource';
         $rules = [
             'contact' => ['required', 'array:civility,lastName,firstName,email,phone,address,postalCode,city,notes'],
             'contact.civility' => ['required', Rule::in(['m', 'mme'])],
@@ -79,9 +82,6 @@ class QuoteRequest extends FormRequest
         ];
         foreach ($choices as $field => $values) {
             $rules['product.'.$field] = ['required', Rule::in($values)];
-        }
-        if ($store) {
-            $rules['product.powerSource'] = ['exclude_unless:product.control,motorisee', 'required', Rule::in(['filaire', 'batterie', 'solaire'])];
         }
         return $rules;
     }

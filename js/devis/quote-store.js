@@ -11,13 +11,10 @@
 
   const esc = function (text) { return MDS.validation.escapeHtml(text); };
 
-  const MODELS = [
-    { id: 'enrouleur', name: 'Store enrouleur', text: 'Toile enroulée, sobre et facile à vivre, idéale pour vos baies vitrées.' },
-    { id: 'venitien', name: 'Store vénitien', text: 'Lames orientables très précises pour doser la lumière au degré près.' },
-    { id: 'californien', name: 'Store californien', text: 'Bandes alternées qui structurent la lumière du jour à la nuit.' },
-    { id: 'plisse', name: 'Store plissé', text: 'Compact et thermique, régule légèrement la température de la pièce.' },
-    { id: 'bateau', name: 'Store bateau', text: 'Plis retenus par un drapé souple, pour une allure décorative.' }
-  ];
+  MDS.quoteMedia = function (item,size) {
+    return item?.imageUrl ? '<img class="quote-image quote-image--'+size+'" src="'+esc(item.imageUrl)+'" alt="'+esc(item.imageAlt||item.label||item.name||'Illustration')+'" loading="lazy">' : '<span class="image-placeholder image-placeholder--'+size+'" aria-hidden="true"></span>';
+  };
+  const MODELS = (MDS.quoteProducts || []).filter(p => p.category === 'store');
 
   const ORDER_TYPES = [
     { id: 'installation', label: 'Nouvelle installation' },
@@ -38,29 +35,18 @@
     { id: 'inconnu', icon: 'i-info', label: 'Je ne sais pas', text: 'Nous vous conseillons selon votre installation électrique.' }
   ];
 
-  const POWER_SOURCES = [
-    { id: 'filaire', label: 'Filaire / Secteur', text: 'Raccordement électrique classique.' },
-    { id: 'batterie', label: 'Batterie rechargeable', text: 'Sans fil, recharge périodique.' },
-    { id: 'solaire', label: 'Panneau solaire', text: 'Autonome, recharge par la lumière du jour.' }
-  ];
 
-  const FINISHES = [
-    { id: 'voile', label: 'Voile suédé', text: 'Toucher doux et velouté, tenue impeccable.' },
-    { id: 'oxford', label: 'Oxford', text: 'Tissage serré, aspect mat et régulier.' },
-    { id: 'technique', label: 'Toile technique Sortex\u00AE', text: 'Résistance renforcée pour un usage intensif.' }
-  ];
-
-  function findLabel(list, id) {
-    const item = (list || []).filter(function (x) { return x.id === id; })[0];
-    return item ? (item.label || item.name) : '';
+  const FABRICS = (MDS.quoteOptions || []).filter(o=>o.category==='store' && o.kind==='material');
+  const FINISHES = (MDS.quoteOptions || []).filter(o=>o.category==='store' && o.kind==='finish');
+  function findLabel(list,id) { const item=list.find(x=>x.id===id); return item ? (item.label||item.name) : ''; }
+  function compatible(o,state) {
+    return (!o.product_ids?.length || o.product_ids.includes(Number(state.store.model.replace('product-','')))) &&
+      (o.motorization==='any' || state.store.control==='inconnu' || o.motorization===(state.store.control==='motorisee'?'yes':'no'));
   }
-
-  const storeMaterials=Array.isArray(MDS.quoteOptions) ? MDS.quoteOptions.filter(o=>o.category==='store' && o.kind==='material') : [{id:'store-lourd',label:'Store lourd',text:'Toile lourde sur mesure.'},{id:'store-leger',label:'Store léger',text:'Toile légère sur mesure.'}];
-  FINISHES.splice(0,FINISHES.length,...storeMaterials);
-
   /* --- Étape 1 : modèle de store ------------------------------------------- */
 
   function renderModel(container, state) {
+    if(!MODELS.length){container.innerHTML='<p class="notice">Aucun store disponible. Contactez-nous sur WhatsApp.</p>';return;}
     container.innerHTML =
       '<h2 class="step__heading">Quel modèle de store souhaitez-vous ?</h2>' +
       '<p class="step__intro">Sélectionnez le type de confection idéal pour vos fenêtres.</p>' +
@@ -70,7 +56,7 @@
         return (
           '<label class="choice-card' + (checked ? ' is-selected' : '') + '">' +
             '<input type="radio" name="store-model" value="' + m.id + '"' + (checked ? ' checked' : '') + '>' +
-            '<span class="choice-card__media"><span class="image-placeholder image-placeholder--thumb" aria-hidden="true"></span></span>' +
+            '<span class="choice-card__media">' + MDS.quoteMedia(m,'thumb') + '</span>' +
             '<span class="choice-card__body"><span class="choice-card__title">' + esc(m.name) + '</span>' +
               '<span class="choice-card__text">' + esc(m.text) + '</span></span>' +
             '<span class="choice-card__check" aria-hidden="true"><svg class="icon icon--sm"><use href="#i-check"/></svg></span>' +
@@ -119,21 +105,6 @@
   /* --- Étape 3 : commande / motorisation -------------------------------------- */
 
   function renderControl(container, state) {
-    const powerVisible = state.store.control === 'motorisee';
-    const power =
-      '<div class="field form-grid__full" data-field="powerSource" data-power-block' + (powerVisible ? '' : ' hidden') + '>' +
-      '<label class="field__label">Type d\u2019alimentation retenu</label>' +
-      '<div class="option-grid option-grid--compact" role="radiogroup" aria-label="Alimentation">' +
-      POWER_SOURCES.map(function (p) {
-        const checked = state.store.powerSource === p.id;
-        return (
-          '<label class="option-tile option-tile--sm' + (checked ? ' is-selected' : '') + '">' +
-            '<input type="radio" name="store-power" value="' + p.id + '"' + (checked ? ' checked' : '') + '>' +
-            '<span class="option-tile__title">' + esc(p.label) + '</span><span class="option-tile__text">' + esc(p.text) + '</span>' +
-          '</label>'
-        );
-      }).join('') + '</div></div>';
-
     container.innerHTML =
       '<h2 class="step__heading">Type de manœuvre &amp; commande</h2>' +
       '<p class="step__intro">Sélectionnez comment vous souhaitez manœuvrer vos stores sur mesure.</p>' +
@@ -149,26 +120,13 @@
             '<span class="choice-card__check" aria-hidden="true"><svg class="icon icon--sm"><use href="#i-check"/></svg></span>' +
           '</label>'
         );
-      }).join('') + '</div>' + power;
+      }).join('') + '</div>';
 
-    // Le bloc « alimentation » n'apparaît que si la commande motorisée est choisie ;
-    // pas de nouvel appel à render() ici, pour ne perdre aucune autre saisie de l'étape.
-    container.addEventListener('change', function (event) {
-      if (!event.target.matches('input[name="store-control"]')) return;
-      const block = container.querySelector('[data-power-block]');
-      if (!block) return;
-      const show = event.target.value === 'motorisee';
-      block.hidden = !show;
-      if (!show) {
-        block.querySelectorAll('input[name="store-power"]').forEach(function (input) { input.checked = false; });
-      }
-    });
   }
 
   function collectControl(container) {
     const checked = container.querySelector('input[name="store-control"]:checked');
-    const power = container.querySelector('input[name="store-power"]:checked');
-    return { control: checked ? checked.value : '', powerSource: power ? power.value : '' };
+    return { control: checked ? checked.value : '' };
   }
 
   /* --- Étape 4 : matières, couleurs & finitions -------------------------------- */
@@ -190,23 +148,14 @@
           '</label>'
         );
       }).join('') + '</div></div>' +
-      '<div class="field form-grid__full" data-field="finish"><label class="field__label">Type de toile</label>' +
-      '<div class="option-grid option-grid--compact" role="radiogroup" aria-label="Type de toile">' +
-      FINISHES.map(function (f) {
-        const checked = state.store.finish === f.id;
-        return (
-          '<label class="option-tile option-tile--sm' + (checked ? ' is-selected' : '') + '">' +
-            '<input type="radio" name="store-finish" value="' + f.id + '"' + (checked ? ' checked' : '') + '>' +
-            '<span class="option-tile__title">' + esc(f.label) + '</span><span class="option-tile__text">' + esc(f.text) + '</span>' +
-          '</label>'
-        );
-      }).join('') + '</div></div>';
+      [['fabric','Type de toile',FABRICS],['finish','Finition',FINISHES]].map(function ([field,title,list]) {
+        const options=list.filter(o=>compatible(o,state));
+        return '<div class="field" data-field="'+field+'"><h3>'+title+'</h3><div class="option-grid">'+
+          (options.length ? options.map(f=>'<label class="option-tile"><input type="radio" name="store-'+field+'" value="'+esc(f.id)+'"'+(state.store[field]===f.id?' checked':'')+'>'+MDS.quoteMedia(f,'fabric')+'<span>'+esc(f.label)+'</span></label>').join('') : '<p>Aucun choix disponible pour cette configuration. Contactez-nous.</p>')+'</div></div>';
+      }).join('');
   }
-
   function collectFinish(container) {
-    const color = container.querySelector('input[name="store-color"]:checked');
-    const finish = container.querySelector('input[name="store-finish"]:checked');
-    return { color: color ? color.value : '', finish: finish ? finish.value : '' };
+    return Object.fromEntries(['color','fabric','finish'].map(field=>[field,container.querySelector('input[name="store-'+field+'"]:checked')?.value || '']));
   }
 
   /* --- Déclaration des étapes, lues par quote.js ------------------------------- */
@@ -224,11 +173,11 @@
       orderType: findLabel(ORDER_TYPES, store.orderType),
       mount: findLabel(MOUNTS, store.mount),
       control: findLabel(CONTROLS, store.control),
-      powerSource: findLabel(POWER_SOURCES, store.powerSource),
       color: findLabel(MDS.data.colors, store.color),
+      fabric: findLabel(FABRICS, store.fabric),
       finish: findLabel(FINISHES, store.finish)
     };
   }
 
-  MDS.quoteStore = { STEPS, MODELS, ORDER_TYPES, MOUNTS, CONTROLS, POWER_SOURCES, FINISHES, labels };
+  MDS.quoteStore = { STEPS, MODELS, ORDER_TYPES, MOUNTS, CONTROLS, FABRICS, FINISHES, labels };
 })((window.MDS = window.MDS || {}));

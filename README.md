@@ -74,11 +74,11 @@ cette règle reste vraie :
 
 ## Mode démonstration et backend Laravel
 
-La maquette HTML à la racine fonctionne entièrement en local : le catalogue vient de
-`js/catalogue/products.js`, et les formulaires (devis, rendez-vous)
-n'envoient rien — ils simulent un succès après un court délai et
-l'affichent clairement comme tel (« mode démonstration »), avec un lien
-`mailto:` de secours vers `contact@maisondustoream.com`.
+La maquette HTML à la racine permet de consulter la présentation en local.
+Le configurateur de devis utilise exclusivement les produits, matériaux et
+finitions de la base : utiliser la page `/devis` servie par Laravel pour le tester.
+L'ouverture directe de `devis.html` ne charge pas ces choix et ne permet pas
+d'enregistrer un devis réel.
 
 Pour utiliser le frontend statique avec une API Laravel :
 
@@ -91,13 +91,27 @@ Pour utiliser le frontend statique avec une API Laravel :
    - `POST /api/quotes/curtains/`
    - `POST /api/appointments/`
 
-Aucun autre fichier n'a besoin d'être modifié : tous les modules
-(catalogue, devis, rendez-vous) passent déjà par `MDS.api`.
+Les modules passent par `MDS.api`. Pour le configurateur, la vue Laravel injecte
+aussi les produits et les options disponibles, sans leurs coûts internes.
 
 La version directement intégrable à Laravel se trouve dans `Backend/` :
 elle contient les vues Blade, les sources Vite, les URLs Laravel et la
 protection CSRF. Le design et le contenu sont identiques à cette version
 statique.
+
+### Catalogue et illustrations du devis
+
+- Dans **Catalogue**, publier les produits disponibles et leur ajouter une photo.
+- Dans **Matériaux & finitions**, activer les choix proposés au formulaire public.
+  Les produits associés limitent leur compatibilité et fournissent leur miniature ;
+  sans association, une photo de la même catégorie est utilisée si disponible.
+- Dans **Images & portfolio**, modifier les deux éléments **Carte — démarrer un
+  devis** pour les images, titres et descriptions des cartes Store et Rideaux.
+- Les images sont recadrées automatiquement dans les emplacements des formulaires
+  client et agent. Les coûts internes restent réservés aux administrateurs.
+- Le devis store conserve le choix de motorisation, sans demander l'alimentation.
+  Les cartes du catalogue n'affichent plus « Prix » et **Nous contacter** ouvre
+  WhatsApp au **+225 07 12 44 93 19**.
 
 ## Points d'attention
 
@@ -120,9 +134,9 @@ Le site a été vérifié avec Chromium (Playwright) :
 
 - aucune erreur console sur `index.html` et `devis.html` ;
 - aucun défilement horizontal aux largeurs 1440 / 768 / 390 px ;
-- parcours complets testés de bout en bout : devis Store (7 étapes) et
-  devis Rideau (9 étapes), y compris validation des champs, révélation
-  conditionnelle (alimentation motorisée), édition depuis le
-  récapitulatif, et confirmation finale ;
+- parcours de devis avec validation des choix en base, compatibilité des
+  matériaux et finitions, et récapitulatif ;
+- miniatures et cartes de démarrage, motorisation sans alimentation,
+  affichage mobile et accès aux illustrations par les agents ;
 - calendrier et créneaux de rendez-vous, recherche, filtres, catégories,
   pagination, fiche produit en modale, menu mobile.

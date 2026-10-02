@@ -42,7 +42,7 @@
     return (
       '<article class="product-card" data-product-id="' + esc(product.id) + '">' +
         '<div class="product-card__media">' +
-          '<div class="image-placeholder image-placeholder--card" aria-hidden="true"></div>' + badge +
+          (product.imageUrl ? '<img class="site-image site-image--card" src="' + esc(product.imageUrl) + '" alt="' + esc(product.imageAlt || product.name) + '" loading="lazy" decoding="async">' : '<div class="image-placeholder image-placeholder--card" aria-hidden="true"></div>') + badge +
         '</div>' +
         '<div class="product-card__body">' +
           '<p class="product-card__eyebrow">' + esc(product.category) + '</p>' +
@@ -53,7 +53,6 @@
           '<p class="product-card__text">' + esc(product.description) + '</p>' +
           '<ul class="tag-list" aria-label="Caractéristiques">' + tags + '</ul>' +
           '<div class="product-card__footer">' +
-            '<span class="product-card__price">' + esc(product.price) + '</span>' +
             '<a class="btn btn--gold btn--sm" href="' + quoteHref(product) + '" data-action="quote" data-type="' +
               esc(product.type) + '" data-product-id="' + esc(product.id) + '">Demander un devis</a>' +
           '</div>' +

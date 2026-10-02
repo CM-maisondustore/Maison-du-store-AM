@@ -58,7 +58,7 @@
           <li><a class="site-nav__link" data-nav-link href="{{ url('/') }}#contact">Contact</a></li>
         </ul>
         <div class="site-nav__actions">
-          <a class="btn btn--outline" href="tel:+2250712449319">Nous appeler</a>
+          <a class="btn btn--outline" href="https://wa.me/2250712449319" target="_blank" rel="noopener">Nous contacter</a>
           <a class="btn btn--gold" href="{{ url('/devis') }}" data-action="quote">Demander un devis</a>
         </div>
       </nav>
@@ -78,20 +78,23 @@
           <h1>Demander un Devis</h1>
           <p class="lead">Choisissez votre type de produit pour commencer votre configuration sur mesure haut de gamme.</p>
         </div>
+        @php($quoteCards=\App\Models\SiteContent::with('media')->where('kind','quote')->where('published',true)->get()->keyBy('slot'))
         <div class="quote-type-grid">
           <article class="quote-type-card">
-            <div class="image-placeholder image-placeholder--choice" aria-hidden="true"></div>
+            @php($card=$quoteCards->get('quote-store'))
+            @if($card?->media)<img class="quote-image quote-image--choice" src="{{ $card->media->url() }}" alt="{{ $card->image_alt ?: $card->title }}" loading="lazy">@else<div class="image-placeholder image-placeholder--choice" aria-hidden="true"></div>@endif
             <div>
-              <h2>Devis Store</h2>
-              <p class="quote-type-card__text">Configurez un store intérieur ou extérieur : enrouleur, vénitien, plissé ou californien, sur mesure et confectionné pour vos fenêtres.</p>
+              <h2>{{ $card?->title ?: 'Devis Store' }}</h2>
+              <p class="quote-type-card__text">{{ $card?->description ?: 'Choisissez les produits, matériaux et finitions de notre catalogue pour votre projet sur mesure.' }}</p>
             </div>
             <button type="button" class="btn btn--gold btn--block btn--wrap" data-quote-start="store">Commencer le Devis Store</button>
           </article>
           <article class="quote-type-card">
-            <div class="image-placeholder image-placeholder--choice" aria-hidden="true"></div>
+            @php($card=$quoteCards->get('quote-rideau'))
+            @if($card?->media)<img class="quote-image quote-image--choice" src="{{ $card->media->url() }}" alt="{{ $card->image_alt ?: $card->title }}" loading="lazy">@else<div class="image-placeholder image-placeholder--choice" aria-hidden="true"></div>@endif
             <div>
-              <h2>Devis Rideau</h2>
-              <p class="quote-type-card__text">Rideaux occultants, voilages légers ou doublures thermiques à la main, à partir des plus belles étoffes d’Atelier ou sur mesure.</p>
+              <h2>{{ $card?->title ?: 'Devis Rideaux et voilages' }}</h2>
+              <p class="quote-type-card__text">{{ $card?->description ?: 'Choisissez les produits, matériaux et finitions de notre catalogue pour votre projet sur mesure.' }}</p>
             </div>
             <button type="button" class="btn btn--outline btn--block btn--wrap" data-quote-start="rideau">Commencer le Devis Rideau</button>
           </article>
@@ -173,6 +176,7 @@
 
   <script>
     window.MDS = {
+      quoteProducts: @json(\App\Services\PublicQuoteChoices::models()),
       quoteOptions: @json(\App\Services\PublicQuoteChoices::data()),
       config: {
         business: { timezone: @json(config('app.timezone')) },

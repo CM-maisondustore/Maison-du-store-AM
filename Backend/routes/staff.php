@@ -10,6 +10,7 @@ Route::prefix('admin')->group(function () {
         Route::get('mot-de-passe', [AuthController::class, 'password'])->name('password');
         Route::post('mot-de-passe', [AuthController::class, 'changePassword'])->middleware('throttle:5,1')->name('password.update');
         Route::get('devis', [QuoteController::class, 'index'])->name('quotes.index');
+        Route::get('illustrations-produits/{product}',[App\Http\Controllers\MediaController::class,'staffProduct'])->name('quote-product-image');
         Route::get('devis/nouveau', [App\Http\Controllers\Staff\QuoteFormController::class, 'create'])->name('quotes.create');
         Route::post('devis', [App\Http\Controllers\Staff\QuoteFormController::class, 'store'])->name('quotes.store');
         Route::post('devis/chiffrer', [App\Http\Controllers\Staff\QuoteFormController::class, 'calculate'])->middleware('throttle:60,1')->name('quotes.calculate');

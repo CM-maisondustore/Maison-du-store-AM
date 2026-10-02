@@ -19,7 +19,7 @@ class SiteContentTest extends TestCase
     {
         $this->withoutVite();
         $this->actingAs($this->staff())->post('/admin/contents',[...$this->data(),'image'=>$this->upload()])->assertSessionHasNoErrors()->assertRedirect();
-        $content=SiteContent::firstOrFail(); $asset=MediaAsset::findOrFail($content->media_asset_id);
+        $content=SiteContent::where('kind','portfolio')->firstOrFail(); $asset=MediaAsset::findOrFail($content->media_asset_id);
         $this->assertSame($this->png(),base64_decode($asset->payload));
         $this->assertArrayNotHasKey('payload',$asset->toArray());
         $this->get('/')->assertOk()->assertSee('Description du projet')->assertSee($asset->url());
@@ -34,7 +34,7 @@ class SiteContentTest extends TestCase
     {
         $this->withoutVite();
         $this->actingAs($this->staff())->post('/admin/contents',[...$this->data(),'image'=>$this->upload()]);
-        $content=SiteContent::firstOrFail(); $old=MediaAsset::findOrFail($content->media_asset_id);
+        $content=SiteContent::where('kind','portfolio')->firstOrFail(); $old=MediaAsset::findOrFail($content->media_asset_id);
         $this->put('/admin/contents/'.$content->id,[...$this->data(),'image'=>$this->upload()])->assertSessionHasNoErrors();
         $this->assertDatabaseMissing('media_assets',['id'=>$old->id]); $this->get($old->url())->assertNotFound();
         $asset=MediaAsset::findOrFail($content->fresh()->media_asset_id);
@@ -52,9 +52,9 @@ class SiteContentTest extends TestCase
         foreach ([UploadedFile::fake()->createWithContent('fake.png','<?php echo 1;'),UploadedFile::fake()->createWithContent('vector.svg','<svg xmlns="http://www.w3.org/2000/svg"></svg>'),$this->upload()->size(2049)] as $file) {
             $this->post('/admin/contents',[...$this->data(),'image'=>$file])->assertSessionHasErrors('image');
         }
-        $this->assertDatabaseCount('site_contents',0); $this->assertDatabaseCount('media_assets',0);
+        $this->assertDatabaseCount('site_contents',2); $this->assertDatabaseCount('media_assets',0);
         $this->post('/admin/contents',[...$this->data(),'image'=>$this->upload()])->assertSessionHasNoErrors();
-        $content=SiteContent::firstOrFail();
+        $content=SiteContent::where('kind','portfolio')->firstOrFail();
         $this->put('/admin/contents/'.$content->id,[...$this->data(),'title'=>'Do not save','image'=>UploadedFile::fake()->createWithContent('bad.jpg','invalid')])->assertSessionHasErrors('image');
         $this->assertSame('Réalisation test',$content->fresh()->title);
         auth()->logout(); session()->flush();
@@ -97,7 +97,7 @@ class SiteContentTest extends TestCase
         SiteContent::where('slot','portfolio-initial-2')->update(['title'=>'Dernière réalisation','position'=>999]);
         $this->seed();
         $this->get('/')->assertSee('Notre titre personnalisé')->assertSee('Notre description')->assertDontSee('Appartement Haussmannien')->assertSeeInOrder(['Première réalisation','Dernière réalisation']);
-        $this->assertDatabaseCount('site_contents',6); $this->assertDatabaseCount('media_assets',1);
+        $this->assertDatabaseCount('site_contents',8); $this->assertDatabaseCount('media_assets',1);
         $this->get($hero->media->url())->assertOk()->assertHeader('Content-Type','image/webp');
     }
 }

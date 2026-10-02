@@ -11,6 +11,9 @@ class QuoteController
     public function __invoke(QuoteRequest $request): JsonResponse
     {
         $data = $request->validated();
+        $model=collect(\App\Services\PublicQuoteChoices::models())->firstWhere('id',$data['product']['model']);
+        $data['product']['model_id']=$model['productId'];
+        $data['product']['model']=$model['name'];
         $publicOptions=\App\Services\PublicQuoteChoices::options()->keyBy('code');
         // Preserve the labels the client selected, even after a catalogue rename.
         foreach (['fabric','finish','hanging'] as $field) if (isset($data['product'][$field]) && isset($publicOptions[$data['product'][$field]])) $data['product'][$field]=$publicOptions[$data['product'][$field]]->label;

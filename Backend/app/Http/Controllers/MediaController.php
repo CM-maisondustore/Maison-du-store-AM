@@ -4,6 +4,16 @@ use App\Models\{MediaAsset, Product, SiteContent};
 use Illuminate\Http\Request;
 class MediaController
 {
+    public function quoteProduct(Product $product)
+    {
+        abort_unless($product->published && !empty($product->details['available']) && $product->media_asset_id,404);
+        return $this->preview($product->media_asset_id);
+    }
+    public function staffProduct(Product $product)
+    {
+        abort_unless($product->media_asset_id,404);
+        return $this->preview($product->media_asset_id);
+    }
     public function show(Request $request, int $media, string $hash)
     {
         abort_unless(SiteContent::where('media_asset_id', $media)->where('published', true)->exists()

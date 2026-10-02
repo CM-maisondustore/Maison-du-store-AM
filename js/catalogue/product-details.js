@@ -22,6 +22,7 @@
   let modal = null;
   let content = null;
   let products = [];
+  let productsReady = Promise.resolve();
   let currentId = null;
 
   function byId(id) {
@@ -61,7 +62,6 @@
           '<span class="suggestion__category">' + esc(p.category) + '</span>' +
           '<span class="suggestion__name">' + esc(p.name) + '</span>' +
         '</span>' +
-        '<span class="suggestion__price">' + esc(p.price) + '</span>' +
       '</button></li>'
     );
   }
@@ -93,10 +93,7 @@
     content.innerHTML =
       '<div class="product-detail">' +
         '<div class="product-detail__gallery">' +
-          '<div class="image-placeholder image-placeholder--gallery" aria-hidden="true"></div>' +
-          '<div class="product-detail__thumbs" aria-hidden="true">' +
-            '<div class="image-placeholder image-placeholder--tiny"></div>'.repeat(4) +
-          '</div>' +
+          (product.imageUrl ? '<img class="site-image site-image--gallery" src="' + esc(product.imageUrl) + '" alt="' + esc(product.imageAlt || product.name) + '">' : '<div class="image-placeholder image-placeholder--gallery" aria-hidden="true"></div>') +
         '</div>' +
         '<div class="product-detail__info">' +
           '<p class="eyebrow">' + esc(type.label) + ' · ' + esc(product.category) + '</p>' +
@@ -108,7 +105,6 @@
           '<dl class="spec-list">' + specs + '</dl>' +
           (colors ? '<h3 class="product-detail__heading">Couleurs disponibles</h3><ul class="swatch-list">' + colors + '</ul>' : '') +
           '<div class="product-detail__buy">' +
-            '<div class="product-detail__price"><span class="product-detail__price-label">Tarif</span><strong>' + esc(product.price) + '</strong></div>' +
             '<div class="product-detail__cta">' +
               '<a class="btn btn--gold" href="' + href + '" data-action="quote" data-type="' + esc(product.type) +
                 '" data-product-id="' + esc(product.id) + '">Demander un devis</a>' +
@@ -131,7 +127,9 @@
   }
 
   /** Ouvre (ou met à jour) le détail d'un produit. */
-  function open(id) {
+  async function open(id) {
+    // A card may be visible before the detail request has finished.
+    await productsReady;
     const product = byId(id);
     if (!product || !modal) return;
     currentId = product.id;
@@ -153,7 +151,9 @@
     content = modal && modal.querySelector('[data-product-detail]');
     if (!modal || !content) return;
 
-    MDS.api.getProducts().then(function (list) { products = list; });
+    productsReady = MDS.api.getProducts().then(function (list) { products = list; }).catch(function () {
+      if (MDS.notifications) MDS.notifications.error('Impossible de charger les fiches produits. Rechargez la page.');
+    });
 
     document.addEventListener('click', function (event) {
       const trigger = event.target.closest('[data-product-open]');

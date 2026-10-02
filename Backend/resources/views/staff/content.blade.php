@@ -5,7 +5,7 @@
 <form method="post" enctype="multipart/form-data" action="{{ $content->exists ? route('staff.contents.update',$content) : route('staff.contents.store') }}">
 @csrf @if($content->exists) @method('PUT') @endif
 <section class="panel">
-<p class="badge">{{ ['hero'=>'Hero — accueil','contact'=>'Contact — showroom','portfolio'=>'Portfolio'][$content->kind] }}</p>
+<p class="badge">{{ ['hero'=>'Hero — accueil','contact'=>'Contact — showroom','portfolio'=>'Portfolio','quote'=>'Carte — démarrer un devis'][$content->kind] }}</p>
 <label>Titre<input name="title" required maxlength="150" value="{{ old('title',$content->title) }}"></label>
 <label for="content-description">Description</label>
 <textarea id="content-description" name="description" maxlength="3000">{{ old('description',$content->description) }}</textarea>

@@ -67,10 +67,10 @@
       requiredChoice(data.orderType, 'Choisissez un type de commande.', errors, 'orderType');
     } else if (stepId === 'store-control') {
       requiredChoice(data.control, 'Choisissez un type de commande.', errors, 'control');
-      if (data.control === 'motorisee') requiredChoice(data.powerSource, 'Choisissez une alimentation.', errors, 'powerSource');
     } else if (stepId === 'store-finish') {
       requiredChoice(data.color, 'Choisissez une couleur.', errors, 'color');
-      requiredChoice(data.finish, 'Choisissez un type de toile.', errors, 'finish');
+      requiredChoice(data.fabric, 'Choisissez un type de toile.', errors, 'fabric');
+      requiredChoice(data.finish, 'Choisissez une finition.', errors, 'finish');
     }
     return { valid: Object.keys(errors).length === 0, errors: errors };
   }
@@ -85,8 +85,7 @@
     } else if (stepId === 'curtain-color') {
       requiredChoice(data.color, 'Choisissez un coloris.', errors, 'color');
       requiredChoice(data.pattern, 'Choisissez un motif.', errors, 'pattern');
-    } else if (stepId === 'curtain-lining') {
-      requiredChoice(data.lining, 'Choisissez une doublure.', errors, 'lining');
+
     } else if (stepId === 'curtain-finish') {
       requiredChoice(data.finish, 'Choisissez une finition.', errors, 'finish');
     } else if (stepId === 'curtain-hanging') {

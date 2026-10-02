@@ -97,12 +97,12 @@ class QuoteCostingTest extends TestCase
         QuoteCosting::saved(new Request([...$data,'use_catalogue'=>1,'calculation_token'=>QuoteCosting::token($calc)]));
     }
     public function test_public_choices_follow_catalogue_without_exposing_costs_and_are_archived(): void {
-        $this->seed(); $this->withoutVite();
+        $this->seed(); $this->seedProducts(); $this->withoutVite();
         $choices=\App\Services\PublicQuoteChoices::data();
         $this->assertContains('occultant-100',array_column($choices,'id'));
         $this->assertArrayNotHasKey('unit_price',$choices[0]);
         $data=['contact'=>['civility'=>'mme','firstName'=>'Awa','lastName'=>'Test','email'=>'test@example.invalid','phone'=>'+2250700000000','address'=>'Rue de test','city'=>'Abidjan'],
-            'product'=>['model'=>'occultant','fabric'=>'occultant-100','finish'=>'wave-manuel','hanging'=>'rail-wave-manuel','lining'=>'sans','pattern'=>'uni','color'=>'beige'],
+            'product'=>['model'=>'product-'.\App\Models\Product::where('details->type','rideau')->firstOrFail()->id,'fabric'=>'occultant-100','finish'=>'wave-manuel','hanging'=>'rail-wave-manuel','pattern'=>'uni','color'=>'beige'],
             'dimensions'=>[['label'=>'Salon','width'=>200,'height'=>250,'quantity'=>1]],'acceptTerms'=>true];
         $this->postJson('/api/quotes/curtains',$data)->assertCreated();
         $q=Quote::firstOrFail(); $this->assertSame('Tissu occultant 100 %',$q->product['fabric']);

@@ -10,21 +10,9 @@
 
   const esc = function (text) { return MDS.validation.escapeHtml(text); };
 
-  const MODELS = [
-    { id: 'occultant', name: 'Rideau occultant', text: 'Tissu dense qui bloque la lumière du jour, idéal pour les chambres.' },
-    { id: 'voilage', name: 'Voilage d\u2019Atelier', text: 'Lumière douce et tamisée, un tissu léger qui laisse passer le jour.' },
-    { id: 'double', name: 'Double rideau', text: 'Superposition d\u2019un voilage et d\u2019un rideau pour un rendu élaboré.' },
-    { id: 'automatique', name: 'Rideau automatique', text: 'Ouverture et fermeture pilotées à distance ou sur horaire.' }
-  ];
+  const MODELS = (MDS.quoteProducts || []).filter(p => p.category === 'rideau');
 
-  const FABRICS = [
-    { id: 'voile-tulle', label: 'Voile de Tulle', text: 'Occultation minimale, transparence.' },
-    { id: 'lin-sauvage', label: 'Pur Lin Sauvage', text: 'Texture authentique et chic, filtre la lumière avec élégance.' },
-    { id: 'coton-satine', label: 'Coton Satiné', text: 'Doux au toucher, tombé parfait et entretien simple.' },
-    { id: 'polyester-recycle', label: 'Polyester recyclé', text: 'Résistant, entretien facile pour un usage quotidien.' },
-    { id: 'velours-double', label: 'Velours Doublé', text: 'Isolation renforcée et rendu majestueux.' },
-    { id: 'metisse-lin-coton', label: 'Métisse Lin-Coton', text: 'Le parfait compromis entre la texture du lin et le confort du coton.' }
-  ];
+  const FABRICS = [];
 
   const PATTERNS = [
     { id: 'uni', label: 'Uni épuré' },
@@ -34,41 +22,24 @@
     { id: 'texture', label: 'Texture Relief' }
   ];
 
-  const LININGS = [
-    { id: 'sans', label: 'Sans doublure', text: 'Laisse passer un maximum de lumière et préserve l\u2019aspect léger du tissu.' },
-    { id: 'thermique', label: 'Doublure thermique Sortex\u00AE', text: 'Isole du froid et des déperditions de chaleur en toute saison.' },
-    { id: 'occultante', label: 'Doublure occultante de prestige', text: 'Obscurité quasi totale, idéale pour les chambres ou salles de repos.' },
-    { id: 'acoustique', label: 'Doublure acoustique Phonic', text: 'Réduit sensiblement les bruits extérieurs et de circulation.' }
-  ];
 
-  const FINISHES = [
-    { id: 'oeillets', label: 'Œillets métalliques', text: 'Tombé fluide et ondulé, idéal pour une manipulation fréquente.' },
-    { id: 'pattes', label: 'Galon fronces classique', text: 'Plis froncés traditionnels, style intemporel et bourgeois.' },
-    { id: 'plis-flamands', label: 'Plis Flamands doublés', text: 'Souple et parfaitement structuré, grande tenue dans le temps.' },
-    { id: 'plis-simples', label: 'Plis Pinces simples', text: 'Fini classique et épuré, effet soigné et discret.' },
-    { id: 'ruban-fronceur', label: 'Ruban Fronceur de luxe', text: 'Les finitions les plus détaillées, drapé sur mesure.' }
-  ];
 
-  const HANGINGS = [
-    { id: 'tringle', icon: 'i-curtain', label: 'Tringle à rideaux', text: 'Tube décoratif, embouts fixes, finitions au style affirmé.' },
-    { id: 'rail-chemin', icon: 'i-blinds', label: 'Rail chemin de fer', text: 'Profilé discret et solide, recommandé pour un glissement sans friction.' },
-    { id: 'rail-wave', icon: 'i-bolt', label: 'Rail motorisé Wave\u00AE', text: 'Module rideau motorisé intégré, pilotable par télécommande ou domotique.' },
-    { id: 'sans', icon: 'i-info', label: 'Pose sans passage renseigné', text: 'Fixation par pression sans perçage, adaptée aux locations meublées.' }
-  ];
+  const FINISHES = [];
+
+  const HANGINGS = [];
 
   function findLabel(list, id) {
     const item = (list || []).filter(function (x) { return x.id === id; })[0];
     return item ? (item.label || item.name) : '';
   }
 
-  const curtainChoices = Array.isArray(MDS.quoteOptions) ? MDS.quoteOptions.filter(o => o.category === 'rideau') : [
-    ...[['occultant-100','Tissu occultant 100 %'],['occultant-80','Tissu occultant 80 %'],['occultant-60','Tissu occultant 60 %'],['voilage-transparent','Voilage transparent'],['voilage-luxe','Voilage luxe']].map(([id,label]) => ({id,label,kind:'material'})),
-    ...[['wave-manuel','Wave manuel'],['wave-electric','Wave électrique'],['barre-fer','Barre de fer'],['reflete-manuel','Reflète manuelle']].map(([id,label]) => ({id,label,kind:'finish'})),
-    ...[['rail-double','Rail double','reflete-manuel'],['rail-simple','Rail simple','reflete-manuel'],['rail-wave-electric','Rail Wave électrique','wave-electric'],['rail-wave-manuel','Rail Wave manuel','wave-manuel'],['barre-double','Barre de fer double','barre-fer'],['barre-simple','Barre de fer simple','barre-fer']].map(([id,label,finish]) => ({id,label,kind:'support',finish_codes:[finish]}))
-  ];
+  const curtainChoices = (MDS.quoteOptions || []).filter(o=>o.category==='rideau');
   [[FABRICS,'material'],[FINISHES,'finish'],[HANGINGS,'support']].forEach(([list,kind]) => list.splice(0,list.length,...curtainChoices.filter(o=>o.kind===kind).map(o=>({text:'À confirmer avec votre conseiller.',icon:'i-curtain',...o}))));
 
+  function matchesProduct(o,state) { return !o.product_ids?.length || o.product_ids.includes(Number(state.curtain.model.replace('product-',''))); }
+
   function renderChoiceList(name, options, selected, withIcon) {
+    if(!options.length) return '<p class="notice">Aucun produit disponible dans cette catégorie. Contactez-nous sur WhatsApp.</p>';
     return '<div class="choice-list" role="radiogroup">' + options.map(function (o) {
       const checked = selected === o.id;
       return (
@@ -76,7 +47,7 @@
           '<input type="radio" name="' + name + '" value="' + o.id + '"' + (checked ? ' checked' : '') + '>' +
           (withIcon
             ? '<span class="choice-card__icon"><svg class="icon" aria-hidden="true"><use href="#' + o.icon + '"/></svg></span>'
-            : '<span class="choice-card__media"><span class="image-placeholder image-placeholder--thumb" aria-hidden="true"></span></span>') +
+            : '<span class="choice-card__media">' + MDS.quoteMedia(o,'thumb') + '</span>') +
           '<span class="choice-card__body"><span class="choice-card__title">' + esc(o.label || o.name) + '</span>' +
             '<span class="choice-card__text">' + esc(o.text) + '</span></span>' +
           '<span class="choice-card__check" aria-hidden="true"><svg class="icon icon--sm"><use href="#i-check"/></svg></span>' +
@@ -105,12 +76,12 @@
       '<h2 class="step__heading">Sélectionnez le tissu de votre confection</h2>' +
       '<p class="step__intro">Chaque matière possède un comportement unique de filtrage et de tombé.</p>' +
       '<div class="fabric-grid" role="radiogroup" aria-label="Tissu">' +
-      FABRICS.map(function (f) {
+      FABRICS.filter(o=>matchesProduct(o,state)).map(function (f) {
         const checked = state.curtain.fabric === f.id;
         return (
           '<label class="fabric-card' + (checked ? ' is-selected' : '') + '">' +
             '<input type="radio" name="curtain-fabric" value="' + f.id + '"' + (checked ? ' checked' : '') + '>' +
-            '<span class="image-placeholder image-placeholder--fabric" aria-hidden="true"></span>' +
+            MDS.quoteMedia(f,'fabric') +
             '<span class="fabric-card__title">' + esc(f.label) + '</span>' +
             '<span class="fabric-card__text">' + esc(f.text) + '</span>' +
           '</label>'
@@ -158,32 +129,19 @@
     return { color: color ? color.value : '', pattern: pattern ? pattern.value : '' };
   }
 
-  /* --- Étape 4 : doublure ----------------------------------------------------------- */
-
-  function renderLining(container, state) {
-    container.innerHTML =
-      '<h2 class="step__heading">Choisissez votre doublure</h2>' +
-      '<p class="step__intro">La doublure prolonge la tenue du rideau et lui apporte des bénéfices thermiques ou acoustiques.</p>' +
-      renderChoiceList('curtain-lining', LININGS, state.curtain.lining, false);
-  }
-  function collectLining(container) {
-    const c = container.querySelector('input[name="curtain-lining"]:checked');
-    return { lining: c ? c.value : '' };
-  }
-
-  /* --- Étape 5 : finition (tête de rideau) ------------------------------------------- */
+  /* --- Étape 4 : finition ----------------------------------------------------------- */
 
   function renderFinish(container, state) {
     container.innerHTML =
       '<h2 class="step__heading">Sélectionnez la finition haute</h2>' +
       '<p class="step__intro">La tête de votre rideau détermine son style de suspension et le tombé du drapé.</p>' +
       '<div class="fabric-grid" role="radiogroup" aria-label="Finition">' +
-      FINISHES.map(function (f) {
+      FINISHES.filter(o=>matchesProduct(o,state)).map(function (f) {
         const checked = state.curtain.finish === f.id;
         return (
           '<label class="fabric-card' + (checked ? ' is-selected' : '') + '">' +
             '<input type="radio" name="curtain-finish" value="' + f.id + '"' + (checked ? ' checked' : '') + '>' +
-            '<span class="image-placeholder image-placeholder--fabric" aria-hidden="true"></span>' +
+            MDS.quoteMedia(f,'fabric') +
             '<span class="fabric-card__title">' + esc(f.label) + '</span>' +
             '<span class="fabric-card__text">' + esc(f.text) + '</span>' +
           '</label>'
@@ -198,7 +156,7 @@
   /* --- Étape 6 : pose & support ---------------------------------------------------- */
 
   function renderHanging(container, state) {
-    const compatible = HANGINGS.filter(h=>!h.finish_codes?.length || h.finish_codes.includes(state.curtain.finish));
+    const compatible = HANGINGS.filter(o=>matchesProduct(o,state)).filter(h=>!h.finish_codes?.length || h.finish_codes.includes(state.curtain.finish));
     if (!compatible.some(h=>h.id===state.curtain.hanging)) state.curtain.hanging='';
     container.innerHTML =
       '<h2 class="step__heading">Mode de pose &amp; support</h2>' +
@@ -227,7 +185,6 @@
     { id: 'curtain-model', title: 'Modèle', render: renderModel, collect: collectModel },
     { id: 'curtain-fabric', title: 'Tissu', render: renderFabric, collect: collectFabric },
     { id: 'curtain-color', title: 'Coloris &amp; motif', render: renderColor, collect: collectColor },
-    { id: 'curtain-lining', title: 'Doublure', render: renderLining, collect: collectLining },
     { id: 'curtain-finish', title: 'Finition', render: renderFinish, collect: collectFinish },
     { id: 'curtain-hanging', title: 'Pose', render: renderHanging, collect: collectHanging }
   ];
@@ -238,11 +195,10 @@
       fabric: findLabel(FABRICS, curtain.fabric),
       color: findLabel(MDS.data.colors, curtain.color),
       pattern: findLabel(PATTERNS, curtain.pattern),
-      lining: findLabel(LININGS, curtain.lining),
       finish: findLabel(FINISHES, curtain.finish),
       hanging: findLabel(HANGINGS, curtain.hanging)
     };
   }
 
-  MDS.quoteCurtain = { STEPS, MODELS, FABRICS, PATTERNS, LININGS, FINISHES, HANGINGS, labels };
+  MDS.quoteCurtain = { STEPS, MODELS, FABRICS, PATTERNS, FINISHES, HANGINGS, labels };
 })((window.MDS = window.MDS || {}));

@@ -53,7 +53,6 @@
           '<p class="product-card__text">' + esc(product.description) + '</p>' +
           '<ul class="tag-list" aria-label="Caractéristiques">' + tags + '</ul>' +
           '<div class="product-card__footer">' +
-            '<span class="product-card__price">' + esc(product.price) + '</span>' +
             '<a class="btn btn--gold btn--sm" href="' + quoteHref(product) + '" data-action="quote" data-type="' +
               esc(product.type) + '" data-product-id="' + esc(product.id) + '">Demander un devis</a>' +
           '</div>' +

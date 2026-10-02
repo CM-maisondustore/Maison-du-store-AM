@@ -7,6 +7,7 @@
 <details class="panel" @if(!$option->exists) open @endif><summary>{{ $option->exists ? $option->label.' · '.$option->category.' · '.($option->active ? 'Actif' : 'Inactif') : 'Ajouter un matériau ou une finition' }}</summary>
 <form method="post" action="{{ $option->exists ? route('staff.quote-options.update',$option) : route('staff.quote-options.store') }}">@csrf @if($option->exists) @method('PUT') @endif
 <input type="hidden" name="tariff_form" value="1">
+<label>Produits associés (même catégorie ; aucun = toute la catégorie)<select name="product_ids[]" multiple>@foreach($products as $product)<option value="{{ $product->id }}" @selected(in_array($product->id,$option->product_ids ?? [],true))>{{ ($product->details['type'] ?? '')==='store' ? 'Store' : 'Rideau' }} — {{ $product->details['name'] ?? $product->reference }}</option>@endforeach</select></label>
 <div class="grid">
 <label>Libellé<input required name="label" maxlength="150" value="{{ $option->label }}"></label>
 <label>Nature<select name="kind">@foreach(\App\Models\QuoteOption::KINDS as $key=>$label)<option value="{{ $key }}" @selected($option->kind===$key)>{{ $label }}</option>@endforeach</select></label>

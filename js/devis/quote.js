@@ -20,8 +20,8 @@
     return {
       type: null, // "store" | "rideau"
       contact: { civility: '', lastName: '', firstName: '', email: '', phone: '', address: '', postalCode: '', city: '', notes: '' },
-      store: { model: '', orderType: '', mount: '', control: '', powerSource: '', color: '', finish: '' },
-      curtain: { model: '', fabric: '', color: '', pattern: '', lining: '', finish: '', hanging: '' },
+      store: { model: '', orderType: '', mount: '', control: '', fabric: '', color: '', finish: '' },
+      curtain: { model: '', fabric: '', color: '', pattern: '', finish: '', hanging: '' },
       dimensions: [],
       acceptTerms: false
     };
@@ -325,7 +325,12 @@
         else MDS.notifications.success('Votre demande de devis a été envoyée.');
         state = emptyState();
       })
-      .catch(function () {
+      .catch(function (error) {
+        if (error.status === 422 && error.data && error.data.errors) {
+          const messages = Object.values(error.data.errors).flat();
+          MDS.notifications.error(messages.join(' '));
+          return;
+        }
         MDS.notifications.error('L\u2019envoi a échoué. Réessayez ou contactez-nous directement.');
       })
       .finally(function () {
@@ -381,7 +386,7 @@
     if (productId) {
       MDS.api.getProducts().then(function (products) {
         const product = products.filter(function (p) { return String(p.id) === String(productId); })[0];
-        if (product) showWizard(product.type, { model: guessModelId(product.type, product.quoteModel) });
+        if (product) showWizard(product.type, { model: 'product-' + product.id });
         else if (type) showWizard(type);
         else showIntro();
       }).catch(function () { if (type) showWizard(type); else showIntro(); });

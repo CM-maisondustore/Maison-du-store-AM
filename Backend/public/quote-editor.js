@@ -12,7 +12,9 @@
   function checkbox(container,o,checked,key,attribute){
     const el=document.createElement('label');el.className='check';
     const input=document.createElement('input');input.type='checkbox';input.value=o.id;input.checked=checked;input.dataset[attribute]=key;
-    el.append(input,document.createTextNode(label(o)));container.append(el);
+    el.append(input);
+    if(o.imageUrl){const image=document.createElement('img');image.src=o.imageUrl;image.alt=o.label;image.width=64;image.height=64;image.loading='lazy';image.style.objectFit='cover';image.style.borderRadius='6px';el.append(image);}
+    el.append(document.createTextNode(label(o)));container.append(el);
   }
   function refresh(root,current=values(root)){
     keys.forEach(key=>field(root,key).value=String(current[key]??''));
@@ -28,6 +30,8 @@
     select.replaceChildren(new Option('Sélectionner une finition…',''));
     data.options.filter(o=>o.kind==='finish'&&compatible(o,v)).forEach(o=>select.add(new Option(o.label,String(o.id))));
     select.value=String(selected??'');if(select.selectedIndex<0)select.value='';
+    let preview=root.querySelector('[data-finish-image]');if(!preview){preview=document.createElement('img');preview.dataset.finishImage='';preview.width=64;preview.height=64;preview.style.objectFit='cover';select.after(preview);}
+    const finish=data.options.find(o=>String(o.id)===select.value);preview.hidden=!finish?.imageUrl;if(finish?.imageUrl){preview.src=finish.imageUrl;preview.alt=finish.label;}else preview.removeAttribute('src');
   }
   function init(root){
     const initial=Object.fromEntries(keys.map(key=>[key,field(root,key).dataset.value]));

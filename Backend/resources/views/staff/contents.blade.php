@@ -6,7 +6,7 @@
 <div class="grid">
 @foreach($contents as $content)
 <article class="panel">
-<span class="badge">{{ ['hero'=>'Hero — accueil','contact'=>'Contact — showroom','portfolio'=>'Portfolio'][$content->kind] }}</span>
+<span class="badge">{{ ['hero'=>'Hero — accueil','contact'=>'Contact — showroom','portfolio'=>'Portfolio','quote'=>'Carte — démarrer un devis'][$content->kind] }}</span>
 <h2>{{ $content->title }}</h2>
 @if($content->media_asset_id)<img src="{{ route('staff.media.preview',$content->media_asset_id) }}" alt="{{ $content->image_alt }}" loading="lazy" style="width:100%;height:160px;object-fit:cover;border-radius:6px">@else<p class="muted">Aucune image importée</p>@endif
 <p>{{ \Illuminate\Support\Str::limit($content->description,150) }}</p>
