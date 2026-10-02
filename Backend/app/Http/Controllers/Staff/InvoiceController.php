@@ -36,7 +36,7 @@ class InvoiceController
                 $snapshot['payment_plan']=[...($snapshot['payment_plan'] ?? []),'received'=>$source->receivedAmount()];
             }
             $snapshot['issuer'] = \App\Services\CommunicationTemplates::issuer($snapshot['presentation']);
-            $locked->update(['number' => 'MDS-'.str_pad((string) $locked->id, 7, '0', STR_PAD_LEFT), 'snapshot' => $snapshot, 'status' => 'issued', 'issued_at' => now()]);
+            $locked->update(['number' => \App\Services\DocumentReferences::invoice($source ?? Quote::findOrFail($locked->quote_id)), 'snapshot' => $snapshot, 'status' => 'issued', 'issued_at' => now()]);
             \App\Models\DocumentArchive::capture(app(Documents::class)->render(app(Documents::class)->invoiceData($locked)),['invoice_id'=>$locked->id]);
             Audit::record('facture_emise', $locked);
         });
@@ -47,5 +47,5 @@ class InvoiceController
         DB::transaction(function () use ($invoice) { $locked = Invoice::whereKey($invoice->id)->lockForUpdate()->firstOrFail(); abort_unless($locked->status === 'issued', 409); $locked->update(['status' => 'paid', 'paid_at' => now()]); Audit::record('facture_payee', $locked); });
         return back()->with('success', 'Paiement enregistré.');
     }
-    public function pdf(Invoice $invoice, Documents $documents) { return response($documents->invoice($invoice))->header('Content-Type', 'application/pdf')->header('Content-Disposition', 'attachment; filename="facture-'.$invoice->id.'.pdf"'); }
+    public function pdf(Invoice $invoice, Documents $documents) { return response($documents->invoice($invoice))->header('Content-Type', 'application/pdf')->header('Content-Disposition', 'attachment; filename="facture-'.($invoice->number ?? $invoice->id).'.pdf"'); }
 }

@@ -88,7 +88,7 @@ class Documents
     {
         $presentation=CommunicationTemplates::presentation('receipt');
         $presentation=[...DocumentLayout::defaults(),...$presentation,'renderer_version'=>2];
-        return ['kind'=>'receipt','title'=>'Reçu','number'=>'REC-'.str_pad((string)$payment->id,7,'0',STR_PAD_LEFT),'draft'=>false,
+        return ['kind'=>'receipt','title'=>'Reçu','number'=>DocumentReferences::receipt($quote),'draft'=>false,
             'date'=>$payment->received_on->format('d/m/Y'),'due'=>'','customer'=>$quote->contact,'quote_reference'=>$quote->reference,
             'invoice_reference'=>Invoice::where('quote_id',$quote->id)->whereNotNull('issued_at')->value('number'),
             'issuer'=>CommunicationTemplates::issuer($presentation),'presentation'=>$presentation,'lines'=>[],'tax_basis_points'=>0,

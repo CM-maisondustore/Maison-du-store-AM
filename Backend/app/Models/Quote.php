@@ -9,6 +9,9 @@ class Quote extends Model
 {
     protected static function booted(): void
     {
+        static::creating(function (Quote $quote) {
+            if (!$quote->reference) $quote->reference=\App\Services\DocumentReferences::nextQuote($quote);
+        });
         static::saving(function (Quote $quote) {
             if (in_array($quote->status,['approved','accepted']) && !in_array($quote->getOriginal('status'),['approved','accepted'])) $quote->approved_at=now();
         });

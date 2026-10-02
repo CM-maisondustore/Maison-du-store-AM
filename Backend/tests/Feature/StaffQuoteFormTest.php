@@ -37,6 +37,7 @@ class StaffQuoteFormTest extends TestCase
             $this->post('/admin/devis',$data)->assertSessionHasNoErrors()->assertRedirect();
             $quote=Quote::where('submission_token',$data['submission_token'])->firstOrFail();
             $this->assertSame('draft',$quote->status); $this->assertSame($user->id,$quote->created_by);
+            $this->assertStringStartsWith('AM-'.$data['quote_date'].'-RV-',$quote->reference);
             $this->assertSame($role==='agent' ? $user->id : null,$quote->agent_id);
             $this->assertSame(120.5,$quote->dimensions[0]['width']);
             $this->assertSame('Wave',$quote->dimensions[0]['finish_name']); $this->assertSame('Store lourd',$quote->dimensions[1]['material_name']);
@@ -53,6 +54,7 @@ class StaffQuoteFormTest extends TestCase
         $this->post('/admin/devis',$data)->assertSessionHasNoErrors();
         $this->post('/admin/devis',$data)->assertRedirect();
         $this->assertDatabaseCount('quotes',1); $this->assertDatabaseCount('contacts',1); $this->assertDatabaseCount('quote_payments',1);
+        $this->assertSame(113,(int)\Illuminate\Support\Facades\DB::table('document_sequences')->where('name','quotes')->value('next_value'));
         $quote=Quote::firstOrFail(); $payment=[...$data,'receipt_token'=>(string)Str::uuid(),'receipt_amount'=>15000];
         $this->post('/admin/devis/'.$quote->id.'/paiements',$payment)->assertSessionHasNoErrors();
         $this->post('/admin/devis/'.$quote->id.'/paiements',$payment)->assertSessionHasNoErrors();

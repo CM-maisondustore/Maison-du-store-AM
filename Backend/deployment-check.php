@@ -21,6 +21,7 @@ if (in_array('--database', $argv, true)) {
         }
         Illuminate\Support\Facades\DB::table('communication_templates')->select('layout_draft','published_version')->limit(1)->get();
         Illuminate\Support\Facades\DB::table('quotes')->select('document_metadata')->limit(1)->get();
+        if (!Illuminate\Support\Facades\DB::table('document_sequences')->where('name','quotes')->exists()) $failures[]='Document sequence missing.';
     } catch (Throwable $exception) {
         $failures[] = 'Database or expected tables unavailable.';
     }

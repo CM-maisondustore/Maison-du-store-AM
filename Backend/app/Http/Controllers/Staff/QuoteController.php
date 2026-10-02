@@ -4,7 +4,6 @@ use App\Models\{Quote, User, Intervention};
 use App\Services\{Audit, Pricing, Documents};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 class QuoteController
 {
@@ -25,7 +24,7 @@ class QuoteController
             abort_unless($r->user()->isAdmin() || $job->agent_id === $r->user()->id,403);
             if ($job->quote_id) return Quote::findOrFail($job->quote_id);
             $contact = $job->contact;
-            $quote = Quote::create(['reference' => (string) Str::uuid(), 'type' => $r->input('type'), 'source' => 'sur_place', 'status' => 'draft', 'contact_id' => $contact->id, 'agent_id' => $job->agent_id, 'contact' => ['firstName' => $contact->name, 'lastName' => '', 'email' => $contact->email, 'phone' => $contact->phone, 'address' => $contact->address], 'product' => [], 'dimensions' => []]);
+            $quote = Quote::create(['type' => $r->input('type'), 'source' => 'sur_place', 'status' => 'draft', 'contact_id' => $contact->id, 'agent_id' => $job->agent_id, 'contact' => ['firstName' => $contact->name, 'lastName' => '', 'email' => $contact->email, 'phone' => $contact->phone, 'address' => $contact->address], 'product' => [], 'dimensions' => []]);
             $job->update(['quote_id' => $quote->id]); Audit::record('devis_sur_place_cree', $quote);
             return $quote;
         });

@@ -24,10 +24,11 @@ final class DocumentPreview
         if ($scenario==='individual') $openings[0]['quantity']=4;
         $financial=(new QuoteCalculator)->calculate(['openings'=>$openings,'fees'=>[['label'=>'Pose et livraison','scope'=>'global','unitPrice'=>30000]],
             'displayMode'=>$scenario==='individual'?'individual':'grouped','discount'=>match($scenario){'discount'=>['type'=>'percentage','value'=>10],'negotiated'=>['type'=>'target_total','value'=>150000],default=>['type'=>'none','value'=>0]},'depositPercent'=>70]);
-        return ['kind'=>$kind,'title'=>$kind==='invoice'?'Facture':($kind==='receipt'?'Reçu':'Devis'),'number'=>'DEMO-2026-001','draft'=>true,
+        $reference='AM-2026-09-30-'.($scenario==='store'?'ST':'RV').'-112';
+        return ['kind'=>$kind,'title'=>$kind==='invoice'?'Facture':($kind==='receipt'?'Reçu':'Devis'),'number'=>$reference.match($kind){'invoice'=>'-FAC','receipt'=>'-REC-01',default=>''},'draft'=>true,
             'date'=>'30/09/2026','due'=>$kind==='receipt'?'':'30/10/2026','issuer'=>CommunicationTemplates::issuer($presentation),'presentation'=>$presentation,
             'customer'=>['firstName'=>'Client','lastName'=>'Démonstration','address'=>'Abidjan','phone'=>'07 00 00 00 00'],
-            'object'=>'Fourniture, confection et installation sur mesure','rooms'=>$rooms,'quote_reference'=>$kind==='quote'?null:'DEV-DEMO-001','lines'=>[],'tax_basis_points'=>0,'financial'=>$financial,
+            'object'=>'Fourniture, confection et installation sur mesure','rooms'=>$rooms,'quote_reference'=>$kind==='quote'?null:$reference,'lines'=>[],'tax_basis_points'=>0,'financial'=>$financial,
             'payment_plan'=>['mode'=>'advance','deposit'=>$financial['deposit'],'received'=>$kind==='quote'?0:50000],
             'receipt'=>['amount'=>50000,'method'=>'Mobile Money','reference'=>'DEMO-VERSEMENT']];
     }

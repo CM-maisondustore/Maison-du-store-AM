@@ -46,7 +46,7 @@ class QuoteFormController
         if ($previous) { abort_unless($previous->created_by===$r->user()->id,403); return redirect()->route('staff.quotes.show',$previous); }
         try {
             $quote=DB::transaction(function () use ($r,$data,$payment,$token) {
-                $quote=Quote::create([...$data,'contact_id'=>$this->contact($data['contact'])->id,'reference'=>(string)Str::uuid(),'source'=>'interne','status'=>'draft','submission_token'=>$token,'created_by'=>$r->user()->id,'agent_id'=>$r->user()->isAdmin() ? ($data['agent_id'] ?? null) : $r->user()->id]);
+                $quote=Quote::create([...$data,'contact_id'=>$this->contact($data['contact'])->id,'source'=>'interne','status'=>'draft','submission_token'=>$token,'created_by'=>$r->user()->id,'agent_id'=>$r->user()->isAdmin() ? ($data['agent_id'] ?? null) : $r->user()->id]);
                 if ($payment) QuoteReceipts::record($quote,$payment,$r->user()->id); Audit::record('devis_interne_cree',$quote); return $quote;
             });
         } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {

@@ -66,7 +66,9 @@ class WorkspaceTest extends TestCase
         $agent = $this->user('agent'); $job = $this->job($agent); $this->actingAs($agent);
         $this->post('/admin/prestations/'.$job->id.'/devis',['type'=>'store'])->assertRedirect();
         $quote = Quote::firstOrFail(); $this->assertNull($quote->terms_accepted_at);
+        $this->assertSame('AM-'.today()->toDateString().'-ST-112',$quote->reference);
         $this->post('/admin/prestations/'.$job->id.'/devis',['type'=>'rideau'])->assertRedirect(); $this->assertDatabaseCount('quotes',1);
+        $this->assertSame(113,(int)\Illuminate\Support\Facades\DB::table('document_sequences')->where('name','quotes')->value('next_value'));
         $this->put('/admin/devis/'.$quote->id, ['status'=>'accepted','agent_id'=>999,'contact_id'=>999,'valid_until'=>'2026-12-31','tax_basis_points'=>0,'lines'=>[['description'=>'Pose','quantity'=>1,'unit_price'=>45000]]])->assertForbidden();
         $this->assertSame('draft',$quote->fresh()->status); $this->assertSame($agent->id,$quote->fresh()->agent_id);
         $this->get('/admin/devis/'.$quote->id.'/pdf')->assertForbidden();
@@ -148,6 +150,7 @@ class WorkspaceTest extends TestCase
         $this->post('/admin/factures/'.$invoice->id.'/emettre')->assertSessionHasErrors('issuer');
         config(['workspace.issuer.address'=>'Abidjan','workspace.issuer.registration'=>'Registre test','workspace.issuer.tax_note'=>'Mention test','workspace.issuer.payment_terms'=>'Paiement à 30 jours']);
         $this->post('/admin/factures/'.$invoice->id.'/emettre')->assertRedirect();
+        $this->assertSame($quote->reference.'-FAC',$invoice->fresh()->number);
         $this->post('/admin/factures/'.$invoice->id.'/emettre')->assertConflict();
         $this->get('/admin/factures/'.$invoice->id)->assertOk();
         $this->get('/admin/factures/'.$invoice->id.'/pdf')->assertOk()->assertHeader('Content-Type','application/pdf');

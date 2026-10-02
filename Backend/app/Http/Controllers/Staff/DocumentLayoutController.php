@@ -78,7 +78,7 @@ class DocumentLayoutController
     public function receipt(Quote $quote,QuotePayment $payment,Documents $documents)
     {
         $issue=DocumentIssues::receipt($quote,$payment,$documents);
-        return response($issue->archive->contents())->header('Content-Type','application/pdf')->header('Content-Disposition','attachment; filename="recu-'.$payment->id.'.pdf"');
+        return response($issue->archive->contents())->header('Content-Type','application/pdf')->header('Content-Disposition','attachment; filename="recu-'.$issue->snapshot['number'].'.pdf"');
     }
     public function archive(DocumentIssue $issue)
     {

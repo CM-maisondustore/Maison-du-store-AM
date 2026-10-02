@@ -47,6 +47,7 @@ class ApiTest extends TestCase
         $this->postJson('/api/quotes/stores', $this->quote())->assertCreated()->assertJsonStructure(['data' => ['reference', 'status']])->assertJsonMissingPath('data.contact');
         $quote = Quote::firstOrFail();
         $this->assertSame('store', $quote->type);
+        $this->assertSame('AM-'.today()->toDateString().'-ST-112',$quote->reference);
         $this->assertEquals(120.5, $quote->dimensions[0]['width']);
         $this->assertNotNull($quote->terms_accepted_at);
     }
