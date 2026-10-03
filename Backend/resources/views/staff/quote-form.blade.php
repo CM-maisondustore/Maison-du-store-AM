@@ -2,7 +2,7 @@
 @section('title',$quote->exists ? 'Préparer le devis' : 'Nouveau devis')
 @section('content')
 @php
- $base=$quote->configuration['defaults'] ?? ['category'=>$quote->type ?? 'store','motorized'=>false];
+ $base=$quote->configuration['defaults'] ?? ['category'=>$quote->type ?? 'store','motorized'=>in_array($quote->product['control'] ?? '',['motorisee','Motorisée'],true)];
  $defaults=old('defaults',$base);
  $windows=old('windows',$quote->dimensions ?: [['label'=>'Ouverture 1','quantity'=>1,'inherit_defaults'=>true]]);
 @endphp
@@ -16,7 +16,13 @@
 @if(auth()->user()->isAdmin())<input type="hidden" name="calculation_token" value="{{ old('calculation_token',!empty($quote->configuration['calculation']['financial']) ? \App\Services\QuoteCosting::token($quote->configuration['calculation']) : '') }}">@endif
 <section class="panel"><h2>Client</h2><div class="grid">
 @foreach(['firstName'=>'Prénom','lastName'=>'Nom / raison sociale','phone'=>'Téléphone','email'=>'E-mail (facultatif)','address'=>'Adresse de livraison et de pose','city'=>'Ville'] as $key=>$label)
+@if($key==='phone')
+@include('staff.quote-phone')
+@else
+
 <label>{{ $label }}<input name="contact[{{ $key }}]" type="{{ $key==='email' ? 'email' : 'text' }}" @required(in_array($key,['lastName','phone','address'])) maxlength="{{ $key==='address' ? 1000 : ($key==='email' ? 255 : ($key==='phone' ? 50 : 100)) }}" value="{{ old('contact.'.$key,$quote->contact[$key] ?? '') }}"></label>
+
+@endif
 @endforeach
 </div></section>
 <section class="panel" id="quote-defaults"><h2>Choix communs</h2>

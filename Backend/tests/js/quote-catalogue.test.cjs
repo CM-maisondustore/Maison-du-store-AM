@@ -1,7 +1,7 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
 function load(products=[],options=[],finishes=[]){
  const MDS={quoteProducts:products,quoteOptions:options,quoteFinishes:finishes,data:{colors:[]},validation:{isRequired:s=>String(s??'').trim().length>0,escapeHtml:s=>String(s??'').replaceAll('"','&quot;')}};
- for(const file of ['quote-store.js','quote-curtain.js','quote-validation.js'])vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../../resources/js/mds/devis',file),'utf8'),{window:{MDS}});
+ for(const file of ['../utils/quote-phone.js','quote-store.js','quote-curtain.js','quote-validation.js'])vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../../resources/js/mds/devis',file),'utf8'),{window:{MDS}});
  return MDS;
 }
 test('quote choices contain only database entries, reuse images and omit power supplies',()=>{

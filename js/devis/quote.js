@@ -19,9 +19,9 @@
   function emptyState() {
     return {
       type: null, // "store" | "rideau"
-      contact: { civility: '', lastName: '', firstName: '', email: '', phone: '', address: '', postalCode: '', city: '', notes: '' },
+      contact: { civility: '', lastName: '', firstName: '', email: '', phoneCountryCode: '+225', phone: '', address: '', postalCode: '', city: '', notes: '' },
       store: { model: '', orderType: '', control: '', fabric: '', color: '', finish: '' },
-      curtain: { model: '', fabric: '', sheer: '', color: '', finish: '' },
+      curtain: { model: '', fabric: '', sheer: '', color: '', finish: '', control: '' },
       dimensions: [],
       acceptTerms: false
     };
@@ -53,7 +53,7 @@
         field('lastName', 'Nom', c.lastName, 'text', 'Dupont') +
         field('firstName', 'Prénom', c.firstName, 'text', 'Jean') +
         field('email', 'Adresse e-mail (facultatif)', c.email, 'email', 'jean.dupont@email.com') +
-        field('phone', 'Téléphone', c.phone, 'tel', '07 12 34 56 78') +
+        MDS.quotePhone.render(c) +
         field('address', 'Adresse (rue et numéro)', c.address, 'text', '14 Rue de la Paix', true) +
         field('postalCode', 'Code postal', c.postalCode, 'text', 'Facultatif') +
         field('city', 'Ville', c.city, 'text', 'Abidjan') +
@@ -78,7 +78,7 @@
     };
     return {
       civility: civility ? civility.value : '',
-      lastName: read('lastName'), firstName: read('firstName'), email: read('email'), phone: read('phone'),
+      lastName: read('lastName'), firstName: read('firstName'), email: read('email'), phoneCountryCode: read('phoneCountryCode'), phone: read('phone'),
       address: read('address'), postalCode: read('postalCode'), city: read('city'), notes: read('notes')
     };
   }

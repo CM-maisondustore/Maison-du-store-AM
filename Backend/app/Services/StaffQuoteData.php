@@ -12,13 +12,14 @@ class StaffQuoteData
     }
     public static function validate(Request $r): array
     {
+        QuotePhone::prepare($r);
         QuoteSelections::prepare($r);
         $admin=$r->user()->isAdmin();
         $windows=$r->input('windows',[]);
         if (is_array($windows)) foreach ($windows as &$window) if (is_array($window)) foreach (['width','height'] as $key) if (isset($window[$key]) && is_string($window[$key])) $window[$key]=str_replace(',','.',$window[$key]);
         unset($window); $r->merge(['windows'=>$windows]);
         $rules=['submission_token'=>'required|uuid','edit_version'=>'required|integer|min:0',
-            'contact'=>'required|array','contact.firstName'=>'nullable|string|max:100','contact.lastName'=>'required|string|max:100','contact.email'=>'nullable|email|max:255','contact.phone'=>'required|string|max:50','contact.address'=>'required|string|max:1000','contact.city'=>'nullable|string|max:100',
+            'contact'=>'required|array','contact.firstName'=>'nullable|string|max:100','contact.lastName'=>'required|string|max:100','contact.email'=>'nullable|email|max:255','contact.phone'=>['required','string','max:30',new \App\Rules\Phone],'contact.address'=>'required|string|max:1000','contact.city'=>'nullable|string|max:100',
             'quote_date'=>'required|date_format:Y-m-d','valid_until'=>'required|date_format:Y-m-d|after_or_equal:quote_date','delivery_date'=>'nullable|date_format:Y-m-d|after_or_equal:quote_date',
             'installation_date'=>'nullable|date_format:Y-m-d|after_or_equal:quote_date',
             'field_notes'=>'nullable|string|max:10000',

@@ -18,13 +18,13 @@
     }).join('');
   }
   function renderColor(c,s){c.innerHTML='<h2 class="step__heading">Choix du coloris</h2><p class="step__intro">Indiquez votre préférence. Le choix définitif sera effectué sur place avec l’agent.</p><div class="field" data-field="color"><div class="swatch-row swatch-row--lg">'+(MDS.data.colors||[]).filter(o=>o.types.includes('rideau')).map(o=>'<label class="swatch-choice"><input type="radio" name="curtain-color" value="'+esc(o.id)+'"'+(s.curtain.color===o.id?' checked':'')+'><span class="swatch-choice__dot" style="--swatch:'+o.hex+'"></span><span class="swatch-choice__label">'+esc(o.label)+'</span></label>').join('')+'</div></div>';}
-  function renderFinish(c,s){c.innerHTML='<h2 class="step__heading">Choisissez votre finition</h2><p class="step__intro">Les détails techniques et les accessoires seront définis avec notre équipe.</p><div class="field" data-field="finish"><div class="fabric-grid">'+cards('curtain-finish',FINISHES,s.curtain.finish)+'</div></div>';}
+  function renderFinish(c,s){c.innerHTML='<h2 class="step__heading">Choisissez votre finition</h2><p class="step__intro">Les détails techniques et les accessoires seront définis avec notre équipe.</p><div class="field" data-field="finish"><div class="fabric-grid">'+cards('curtain-finish',FINISHES,s.curtain.finish)+'</div></div><fieldset class="field" data-field="control"><legend class="field__label">Motorisé : oui ou non ?</legend><div class="pill-group">'+[['manuelle','Non'],['motorisee','Oui']].map(([value,label])=>'<label class="pill"><input type="radio" name="curtain-control" value="'+value+'"'+(s.curtain.control===value?' checked':'')+'><span>'+label+'</span></label>').join('')+'</div></fieldset>';}
   const STEPS=[
     {id:'curtain-model',title:'Modèle',render:renderModel,collect:c=>({model:read(c,'curtain-model')})},
     {id:'curtain-fabric',title:'Tissus et voilages',render:renderFabric,collect:c=>({fabric:read(c,'curtain-fabric'),sheer:read(c,'curtain-sheer')})},
     {id:'curtain-color',title:'Coloris',render:renderColor,collect:c=>({color:read(c,'curtain-color')})},
-    {id:'curtain-finish',title:'Finition',render:renderFinish,collect:c=>({finish:read(c,'curtain-finish')})}
+    {id:'curtain-finish',title:'Finition',render:renderFinish,collect:c=>({finish:read(c,'curtain-finish'),control:read(c,'curtain-control')})}
   ];
-  function labels(s){return {model:label(MODELS,s.model),fabric:[label(FABRICS,s.fabric),label(FABRICS,s.sheer)].filter(Boolean).join(' + '),color:label(MDS.data.colors,s.color),finish:label(FINISHES,s.finish)};}
+  function labels(s){return {model:label(MODELS,s.model),fabric:[label(FABRICS,s.fabric),label(FABRICS,s.sheer)].filter(Boolean).join(' + '),color:label(MDS.data.colors,s.color),finish:label(FINISHES,s.finish),control:s.control==='motorisee'?'Oui':s.control==='manuelle'?'Non':''};}
   MDS.quoteCurtain={STEPS,MODELS,FABRICS,FINISHES,labels};
 })((window.MDS=window.MDS||{}));

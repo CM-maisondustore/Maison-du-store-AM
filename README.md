@@ -119,7 +119,12 @@ statique.
   la motorisation, la finition, la zone et les notes de terrain. L’administrateur
   complète les matériaux, quantités, coûts, dates et affectations. Les modifications
   du relevé conservent le chiffrage existant et imposent sa vérification avant validation.
-- Le devis store conserve le choix de motorisation, sans demander l'alimentation.
+- Les devis Store et Rideaux demandent **Motorisé : oui ou non**. Le choix est
+  enregistré avec le devis, sans demander l'alimentation.
+- Les formulaires client, agent et administrateur proposent un champ **Pays / indicatif**
+  avant le téléphone, avec **+225** par défaut et des suggestions de pays. Le numéro
+  est enregistré au format international ; un numéro déjà préfixé ne reçoit pas
+  un second indicatif. Les coordonnées restent modifiables dans l'espace pro.
   Les cartes du catalogue n'affichent plus « Prix » et **Nous contacter** ouvre
   WhatsApp au **+225 07 12 44 93 19**.
 

@@ -13,6 +13,7 @@ class QuoteRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
+        \App\Services\QuotePhone::prepare($this);
         // Le formulaire accepte les décimales françaises.
         $dimensions = $this->input('dimensions');
         if (is_array($dimensions)) {
@@ -40,6 +41,7 @@ class QuoteRequest extends FormRequest
             'model' => [],
             'fabric' => [],
             'sheer' => [],
+            'control' => ['manuelle','motorisee'],
             'finish' => [],
         ];
         $colors = ['blanc', 'ecru', 'beige', 'taupe', 'gris', 'anthracite'];

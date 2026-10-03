@@ -57,7 +57,7 @@ class ApiTest extends TestCase
     public function test_curtain_quote_uses_its_own_choices(): void
     {
         $data = $this->quote();
-        $data['product'] = ['model' => 'product-'.\App\Models\Product::where('details->type','rideau')->firstOrFail()->id, 'sheer' => 'voilage-luxe', 'color' => 'bleu', 'finish' => 'wave'];
+        $data['product'] = ['model' => 'product-'.\App\Models\Product::where('details->type','rideau')->firstOrFail()->id, 'sheer' => 'voilage-luxe', 'color' => 'bleu', 'control' => 'manuelle', 'finish' => 'wave'];
         $this->postJson('/api/quotes/curtains', $data)->assertCreated();
         $this->assertDatabaseHas('quotes', ['type' => 'rideau']);
         $this->postJson('/api/quotes/stores', $data)->assertUnprocessable();

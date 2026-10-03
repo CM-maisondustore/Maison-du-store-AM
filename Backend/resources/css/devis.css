@@ -708,3 +708,4 @@
 .quote-image{display:block;max-width:100%;object-fit:cover;object-position:center;border-radius:var(--radius-sm)}
 .quote-image--thumb{width:68px;height:68px;flex-shrink:0}
 .quote-image--fabric,.quote-image--choice{width:100%;aspect-ratio:16/9;height:auto}
+.quote-phone-row{display:grid;grid-template-columns:minmax(110px,.6fr) minmax(0,1fr);gap:12px}.quote-phone-row .field__hint{margin-top:0}@media(max-width:360px){.quote-phone-row{grid-template-columns:1fr}}

@@ -179,6 +179,7 @@
       quoteFinishes: @json(\App\Services\PublicQuoteChoices::finishes()),
       quoteMessages: @json(\App\Services\PublicQuoteChoices::messages()),
       quoteProducts: @json(\App\Services\PublicQuoteChoices::models()),
+      phonePrefixes: @json(\App\Services\QuotePhone::PREFIXES),
       quoteOptions: @json(\App\Services\PublicQuoteChoices::data()),
       config: {
         business: { timezone: @json(config('app.timezone')) },

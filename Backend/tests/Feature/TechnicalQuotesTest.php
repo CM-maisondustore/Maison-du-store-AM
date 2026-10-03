@@ -75,7 +75,7 @@ class TechnicalQuotesTest extends TestCase
         $this->seed();
         $model=Product::create(['reference'=>'TEST-RIDEAU','published'=>true,'details'=>['name'=>'Rideau de test','type'=>'rideau','available'=>true]]);
         $data=['contact'=>['civility'=>'mme','lastName'=>'Test','firstName'=>'Awa','phone'=>'+2250700000000','address'=>'Abidjan test','city'=>'Abidjan'],
-            'product'=>['model'=>'product-'.$model->id,'fabric'=>'occultant-100','finish'=>'wave','color'=>'beige'],
+            'product'=>['model'=>'product-'.$model->id,'fabric'=>'occultant-100','control'=>'manuelle','finish'=>'wave','color'=>'beige'],
             'dimensions'=>[['label'=>'Salon','width'=>200,'height'=>250,'quantity'=>1]],'acceptTerms'=>true];
         $this->postJson('/api/quotes/curtains',$data)->assertCreated();$data['contact']['lastName']='Second';$this->postJson('/api/quotes/curtains',$data)->assertCreated();
         $this->assertDatabaseCount('contacts',2);

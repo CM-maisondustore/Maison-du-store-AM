@@ -7,3 +7,4 @@
 @media(max-width:850px){.sidebar{position:sticky;top:0;z-index:30;max-width:100%;padding:10px 16px}.sidebar nav{flex:initial;overflow-x:auto;overflow-y:hidden;max-width:100%;scroll-snap-type:x proximity}.sidebar nav a{flex-shrink:0;scroll-snap-align:start}.sidebar-controls{position:absolute;right:16px;top:8px}.sidebar .brand{font-size:18px;margin-right:90px;margin-bottom:10px}}
 
 @media print{.sidebar{display:none}}
+.quote-phone{grid-column:1/-1;display:grid;grid-template-columns:minmax(110px,.5fr) minmax(0,1fr);gap:0 12px}.quote-phone .muted{grid-column:1/-1;margin-top:6px}@media(max-width:360px){.quote-phone{grid-template-columns:1fr}}

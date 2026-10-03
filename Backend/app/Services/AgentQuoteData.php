@@ -11,8 +11,9 @@ class AgentQuoteData
         return ['options'=>QuoteOption::where('active',true)->where('kind','finish')->where(fn($q)=>$q->where('category','store')->orWhereIn('code',array_keys(self::FINISHES)))->get(['id','code','label','category','motorization'])->map(fn($o)=>['id'=>$o->id,'code'=>$o->code,'label'=>self::FINISHES[$o->code] ?? $o->label,'category'=>$o->category,'motorization'=>$o->motorization])->all()];
     }
     public static function validate(Request $r): array {
+        QuotePhone::prepare($r);
         $rules=['submission_token'=>'required|uuid','edit_version'=>'required|integer|min:0','contact'=>'required|array:firstName,lastName,email,phone,address,city',
-            'contact.firstName'=>'nullable|string|max:100','contact.lastName'=>'required|string|max:100','contact.email'=>'nullable|email|max:255','contact.phone'=>'required|string|max:50','contact.address'=>'required|string|max:1000','contact.city'=>'nullable|string|max:100',
+            'contact.firstName'=>'nullable|string|max:100','contact.lastName'=>'required|string|max:100','contact.email'=>'nullable|email|max:255','contact.phone'=>['required','string','max:30',new \App\Rules\Phone],'contact.address'=>'required|string|max:1000','contact.city'=>'nullable|string|max:100',
             'defaults'=>'required|array:project_type,motorized,finish_id,zone','windows'=>'required|array|min:1|max:30',
             'windows.*'=>'required|array:project_type,motorized,finish_id,zone,inherit_defaults,label,width,height,notes',
             'windows.*.label'=>'required|string|max:100','windows.*.width'=>'required|numeric|min:1|max:2000','windows.*.height'=>'required|numeric|min:1|max:2000','windows.*.notes'=>'nullable|string|max:1000','windows.*.inherit_defaults'=>'sometimes|boolean','field_notes'=>'nullable|string|max:10000'];

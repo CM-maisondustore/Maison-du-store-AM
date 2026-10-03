@@ -16,6 +16,7 @@ import '../css/placeholders.css';
 import '../css/responsive.css';
 
 import './mds/utils/validation.js';
+import './mds/utils/quote-phone.js';
 import './mds/utils/notifications.js';
 import './mds/utils/modal.js';
 import './mds/utils/api.js';

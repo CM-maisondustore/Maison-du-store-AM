@@ -29,7 +29,9 @@
     if (v.isRequired(data.email) && !v.isEmail(data.email)) errors.email = v.messages.email;
 
     if (!v.isRequired(data.phone)) errors.phone = 'Indiquez votre numéro de téléphone.';
-    else if (!v.isPhone(data.phone)) errors.phone = v.messages.phone;
+    else if (!v.isPhone(MDS.quotePhone.normalize(data.phone,data.phoneCountryCode))) errors.phone = v.messages.phone;
+
+    if (data.phoneCountryCode && !/^\+[1-9][0-9]{0,2}$/.test(data.phoneCountryCode)) errors.phoneCountryCode='Saisissez un indicatif valide, par exemple +225.';
 
     if (!v.isRequired(data.address)) errors.address = 'Indiquez votre adresse.';
     else if (!v.isValidText(data.address, { min: 4, max: 120 })) errors.address = 'Votre adresse doit contenir entre 4 et 120 caractères.';
@@ -86,6 +88,7 @@
 
 
     } else if (stepId === 'curtain-finish') {
+      requiredChoice(data.control, 'Précisez si le rideau doit être motorisé.', errors, 'control');
       requiredChoice(data.finish, 'Choisissez une finition.', errors, 'finish');
     } else if (stepId === 'curtain-hanging') {
       requiredChoice(data.hanging, 'Choisissez un mode de pose.', errors, 'hanging');

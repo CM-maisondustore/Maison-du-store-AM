@@ -13,7 +13,7 @@ class QuoteJourneyTest extends TestCase
     public function test_public_curtain_requests_allow_curtain_sheer_or_both_and_reject_technical_options(): void {
         $this->seed();$p=Product::create(['reference'=>'CURTAIN-TEST','published'=>true,'details'=>['type'=>'rideau','name'=>'Rideau','available'=>true]]);
         $data=['contact'=>['civility'=>'mme','firstName'=>'Awa','lastName'=>'Test','phone'=>'+2250700000000','address'=>'Adresse de test','city'=>'Abidjan'],
-            'product'=>['model'=>'product-'.$p->id,'fabric'=>'occultant-100','sheer'=>'voilage-transparent','color'=>'beige','finish'=>'wave'],'dimensions'=>[['label'=>'Ouverture 1','width'=>120,'height'=>220,'quantity'=>1]],'acceptTerms'=>true];
+            'product'=>['model'=>'product-'.$p->id,'fabric'=>'occultant-100','sheer'=>'voilage-transparent','color'=>'beige','control'=>'manuelle','finish'=>'wave'],'dimensions'=>[['label'=>'Ouverture 1','width'=>120,'height'=>220,'quantity'=>1]],'acceptTerms'=>true];
         foreach([['occultant-100','voilage-transparent'],['occultant-80',''],['','voilage-luxe']] as [$fabric,$sheer]){$data['product']['fabric']=$fabric;$data['product']['sheer']=$sheer;$this->postJson('/api/quotes/curtains',$data)->assertCreated();}
         $this->assertStringContainsString(' + ',Quote::first()->product['fabric']);$this->assertSame('Wave',Quote::first()->product['finish']);
         $data['product']['sheer']='';$this->postJson('/api/quotes/curtains',$data)->assertUnprocessable()->assertJsonValidationErrors(['product.fabric','product.sheer']);

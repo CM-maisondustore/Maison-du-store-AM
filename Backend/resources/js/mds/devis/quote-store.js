@@ -23,9 +23,8 @@
   ];
 
   const CONTROLS = [
-    { id: 'manuelle', icon: 'i-tools', label: 'Commande manuelle', text: 'Cordon, chaînette ou tige de manœuvre classique et fiable.' },
-    { id: 'motorisee', icon: 'i-bolt', label: 'Commande motorisée', text: 'Ouverture et fermeture automatisées, pilotables à distance.' },
-    { id: 'inconnu', icon: 'i-info', label: 'Je ne sais pas', text: 'Nous vous conseillons selon votre installation électrique.' }
+    { id: 'manuelle', icon: 'i-tools', label: 'Non — commande manuelle', text: 'Cordon, chaînette ou tige de manœuvre classique et fiable.' },
+    { id: 'motorisee', icon: 'i-bolt', label: 'Oui — commande motorisée', text: 'Ouverture et fermeture automatisées, pilotables à distance.' },
   ];
 
 
@@ -42,7 +41,7 @@
     if(!MODELS.length){container.innerHTML='<p class="notice">Aucun store disponible. Contactez-nous sur WhatsApp.</p>';return;}
     container.innerHTML =
       '<h2 class="step__heading">Quel modèle de store souhaitez-vous ?</h2>' +
-      '<p class="step__intro">Sélectionnez le type de confection idéal pour vos fenêtres.</p>' +
+      '<p class="step__intro">Sélectionnez le type de confection idéal pour vos ouvertures.</p>' +
       '<div class="choice-list" role="radiogroup" aria-label="Modèle de store">' +
       MODELS.map(function (m) {
         const checked = state.store.model === m.id;
@@ -67,7 +66,7 @@
 
   function renderControl(container, state) {
     container.innerHTML =
-      '<h2 class="step__heading">Type de manœuvre &amp; commande</h2>' +
+      '<h2 class="step__heading">Motorisé : oui ou non ?</h2>' +
       '<p class="step__intro">Sélectionnez comment vous souhaitez manœuvrer vos stores sur mesure.</p>' +
       '<div class="choice-list" role="radiogroup" aria-label="Type de commande">' +
       CONTROLS.map(function (c) {
