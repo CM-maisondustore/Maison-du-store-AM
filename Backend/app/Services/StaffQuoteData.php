@@ -8,11 +8,7 @@ class StaffQuoteData
 {
     public static function catalogue(bool $prices=true): array
     {
-        $products=\App\Models\Product::whereNotNull('media_asset_id')->orderBy('id')->get();
-        return ['options'=>QuoteOption::orderBy('label')->get(['id','code','kind','category','label','motorization','active','unit','finish_codes','fabric_group','product_ids',...($prices ? ['unit_price'] : [])])->map(function($o) use ($products) {
-            $product=$products->first(fn($p)=>($p->details['type'] ?? '')===$o->category && (!$o->product_ids || in_array($p->id,$o->product_ids,true)));
-            return [...$o->toArray(),'imageUrl'=>$product ? route('staff.quote-product-image',$product) : null];
-        })->all()];
+        return ['options'=>QuoteOption::orderBy('label')->get(['id','code','kind','category','label','motorization','active','unit','finish_codes','fabric_group','product_ids',...($prices ? ['unit_price'] : [])])->toArray()];
     }
     public static function validate(Request $r): array
     {

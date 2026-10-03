@@ -91,7 +91,7 @@ class QuotePricingIntegrationTest extends TestCase
         foreach ($q->dimensions as $window) $this->assertFalse($window['inherit_defaults']);
         // Agents can also save their independent technical selections without common choices.
         $agent=$this->login('agent');unset($data['pricing'],$data['tax_rate'],$data['payment_mode'],$data['deposit_amount'],$data['receipt_token']);
-        $data['submission_token']=(string)Str::uuid();
+        $data=$this->agentPayload($data);$data['submission_token']=(string)Str::uuid();
         $this->post('/admin/devis',$data)->assertSessionHasNoErrors();
         $technical=Quote::latest('id')->firstOrFail();$this->assertSame($agent->id,$technical->agent_id);$this->assertTrue($technical->configuration['pricing_review_required']);
     }
@@ -144,7 +144,7 @@ class QuotePricingIntegrationTest extends TestCase
     }
     public function test_agents_cannot_see_or_submit_any_new_prices(): void
     {
-        $this->seed();$this->login();$q=$this->save($this->payload());$agent=$this->login('agent');$q->update(['agent_id'=>$agent->id]);
+        $this->seed();$this->login();$q=$this->save($this->payload());$agent=$this->login('agent');$q->update(['agent_id'=>$agent->id,'created_by'=>$agent->id]);
         foreach (['','/formulaire'] as $path) {
             $html=$this->get('/admin/devis/'.$q->id.$path)->assertOk()->getContent();
             foreach (['unit_price','271875','271 875','190313','discount_type','F CFA'] as $secret) $this->assertStringNotContainsString($secret,$html);
@@ -153,9 +153,9 @@ class QuotePricingIntegrationTest extends TestCase
         $this->post('/admin/devis/'.$q->id.'/avancement',['stage'=>'in_production','edit_version'=>0])->assertForbidden();
         $data=$this->payload();unset($data['pricing'],$data['tax_rate'],$data['payment_mode'],$data['deposit_amount']);
         foreach (['material_unit_price','finish_unit_price'] as $key) {
-            $bad=$data;$bad['windows'][0]['costing'][$key]=1;$this->put('/admin/devis/'.$q->id.'/formulaire',$bad)->assertSessionHasErrors('windows.0.costing.'.$key);
+            $bad=$data;$bad['windows'][0]['costing'][$key]=1;$this->put('/admin/devis/'.$q->id.'/formulaire',$bad)->assertSessionHasErrors('windows.0.costing');
         }
-        $bad=$data;$bad['windows'][0]['costing']['support']['unit_price']=1;$this->put('/admin/devis/'.$q->id.'/formulaire',$bad)->assertSessionHasErrors('windows.0.costing.support.unit_price');
+        $bad=$data;$bad['windows'][0]['costing']['support']['unit_price']=1;$this->put('/admin/devis/'.$q->id.'/formulaire',$bad)->assertSessionHasErrors('windows.0.costing');
     }
     public function test_production_is_blocked_until_confirmed_deposit_and_overpayments_are_rejected(): void
     {

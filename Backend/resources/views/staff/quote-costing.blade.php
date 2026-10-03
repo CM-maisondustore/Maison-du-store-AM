@@ -8,7 +8,7 @@
 @if(auth()->user()->isAdmin())<label>Prix du tissu / store (F CFA par unité)<input name="windows[{{ $index }}][costing][material_unit_price]" type="number" min="0" max="100000000" step="1" value="{{ $window['costing']['material_unit_price'] ?? '' }}" placeholder="Tarif du catalogue"></label>
 <label>Quantité de finition (si facturée)<input name="windows[{{ $index }}][costing][finish_quantity]" inputmode="decimal" value="{{ $window['costing']['finish_quantity'] ?? '' }}" placeholder="Largeur ou 1 unité"></label>
 <label>Prix de finition (F CFA par unité)<input name="windows[{{ $index }}][costing][finish_unit_price]" type="number" min="0" max="100000000" step="1" value="{{ $window['costing']['finish_unit_price'] ?? '' }}" placeholder="Tarif du catalogue"></label>@endif
-<label>Zone de pose<select name="windows[{{ $index }}][costing][zone]"><option value="abidjan" @selected(($window['costing']['zone'] ?? 'abidjan')==='abidjan')>Abidjan</option><option value="other" @selected(($window['costing']['zone'] ?? '')==='other')>Hors Abidjan — à chiffrer</option></select></label>
+<label>Zone de pose<select name="windows[{{ $index }}][costing][zone]"><option value="abidjan" @selected(($window['zone'] ?? $window['costing']['zone'] ?? 'abidjan')==='abidjan')>Abidjan</option><option value="other" @selected(($window['zone'] ?? $window['costing']['zone'] ?? '')==='other')>Hors Abidjan — à chiffrer</option></select></label>
 </div>
 @foreach(\App\Services\QuoteCosting::PARTS as $kind)
 <div class="grid" data-cost-part="{{ $kind }}">

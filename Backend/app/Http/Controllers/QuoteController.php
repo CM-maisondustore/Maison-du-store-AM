@@ -16,7 +16,12 @@ class QuoteController
         $data['product']['model']=$model['name'];
         $publicOptions=\App\Services\PublicQuoteChoices::options()->keyBy('code');
         // Preserve the labels the client selected, even after a catalogue rename.
-        foreach (['fabric','finish','hanging'] as $field) if (isset($data['product'][$field]) && isset($publicOptions[$data['product'][$field]])) $data['product'][$field]=$publicOptions[$data['product'][$field]]->label;
+        foreach (['fabric','sheer',...($request->routeIs('quotes.stores') ? ['finish'] : [])] as $field) if (isset($data['product'][$field]) && isset($publicOptions[$data['product'][$field]])) $data['product'][$field]=$publicOptions[$data['product'][$field]]->label;
+        if (!$request->routeIs('quotes.stores')) {
+            $finish=collect(\App\Services\PublicQuoteChoices::finishes())->firstWhere('id',$data['product']['finish']);
+            $data['product']['finish_code']=$finish['id'];$data['product']['finish']=$finish['label'];
+            $data['product']['fabric']=implode(' + ',array_filter([$data['product']['fabric'] ?? null,$data['product']['sheer'] ?? null]));
+        }
         $quote = \Illuminate\Support\Facades\DB::transaction(fn () => Quote::create([
             'contact_id' => app(\App\Services\ContactArchive::class)->capture($data['contact'])->id,
             'type' => $request->routeIs('quotes.stores') ? 'store' : 'rideau',

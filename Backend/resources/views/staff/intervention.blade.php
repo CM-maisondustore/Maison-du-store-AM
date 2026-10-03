@@ -27,7 +27,7 @@
 </form>
 <section class="panel">
 <h2>Devis sur place</h2>
-@if($job->quote_id)<a href="{{ route('staff.quotes.show',$job->quote_id) }}">Ouvrir le devis lié</a>
+@if($job->quote_id)@if($job->quote?->canBeViewedBy(auth()->user()))<a href="{{ route('staff.quotes.show',$job->quote_id) }}">Ouvrir le devis lié</a>@else<p>Le devis lié est géré par son auteur et Admin-CM.</p>@endif
 @else<form method="post" action="{{ route('staff.interventions.quote',$job) }}">
 @csrf<label>Type de projet<select name="type">
 <option value="store">Store</option>

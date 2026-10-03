@@ -22,13 +22,6 @@
     { id: 'renovation', label: 'Rénovation' }
   ];
 
-  const MOUNTS = [
-    { id: 'murale', icon: 'i-home', label: 'Pose murale', text: 'Fixation directe dans la façade, idéale pour une pose apparente.' },
-    { id: 'plafond', icon: 'i-building', label: 'Pose plafond', text: 'Fixation au-dessus de la fenêtre, pour un rendu discret et propre.' },
-    { id: 'encastree', icon: 'i-blinds', label: 'Pose en feuillure', text: 'Intégration discrète dans le cadre, pour les fenêtres adaptées.' },
-    { id: 'inconnu', icon: 'i-info', label: 'Je ne sais pas', text: 'Nos conseillers valident le type de pose lors de l\u2019étude à domicile.' }
-  ];
-
   const CONTROLS = [
     { id: 'manuelle', icon: 'i-tools', label: 'Commande manuelle', text: 'Cordon, chaînette ou tige de manœuvre classique et fiable.' },
     { id: 'motorisee', icon: 'i-bolt', label: 'Commande motorisée', text: 'Ouverture et fermeture automatisées, pilotables à distance.' },
@@ -72,38 +65,6 @@
 
   /* --- Étape 2 : type de pose ------------------------------------------------ */
 
-  function renderMount(container, state) {
-    container.innerHTML =
-      '<h2 class="step__heading">Choisissez votre type de pose</h2>' +
-      '<p class="step__intro">Le type de fixage détermine l\u2019encombrement final et le rendu visuel.</p>' +
-      '<div class="option-grid" role="radiogroup" aria-label="Type de pose">' +
-      MOUNTS.map(function (o) {
-        const checked = state.store.mount === o.id;
-        return (
-          '<label class="option-tile' + (checked ? ' is-selected' : '') + '">' +
-            '<input type="radio" name="store-mount" value="' + o.id + '"' + (checked ? ' checked' : '') + '>' +
-            '<svg class="icon icon--lg" aria-hidden="true"><use href="#' + o.icon + '"/></svg>' +
-            '<span class="option-tile__title">' + esc(o.label) + '</span>' +
-            '<span class="option-tile__text">' + esc(o.text) + '</span>' +
-          '</label>'
-        );
-      }).join('') + '</div>' +
-      '<div class="notice notice--info"><svg class="icon" aria-hidden="true"><use href="#i-info"/></svg>' +
-      '<span>Besoin d\u2019aide pour l\u2019installation ? Nos équipes peuvent réaliser une visite technique avant la fabrication.</span></div>' +
-      '<div class="field form-grid__full" data-field="orderType"><label class="field__label" for="store-order-type">Type de commande</label>' +
-      '<select class="select" id="store-order-type" name="orderType">' + ORDER_TYPES.map(function (o) {
-        return '<option value="' + o.id + '"' + (state.store.orderType === o.id ? ' selected' : '') + '>' + esc(o.label) + '</option>';
-      }).join('') + '</select></div>';
-  }
-
-  function collectMount(container) {
-    const checked = container.querySelector('input[name="store-mount"]:checked');
-    const select = container.querySelector('#store-order-type');
-    return { mount: checked ? checked.value : '', orderType: select ? select.value : '' };
-  }
-
-  /* --- Étape 3 : commande / motorisation -------------------------------------- */
-
   function renderControl(container, state) {
     container.innerHTML =
       '<h2 class="step__heading">Type de manœuvre &amp; commande</h2>' +
@@ -122,11 +83,13 @@
         );
       }).join('') + '</div>';
 
+    container.innerHTML += '<div class="field" data-field="orderType"><label class="field__label" for="store-order-type">Type de commande</label><select class="select" id="store-order-type">'+ORDER_TYPES.map(o=>'<option value="'+o.id+'"'+(state.store.orderType===o.id?' selected':'')+'>'+esc(o.label)+'</option>').join('')+'</select></div>';
+
   }
 
   function collectControl(container) {
     const checked = container.querySelector('input[name="store-control"]:checked');
-    return { control: checked ? checked.value : '' };
+    return { control: checked ? checked.value : '', orderType: container.querySelector('#store-order-type').value };
   }
 
   /* --- Étape 4 : matières, couleurs & finitions -------------------------------- */
@@ -135,7 +98,7 @@
     const colors = (MDS.data.colors || []).filter(function (c) { return c.types.indexOf('store') !== -1; });
     container.innerHTML =
       '<h2 class="step__heading">Matières, couleurs &amp; finitions</h2>' +
-      '<p class="step__intro">Personnalisez l\u2019aspect final de votre store avec nos finitions artisanales.</p>' +
+      '<p class="step__intro">Indiquez votre préférence. Le choix définitif du coloris sera effectué sur place avec l’agent.</p>' +
       '<div class="field" data-field="color"><label class="field__label">Couleur de la toile</label>' +
       '<div class="swatch-row swatch-row--lg" role="radiogroup" aria-label="Couleur">' +
       colors.map(function (c) {
@@ -163,7 +126,6 @@
 
   const STEPS = [
     { id: 'store-model', title: 'Modèle', render: renderModel, collect: collectModel },
-    { id: 'store-mount', title: 'Type de pose', render: renderMount, collect: collectMount },
     { id: 'store-control', title: 'Commande', render: renderControl, collect: collectControl },
     { id: 'store-finish', title: 'Matières &amp; finitions', render: renderFinish, collect: collectFinish }
   ];
@@ -172,7 +134,6 @@
     return {
       model: findLabel(MODELS, store.model),
       orderType: findLabel(ORDER_TYPES, store.orderType),
-      mount: findLabel(MOUNTS, store.mount),
       control: findLabel(CONTROLS, store.control),
       color: findLabel(MDS.data.colors, store.color),
       fabric: findLabel(FABRICS, store.fabric),
@@ -180,5 +141,5 @@
     };
   }
 
-  MDS.quoteStore = { STEPS, MODELS, ORDER_TYPES, MOUNTS, CONTROLS, FABRICS, FINISHES, labels, hasFinish: store=>FINISHES.some(o=>compatible(o,{store})) };
+  MDS.quoteStore = { STEPS, MODELS, ORDER_TYPES, CONTROLS, FABRICS, FINISHES, labels, hasFinish: store=>FINISHES.some(o=>compatible(o,{store})) };
 })((window.MDS = window.MDS || {}));

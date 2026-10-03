@@ -64,9 +64,7 @@
     container.innerHTML =
       '<h2 class="config-card__title">Votre configuration</h2>' +
       (client ? '<p class="config-card__client">' + esc(client) + '</p>' : '') +
-      '<dl class="config-card__list">' + rows + '</dl>' +
-      '<div class="config-card__price"><span>Estimation du devis</span><strong>Prix</strong></div>' +
-      '<p class="config-card__hint">Ce tarif final vous sera communiqué sous 24 h ouvrées après étude de votre projet.</p>';
+      '<dl class="config-card__list">' + rows + '</dl>';
   }
 
   /* --- Récapitulatif final ------------------------------------------------------------ */
@@ -93,12 +91,11 @@
       recapRow('Dimensions saisies', MDS.dimensions.formatWindows(state.dimensions), 'dimensions');
 
     if (state.type === 'store') {
-      rows += recapRow('Pose et commande', [l.mount, l.orderType, l.control].filter(Boolean).join(' \u2014 '), 'store-mount');
+      rows += recapRow('Commande', [l.orderType, l.control].filter(Boolean).join(' \u2014 '), 'store-control');
       rows += recapRow('Matière et finition', [l.fabric, l.color, l.finish].filter(Boolean).join(' \u2014 '), 'store-finish');
     } else {
       rows += recapRow('Tissu et coloris', [l.fabric, l.color, l.pattern].filter(Boolean).join(' \u2014 '), 'curtain-fabric');
       rows += recapRow('Finition', l.finish, 'curtain-finish');
-      rows += recapRow('Pose et support', l.hanging, 'curtain-hanging');
     }
     if (contact.notes) rows += recapRow('Précisions sur le projet', contact.notes, 'contact');
 
@@ -106,9 +103,7 @@
       '<h2 class="recap__title">Récapitulatif de votre projet</h2>' +
       '<p class="recap__intro">Vérifiez l\u2019ensemble des éléments de votre configuration avant d\u2019envoyer votre demande de devis d\u2019excellence.</p>' +
       '<div class="recap-list">' + rows + '</div>' +
-      '<div class="notice recap__estimate"><div><strong>Estimation budgétaire du projet</strong>' +
-      '<p class="field__hint">Cette étude de prix individualisée vous sera envoyée sous 24 h par votre conseiller.</p></div>' +
-      '<span class="recap__price">Prix</span></div>' +
+      (MDS.quoteMessages?.[state.type] ? '<div class="notice recap__estimate"><div><strong>'+esc(MDS.quoteMessages[state.type].title)+'</strong><p class="field__hint">'+esc(MDS.quoteMessages[state.type].text)+'</p></div></div>' : '') +
       '<label class="check recap__accept"><input type="checkbox" id="quote-accept" data-field="acceptTerms"' +
       (state.acceptTerms ? ' checked' : '') + '><span>J\u2019accepte que Maison du Store AM me contacte au sujet de ma demande, ' +
       'conformément aux conditions générales de vente de l\u2019Atelier de confection.</span></label>';
@@ -138,7 +133,6 @@
           '<div><dt>Coordonnées</dt><dd>' + esc(state.contact.firstName + ' ' + state.contact.lastName + ' \u2014 ' + state.contact.phone + ' \u2014 ' + state.contact.email) + '</dd></div>' +
           '<div><dt>Projet</dt><dd>' + esc(type + (l.model ? ' \u2014 ' + l.model : '')) + '</dd></div>' +
           '<div><dt>Dimensions</dt><dd>' + esc(MDS.dimensions.formatWindows(state.dimensions)) + '</dd></div>' +
-          '<div><dt>Estimation</dt><dd>Prix</dd></div>' +
         '</dl>' +
         '<button type="button" class="btn btn--dark" data-action="back-to-catalogue">Retourner au catalogue</button>' +
       '</div>';

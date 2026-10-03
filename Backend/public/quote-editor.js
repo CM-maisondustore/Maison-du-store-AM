@@ -13,7 +13,6 @@
     const el=document.createElement('label');el.className='check';
     const input=document.createElement('input');input.type='checkbox';input.value=o.id;input.checked=checked;input.dataset[attribute]=key;
     el.append(input);
-    if(o.imageUrl){const image=document.createElement('img');image.src=o.imageUrl;image.alt=o.label;image.width=64;image.height=64;image.loading='lazy';image.style.objectFit='cover';image.style.borderRadius='6px';el.append(image);}
     el.append(document.createTextNode(label(o)));container.append(el);
   }
   function refresh(root,current=values(root)){
@@ -30,8 +29,6 @@
     select.replaceChildren(new Option('Sélectionner une finition…',''));
     data.options.filter(o=>o.kind==='finish'&&compatible(o,v)).forEach(o=>select.add(new Option(o.label,String(o.id))));
     select.value=String(selected??'');if(select.selectedIndex<0)select.value='';
-    let preview=root.querySelector('[data-finish-image]');if(!preview){preview=document.createElement('img');preview.dataset.finishImage='';preview.width=64;preview.height=64;preview.style.objectFit='cover';select.after(preview);}
-    const finish=data.options.find(o=>String(o.id)===select.value);preview.hidden=!finish?.imageUrl;if(finish?.imageUrl){preview.src=finish.imageUrl;preview.alt=finish.label;}else preview.removeAttribute('src');
   }
   function init(root){
     const initial=Object.fromEntries(keys.map(key=>[key,field(root,key).dataset.value]));
@@ -117,7 +114,7 @@
   const calculate=document.getElementById('calculate-quote'),status=document.getElementById('calculation-status');
   calculate?.addEventListener('click',async()=>{
     if(calculating)return;
-    if(!selectionValidity(true)){status.textContent='Complétez les tissus / matériaux et les finitions des fenêtres. Les choix communs sont nécessaires uniquement pour les fenêtres qui les utilisent.';return;}
+    if(!selectionValidity(true)){status.textContent='Complétez les tissus / matériaux et les finitions des ouvertures. Les choix communs sont nécessaires uniquement pour les ouvertures qui les utilisent.';return;}
     calculating=true;calculate.disabled=true;const requestedRevision=revision;status.textContent='Calcul en cours…';
     try{
       const payload=new FormData(form);payload.delete('_method');

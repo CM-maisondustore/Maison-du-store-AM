@@ -20,8 +20,8 @@
     return {
       type: null, // "store" | "rideau"
       contact: { civility: '', lastName: '', firstName: '', email: '', phone: '', address: '', postalCode: '', city: '', notes: '' },
-      store: { model: '', orderType: '', mount: '', control: '', fabric: '', color: '', finish: '' },
-      curtain: { model: '', fabric: '', color: '', pattern: '', finish: '', hanging: '' },
+      store: { model: '', orderType: '', control: '', fabric: '', color: '', finish: '' },
+      curtain: { model: '', fabric: '', sheer: '', color: '', finish: '' },
       dimensions: [],
       acceptTerms: false
     };
@@ -59,7 +59,7 @@
         field('city', 'Ville', c.city, 'text', 'Abidjan') +
       '</div>' +
       '<div class="field form-grid__full" data-field="notes"><label class="field__label" for="quote-notes">Précisions sur votre projet <small>(facultatif)</small></label>' +
-      '<textarea class="textarea" id="quote-notes" name="notes" placeholder="Ex. Je souhaite équiper 3 fenêtres de mon salon avec des rideaux occultants...">' + esc(c.notes) + '</textarea></div>';
+      '<textarea class="textarea" id="quote-notes" name="notes" placeholder="Ex. Je souhaite équiper 3 ouvertures de mon salon avec des rideaux occultants...">' + esc(c.notes) + '</textarea></div>';
   }
 
   function field(name, label, value, type, placeholder, full) {
@@ -87,7 +87,7 @@
 
   function renderDimensions(container, s) {
     container.innerHTML =
-      '<h2 class="step__heading">Saisissez les dimensions de vos fenêtres</h2>' +
+      '<h2 class="step__heading">Saisissez les dimensions de vos ouvertures</h2>' +
       '<p class="step__intro">Prenez les mesures intérieures au mm près pour une confection sur mesure au cordeau.</p>' +
       '<div data-dimensions-root></div>';
     dimensionsManager = MDS.dimensions.create(container.querySelector('[data-dimensions-root]'), {
@@ -119,10 +119,10 @@
       { id: 'contact', title: 'Vos coordonnées', render: renderContact, collect: collectContact,
         validate: function (data) { return MDS.quoteValidation.validateContact(data); }, target: 'contact' }
     ];
-    module.STEPS.slice(0, 1).forEach(function (step) { list.push(moduleStep(step, type)); }); // modèle
+    module.STEPS.slice(0, type === 'store' ? 2 : 1).forEach(function (step) { list.push(moduleStep(step, type)); }); // modèle
     list.push({ id: 'dimensions', title: 'Dimensions', render: renderDimensions, collect: collectDimensions,
       validate: function (data) { return MDS.quoteValidation.validateDimensions(data); }, target: 'dimensions' });
-    module.STEPS.slice(1).forEach(function (step) { list.push(moduleStep(step, type)); }); // reste des étapes
+    module.STEPS.slice(type === 'store' ? 2 : 1).forEach(function (step) { list.push(moduleStep(step, type)); }); // reste des étapes
     list.push({ id: 'recap', title: 'Récapitulatif', render: renderRecap, collect: collectRecap,
       validate: function (data) { return MDS.quoteValidation.validateSubmission(Object.assign({}, state, data)); }, target: 'meta', isRecap: true });
     return list;
@@ -153,7 +153,7 @@
   /* --- Rendu de la mise en page (progression, étape, sidebar) ------------------------ */
 
   function renderProgress() {
-    if (!els.progress) return;
+    if (!els.progressText || !els.progressBar) return;
     const total = steps.length;
     const current = index + 1;
     els.progressText.textContent = 'Étape ' + current + ' sur ' + total;

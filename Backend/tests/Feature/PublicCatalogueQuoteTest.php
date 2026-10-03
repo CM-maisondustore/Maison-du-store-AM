@@ -15,7 +15,7 @@ class PublicCatalogueQuoteTest extends TestCase
     private function payload(Product $p): array
     {
         return ['contact'=>['civility'=>'mme','firstName'=>'Client','lastName'=>'Test','phone'=>'+2250700000000','address'=>'Rue du test','city'=>'Abidjan'],
-            'product'=>['model'=>'product-'.$p->id,'fabric'=>'store-lourd','finish'=>'store-standard','control'=>'motorisee','mount'=>'murale','orderType'=>'installation','color'=>'beige'],
+            'product'=>['model'=>'product-'.$p->id,'fabric'=>'store-lourd','finish'=>'store-standard','control'=>'motorisee','orderType'=>'installation','color'=>'beige'],
             'dimensions'=>[['label'=>'Salon','width'=>200,'height'=>220,'quantity'=>1]],'acceptTerms'=>true];
     }
     public function test_only_current_database_products_and_options_are_accepted_and_no_power_is_required(): void
@@ -48,7 +48,7 @@ class PublicCatalogueQuoteTest extends TestCase
         $agent=User::create(['username'=>'AgentPhoto','name'=>'Agent','email'=>'agent-photo@example.invalid','role'=>'agent','password'=>'TestPassword123!','must_change_password'=>false]);$this->actingAs($agent);
         $this->get(route('staff.quote-product-image',$p))->assertOk();
         $option=collect(StaffQuoteData::catalogue(false)['options'])->firstWhere('code','store-lourd');
-        $this->assertArrayNotHasKey('unit_price',$option);$this->assertSame(route('staff.quote-product-image',$p),$option['imageUrl']);
+        $this->assertArrayNotHasKey('unit_price',$option);$this->assertArrayNotHasKey('imageUrl',$option);
     }
     public function test_store_without_public_finishes_can_be_requested_but_unpublished_codes_are_rejected(): void
     {

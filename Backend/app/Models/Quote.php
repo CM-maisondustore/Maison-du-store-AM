@@ -25,10 +25,7 @@ class Quote extends Model
     public function scopeVisibleTo(Builder $query, User $user): Builder
     {
         if ($user->isAdmin()) return $query;
-        return $query->where(fn (Builder $q) => $q->where('agent_id',$user->id)->orWhereExists(fn ($jobs) => $jobs
-            ->selectRaw('1')->from('interventions')->whereColumn('interventions.quote_id','quotes.id')
-            ->whereColumn('interventions.contact_id','quotes.contact_id')->where('interventions.agent_id',$user->id)
-            ->where('interventions.status','!=','cancelled')));
+        return $query->where('created_by',$user->id);
     }
     public function canBeViewedBy(User $user): bool
     {

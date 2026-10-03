@@ -26,6 +26,6 @@ class MediaStorage
         elseif ($request->boolean('remove_image')) $owner->media_asset_id = null;
         if ($request->exists('image_alt')) $owner->image_alt = $request->input('image_alt') ?? '';
         $owner->save();
-        if ($old && $old !== $owner->media_asset_id && !Product::where('media_asset_id', $old)->exists() && !SiteContent::where('media_asset_id', $old)->exists()) MediaAsset::whereKey($old)->delete();
+        if ($old && $old !== $owner->media_asset_id && !Product::withTrashed()->where('media_asset_id', $old)->exists() && !SiteContent::where('media_asset_id', $old)->exists() && !\App\Models\QuoteOption::withTrashed()->where('media_asset_id',$old)->exists()) MediaAsset::whereKey($old)->delete();
     }
 }

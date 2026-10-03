@@ -2,3 +2,8 @@
 
 [hidden]{display:none!important}
 .quote-pricing-summary td:nth-child(n+2){white-space:nowrap}.quote-pricing-summary td:last-child{font-weight:600}@media(max-width:600px){.quote-pricing-summary table{font-size:11px}.quote-pricing-summary th{font-size:9px;letter-spacing:0}.quote-pricing-summary td,.quote-pricing-summary th{padding:8px 4px}}
+/* Keep all professional tabs reachable at any viewport height or width. */
+.sidebar{display:flex;flex-direction:column;min-height:0}.sidebar nav{min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;flex:1}.sidebar-controls{display:flex;gap:8px;margin-bottom:8px}.sidebar-controls button{padding:5px 12px}.sidebar-controls[hidden]{display:none}
+@media(max-width:850px){.sidebar{position:sticky;top:0;z-index:30;max-width:100%;padding:10px 16px}.sidebar nav{flex:initial;overflow-x:auto;overflow-y:hidden;max-width:100%;scroll-snap-type:x proximity}.sidebar nav a{flex-shrink:0;scroll-snap-align:start}.sidebar-controls{position:absolute;right:16px;top:8px}.sidebar .brand{font-size:18px;margin-right:90px;margin-bottom:10px}}
+
+@media print{.sidebar{display:none}}

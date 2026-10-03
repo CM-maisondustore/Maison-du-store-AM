@@ -107,8 +107,18 @@ statique.
   sans association, une photo de la même catégorie est utilisée si disponible.
 - Dans **Images & portfolio**, modifier les deux éléments **Carte — démarrer un
   devis** pour les images, titres et descriptions des cartes Store et Rideaux.
-- Les images sont recadrées automatiquement dans les emplacements des formulaires
-  client et agent. Les coûts internes restent réservés aux administrateurs.
+- Les images sont recadrées automatiquement dans le formulaire client. Les photos
+  propres aux tissus et voilages se modifient dans **Catalogue → Matériaux & finitions**.
+  Les formulaires professionnels n’affichent pas de miniatures.
+- Les cartes publiques **Wave**, **Ruflette** et **Barre de fer**, ainsi que les
+  messages du récapitulatif Store / Rideaux, se modifient dans **Images & portfolio**.
+- Le client peut choisir un tissu, un voilage, ou les deux. Les accessoires techniques
+  et les motifs ne sont plus demandés. Le coloris définitif est confirmé sur place.
+- L’agent voit uniquement les devis dont il est l’auteur. Son formulaire conserve
+  les coordonnées, les dimensions et descriptions des ouvertures, le type de projet,
+  la motorisation, la finition, la zone et les notes de terrain. L’administrateur
+  complète les matériaux, quantités, coûts, dates et affectations. Les modifications
+  du relevé conservent le chiffrage existant et imposent sa vérification avant validation.
 - Le devis store conserve le choix de motorisation, sans demander l'alimentation.
   Les cartes du catalogue n'affichent plus « Prix » et **Nous contacter** ouvre
   WhatsApp au **+225 07 12 44 93 19**.

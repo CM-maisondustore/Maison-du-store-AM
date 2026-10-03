@@ -3,14 +3,14 @@
    Gère uniquement les DIMENSIONS. Utilisé aussi bien par le devis Store que
    par le devis Rideau (quote-store.js et quote-curtain.js s'appuient dessus).
 
-   Structure d'une fenêtre : { id, label, width, height, quantity }
+   Structure d'une ouverture : { id, label, width, height, quantity }
    Fonctions : ajouter, supprimer, modifier largeur/hauteur/quantité,
    vérifier la validité (nombre positif, dans une plage raisonnable).
    ========================================================================== */
 (function (MDS) {
   'use strict';
 
-  const LIMITS = { min: 20, max: 400 }; // centimètres, plage plausible pour une fenêtre
+  const LIMITS = { min: 20, max: 400 }; // centimètres, plage plausible pour une ouverture
   const MAX_WINDOWS = 8;
 
   const esc = function (text) { return MDS.validation.escapeHtml(text); };
@@ -40,7 +40,7 @@
       return (
         '<div class="window-row" data-window="' + win.id + '">' +
           '<div class="window-row__head">' +
-            '<p class="window-row__title">Fenêtre n\u00B0 ' + (index + 1) + (win.label ? ' \u2014 ' + esc(win.label) : '') + '</p>' +
+            '<p class="window-row__title">Ouverture n\u00B0 ' + (index + 1) + (win.label ? ' \u2014 ' + esc(win.label) : '') + '</p>' +
             (windows.length > 1
               ? '<button type="button" class="window-row__remove" data-window-remove="' + win.id + '">' +
                 '<svg class="icon icon--sm" aria-hidden="true"><use href="#i-trash"/></svg> Supprimer</button>'
@@ -67,8 +67,8 @@
         '<div class="window-list">' + windows.map(row).join('') + '</div>' +
         (windows.length < MAX_WINDOWS
           ? '<button type="button" class="add-window" data-window-add>' +
-            '<svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg> Ajouter une fenêtre</button>'
-          : '<p class="field__hint">Nombre maximal de fenêtres atteint pour une même demande.</p>') +
+            '<svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg> Ajouter une ouverture</button>'
+          : '<p class="field__hint">Nombre maximal de ouvertures atteint pour une même demande.</p>') +
         (opts.suggestion
           ? '<p class="window-suggestion"><svg class="icon icon--sm" aria-hidden="true"><use href="#i-info"/></svg> ' + esc(opts.suggestion) + '</p>'
           : '');
@@ -135,16 +135,16 @@
     };
   }
 
-  /** Vérifie une liste de fenêtres. Renvoie { valid, errors: [{id, field, message}] }. */
+  /** Vérifie une liste de ouvertures. Renvoie { valid, errors: [{id, field, message}] }. */
   function validateWindows(windows) {
     const v = MDS.validation;
     const errors = [];
     if (!windows || !windows.length) {
-      errors.push({ id: null, field: 'general', message: 'Ajoutez au moins une fenêtre à mesurer.' });
+      errors.push({ id: null, field: 'general', message: 'Ajoutez au moins une ouverture à mesurer.' });
       return { valid: false, errors: errors };
     }
     windows.forEach(function (win, index) {
-      const label = 'Fenêtre n\u00B0 ' + (index + 1);
+      const label = 'Ouverture n\u00B0 ' + (index + 1);
       if (!v.isPositiveNumber(win.width, { min: LIMITS.min, max: LIMITS.max })) {
         errors.push({ id: win.id, field: 'width', message: label + ' : indiquez une largeur entre ' + LIMITS.min + ' et ' + LIMITS.max + ' cm.' });
       }

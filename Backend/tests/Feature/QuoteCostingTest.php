@@ -102,15 +102,15 @@ class QuoteCostingTest extends TestCase
         $this->assertContains('occultant-100',array_column($choices,'id'));
         $this->assertArrayNotHasKey('unit_price',$choices[0]);
         $data=['contact'=>['civility'=>'mme','firstName'=>'Awa','lastName'=>'Test','email'=>'test@example.invalid','phone'=>'+2250700000000','address'=>'Rue de test','city'=>'Abidjan'],
-            'product'=>['model'=>'product-'.\App\Models\Product::where('details->type','rideau')->firstOrFail()->id,'fabric'=>'occultant-100','finish'=>'wave-manuel','hanging'=>'rail-wave-manuel','pattern'=>'uni','color'=>'beige'],
+            'product'=>['model'=>'product-'.\App\Models\Product::where('details->type','rideau')->firstOrFail()->id,'fabric'=>'occultant-100','finish'=>'wave','color'=>'beige'],
             'dimensions'=>[['label'=>'Salon','width'=>200,'height'=>250,'quantity'=>1]],'acceptTerms'=>true];
         $this->postJson('/api/quotes/curtains',$data)->assertCreated();
         $q=Quote::firstOrFail(); $this->assertSame('Tissu occultant 100 %',$q->product['fabric']);
         QuoteOption::where('code','occultant-100')->update(['label'=>'Nouveau nom','public_choice'=>false]);
         $this->assertSame('Tissu occultant 100 %',$q->fresh()->product['fabric']);
         $this->postJson('/api/quotes/curtains',$data)->assertUnprocessable()->assertJsonValidationErrors('product.fabric');
-        $data['product']['fabric']='voilage-luxe'; $data['product']['hanging']='barre-simple';
-        $this->postJson('/api/quotes/curtains',$data)->assertUnprocessable()->assertJsonValidationErrors('product.hanging');
+        $data['product']['fabric']=''; $data['product']['sheer']='voilage-luxe'; $data['product']['finish']='barre-simple';
+        $this->postJson('/api/quotes/curtains',$data)->assertUnprocessable()->assertJsonValidationErrors('product.finish');
     }
     public function test_only_admin_can_edit_costs_and_calculate(): void {
         $this->seed(); $this->login(); $o=QuoteOption::where('code','rail-wave-manuel')->firstOrFail();

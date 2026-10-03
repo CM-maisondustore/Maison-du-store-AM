@@ -106,7 +106,7 @@
         <div class="container">
           <div class="quote-header__row">
             <h1 class="quote-header__title">Configurez votre projet sur mesure</h1>
-            <p class="progress-text" data-quote-progress-text>Étape 1 sur 7</p>
+            <p class="progress-text" data-quote-progress-text aria-live="polite"></p>
           </div>
           <ul class="progress-bar" data-quote-progress-bar></ul>
         </div>
@@ -176,6 +176,8 @@
 
   <script>
     window.MDS = {
+      quoteFinishes: @json(\App\Services\PublicQuoteChoices::finishes()),
+      quoteMessages: @json(\App\Services\PublicQuoteChoices::messages()),
       quoteProducts: @json(\App\Services\PublicQuoteChoices::models()),
       quoteOptions: @json(\App\Services\PublicQuoteChoices::data()),
       config: {

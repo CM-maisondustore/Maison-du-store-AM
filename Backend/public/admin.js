@@ -16,3 +16,11 @@ document.addEventListener('submit', event => {
   const message = event.target.dataset.confirm;
   if (message && !window.confirm(message)) event.preventDefault();
 });
+(() => {
+  const nav=document.getElementById('staff-navigation');if(!nav)return;
+  const buttons=[...document.querySelectorAll('[data-nav-scroll]')],controls=document.querySelector('.sidebar-controls');
+  const horizontal=()=>matchMedia('(max-width:850px)').matches;
+  function update(){const max=horizontal()?nav.scrollWidth-nav.clientWidth:nav.scrollHeight-nav.clientHeight,pos=horizontal()?nav.scrollLeft:nav.scrollTop;controls.hidden=max<2;buttons.forEach(b=>b.disabled=Number(b.dataset.navScroll)<0?pos<2:pos>=max-2);}
+  buttons.forEach(b=>b.addEventListener('click',()=>nav.scrollBy({[horizontal()?'left':'top']:Number(b.dataset.navScroll)*(horizontal()?nav.clientWidth:nav.clientHeight)*0.7,behavior:'smooth'})));
+  nav.addEventListener('scroll',update,{passive:true});window.addEventListener('resize',update);update();
+})();

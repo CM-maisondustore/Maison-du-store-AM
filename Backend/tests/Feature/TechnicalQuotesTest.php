@@ -29,17 +29,17 @@ class TechnicalQuotesTest extends TestCase
         $this->assertSame(8,QuoteOption::where('kind','material')->count());
     }
     public function test_agent_saves_separate_curtains_and_sheers_without_email_or_prices(): void {
-        $this->seed(); $this->login('agent'); $data=$this->data();
+        $this->seed(); $this->login('agent'); $data=$this->agentPayload($this->data());
         $html=$this->get('/admin/devis/nouveau')->assertOk()->assertSee('Voilages')->assertSee('facultatif')->getContent();
         foreach (['unit_price','calculation_token','name="lines','FCFA','[product_id]'] as $secret) $this->assertStringNotContainsString($secret,$html);
         $this->post('/admin/devis',$data)->assertSessionHasNoErrors();$q=Quote::firstOrFail();
         $this->assertSame('Rideaux et voilages',$q->product['model']);
-        $this->assertSame($this->id('voilage-transparent'),$q->dimensions[0]['costing']['secondary_material']['option_id']);
+        $this->assertSame('rideau_voilage',$q->dimensions[0]['project_type']);$this->assertArrayNotHasKey('costing',$q->dimensions[0]);
         $this->assertNull($q->customer->email);$this->assertTrue($q->configuration['pricing_review_required']);
-        $this->get('/admin/devis/'.$q->id)->assertOk()->assertSee('Voilage transparent')->assertDontSee('FCFA');
+        $this->get('/admin/devis/'.$q->id)->assertOk()->assertSee('Rideaux et voilages')->assertDontSee('FCFA');
     }
     public function test_agent_cannot_read_prices_or_write_financial_fields_and_edits_preserve_admin_amounts(): void {
-        $this->seed();$this->login('agent');$data=$this->data();$this->post('/admin/devis',$data)->assertSessionHasNoErrors();$q=Quote::firstOrFail();
+        $this->seed();$this->login('agent');$data=$this->agentPayload($this->data());$this->post('/admin/devis',$data)->assertSessionHasNoErrors();$q=Quote::firstOrFail();
         $lines=[['description'=>'Admin chiffrage confidentiel','quantity'=>1,'unit_price'=>9876543]];
         $q->update(['lines'=>$lines,'tax_basis_points'=>1800,'deposit_amount'=>1234567,'internal_notes'=>'ADMIN-PRIVATE-NOTE']);
         $lines=$q->fresh()->lines; // Compare the database snapshot; MySQL canonicalizes JSON object key order.
@@ -54,7 +54,7 @@ class TechnicalQuotesTest extends TestCase
         $this->put('/admin/devis/'.$q->id.'/formulaire',$data)->assertSessionHasNoErrors();$q->refresh();
         $this->assertSame($lines,$q->lines);$this->assertSame(1234567,$q->deposit_amount);$this->assertSame(1800,$q->tax_basis_points);$this->assertSame('ADMIN-PRIVATE-NOTE',$q->internal_notes);
         $this->login('admin');
-        $this->put('/admin/devis/'.$q->id,['lines'=>$lines,'tax_rate'=>18,'valid_until'=>$data['valid_until'],'status'=>'approved'])->assertSessionHasErrors('status');
+        $this->put('/admin/devis/'.$q->id,['lines'=>$lines,'tax_rate'=>18,'valid_until'=>today()->addDays(30)->toDateString(),'status'=>'approved'])->assertSessionHasErrors('status');
     }
     public function test_admin_can_calculate_and_save_the_two_fabrics_without_a_product(): void {
         $this->seed();$this->login('admin');$data=$this->data();
@@ -65,19 +65,17 @@ class TechnicalQuotesTest extends TestCase
         $this->assertFalse($q->configuration['pricing_review_required']);$this->assertSame(2,count($q->configuration['calculation']['items']));
         $this->get('/admin/devis/'.$q->id.'/pdf')->assertOk();
     }
-    public function test_sheer_only_and_store_choices_work_and_wrong_fabric_groups_are_rejected(): void {
-        $this->seed();$this->login('agent');$data=$this->data();$data['defaults']['curtain_id']=null;
+    public function test_agent_records_project_type_without_selecting_materials(): void {
+        $this->seed();$this->login('agent');$data=$this->agentPayload($this->data());$data['defaults']['project_type']='voilage';
         $this->post('/admin/devis',$data)->assertSessionHasNoErrors();$this->assertSame('Voilages',Quote::first()->product['model']);
-        $data=$this->data();$data['defaults']=['category'=>'store','motorized'=>0,'store_id'=>$this->id('store-leger'),'finish_id'=>$this->id('store-standard'),'curtain_id'=>null,'sheer_id'=>null];
-        $this->post('/admin/devis',$data)->assertSessionHasNoErrors();$this->assertSame('store',Quote::latest('id')->first()->type);
-        $bad=$this->data();$bad['defaults']['curtain_id']=$this->id('voilage-luxe');
-        $this->post('/admin/devis',$bad)->assertSessionHasErrors('defaults.curtain_id');
+        $bad=$data;$bad['defaults']['material_id']=$this->id('voilage-luxe');
+        $this->post('/admin/devis',$bad)->assertSessionHasErrors('defaults.material_id');
     }
     public function test_public_email_is_optional_and_anonymous_clients_are_not_merged(): void {
         $this->seed();
         $model=Product::create(['reference'=>'TEST-RIDEAU','published'=>true,'details'=>['name'=>'Rideau de test','type'=>'rideau','available'=>true]]);
         $data=['contact'=>['civility'=>'mme','lastName'=>'Test','firstName'=>'Awa','phone'=>'+2250700000000','address'=>'Abidjan test','city'=>'Abidjan'],
-            'product'=>['model'=>'product-'.$model->id,'fabric'=>'occultant-100','finish'=>'wave-manuel','hanging'=>'rail-wave-manuel','pattern'=>'uni','color'=>'beige'],
+            'product'=>['model'=>'product-'.$model->id,'fabric'=>'occultant-100','finish'=>'wave','color'=>'beige'],
             'dimensions'=>[['label'=>'Salon','width'=>200,'height'=>250,'quantity'=>1]],'acceptTerms'=>true];
         $this->postJson('/api/quotes/curtains',$data)->assertCreated();$data['contact']['lastName']='Second';$this->postJson('/api/quotes/curtains',$data)->assertCreated();
         $this->assertDatabaseCount('contacts',2);

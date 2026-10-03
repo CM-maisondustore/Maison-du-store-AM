@@ -4,11 +4,11 @@
 @php
  $base=$quote->configuration['defaults'] ?? ['category'=>$quote->type ?? 'store','motorized'=>false];
  $defaults=old('defaults',$base);
- $windows=old('windows',$quote->dimensions ?: [['label'=>'Fenêtre 1','quantity'=>1,'inherit_defaults'=>true]]);
+ $windows=old('windows',$quote->dimensions ?: [['label'=>'Ouverture 1','quantity'=>1,'inherit_defaults'=>true]]);
 @endphp
 <div class="actions"><a href="{{ $quote->exists ? route('staff.quotes.show',$quote) : route('staff.quotes.index') }}">← Retour aux devis</a></div>
 <p>Modifiez librement les choix et les mesures, puis cliquez sur <strong>Enregistrer le devis</strong>. Le devis restera en brouillon pour vérification.</p>
-<noscript><p class="notice">Activez JavaScript pour afficher les choix adaptés et ajouter des fenêtres.</p></noscript>
+<noscript><p class="notice">Activez JavaScript pour afficher les choix adaptés et ajouter des ouvertures.</p></noscript>
 <form id="staff-quote-form" method="post" action="{{ $quote->exists ? route('staff.quotes.form.update',$quote) : route('staff.quotes.store') }}">
 @csrf @if($quote->exists) @method('PUT') @endif
 <input type="hidden" name="submission_token" value="{{ old('submission_token',$quote->submission_token ?: (string)\Illuminate\Support\Str::uuid()) }}">
@@ -20,13 +20,13 @@
 @endforeach
 </div></section>
 <section class="panel" id="quote-defaults"><h2>Choix communs</h2>
-<p class="muted">Sélectionnez séparément les tissus rideaux et les voilages, ou choisissez un store. Ces choix sont facultatifs si vous personnalisez chaque fenêtre ; ils restent nécessaires pour les fenêtres utilisant les choix communs.</p>
+<p class="muted">Sélectionnez séparément les tissus rideaux et les voilages, ou choisissez un store. Ces choix sont facultatifs si vous personnalisez chaque ouverture ; ils restent nécessaires pour les ouvertures utilisant les choix communs.</p>
 @include('staff.quote-selection',['prefix'=>'defaults','selection'=>$defaults])
 </section>
-<h2>Mesures fenêtre par fenêtre</h2><p class="muted">Mesures en centimètres, de 1 à 2000 cm. Ajoutez une fenêtre pour chaque configuration différente.</p>
+<h2>Mesures ouverture par ouverture</h2><p class="muted">Mesures en centimètres, de 1 à 2000 cm. Ajoutez une ouverture pour chaque configuration différente.</p>
 <div id="quote-windows">@foreach($windows as $index=>$window) @include('staff.quote-window') @endforeach</div>
 <template id="quote-window-template">@include('staff.quote-window',['index'=>'__INDEX__','window'=>['inherit_defaults'=>true]])</template>
-<div class="actions"><button type="button" class="secondary" id="add-quote-window">Ajouter une fenêtre</button><span class="muted">30 fenêtres maximum</span></div>
+<div class="actions"><button type="button" class="secondary" id="add-quote-window">Ajouter une ouverture</button><span class="muted">30 ouvertures maximum</span></div>
 @if(auth()->user()->isAdmin())
 <section class="panel"><h2>Chiffrage du devis</h2><p class="muted">Ajustez les quantités et les prix dans chaque ouverture. Un champ prix vide reprend le catalogue ; vos prix saisis sont conservés lors du recalcul. Les remises s’appliquent au total sans modifier les fournitures.</p>
 @if(!empty($quote->configuration['pricing_review_required']))<p class="notice">Les choix de l’agent sont à vérifier avant validation du chiffrage.</p>@endif

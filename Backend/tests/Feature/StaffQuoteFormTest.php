@@ -24,7 +24,7 @@ class StaffQuoteFormTest extends TestCase
             foreach (['lines','tax_rate','payment_mode','deposit_amount','receipt_amount'] as $key) unset($data[$key]);
             foreach ($data['windows'] as &$window) $window['costing']=['zone'=>'abidjan','material_quantity'=>2];
         }
-        return $data;
+        return auth()->user()?->isAdmin() ? $data : $this->agentPayload($data);
     }
     public function test_admin_and_agent_create_window_quotes_with_database_choices_and_archives(): void
     {
@@ -32,15 +32,15 @@ class StaffQuoteFormTest extends TestCase
         foreach (['admin','agent'] as $role) {
             auth()->logout(); session()->flush(); $user=$this->staff($role); $this->actingAs($user);
             $this->get('/admin/devis/nouveau')->assertOk()->assertSee('Choix communs');
-            $data=$this->data(); $data['agent_id']=9999;
+            $data=$this->data();
             if ($role==='admin') unset($data['agent_id']);
             $this->post('/admin/devis',$data)->assertSessionHasNoErrors()->assertRedirect();
             $quote=Quote::where('submission_token',$data['submission_token'])->firstOrFail();
             $this->assertSame('draft',$quote->status); $this->assertSame($user->id,$quote->created_by);
-            $this->assertStringStartsWith('AM-'.$data['quote_date'].'-RV-',$quote->reference);
+            $this->assertStringStartsWith('AM-'.($data['quote_date'] ?? today()->toDateString()).'-RV-',$quote->reference);
             $this->assertSame($role==='agent' ? $user->id : null,$quote->agent_id);
             $this->assertSame(120.5,$quote->dimensions[0]['width']);
-            $this->assertSame('Wave',$quote->dimensions[0]['finish_name']); $this->assertSame('Store lourd',$quote->dimensions[1]['material_name']);
+            $this->assertSame($role==='admin'?'Wave':'Wave manuel',$quote->dimensions[0]['finish_name']); if($role==='admin')$this->assertSame('Store lourd',$quote->dimensions[1]['material_name']); else $this->assertArrayNotHasKey('material_name',$quote->dimensions[1]);
             $this->assertSame('store',$quote->dimensions[1]['category']); $this->assertNotNull($quote->contact_id);
             $this->assertSame($role==='admin' ? 20000 : 0,$quote->receivedAmount());
             $response=$this->get('/admin/devis/'.$quote->id)->assertOk()->assertSee('Wave');

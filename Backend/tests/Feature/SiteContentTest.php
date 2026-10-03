@@ -52,7 +52,7 @@ class SiteContentTest extends TestCase
         foreach ([UploadedFile::fake()->createWithContent('fake.png','<?php echo 1;'),UploadedFile::fake()->createWithContent('vector.svg','<svg xmlns="http://www.w3.org/2000/svg"></svg>'),$this->upload()->size(2049)] as $file) {
             $this->post('/admin/contents',[...$this->data(),'image'=>$file])->assertSessionHasErrors('image');
         }
-        $this->assertDatabaseCount('site_contents',2); $this->assertDatabaseCount('media_assets',0);
+        $this->assertDatabaseCount('site_contents',7); $this->assertDatabaseCount('media_assets',0);
         $this->post('/admin/contents',[...$this->data(),'image'=>$this->upload()])->assertSessionHasNoErrors();
         $content=SiteContent::where('kind','portfolio')->firstOrFail();
         $this->put('/admin/contents/'.$content->id,[...$this->data(),'title'=>'Do not save','image'=>UploadedFile::fake()->createWithContent('bad.jpg','invalid')])->assertSessionHasErrors('image');
@@ -97,7 +97,7 @@ class SiteContentTest extends TestCase
         SiteContent::where('slot','portfolio-initial-2')->update(['title'=>'Dernière réalisation','position'=>999]);
         $this->seed();
         $this->get('/')->assertSee('Notre titre personnalisé')->assertSee('Notre description')->assertDontSee('Appartement Haussmannien')->assertSeeInOrder(['Première réalisation','Dernière réalisation']);
-        $this->assertDatabaseCount('site_contents',8); $this->assertDatabaseCount('media_assets',1);
+        $this->assertDatabaseCount('site_contents',13); $this->assertDatabaseCount('media_assets',1);
         $this->get($hero->media->url())->assertOk()->assertHeader('Content-Type','image/webp');
     }
 }

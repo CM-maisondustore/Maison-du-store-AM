@@ -62,10 +62,9 @@
     const errors = {};
     if (stepId === 'store-model') {
       requiredChoice(data.model, 'Choisissez un modèle de store.', errors, 'model');
-    } else if (stepId === 'store-mount') {
-      requiredChoice(data.mount, 'Choisissez un type de pose.', errors, 'mount');
-      requiredChoice(data.orderType, 'Choisissez un type de commande.', errors, 'orderType');
+
     } else if (stepId === 'store-control') {
+      requiredChoice(data.orderType, 'Choisissez un type de commande.', errors, 'orderType');
       requiredChoice(data.control, 'Choisissez un type de commande.', errors, 'control');
     } else if (stepId === 'store-finish') {
       requiredChoice(data.color, 'Choisissez une couleur.', errors, 'color');
@@ -81,10 +80,10 @@
     if (stepId === 'curtain-model') {
       requiredChoice(data.model, 'Choisissez un modèle de rideau.', errors, 'model');
     } else if (stepId === 'curtain-fabric') {
-      requiredChoice(data.fabric, 'Choisissez un tissu.', errors, 'fabric');
+      if (!data.fabric && !data.sheer) errors.fabric='Sélectionnez un tissu, un voilage, ou les deux.';
     } else if (stepId === 'curtain-color') {
       requiredChoice(data.color, 'Choisissez un coloris.', errors, 'color');
-      requiredChoice(data.pattern, 'Choisissez un motif.', errors, 'pattern');
+
 
     } else if (stepId === 'curtain-finish') {
       requiredChoice(data.finish, 'Choisissez une finition.', errors, 'finish');

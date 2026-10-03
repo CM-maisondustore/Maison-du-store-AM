@@ -16,7 +16,7 @@ class ApiTest extends TestCase
         $model=\App\Models\Product::where('details->type','store')->firstOrFail();
         return [
             'contact' => ['civility' => 'mme', 'firstName' => 'Awa', 'lastName' => 'Kone', 'email' => 'awa@example.com', 'phone' => '+225 07 12 44 93 19', 'address' => 'Rue du marché', 'city' => 'Abidjan'],
-            'product' => ['model' => 'product-'.$model->id, 'mount' => 'murale', 'orderType' => 'installation', 'control' => 'manuelle', 'color' => 'beige', 'fabric'=>'store-lourd','finish' => 'store-standard'],
+            'product' => ['model' => 'product-'.$model->id, 'orderType' => 'installation', 'control' => 'manuelle', 'color' => 'beige', 'fabric'=>'store-lourd','finish' => 'store-standard'],
             'dimensions' => [['id' => 'w1', 'label' => 'Salon', 'width' => '120,5', 'height' => 160, 'quantity' => 2]],
             'acceptTerms' => true,
         ];
@@ -57,7 +57,7 @@ class ApiTest extends TestCase
     public function test_curtain_quote_uses_its_own_choices(): void
     {
         $data = $this->quote();
-        $data['product'] = ['model' => 'product-'.\App\Models\Product::where('details->type','rideau')->firstOrFail()->id, 'fabric' => 'voilage-luxe', 'color' => 'bleu', 'pattern' => 'uni', 'finish' => 'wave-manuel', 'hanging' => 'rail-wave-manuel'];
+        $data['product'] = ['model' => 'product-'.\App\Models\Product::where('details->type','rideau')->firstOrFail()->id, 'sheer' => 'voilage-luxe', 'color' => 'bleu', 'finish' => 'wave'];
         $this->postJson('/api/quotes/curtains', $data)->assertCreated();
         $this->assertDatabaseHas('quotes', ['type' => 'rideau']);
         $this->postJson('/api/quotes/stores', $data)->assertUnprocessable();

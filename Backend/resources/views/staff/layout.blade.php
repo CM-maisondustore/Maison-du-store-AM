@@ -15,7 +15,8 @@
 <div class="brand">Maison du Store <span>AM</span>
 <small>ESPACE PROFESSIONNEL</small>
 </div>
-<nav aria-label="Navigation interne">
+<div class="sidebar-controls"><button type="button" class="secondary" data-nav-scroll="-1" aria-label="Faire défiler le menu vers le début" aria-controls="staff-navigation">←</button><button type="button" class="secondary" data-nav-scroll="1" aria-label="Faire défiler le menu vers la fin" aria-controls="staff-navigation">→</button></div>
+<nav id="staff-navigation" tabindex="0" aria-label="Navigation interne">
 @php($menu = ['dashboard' => 'Vue d’ensemble', 'quotes.index' => 'Devis', 'appointments.index' => 'Rendez-vous', 'interventions.index' => 'Prestations'])
 @if(auth()->user()->isAdmin())
 @php($menu += ['layouts.edit'=>'Mise en page','communications.index' => 'Documents & automatisations'])

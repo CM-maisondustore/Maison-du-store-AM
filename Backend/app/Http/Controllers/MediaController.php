@@ -4,6 +4,11 @@ use App\Models\{MediaAsset, Product, SiteContent};
 use Illuminate\Http\Request;
 class MediaController
 {
+    public function quoteMaterial(\App\Models\QuoteOption $option)
+    {
+        abort_unless($option->active && $option->public_choice && $option->kind==='material' && $option->media_asset_id,404);
+        return $this->preview($option->media_asset_id);
+    }
     public function quoteProduct(Product $product)
     {
         abort_unless($product->published && !empty($product->details['available']) && $product->media_asset_id,404);

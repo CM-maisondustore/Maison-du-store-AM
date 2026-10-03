@@ -33,16 +33,14 @@ class QuoteRequest extends FormRequest
         $store = $this->routeIs('quotes.stores');
         $choices = $store ? [
             'model' => [],
-            'mount' => ['murale', 'plafond', 'encastree', 'inconnu'],
             'orderType' => ['installation', 'remplacement', 'renovation'],
             'control' => ['manuelle', 'motorisee', 'inconnu'],
             'fabric' => [], 'finish' => [],
         ] : [
             'model' => [],
             'fabric' => [],
-            'pattern' => ['uni', 'rayures', 'floral', 'geometrique', 'texture'],
+            'sheer' => [],
             'finish' => [],
-            'hanging' => [],
         ];
         $colors = ['blanc', 'ecru', 'beige', 'taupe', 'gris', 'anthracite'];
         $options=\App\Services\PublicQuoteChoices::options()->where('category',$store ? 'store' : 'rideau');
@@ -51,9 +49,14 @@ class QuoteRequest extends FormRequest
         $productId=(int)str_replace('product-','',(string)$this->input('product.model',''));
         $options=$options->filter(fn($o)=>!$o->product_ids || in_array($productId,$o->product_ids,true));
         if ($store && $this->input('product.control')!=='inconnu') $options=$options->filter(fn($o)=>$o->motorization==='any' || $o->motorization===($this->input('product.control')==='motorisee'?'yes':'no'));
-        foreach (['fabric'=>'material','finish'=>'finish',...($store?[]:['hanging'=>'support'])] as $field=>$kind) {
+        foreach (['fabric'=>'material','finish'=>'finish'] as $field=>$kind) {
             $codes=$options->where('kind',$kind)->pluck('code')->all();
             $choices[$field]=$codes;
+        }
+        if (!$store) {
+            $choices['fabric']=$options->where('kind','material')->filter(fn($o)=>($o->fabric_group ?: $o->category)==='rideau')->pluck('code')->all();
+            $choices['sheer']=$options->where('kind','material')->where('fabric_group','voilage')->pluck('code')->all();
+            $choices['finish']=array_column(\App\Services\PublicQuoteChoices::finishes(),'id');
         }
         $choices['color'] = $store ? $colors : [...$colors, 'bleu', 'vert', 'bordeaux'];
         $keys = array_keys($choices);
@@ -83,16 +86,7 @@ class QuoteRequest extends FormRequest
         foreach ($choices as $field => $values) {
             $rules['product.'.$field] = [$store && $field==='finish' && !$values ? 'nullable' : 'required', Rule::in($values)];
         }
+        if (!$store) foreach (['fabric'=>'sheer','sheer'=>'fabric'] as $field=>$other) $rules['product.'.$field]=['nullable','required_without:product.'.$other,Rule::in($choices[$field])];
         return $rules;
-    }
-    public function after(): array
-    {
-        return [function (\Illuminate\Validation\Validator $validator) {
-            if ($validator->errors()->isNotEmpty() || $this->routeIs('quotes.stores')) return;
-            $options=\App\Services\PublicQuoteChoices::options();
-            $finish=$options->firstWhere('code',$this->input('product.finish'));
-            $support=$options->firstWhere('code',$this->input('product.hanging'));
-            if ($support && (($support->finish_codes && !in_array($finish?->code,$support->finish_codes,true)) || ($finish && $support->motorization!=='any' && $finish->motorization!=='any' && $support->motorization!==$finish->motorization))) $validator->errors()->add('product.hanging','Le support ne correspond pas à la finition choisie.');
-        }];
     }
 }

@@ -1,4 +1,5 @@
 <div data-selection data-material="{{ $selection['material_id'] ?? '' }}">
+@if(!empty($selection['project_type']))<p class="notice">Relevé de l’agent : {{ \App\Services\AgentQuoteData::TYPES[$selection['project_type']] ?? $selection['product_name'] ?? '' }}. Complétez les tissus et fournitures pour ce projet.</p>@endif
 <div class="grid">
 <label>Projet<select required data-choice="category" name="{{ $prefix }}[category]" data-value="{{ $selection['category'] ?? 'rideau' }}"><option value="rideau">Rideaux et / ou voilages</option><option value="store">Store</option></select></label>
 <label>Motorisé<select required data-choice="motorized" name="{{ $prefix }}[motorized]" data-value="{{ !empty($selection['motorized']) ? 1 : 0 }}"><option value="0">Non</option><option value="1">Oui</option></select></label>
