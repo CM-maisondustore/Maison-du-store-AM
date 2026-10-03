@@ -81,7 +81,7 @@ class QuoteRequest extends FormRequest
             'submittedAt' => ['sometimes', 'date'],
         ];
         foreach ($choices as $field => $values) {
-            $rules['product.'.$field] = ['required', Rule::in($values)];
+            $rules['product.'.$field] = [$store && $field==='finish' && !$values ? 'nullable' : 'required', Rule::in($values)];
         }
         return $rules;
     }

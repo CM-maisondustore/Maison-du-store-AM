@@ -50,6 +50,16 @@ class PublicCatalogueQuoteTest extends TestCase
         $option=collect(StaffQuoteData::catalogue(false)['options'])->firstWhere('code','store-lourd');
         $this->assertArrayNotHasKey('unit_price',$option);$this->assertSame(route('staff.quote-product-image',$p),$option['imageUrl']);
     }
+    public function test_store_without_public_finishes_can_be_requested_but_unpublished_codes_are_rejected(): void
+    {
+        $this->seed();$p=$this->product();$data=$this->payload($p);
+        QuoteOption::where('category','store')->where('kind','finish')->update(['public_choice'=>false]);
+        $this->postJson('/api/quotes/stores',$data)->assertUnprocessable()->assertJsonValidationErrors('product.finish');
+        $data['product']['finish']='';
+        $this->postJson('/api/quotes/stores',$data)->assertCreated();
+        $this->assertNull(Quote::firstOrFail()->product['finish']);
+        $this->assertDatabaseCount('quotes',1);
+    }
     public function test_start_card_image_is_editable_by_admin_and_rendered_on_quote_page(): void
     {
         $this->withoutVite();$user=User::create(['username'=>'CardAdmin','name'=>'Admin','email'=>'card@example.invalid','role'=>'admin','password'=>'TestPassword123!','must_change_password'=>false]);$this->actingAs($user);

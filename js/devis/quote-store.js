@@ -150,6 +150,7 @@
       }).join('') + '</div></div>' +
       [['fabric','Type de toile',FABRICS],['finish','Finition',FINISHES]].map(function ([field,title,list]) {
         const options=list.filter(o=>compatible(o,state));
+        if(field==='finish' && !options.length) return '';
         return '<div class="field" data-field="'+field+'"><h3>'+title+'</h3><div class="option-grid">'+
           (options.length ? options.map(f=>'<label class="option-tile"><input type="radio" name="store-'+field+'" value="'+esc(f.id)+'"'+(state.store[field]===f.id?' checked':'')+'>'+MDS.quoteMedia(f,'fabric')+'<span>'+esc(f.label)+'</span></label>').join('') : '<p>Aucun choix disponible pour cette configuration. Contactez-nous.</p>')+'</div></div>';
       }).join('');
@@ -179,5 +180,5 @@
     };
   }
 
-  MDS.quoteStore = { STEPS, MODELS, ORDER_TYPES, MOUNTS, CONTROLS, FABRICS, FINISHES, labels };
+  MDS.quoteStore = { STEPS, MODELS, ORDER_TYPES, MOUNTS, CONTROLS, FABRICS, FINISHES, labels, hasFinish: store=>FINISHES.some(o=>compatible(o,{store})) };
 })((window.MDS = window.MDS || {}));

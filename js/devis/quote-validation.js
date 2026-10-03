@@ -70,7 +70,7 @@
     } else if (stepId === 'store-finish') {
       requiredChoice(data.color, 'Choisissez une couleur.', errors, 'color');
       requiredChoice(data.fabric, 'Choisissez un type de toile.', errors, 'fabric');
-      requiredChoice(data.finish, 'Choisissez une finition.', errors, 'finish');
+      if (MDS.quoteStore.hasFinish(data)) requiredChoice(data.finish, 'Choisissez une finition.', errors, 'finish');
     }
     return { valid: Object.keys(errors).length === 0, errors: errors };
   }

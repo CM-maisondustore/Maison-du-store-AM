@@ -17,3 +17,9 @@ test('curtain supports render compatible database options without a fixed fallba
  const container={innerHTML:''};MDS.quoteCurtain.STEPS.find(s=>s.id==='curtain-hanging').render(container,{curtain:{model:'product-8',finish:'wave',hanging:''}});assert.match(container.innerHTML,/Rail DB/);
  const empty=load();empty.quoteStore.STEPS[0].render(container,{store:{}});assert.match(container.innerHTML,/Aucun store/);assert.equal(empty.quoteCurtain.FABRICS.length,0);
 });
+test('store without a published compatible finish does not block a request',()=>{
+ const MDS=load([],[{id:'cloth',kind:'material',category:'store',label:'Toile DB',motorization:'any'}]);
+ const state={store:{model:'product-7',control:'motorisee',fabric:'cloth',color:'beige',finish:''}},container={innerHTML:''};
+ MDS.quoteStore.STEPS.find(s=>s.id==='store-finish').render(container,state);assert.doesNotMatch(container.innerHTML,/name="store-finish"|data-field="finish"/);
+ assert.equal(MDS.quoteValidation.validateStoreStep('store-finish',state.store).valid,true);
+});
