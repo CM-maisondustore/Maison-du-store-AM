@@ -322,7 +322,10 @@
           els.confirmation.scrollIntoView({ block: 'start', behavior: 'smooth' });
         }
         if (result.demo) MDS.notifications.info('Demande enregistrée en mode démonstration : elle n\u2019a pas été transmise.');
-        else MDS.notifications.success('Votre demande de devis a été envoyée.');
+        else {
+          if (MDS.metaPixel) MDS.metaPixel.trackContact();
+          MDS.notifications.success('Votre demande de devis a été envoyée.');
+        }
         state = emptyState();
       })
       .catch(function (error) {

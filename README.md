@@ -133,8 +133,10 @@ statique.
 - **Meta Pixel 1407495181585849.** Les pages publiques Accueil et Devis chargent
   le Pixel uniquement après acceptation des cookies publicitaires. Le choix est
   conservé 180 jours, modifiable via **Préférences cookies** dans le pied de page.
-  Seul `PageView` est envoyé ; la collecte automatique d'événements est désactivée
-  et aucun champ client n'est ajouté au Pixel. Aucun Pixel dans l'espace pro.
+  Seul `PageView` est envoyé automatiquement ; l'événement standard `Contact` est
+  envoyé uniquement après la confirmation effective d'un devis ou d'un rendez-vous.
+  La collecte automatique d'événements est désactivée et aucun champ client n'est
+  ajouté au Pixel. Aucun Pixel dans l'espace pro.
   Les aperçus locaux ne chargent pas Meta. Sur le site de production, vérifier la
   réception dans le Gestionnaire d'événements Meta après avoir accepté les cookies.
 

@@ -18,7 +18,9 @@ test('acceptance initializes specified pixel once, without automatic events or c
   const b=browser();b.choose('accepted');assert.equal(b.scripts.length,1);assert.equal(b.calls().length,0);b.load();
   assert.deepEqual(b.calls().slice(0,2),[['set','autoConfig',false,'1407495181585849'],['init','1407495181585849']]);
   assert.deepEqual(b.calls().filter(c=>c[0]==='track'),[['track','PageView']]);
-  b.choose('accepted');assert.equal(b.scripts.length,1);assert.equal(b.calls().filter(c=>c[0]==='track').length,1);
+  assert.equal(b.window.MDS.metaPixel.trackContact(),true);
+  assert.deepEqual(b.calls().filter(c=>c[0]==='track'),[['track','PageView'],['track','Contact']]);
+  b.choose('accepted');assert.equal(b.scripts.length,1);assert.equal(b.calls().filter(c=>c[0]==='track').length,2);
 });
 test('withdrawal revokes consent and clears pixel cookies without resetting forms',()=>{
   const b=browser({saved:saved('accepted')});b.load();b.choose('rejected');assert.deepEqual(b.calls().at(-1),['consent','revoke']);assert(b.cookies.some(c=>c.startsWith('_fbp=; Max-Age=0')));assert(b.cookies.some(c=>c.startsWith('_fbc=; Max-Age=0')));
@@ -34,4 +36,5 @@ test('expired or corrupt choices ask again; local previews and private pages nev
 });
 test('withdrawal from another tab stops tracking',()=>{
   const b=browser({saved:saved('accepted')});b.load();b.storage(saved('rejected'));assert.deepEqual(b.calls().at(-1),['consent','revoke']);
+  assert.equal(b.window.MDS.metaPixel.trackContact(),false);
 });

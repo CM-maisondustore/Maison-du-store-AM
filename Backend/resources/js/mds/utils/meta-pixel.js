@@ -4,6 +4,9 @@
   const DURATION = 180 * 24 * 60 * 60 * 1000;
 
   function init() {
+    const api = (window.MDS = window.MDS || {}).metaPixel || {};
+    api.trackContact = function () {};
+    window.MDS.metaPixel = api;
     const pixel = document.querySelector('meta[name="mds-meta-pixel"]');
     const footer = document.querySelector('.site-footer__bottom');
     if (!pixel || !/^\d+$/.test(pixel.content) || !footer) return;
@@ -77,6 +80,13 @@
         tracked = true;
       }
     }
+
+    function trackContact() {
+      if (choice !== 'accepted' || !loaded || !initialized || typeof window.fbq !== 'function') return false;
+      window.fbq('track', 'Contact');
+      return true;
+    }
+    api.trackContact = trackContact;
 
     function applyChoice() {
       if (choice !== 'accepted') {

@@ -168,6 +168,7 @@
         if (response.demo) {
           MDS.notifications.info('Rendez-vous enregistré en mode démonstration : il n\u2019a pas été transmis.');
         } else {
+          if (MDS.metaPixel) MDS.metaPixel.trackContact();
           MDS.notifications.success('Votre demande de rendez-vous a été envoyée.');
         }
       })
