@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#1c1c1c">
+  <meta name="mds-meta-pixel" content="1407495181585849">
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <link rel="icon" href="{{ Vite::asset('resources/assets/icons/favicon.svg') }}" type="image/svg+xml">
   <title>Maison du Store AM — Stores &amp; Rideaux Sur Mesure à Abidjan</title>

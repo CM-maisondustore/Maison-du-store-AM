@@ -130,6 +130,14 @@ statique.
 
 ## Points d'attention
 
+- **Meta Pixel 1407495181585849.** Les pages publiques Accueil et Devis chargent
+  le Pixel uniquement après acceptation des cookies publicitaires. Le choix est
+  conservé 180 jours, modifiable via **Préférences cookies** dans le pied de page.
+  Seul `PageView` est envoyé ; la collecte automatique d'événements est désactivée
+  et aucun champ client n'est ajouté au Pixel. Aucun Pixel dans l'espace pro.
+  Les aperçus locaux ne chargent pas Meta. Sur le site de production, vérifier la
+  réception dans le Gestionnaire d'événements Meta après avoir accepté les cookies.
+
 - **Contraste du bouton « or ».** Le texte des boutons `.btn--gold` est
   volontairement sombre (`--color-on-gold: #1c1c1c`) plutôt que blanc comme
   sur la maquette, le blanc sur `#C09F6A` n'atteignant pas un contraste
@@ -140,8 +148,9 @@ statique.
   de rendez-vous (`js/rendez-vous/calendar.js`) ferme uniquement le
   dimanche par défaut — à ajuster dans `CONFIG.closedWeekdays` si les
   horaires réels sont différents.
-- **Aucune dépendance externe.** Polices et icônes sont toutes hébergées
+- **Polices et icônes locales.** Polices et icônes sont toutes hébergées
   dans `assets/`, sans appel à un CDN : le site s'ouvre aussi hors ligne.
+  Le Meta Pixel est une ressource externe facultative, chargée après consentement.
 
 ## Tests effectués
 
