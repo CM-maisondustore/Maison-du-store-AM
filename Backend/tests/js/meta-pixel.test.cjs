@@ -19,8 +19,9 @@ test('acceptance initializes specified pixel once, without automatic events or c
   assert.deepEqual(b.calls().slice(0,2),[['set','autoConfig',false,'1407495181585849'],['init','1407495181585849']]);
   assert.deepEqual(b.calls().filter(c=>c[0]==='track'),[['track','PageView']]);
   assert.equal(b.window.MDS.metaPixel.trackContact(),true);
-  assert.deepEqual(b.calls().filter(c=>c[0]==='track'),[['track','PageView'],['track','Contact']]);
-  b.choose('accepted');assert.equal(b.scripts.length,1);assert.equal(b.calls().filter(c=>c[0]==='track').length,2);
+  assert.equal(b.window.MDS.metaPixel.trackSchedule(),true);
+  assert.deepEqual(b.calls().filter(c=>c[0]==='track'),[['track','PageView'],['track','Contact'],['track','Schedule']]);
+  b.choose('accepted');assert.equal(b.scripts.length,1);assert.equal(b.calls().filter(c=>c[0]==='track').length,3);
 });
 test('withdrawal revokes consent and clears pixel cookies without resetting forms',()=>{
   const b=browser({saved:saved('accepted')});b.load();b.choose('rejected');assert.deepEqual(b.calls().at(-1),['consent','revoke']);assert(b.cookies.some(c=>c.startsWith('_fbp=; Max-Age=0')));assert(b.cookies.some(c=>c.startsWith('_fbc=; Max-Age=0')));

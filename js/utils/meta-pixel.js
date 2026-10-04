@@ -6,6 +6,7 @@
   function init() {
     const api = (window.MDS = window.MDS || {}).metaPixel || {};
     api.trackContact = function () {};
+    api.trackSchedule = function () {};
     window.MDS.metaPixel = api;
     const pixel = document.querySelector('meta[name="mds-meta-pixel"]');
     const footer = document.querySelector('.site-footer__bottom');
@@ -87,6 +88,13 @@
       return true;
     }
     api.trackContact = trackContact;
+
+    function trackSchedule() {
+      if (choice !== 'accepted' || !loaded || !initialized || typeof window.fbq !== 'function') return false;
+      window.fbq('track', 'Schedule');
+      return true;
+    }
+    api.trackSchedule = trackSchedule;
 
     function applyChoice() {
       if (choice !== 'accepted') {

@@ -135,6 +135,8 @@ statique.
   conservé 180 jours, modifiable via **Préférences cookies** dans le pied de page.
   Seul `PageView` est envoyé automatiquement ; l'événement standard `Contact` est
   envoyé uniquement après la confirmation effective d'un devis ou d'un rendez-vous.
+  L'événement standard `Schedule` est envoyé en plus après la confirmation d'un
+  rendez-vous du calendrier.
   La collecte automatique d'événements est désactivée et aucun champ client n'est
   ajouté au Pixel. Aucun Pixel dans l'espace pro.
   Les aperçus locaux ne chargent pas Meta. Sur le site de production, vérifier la
