@@ -9,6 +9,7 @@
   const values=root=>Object.fromEntries(keys.map(key=>[key,field(root,key).value]));
   const units={m:'mètre(s)',m2:'m²',piece:'pièce(s)',lot100:'lot(s) de 100',opening:'ouverture(s)',flat:'forfait(s)'};
   const compatible=(o,v)=>o.active&&o.category===v.category&&(o.motorization==='any'||o.motorization===(v.motorized==='1'?'yes':'no'));
+  const finishLabel=o=>({'wave-manuel':'Wave manuel','wave-electric':'Wave motoris\u00e9','ruflette-wave':'Ruflette Wave','reflete-manuel':'Ruflette','barre-fer':'Barre de fer'}[o.code]||o.label);
   const label=o=>o.label+(Object.hasOwn(o,'unit_price')?' — '+(o.unit_price===null?'à définir':o.unit_price.toLocaleString('fr-FR')+' FCFA / '+units[o.unit]):'');
   function checkbox(container,o,checked,key,attribute){
     const el=document.createElement('label');el.className='check';
@@ -28,7 +29,7 @@
     }
     const select=field(root,'finish_id'),selected=current.finish_id;
     select.replaceChildren(new Option('Sélectionner une finition…',''));
-    data.options.filter(o=>o.kind==='finish'&&compatible(o,v)).forEach(o=>select.add(new Option(o.label,String(o.id))));
+    data.options.filter(o=>o.kind==='finish'&&o.active&&o.category===v.category).forEach(o=>select.add(new Option(finishLabel(o),String(o.id))));
     select.value=String(selected??'');if(select.selectedIndex<0)select.value='';
   }
   function init(root){
