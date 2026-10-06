@@ -32,6 +32,7 @@
     data.options.filter(o=>o.kind==='finish'&&o.active&&o.category===v.category).forEach(o=>select.add(new Option(finishLabel(o),String(o.id))));
     select.value=String(selected??'');if(select.selectedIndex<0)select.value='';
   }
+  function alignFinish(root,target){const selected=data.options.find(o=>String(o.id)===field(root,'finish_id').value);if(target.dataset.choice==='finish_id'&&(selected?.motorization==='yes'||selected?.motorization==='no'))field(root,'motorized').value=selected.motorization==='yes'?'1':'0';else if(target.dataset.choice==='motorized'&&selected?.motorization!=='any'&&selected?.motorization!==undefined)field(root,'finish_id').value='';}
   function init(root){
     const initial=Object.fromEntries(keys.map(key=>[key,field(root,key).dataset.value]));
     if(!initial.curtain_id&&!initial.sheer_id&&!initial.store_id){
@@ -98,7 +99,7 @@
   form.addEventListener('change',event=>{
     dirty=true;revision++;const target=event.target,root=target.closest('[data-selection]');invalidate(target);
     if(target.dataset.fabric)field(root,target.dataset.fabric).value=target.checked?target.value:'';
-    if(root){if(root!==defaults)root.closest('[data-window]').querySelector('[data-inherit]').checked=false;refresh(root);if(root===defaults)windows.querySelectorAll('[data-window]').forEach(inherit);}
+    if(root){alignFinish(root,target);if(root!==defaults)root.closest('[data-window]').querySelector('[data-inherit]').checked=false;refresh(root);if(root===defaults)windows.querySelectorAll('[data-window]').forEach(inherit);}
     if(target.matches('[data-inherit]'))inherit(target.closest('[data-window]'));
     if(target.dataset.part){const input=target.closest('[data-cost-part]').querySelector('[data-component]');input.value=target.checked?target.value:'';input.dataset.userChoice='1';}
     if(root||target.matches('[data-inherit],[data-material-mode]')||target.dataset.part)windows.querySelectorAll('[data-window]').forEach(row=>components(row));

@@ -64,7 +64,7 @@ class StaffQuoteData
         $snapshot=['category'=>$value['category'],'product_id'=>0,'product_name'=>$value['category']==='store' ? 'Store' : 'Rideaux / voilages','reference'=>'','motorized'=>(bool)$value['motorized']];
         foreach (['material','finish'] as $kind) {
             $option=QuoteOption::find($value[$kind.'_id']);
-            $compatible=$kind==='finish' ? ($option && $option->active && $option->category===$value['category']) : ($option && $option->compatible($value['category'],0,(bool)$value['motorized']));
+            $compatible=$option && $option->compatible($value['category'],0,(bool)$value['motorized']);
             if (!$option || $option->kind!==$kind || !$compatible) throw ValidationException::withMessages([$prefix.'.'.$kind.'_id'=>'Choisissez une option disponible pour ce type de projet.']);
             $snapshot[$kind.'_id']=$option->id; $snapshot[$kind.'_name']=$option->label;
         }

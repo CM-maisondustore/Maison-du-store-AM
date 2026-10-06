@@ -36,7 +36,7 @@ class AgentQuoteData
     }
     private static function selection(array $v,string $prefix): array {
         $category=$v['project_type']==='store'?'store':'rideau';$finish=QuoteOption::find($v['finish_id']);
-        if(!$finish || !$finish->active || $finish->kind!=='finish' || $finish->category!==$category)throw ValidationException::withMessages([$prefix.'.finish_id'=>'Choisissez une finition disponible pour ce type de projet.']);
+        if(!$finish || $finish->kind!=='finish' || !$finish->compatible($category,0,(bool)$v['motorized']))throw ValidationException::withMessages([$prefix.'.finish_id'=>'Choisissez une finition disponible pour ce type de projet.']);
         return ['project_type'=>$v['project_type'],'category'=>$category,'product_name'=>self::TYPES[$v['project_type']],'motorized'=>(bool)$v['motorized'],'finish_id'=>$finish->id,'finish_name'=>self::FINISHES[$finish->code] ?? $finish->label,'zone'=>$v['zone']];
     }
     public static function preserveAdminData(array $data,\App\Models\Quote $quote): array {
