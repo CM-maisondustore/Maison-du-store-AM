@@ -8,7 +8,9 @@
 </div>
 <input type="hidden" name="windows[{{ $index }}][inherit_defaults]" value="0">
 <label class="check"><input type="checkbox" data-inherit name="windows[{{ $index }}][inherit_defaults]" value="1" @checked($window['inherit_defaults'] ?? !isset($window['product_id']))>Utiliser les choix communs (décochez pour personnaliser cette ouverture)</label>
+<details class="quote-opening-details"><summary>Choix techniques, quantités et prestations</summary>
 @include('staff.quote-selection',['prefix'=>'windows['.$index.']','selection'=>$window])
 @include('staff.quote-costing')
 <label>Précisions pour cette ouverture<textarea name="windows[{{ $index }}][notes]" maxlength="1000">{{ $window['notes'] ?? '' }}</textarea></label>
+</details>
 </section>

@@ -89,6 +89,7 @@
     container.innerHTML =
       '<h2 class="step__heading">Saisissez les dimensions de vos ouvertures</h2>' +
       '<p class="step__intro">Prenez les mesures intérieures au mm près pour une confection sur mesure au cordeau.</p>' +
+      (s.type === 'rideau' ? '<p class="step__intro">Pour les rideaux et voilages de plus de 2,80 m de hauteur, le métrage et le chiffrage seront établis manuellement par notre équipe.</p>' : '') +
       '<div data-dimensions-root></div>';
     dimensionsManager = MDS.dimensions.create(container.querySelector('[data-dimensions-root]'), {
       initial: s.dimensions,

@@ -1,6 +1,7 @@
 (() => {
   'use strict';
   const form=document.getElementById('staff-quote-form'); if(!form)return;
+  form.addEventListener('invalid',event=>event.target.closest('details')?.setAttribute('open',''),true);
   const data=JSON.parse(document.getElementById('quote-catalogue-data').textContent);
   const defaults=document.querySelector('#quote-defaults [data-selection]'),windows=document.getElementById('quote-windows');
   const keys=['category','motorized','curtain_id','sheer_id','store_id','finish_id'];

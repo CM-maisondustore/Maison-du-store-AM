@@ -8,3 +8,4 @@
 
 @media print{.sidebar{display:none}}
 .quote-phone{grid-column:1/-1;display:grid;grid-template-columns:minmax(110px,.5fr) minmax(0,1fr);gap:0 12px}.quote-phone .muted{grid-column:1/-1;margin-top:6px}@media(max-width:360px){.quote-phone{grid-template-columns:1fr}}
+.quote-opening-details{margin:16px 0;padding:14px 16px;border:1px solid var(--line);border-radius:8px;background:#fbfcf9}.quote-opening-details summary{cursor:pointer;font-weight:700;color:var(--ink)}.quote-opening-details[open] summary{margin-bottom:16px}
