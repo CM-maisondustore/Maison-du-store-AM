@@ -27,6 +27,7 @@ Route::prefix('admin')->group(function () {
         Route::put('prestations/{intervention}', [InterventionController::class, 'update'])->name('interventions.update');
         Route::post('prestations/{intervention}/devis', [QuoteController::class, 'onsite'])->name('interventions.quote');
         Route::middleware('admin')->group(function () {
+            Route::get('visiteurs', [App\Http\Controllers\Staff\VisitorsController::class, 'index'])->name('visitors.index');
             Route::get('mise-en-page/{type?}', [App\Http\Controllers\Staff\DocumentLayoutController::class,'edit'])->name('layouts.edit');
             Route::post('mise-en-page/{type}', [App\Http\Controllers\Staff\DocumentLayoutController::class,'save'])->name('layouts.save');
             Route::post('mise-en-page/{type}/apercu', [App\Http\Controllers\Staff\DocumentLayoutController::class,'preview'])->middleware('throttle:60,1')->name('layouts.preview');

@@ -19,6 +19,7 @@
 <nav id="staff-navigation" tabindex="0" aria-label="Navigation interne">
 @php($menu = ['dashboard' => 'Vue d’ensemble', 'quotes.index' => 'Devis', 'appointments.index' => 'Rendez-vous', 'interventions.index' => 'Prestations'])
 @if(auth()->user()->isAdmin())
+@php($menu += ['visitors.index'=>'Visiteurs'])
 @php($menu += ['layouts.edit'=>'Mise en page','communications.index' => 'Documents & automatisations'])
 @php($menu += ['contacts.index' => 'Clients & contacts', 'products.index' => 'Catalogue', 'contents.index' => 'Images & portfolio', 'invoices.index' => 'Factures', 'messages.index' => 'Messagerie', 'users.index' => 'Équipe'])
 @endif

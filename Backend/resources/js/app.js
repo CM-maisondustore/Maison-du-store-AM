@@ -18,6 +18,7 @@ import '../css/cookies.css';
 
 import './mds/utils/validation.js';
 import './mds/utils/meta-pixel.js';
+import './mds/utils/analytics.js';
 import './mds/utils/quote-phone.js';
 import './mds/utils/notifications.js';
 import './mds/utils/modal.js';

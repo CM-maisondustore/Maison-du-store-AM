@@ -314,6 +314,7 @@
 
     send(payload)
       .then(function (result) {
+        if (!result.demo && MDS.analytics) { MDS.analytics.track('form_submit', {target:'devis'}); MDS.analytics.track('quote_received', {target:'devis'}); }
         if (els.wizard) els.wizard.hidden = true;
         if (els.confirmation) {
           MDS.quoteSummary.renderConfirmation(els.confirmation, state, result);

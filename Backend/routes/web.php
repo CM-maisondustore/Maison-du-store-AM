@@ -14,6 +14,7 @@ Route::view('/devis', 'quote')->name('quote');
 Route::get('/devis/materiaux/{option}/image', [\App\Http\Controllers\MediaController::class, 'quoteMaterial'])->name('quote.material-image');
 Route::get('/devis/produits/{product}/image',[App\Http\Controllers\MediaController::class,'quoteProduct'])->name('quote.product-image');
 Route::get('/health/ready', App\Http\Controllers\ReadinessController::class)->middleware('throttle:60,1');
+Route::post('/api/analytics/collect', [App\Http\Controllers\AnalyticsController::class, 'collect'])->middleware('throttle:120,1');
 Route::get('/robots.txt', function () {
     return response("User-agent: *\n".(config('deployment.indexing') ? "Allow: /\n" : "Disallow: /\n"), 200)
         ->header('Content-Type', 'text/plain');
