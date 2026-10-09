@@ -68,16 +68,15 @@
     container.innerHTML =
       '<h2 class="step__heading">Motorisé : oui ou non ?</h2>' +
       '<p class="step__intro">Sélectionnez comment vous souhaitez manœuvrer vos stores sur mesure.</p>' +
-      '<div class="choice-list" role="radiogroup" aria-label="Type de commande">' +
+      '<div class="fabric-grid" role="radiogroup" aria-label="Type de commande">' +
       CONTROLS.map(function (c) {
         const checked = state.store.control === c.id;
         return (
-          '<label class="choice-card choice-card--compact' + (checked ? ' is-selected' : '') + '">' +
+          '<label class="fabric-card' + (checked ? ' is-selected' : '') + '">' +
             '<input type="radio" name="store-control" value="' + c.id + '"' + (checked ? ' checked' : '') + '>' +
-            '<span class="choice-card__icon"><svg class="icon" aria-hidden="true"><use href="#' + c.icon + '"/></svg></span>' +
-            '<span class="choice-card__body"><span class="choice-card__title">' + esc(c.label) + '</span>' +
-              '<span class="choice-card__text">' + esc(c.text) + '</span></span>' +
-            '<span class="choice-card__check" aria-hidden="true"><svg class="icon icon--sm"><use href="#i-check"/></svg></span>' +
+            '<span class="fabric-card__icon" aria-hidden="true"><svg class="icon"><use href="#' + c.icon + '"/></svg></span>' +
+            '<span class="fabric-card__title">' + esc(c.label) + '</span>' +
+            '<span class="fabric-card__text">' + esc(c.text) + '</span>' +
           '</label>'
         );
       }).join('') + '</div>';

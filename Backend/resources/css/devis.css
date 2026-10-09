@@ -393,6 +393,20 @@
   color: var(--color-ink);
 }
 
+.fabric-card__icon {
+  display: grid;
+  place-items: center;
+  min-height: 5rem;
+  color: var(--color-gold);
+  background: var(--color-gold-tint);
+  border-radius: var(--radius-sm);
+}
+
+.fabric-card__icon .icon {
+  width: 2rem;
+  height: 2rem;
+}
+
 .fabric-card__text {
   font-size: var(--text-xs);
   color: var(--color-text-soft);
