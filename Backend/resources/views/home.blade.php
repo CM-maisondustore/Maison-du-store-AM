@@ -203,8 +203,9 @@
         <div class="section-head section-head--center">
           <p class="eyebrow">Portfolio</p>
           <h2>Inspirations &amp; Réalisations d’Intérieur</h2>
+          <p class="section-head__text">Faites défiler pour découvrir nos réalisations.</p>
         </div>
-        <div class="gallery-grid">
+        <div class="gallery-grid" role="region" aria-label="Catalogue de nos réalisations" aria-roledescription="carrousel" tabindex="0">
           @foreach($portfolio as $entry)
           <article class="gallery-item">
             @if($entry->media)
