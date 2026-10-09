@@ -5,10 +5,9 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\{Rule,ValidationException};
 class AgentQuoteData
 {
-    public const FINISHES=['wave-manuel'=>'Wave manuel','wave-electric'=>"Wave motoris\u{00e9}",'ruflette-wave'=>'Ruflette Wave','reflete-manuel'=>'Ruflette','barre-fer'=>'Barre de fer'];
     public const TYPES=['rideau'=>'Rideaux','voilage'=>'Voilages','rideau_voilage'=>'Rideaux et voilages','store'=>'Stores'];
     public static function catalogue(): array {
-        return ['options'=>QuoteOption::where('active',true)->where('kind','finish')->whereIn('category',['store','rideau'])->orderBy('label')->get(['id','code','label','category','motorization'])->map(fn($o)=>['id'=>$o->id,'code'=>$o->code,'label'=>self::FINISHES[$o->code] ?? $o->label,'category'=>$o->category,'motorization'=>$o->motorization])->all()];
+        return ['options'=>QuoteOption::where('active',true)->where('kind','finish')->whereIn('category',['store','rideau'])->orderBy('label')->get(['id','code','label','category','motorization'])->map(fn($o)=>['id'=>$o->id,'code'=>$o->code,'label'=>$o->label,'category'=>$o->category,'motorization'=>$o->motorization])->all()];
     }
     public static function validate(Request $r): array {
         QuotePhone::prepare($r);
@@ -37,7 +36,7 @@ class AgentQuoteData
     private static function selection(array $v,string $prefix): array {
         $category=$v['project_type']==='store'?'store':'rideau';$finish=QuoteOption::find($v['finish_id']);
         if(!$finish || $finish->kind!=='finish' || !$finish->compatible($category,0,(bool)$v['motorized']))throw ValidationException::withMessages([$prefix.'.finish_id'=>'Choisissez une finition disponible pour ce type de projet.']);
-        return ['project_type'=>$v['project_type'],'category'=>$category,'product_name'=>self::TYPES[$v['project_type']],'motorized'=>(bool)$v['motorized'],'finish_id'=>$finish->id,'finish_name'=>self::FINISHES[$finish->code] ?? $finish->label,'zone'=>$v['zone']];
+        return ['project_type'=>$v['project_type'],'category'=>$category,'product_name'=>self::TYPES[$v['project_type']],'motorized'=>(bool)$v['motorized'],'finish_id'=>$finish->id,'finish_name'=>$finish->label,'zone'=>$v['zone']];
     }
     public static function preserveAdminData(array $data,\App\Models\Quote $quote): array {
         $previous=$quote->configuration ?? [];

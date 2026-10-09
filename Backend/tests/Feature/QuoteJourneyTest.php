@@ -33,11 +33,12 @@ class QuoteJourneyTest extends TestCase
         auth()->logout();session()->flush();$this->actingAs($this->user('agent'));$this->put('/admin/options-devis/'.$o->id,$data)->assertForbidden();
     }
     public function test_agent_restricted_form_saves_field_notes_and_preserves_admin_work_on_edit(): void {
-        $this->seed();$agent=$this->user('agent');$this->actingAs($agent);$finish=QuoteOption::where('code','wave-manuel')->value('id');
-        $selection=['project_type'=>'rideau_voilage','motorized'=>0,'finish_id'=>$finish,'zone'=>'other'];
+        $this->seed();$agent=$this->user('agent');$this->actingAs($agent);$finish=QuoteOption::create(['code'=>'agent-custom-finish','kind'=>'finish','category'=>'rideau','label'=>'Ruflette classique personnalisee','motorization'=>'any','active'=>true,'unit'=>'flat','public_choice'=>true]);
+        QuoteOption::create(['code'=>'agent-disabled-finish','kind'=>'finish','category'=>'rideau','label'=>'Finition inactive','motorization'=>'any','active'=>false,'unit'=>'flat']);
+        $selection=['project_type'=>'rideau_voilage','motorized'=>0,'finish_id'=>$finish->id,'zone'=>'other'];
         $data=['submission_token'=>(string)Str::uuid(),'edit_version'=>0,'contact'=>['lastName'=>'Client Test','phone'=>'+2250700000000','address'=>'Abidjan'],'defaults'=>$selection,'windows'=>[['label'=>'Salon','width'=>'140,5','height'=>220,'inherit_defaults'=>1,'notes'=>'Description conservée']],'field_notes'=>'Observation terrain'];
-        $html=$this->get('/admin/devis/nouveau')->assertOk()->getContent();foreach(['name="quote_date"','name="agent_id"','material_quantity','data-fabric-list','data-finish-image','unit_price'] as $field)$this->assertStringNotContainsString($field,$html);
-        $this->post('/admin/devis',$data)->assertSessionHasNoErrors();$q=Quote::firstOrFail();$this->assertSame($agent->id,$q->created_by);$this->assertEquals(140.5,$q->dimensions[0]['width']);$this->assertSame('other',$q->dimensions[0]['zone']);
+        $html=$this->get('/admin/devis/nouveau')->assertOk()->getContent();$this->assertStringContainsString('Ruflette classique personnalisee',$html);$this->assertStringNotContainsString('Finition inactive',$html);foreach(['name="quote_date"','name="agent_id"','material_quantity','data-fabric-list','data-finish-image','unit_price'] as $field)$this->assertStringNotContainsString($field,$html);
+        $this->post('/admin/devis',$data)->assertSessionHasNoErrors();$q=Quote::firstOrFail();$this->assertSame('Ruflette classique personnalisee',$q->product['finish']);$this->assertSame($agent->id,$q->created_by);$this->assertEquals(140.5,$q->dimensions[0]['width']);$this->assertSame('other',$q->dimensions[0]['zone']);
         $dimensions=$q->dimensions;$dimensions[0]['costing']=['zone'=>'other','material_quantity'=>8,'support'=>['option_id'=>22,'quantity'=>4]];$dimensions[0]['material_name']='Choix Admin';
         $q->update(['dimensions'=>$dimensions,'quote_date'=>'2026-10-03','valid_until'=>'2026-11-03','lines'=>[['description'=>'Chiffrage','quantity'=>1,'unit_price'=>70000]]]);$before=$q->fresh();
         $data['windows'][0]['width']=155;$this->put('/admin/devis/'.$q->id.'/formulaire',$data)->assertSessionHasNoErrors();$q->refresh();
