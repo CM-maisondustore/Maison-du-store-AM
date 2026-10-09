@@ -8,7 +8,7 @@
   const label=(list,id)=>{const o=list.find(o=>o.id===id);return o?(o.label||o.name):'';};
   const read=(c,name)=>c.querySelector('input[name="'+name+'"]:checked')?.value||'';
   function cards(name,list,selected,size='fabric'){
-    return list.map(o=>'<label class="fabric-card"><input type="radio" name="'+name+'" value="'+esc(o.id)+'"'+(selected===o.id?' checked':'')+'>'+MDS.quoteMedia(o,size)+'<span class="fabric-card__title">'+esc(o.label||o.name)+'</span><span class="fabric-card__text">'+esc(o.text||'')+'</span></label>').join('');
+    return list.map(o=>'<article class="fabric-card curtain-option-card"><label class="curtain-option-card__choice"><input type="radio" name="'+name+'" value="'+esc(o.id)+'"'+(selected===o.id?' checked':'')+'>'+MDS.quoteMedia(o,size)+'<span class="fabric-card__title">'+esc(o.label||o.name)+'</span></label>'+(o.text?'<details class="curtain-option-card__description"><summary><span>Description</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary><p>'+esc(o.text)+'</p></details>':'')+'</article>').join('');
   }
   function renderModel(c,s){c.innerHTML='<h2 class="step__heading">Votre modèle de rideau ou voilage</h2><div class="fabric-grid">'+(MODELS.length?cards('curtain-model',MODELS,s.curtain.model):'<p>Aucun produit disponible. Contactez-nous.</p>')+'</div>';}
   function renderFabric(c,s){

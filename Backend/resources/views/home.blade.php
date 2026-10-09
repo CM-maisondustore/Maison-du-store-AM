@@ -214,7 +214,7 @@
             <div class="image-placeholder image-placeholder--wide" aria-hidden="true"></div>
             @endif
             <h3 class="gallery-item__title">{{ $entry->title }}</h3>
-            <p class="gallery-item__text">{{ $entry->description }}</p>
+            <details class="gallery-item__description"><summary><span>Description</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary><p class="gallery-item__text">{{ $entry->description }}</p></details>
           </article>
           @endforeach
         </div>
