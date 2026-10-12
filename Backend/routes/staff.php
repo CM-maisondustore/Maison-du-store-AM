@@ -7,6 +7,10 @@ Route::prefix('admin')->group(function () {
     Route::middleware(['auth', 'auth.session', 'staff'])->name('staff.')->group(function () {
         Route::get('/', DashboardController::class)->name('dashboard');
         Route::post('deconnexion', [AuthController::class, 'logout'])->name('logout');
+        Route::get('profil', [App\Http\Controllers\Staff\ProfileController::class, 'edit'])->name('profile.edit');
+        Route::patch('profil', [App\Http\Controllers\Staff\ProfileController::class, 'update'])->name('profile.update');
+        Route::get('parametres', [App\Http\Controllers\Staff\ProfileController::class, 'settings'])->name('settings.edit');
+        Route::patch('parametres', [App\Http\Controllers\Staff\ProfileController::class, 'updateSettings'])->name('settings.update');
         Route::get('notifications', [App\Http\Controllers\Staff\PushController::class, 'index'])->name('notifications.index');
         Route::get('push/cle-publique', [App\Http\Controllers\Staff\PushController::class, 'publicKey'])->name('push.public-key');
         Route::post('push/abonnement', [App\Http\Controllers\Staff\PushController::class, 'subscribe'])->middleware('throttle:20,1')->name('push.subscribe');

@@ -61,3 +61,24 @@ document.addEventListener('submit', event => {
       : 'Ouvrez le menu du navigateur puis choisissez « Installer l’application » ou « Ajouter à l’écran d’accueil ».');
   });
 })();
+(() => {
+  const sidebar = document.getElementById('staff-sidebar');
+  const toggle = document.getElementById('pro-menu-toggle');
+  if (!sidebar || !toggle) return;
+
+  const setOpen = open => {
+    sidebar.classList.toggle('menu-open', open);
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.textContent = open ? 'Fermer' : 'Menu';
+  };
+
+  toggle.addEventListener('click', () => setOpen(toggle.getAttribute('aria-expanded') !== 'true'));
+  document.addEventListener('click', event => {
+    if (sidebar.classList.contains('menu-open') && !sidebar.contains(event.target)) setOpen(false);
+  });
+  document.addEventListener('keydown', event => { if (event.key === 'Escape') setOpen(false); });
+  const desktop = window.matchMedia('(min-width: 851px)');
+  const closeOnDesktop = event => { if (event.matches) setOpen(false); };
+  if (desktop.addEventListener) desktop.addEventListener('change', closeOnDesktop);
+  else desktop.addListener(closeOnDesktop);
+})();
