@@ -27,6 +27,9 @@ class AppointmentController
             // La contrainte SQL protège aussi deux requêtes simultanées.
             throw ValidationException::withMessages(['time' => 'Ce créneau vient d’être réservé. Choisissez une autre heure.']);
         }
+        app(\App\Services\StaffPushNotifications::class)->admins(
+            'Nouveau rendez-vous demandé', 'Une demande de rendez-vous pour le '.$appointment->date.' à '.$appointment->time.' vient d’être reçue.', route('staff.appointments.show', $appointment),
+        );
         return response()->json(['data' => ['reference' => $appointment->reference, 'status' => 'pending']], 201);
     }
 

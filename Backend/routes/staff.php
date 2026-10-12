@@ -7,6 +7,11 @@ Route::prefix('admin')->group(function () {
     Route::middleware(['auth', 'auth.session', 'staff'])->name('staff.')->group(function () {
         Route::get('/', DashboardController::class)->name('dashboard');
         Route::post('deconnexion', [AuthController::class, 'logout'])->name('logout');
+        Route::get('notifications', [App\Http\Controllers\Staff\PushController::class, 'index'])->name('notifications.index');
+        Route::get('push/cle-publique', [App\Http\Controllers\Staff\PushController::class, 'publicKey'])->name('push.public-key');
+        Route::post('push/abonnement', [App\Http\Controllers\Staff\PushController::class, 'subscribe'])->middleware('throttle:20,1')->name('push.subscribe');
+        Route::delete('push/abonnement', [App\Http\Controllers\Staff\PushController::class, 'unsubscribe'])->middleware('throttle:20,1')->name('push.unsubscribe');
+        Route::post('notifications/{notification}/lu', [App\Http\Controllers\Staff\PushController::class, 'markRead'])->name('notifications.read');
         Route::get('mot-de-passe', [AuthController::class, 'password'])->name('password');
         Route::post('mot-de-passe', [AuthController::class, 'changePassword'])->middleware('throttle:5,1')->name('password.update');
         Route::get('devis', [QuoteController::class, 'index'])->name('quotes.index');

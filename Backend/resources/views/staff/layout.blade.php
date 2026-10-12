@@ -4,10 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
+<meta name="csrf-token" content="{{ csrf_token() }}">
+<link rel="manifest" href="{{ asset('manifest.webmanifest') }}">
+<meta name="theme-color" content="#163b35">
 <title>@yield('title', 'Espace interne') — Maison du Store AM</title>
 <link rel="stylesheet" href="{{ asset('admin.css') }}?v={{ filemtime(public_path('admin.css')) }}">
 <script src="{{ asset('admin.js') }}?v={{ filemtime(public_path('admin.js')) }}" defer>
 </script>
+<script src="{{ asset('admin-push.js') }}?v={{ filemtime(public_path('admin-push.js')) }}" defer></script>
 </head>
 <body>
 <div class="shell">
@@ -31,6 +35,8 @@
 <header class="topbar">
 <span>{{ auth()->user()->name }} · {{ auth()->user()->isAdmin() ? 'Admin-CM' : 'Agent' }}</span>
 <div class="actions" style="margin:0">
+<a href="{{ route('staff.notifications.index') }}">Notifications <span class="notification-count">{{ auth()->user()->unreadNotifications()->count() }}</span></a>
+<button type="button" class="secondary" id="push-toggle" data-configured="{{ filled(config('push.public_key')) ? '1' : '0' }}" data-public-key-url="{{ route('staff.push.public-key') }}" data-subscribe-url="{{ route('staff.push.subscribe') }}" data-unsubscribe-url="{{ route('staff.push.unsubscribe') }}">Activer les notifications</button>
 <a href="{{ route('staff.password') }}">Mot de passe</a>
 <a href="{{ route('home') }}" target="_blank" rel="noopener">Voir le site</a>
 <form method="post" action="{{ route('staff.logout') }}">

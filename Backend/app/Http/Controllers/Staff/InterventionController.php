@@ -25,6 +25,9 @@ class InterventionController
         foreach (['quote_id' => Quote::class, 'appointment_id' => Appointment::class] as $field => $model) if (!empty($data[$field]) && $model::findOrFail($data[$field])->contact_id !== (int) $data['contact_id']) throw ValidationException::withMessages([$field => 'Le document appartient à un autre client.']);
         $job = DB::transaction(function () use ($data) { $this->checkSlot($data); return Intervention::create($data); });
         Audit::record('intervention_creee', $job);
+        app(\App\Services\StaffPushNotifications::class)->send(
+            [User::findOrFail($job->agent_id)], 'Nouvelle prestation affectée', 'Une prestation vous est affectée le '.$job->scheduled_at->format('d/m/Y à H:i').'.', route('staff.interventions.show', $job),
+        );
         return redirect()->route('staff.interventions.show', $job);
     }
     public function update(Request $r, Intervention $intervention)
@@ -41,6 +44,12 @@ class InterventionController
             $job->update([...$data, 'completed_at' => $data['status'] === 'completed' ? ($job->completed_at ?? now()) : null]);
             Audit::record('intervention_modifiee', $job);
         });
+        if ($r->user()->isAdmin()) {
+            $intervention->refresh();
+            app(\App\Services\StaffPushNotifications::class)->send(
+                [User::findOrFail($intervention->agent_id)], 'Prestation mise à jour', 'Les informations de votre prestation ont été mises à jour.', route('staff.interventions.show', $intervention),
+            );
+        }
         return back()->with('success', 'Prestation enregistrée.');
     }
     private function planning(Request $r): array
