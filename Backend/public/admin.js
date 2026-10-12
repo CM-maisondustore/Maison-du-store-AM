@@ -24,3 +24,40 @@ document.addEventListener('submit', event => {
   buttons.forEach(b=>b.addEventListener('click',()=>nav.scrollBy({[horizontal()?'left':'top']:Number(b.dataset.navScroll)*(horizontal()?nav.clientWidth:nav.clientHeight)*0.7,behavior:'smooth'})));
   nav.addEventListener('scroll',update,{passive:true});window.addEventListener('resize',update);update();
 })();
+(() => {
+  const button = document.getElementById('pwa-install');
+  if (!button) return;
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/service-worker.js', { scope: '/' }).catch(() => {});
+  }
+
+  const isInstalled = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  if (isInstalled) return;
+
+  let installPrompt = null;
+  button.hidden = false;
+
+  window.addEventListener('beforeinstallprompt', event => {
+    event.preventDefault();
+    installPrompt = event;
+    button.textContent = 'Installer l’application';
+  });
+
+  window.addEventListener('appinstalled', () => { button.hidden = true; });
+
+  button.addEventListener('click', async () => {
+    if (installPrompt) {
+      await installPrompt.prompt();
+      const { outcome } = await installPrompt.userChoice;
+      installPrompt = null;
+      if (outcome === 'accepted') button.hidden = true;
+      return;
+    }
+
+    const isAppleMobile = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    window.alert(isAppleMobile
+      ? 'Dans Safari, touchez Partager puis « Sur l’écran d’accueil » et Ajouter.'
+      : 'Ouvrez le menu du navigateur puis choisissez « Installer l’application » ou « Ajouter à l’écran d’accueil ».');
+  });
+})();

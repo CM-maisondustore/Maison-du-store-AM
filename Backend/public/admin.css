@@ -7,6 +7,7 @@
 @media(max-width:850px){.sidebar{position:sticky;top:0;z-index:30;max-width:100%;padding:10px 16px}.sidebar nav{flex:initial;overflow-x:auto;overflow-y:hidden;max-width:100%;scroll-snap-type:x proximity}.sidebar nav a{flex-shrink:0;scroll-snap-align:start}.sidebar-controls{position:absolute;right:16px;top:8px}.sidebar .brand{font-size:18px;margin-right:90px;margin-bottom:10px}}
 
 @media print{.sidebar{display:none}}
+.pwa-install[hidden]{display:none}
 .notification-count{display:inline-flex;min-width:1.4rem;height:1.4rem;align-items:center;justify-content:center;margin-left:.35rem;padding:0 .35rem;border-radius:999px;background:#d2b98c;color:#243831;font-size:.75rem;font-weight:700;line-height:1}
 .quote-phone{grid-column:1/-1;display:grid;grid-template-columns:minmax(110px,.5fr) minmax(0,1fr);gap:0 12px}.quote-phone .muted{grid-column:1/-1;margin-top:6px}@media(max-width:360px){.quote-phone{grid-template-columns:1fr}}
 .quote-opening-details{margin:16px 0;padding:14px 16px;border:1px solid var(--line);border-radius:8px;background:#fbfcf9}.quote-opening-details summary{cursor:pointer;font-weight:700;color:var(--ink)}.quote-opening-details[open] summary{margin-bottom:16px}

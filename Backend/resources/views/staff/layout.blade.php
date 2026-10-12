@@ -6,7 +6,10 @@
 <meta name="robots" content="noindex,nofollow">
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <link rel="manifest" href="{{ asset('manifest.webmanifest') }}">
+<link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
 <meta name="theme-color" content="#163b35">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="MDS Pro">
 <title>@yield('title', 'Espace interne') — Maison du Store AM</title>
 <link rel="stylesheet" href="{{ asset('admin.css') }}?v={{ filemtime(public_path('admin.css')) }}">
 <script src="{{ asset('admin.js') }}?v={{ filemtime(public_path('admin.js')) }}" defer>
@@ -35,6 +38,7 @@
 <header class="topbar">
 <span>{{ auth()->user()->name }} · {{ auth()->user()->isAdmin() ? 'Admin-CM' : 'Agent' }}</span>
 <div class="actions" style="margin:0">
+<button type="button" class="secondary pwa-install" id="pwa-install" hidden>Installer l’application</button>
 <button type="button" class="secondary" id="push-toggle" data-configured="{{ filled(config('push.public_key')) ? '1' : '0' }}" data-public-key-url="{{ route('staff.push.public-key') }}" data-subscribe-url="{{ route('staff.push.subscribe') }}" data-unsubscribe-url="{{ route('staff.push.unsubscribe') }}">Activer les notifications</button>
 <a href="{{ route('staff.password') }}">Mot de passe</a>
 <a href="{{ route('home') }}" target="_blank" rel="noopener">Voir le site</a>
