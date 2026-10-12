@@ -34,6 +34,8 @@ class StaffProfileTest extends TestCase
             ->assertSee('Photo de profil')
             ->assertSee('name="profile_photo"', false)
             ->assertSee('id="pro-menu-toggle"', false)
+            ->assertSee('aria-label="Ouvrir le menu"', false)
+            ->assertSee('class="menu-toggle-icon"', false)
             ->assertSee('id="pro-menu-panel"', false)
             ->assertSee('aria-label="Créer un nouveau devis"', false)
             ->assertDontSee('mobile-fab-label', false)

@@ -21,7 +21,7 @@
 <aside class="sidebar" id="staff-sidebar">
 <div class="sidebar-brand-row">
 <div class="brand">Maison du Store <span>AM</span><small>ESPACE PROFESSIONNEL</small></div>
-<button type="button" class="secondary mobile-menu-toggle" id="pro-menu-toggle" aria-controls="pro-menu-panel" aria-expanded="false">Menu</button>
+<button type="button" class="secondary mobile-menu-toggle" id="pro-menu-toggle" aria-label="Ouvrir le menu" aria-controls="pro-menu-panel" aria-expanded="false"><span class="menu-toggle-icon" aria-hidden="true"><span></span><span></span><span></span></span></button>
 </div>
 <div class="sidebar-menu-panel" id="pro-menu-panel">
 <div class="sidebar-controls"><button type="button" class="secondary" data-nav-scroll="-1" aria-label="Faire défiler le menu vers le début" aria-controls="staff-navigation">←</button><button type="button" class="secondary" data-nav-scroll="1" aria-label="Faire défiler le menu vers la fin" aria-controls="staff-navigation">→</button></div>

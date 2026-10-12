@@ -69,7 +69,7 @@ document.addEventListener('submit', event => {
   const setOpen = open => {
     sidebar.classList.toggle('menu-open', open);
     toggle.setAttribute('aria-expanded', String(open));
-    toggle.textContent = open ? 'Fermer' : 'Menu';
+    toggle.setAttribute('aria-label', open ? 'Fermer le menu' : 'Ouvrir le menu');
   };
 
   toggle.addEventListener('click', () => setOpen(toggle.getAttribute('aria-expanded') !== 'true'));
