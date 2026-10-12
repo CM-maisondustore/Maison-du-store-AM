@@ -52,5 +52,9 @@
 <p class="eyebrow">Maison du Store AM · Gestion</p>
 <h1>@yield('title', 'Espace interne')</h1>@yield('content')</main>
 </div>
+<a class="mobile-fab" href="{{ route('staff.quotes.create') }}" aria-label="Créer un nouveau devis">
+<span class="mobile-fab-icon" aria-hidden="true">+</span>
+<span class="mobile-fab-label">Nouveau devis</span>
+</a>
 </body>
 </html>

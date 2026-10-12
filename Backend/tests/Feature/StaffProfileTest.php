@@ -35,6 +35,8 @@ class StaffProfileTest extends TestCase
             ->assertSee('name="profile_photo"', false)
             ->assertSee('id="pro-menu-toggle"', false)
             ->assertSee('id="pro-menu-panel"', false)
+            ->assertSee('aria-label="Créer un nouveau devis"', false)
+            ->assertSee('Nouveau devis')
             ->assertSee('Paramètres')
             ->assertSee('Déconnexion')
             ->assertDontSee('name="password"', false);
