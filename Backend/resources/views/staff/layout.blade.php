@@ -21,13 +21,13 @@
 </div>
 <div class="sidebar-controls"><button type="button" class="secondary" data-nav-scroll="-1" aria-label="Faire défiler le menu vers le début" aria-controls="staff-navigation">←</button><button type="button" class="secondary" data-nav-scroll="1" aria-label="Faire défiler le menu vers la fin" aria-controls="staff-navigation">→</button></div>
 <nav id="staff-navigation" tabindex="0" aria-label="Navigation interne">
-@php($menu = ['dashboard' => 'Vue d’ensemble', 'quotes.index' => 'Devis', 'appointments.index' => 'Rendez-vous', 'interventions.index' => 'Prestations'])
+@php($menu = ['dashboard' => 'Vue d’ensemble', 'notifications.index' => 'Notifications', 'quotes.index' => 'Devis', 'appointments.index' => 'Rendez-vous', 'interventions.index' => 'Prestations'])
 @if(auth()->user()->isAdmin())
 @php($menu += ['visitors.index'=>'Visiteurs'])
 @php($menu += ['layouts.edit'=>'Mise en page','communications.index' => 'Documents & automatisations'])
 @php($menu += ['contacts.index' => 'Clients & contacts', 'products.index' => 'Catalogue', 'contents.index' => 'Images & portfolio', 'invoices.index' => 'Factures', 'messages.index' => 'Messagerie', 'users.index' => 'Équipe'])
 @endif
-@foreach($menu as $route => $label)<a class="{{ request()->routeIs('staff.'.explode('.', $route)[0].'*') ? 'current' : '' }}" href="{{ route('staff.'.$route) }}">{{ $label }}</a>
+@foreach($menu as $route => $label)<a class="{{ request()->routeIs('staff.'.explode('.', $route)[0].'*') ? 'current' : '' }}" href="{{ route('staff.'.$route) }}">{{ $label }}@if($route === 'notifications.index') <span class="notification-count">{{ auth()->user()->unreadNotifications()->count() }}</span>@endif</a>
 @endforeach
 </nav>
 </aside>
@@ -35,7 +35,6 @@
 <header class="topbar">
 <span>{{ auth()->user()->name }} · {{ auth()->user()->isAdmin() ? 'Admin-CM' : 'Agent' }}</span>
 <div class="actions" style="margin:0">
-<a href="{{ route('staff.notifications.index') }}">Notifications <span class="notification-count">{{ auth()->user()->unreadNotifications()->count() }}</span></a>
 <button type="button" class="secondary" id="push-toggle" data-configured="{{ filled(config('push.public_key')) ? '1' : '0' }}" data-public-key-url="{{ route('staff.push.public-key') }}" data-subscribe-url="{{ route('staff.push.subscribe') }}" data-unsubscribe-url="{{ route('staff.push.unsubscribe') }}">Activer les notifications</button>
 <a href="{{ route('staff.password') }}">Mot de passe</a>
 <a href="{{ route('home') }}" target="_blank" rel="noopener">Voir le site</a>
