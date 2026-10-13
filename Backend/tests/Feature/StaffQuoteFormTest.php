@@ -48,6 +48,14 @@ class StaffQuoteFormTest extends TestCase
             $this->get('/admin/devis/'.$quote->id.'/formulaire')->assertOk()->assertSee('value="120.5"',false);
         }
     }
+    public function test_agent_catalogue_exposes_kind_and_active_fields_needed_to_filter_finishes(): void
+    {
+        $this->seed(); $this->actingAs($this->staff('agent'));
+        $response=$this->get('/admin/devis/nouveau')->assertOk();
+        $response->assertSee('"kind":"finish","label":',false)
+            ->assertSee('"active":true,"category":"rideau"',false)
+            ->assertSee('"active":true,"category":"store"',false);
+    }
     public function test_save_replay_does_not_duplicate_quote_contact_or_receipt(): void
     {
         $this->seed(); $this->actingAs($this->staff()); $data=$this->data();
