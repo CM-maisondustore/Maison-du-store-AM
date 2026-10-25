@@ -76,7 +76,7 @@ Depuis Windows, avec les paramètres SSH réels :
   -KnownHostsFile C:\chemin\known_hosts
 ```
 
-Adapter le port à celui affiché par hPanel. La clé SSH doit déjà être autorisée ; l’envoi utilise `BatchMode=yes`. Les paramètres `IdentityFile` et `KnownHostsFile` sont optionnels : sur la machine de préparation, le script détecte respectivement `$env:USERPROFILE\.ssh\mds_hostinger` et `artifacts/ssh/known_hosts` s’ils existent. Ne jamais publier la clé privée. Le script vérifie l’empreinte de l’archive, exécute les contrôles de production, migre la base, ajoute le catalogue sans écraser les produits existants, prépare les caches puis active le lien de la nouvelle version. Il ne régénère jamais APP_KEY. Une activation échouée avant le changement de lien conserve le code courant ; les migrations déjà exécutées restent appliquées.
+Adapter le port à celui affiché par hPanel. La clé SSH doit déjà être autorisée ; l’envoi utilise `BatchMode=yes`. Les paramètres `IdentityFile` et `KnownHostsFile` sont optionnels : sur la machine de préparation, le script détecte respectivement `$env:USERPROFILE\.ssh\mds_hostinger` et `artifacts/ssh/known_hosts` s’ils existent. Ne jamais publier la clé privée. Le script vérifie l’empreinte de l’archive, exécute les contrôles de production, migre la base, ajoute le catalogue sans écraser les produits existants, prépare les caches puis active le lien de la nouvelle version. Il ne régénère jamais APP_KEY. Une activation échouée avant le changement de lien conserve le code courant et supprime la version incomplète, ce qui permet de relancer le même commit ; les migrations déjà exécutées restent appliquées. Après activation, seules les 5 versions les plus récentes sont gardées (`KEEP_RELEASES`), `current` et `previous` comprises.
 
 Après extraction, le script rétablit les permissions de traversée des répertoires publics pour le serveur Web Hostinger. Le répertoire partagé reste privé (`700`), ainsi que `.env` et le cache de configuration (`600`).
 
@@ -89,6 +89,7 @@ Les mêmes scripts s’appliquent à la préproduction avec sa racine et sa conf
 - `/api/products` retourne le catalogue ; refus 419 sans CSRF et 422 pour des données invalides.
 - Envoyer une demande de test identifiée, vérifier sa persistance en base et supprimer uniquement cet enregistrement après vérification.
 - `/.env`, `/composer.json`, `/vendor/autoload.php` et `/database/database.sqlite` doivent répondre 404/403, jamais livrer un fichier.
+- Les réponses portent `Strict-Transport-Security` quand `APP_FORCE_HTTPS=true` ; la redirection HTTP vers HTTPS reste assurée par hPanel / le CDN Hostinger.
 - Vérifier les cookies Secure/HttpOnly, la redirection du domaine nu vers `www` si configurée dans hPanel, et `/robots.txt` selon l’environnement.
 
 ## Mises à jour, sauvegardes et retour arrière
@@ -105,7 +106,7 @@ Pour réactiver le code précédent, en SSH :
 bash rollback.sh /home/UTILISATEUR_HOSTINGER/domains/maisondustoream.com
 ```
 
-Ce retour arrière change uniquement le code. Il ne restaure pas la base : toute migration doit rester compatible avec la version précédente ; une restauration de données exige une décision séparée. Les anciennes versions ne sont pas supprimées automatiquement. Surveiller l’espace disque et les journaux, avec une rotation adaptée au quota hPanel.
+Ce retour arrière change uniquement le code. Il ne restaure pas la base : toute migration doit rester compatible avec la version précédente ; une restauration de données exige une décision séparée. Les sauvegardes de `.mds/backups/` ne sont pas supprimées automatiquement. Surveiller l’espace disque et les journaux, avec une rotation adaptée au quota hPanel.
 
 ## Publication GitHub
 
