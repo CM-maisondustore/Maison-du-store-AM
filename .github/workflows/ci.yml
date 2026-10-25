@@ -40,6 +40,8 @@ jobs:
           cache-dependency-path: Backend/package-lock.json
       - run: composer install --no-interaction --prefer-dist
       - run: composer validate --no-check-publish
+      - name: Audit PHP dependencies
+        run: composer audit --locked --abandoned=report
       - run: composer test
       - name: Compile and lint all Blade views
         run: |
@@ -56,6 +58,8 @@ jobs:
           DB_USERNAME: mds_test
           DB_PASSWORD: ci-test-only
       - run: npm ci
+      - name: Audit JavaScript dependencies
+        run: npm audit --audit-level=high
       - run: npm test
       - run: npm run build
       - name: Validate deployment shell scripts
@@ -67,8 +71,14 @@ jobs:
         if: github.event_name != 'pull_request'
         run: |
           printf '%s\n' "$GITHUB_SHA" > REVISION
-          tar --exclude='bootstrap/cache/*.php' -czf ../hostinger-release.tar.gz app bootstrap config database/data database/migrations database/seeders lang public resources/views routes vendor artisan composer.json composer.lock deployment-check.php prepare-document-rollback.php REVISION
+          # Liste partagée avec deploy/build-release.ps1.
+          mapfile -t files < <(tr -d '\r' < ../deploy/release-files.txt | grep -v -e '^#' -e '^$')
+          tar --exclude='bootstrap/cache/*.php' -czf ../hostinger-release.tar.gz "${files[@]}" vendor REVISION
           cd ..
+          contents=$(tar -tzf hostinger-release.tar.gz)
+          for path in "${files[@]}" vendor/autoload.php public/build/manifest.json REVISION; do
+            grep -qx -e "$path" -e "$path/.*" <<< "$contents" || { echo "Missing from release: $path" >&2; exit 1; }
+          done
           sha256sum hostinger-release.tar.gz > hostinger-release.tar.gz.sha256
       - uses: actions/upload-artifact@v4
         if: github.event_name != 'pull_request'

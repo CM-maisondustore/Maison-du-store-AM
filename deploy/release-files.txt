@@ -1,0 +1,17 @@
+# Fichiers sources de l'archive Hostinger, relatifs à Backend/.
+# Liste unique lue par la CI et par build-release.ps1 ; vendor/, public/build/ et REVISION sont ajoutés par la construction.
+app
+artisan
+bootstrap
+composer.json
+composer.lock
+config
+database/data
+database/migrations
+database/seeders
+deployment-check.php
+lang
+prepare-document-rollback.php
+public
+resources/views
+routes

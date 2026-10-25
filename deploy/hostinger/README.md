@@ -49,7 +49,7 @@ Vérifier que la configuration du domaine autorise ce lien symbolique. Si l’of
 
 ## Construire une version
 
-La CI GitHub teste le backend et le frontend, compile Vite et produit l’artefact `hostinger-<commit>`. Télécharger et décompresser cet artefact : il contient l’archive, son empreinte SHA-256 et les scripts serveur. Aucun déploiement automatique n’est déclenché par un push.
+La CI GitHub teste le backend et le frontend, compile Vite et produit l’artefact `hostinger-<commit>`. Télécharger et décompresser cet artefact : il contient l’archive, son empreinte SHA-256 et, dans `deploy/hostinger/`, les scripts serveur de la même révision. Aucun déploiement automatique n’est déclenché par un push.
 
 Depuis Windows, après avoir enregistré les changements dans Git :
 
@@ -57,7 +57,9 @@ Depuis Windows, après avoir enregistré les changements dans Git :
 .\deploy\build-release.ps1
 ```
 
-Le script utilise PHP/Node du PATH ou les outils temporaires de cette session. Si Composer n’est pas dans le PATH, on peut passer `-ComposerPhar C:\chemin\composer.phar`. Les archives sont placées dans `artifacts/`, ignoré par Git. Elles contiennent uniquement les dépendances de production et les ressources compilées ; pas de `.env`, base locale, sessions ni journaux. `REVISION` identifie le commit source.
+Le script utilise PHP/Node du PATH ou les outils temporaires de cette session. Si Composer n’est pas dans le PATH, on peut passer `-ComposerPhar C:\chemin\composer.phar`. Les archives sont placées dans `artifacts/`, ignoré par Git. Elles contiennent uniquement les dépendances de production et les ressources compilées ; pas de `.env`, base locale, sessions ni journaux. `REVISION` identifie le commit source. Le dossier de sortie a la même disposition que l’artefact CI (archive, empreinte, `deploy/hostinger/`).
+
+Le contenu de l’archive est défini une seule fois dans [deploy/release-files.txt](../release-files.txt), lu par la CI et par `build-release.ps1`. Tout nouveau fichier nécessaire en production doit y être ajouté ; la CI échoue si un chemin listé manque dans l’archive.
 
 ## Première mise en ligne
 
@@ -76,7 +78,7 @@ Depuis Windows, avec les paramètres SSH réels :
   -KnownHostsFile C:\chemin\known_hosts
 ```
 
-Adapter le port à celui affiché par hPanel. La clé SSH doit déjà être autorisée ; l’envoi utilise `BatchMode=yes`. Les paramètres `IdentityFile` et `KnownHostsFile` sont optionnels : sur la machine de préparation, le script détecte respectivement `$env:USERPROFILE\.ssh\mds_hostinger` et `artifacts/ssh/known_hosts` s’ils existent. Ne jamais publier la clé privée. Le script vérifie l’empreinte de l’archive, exécute les contrôles de production, migre la base, ajoute le catalogue sans écraser les produits existants, prépare les caches puis active le lien de la nouvelle version. Il ne régénère jamais APP_KEY. Une activation échouée avant le changement de lien conserve le code courant et supprime la version incomplète, ce qui permet de relancer le même commit ; les migrations déjà exécutées restent appliquées. Après activation, seules les 5 versions les plus récentes sont gardées (`KEEP_RELEASES`), `current` et `previous` comprises.
+Adapter le port à celui affiché par hPanel. La clé SSH doit déjà être autorisée ; l’envoi utilise `BatchMode=yes`. Les paramètres `IdentityFile` et `KnownHostsFile` sont optionnels : sur la machine de préparation, le script détecte respectivement `$env:USERPROFILE\.ssh\mds_hostinger` et `artifacts/ssh/known_hosts` s’ils existent. Ne jamais publier la clé privée. `-Archive` doit désigner le `hostinger-release.tar.gz` d’un artefact décompressé ou d’un dossier `artifacts/<commit>-…` : les scripts serveur envoyés sont ceux de son dossier `deploy/hostinger/` voisin, jamais ceux de la copie locale, afin que scripts et code viennent du même commit. Le script vérifie l’empreinte de l’archive, exécute les contrôles de production, migre la base, ajoute le catalogue sans écraser les produits existants, prépare les caches puis active le lien de la nouvelle version. Il ne régénère jamais APP_KEY. Une activation échouée avant le changement de lien conserve le code courant et supprime la version incomplète, ce qui permet de relancer le même commit ; les migrations déjà exécutées restent appliquées. Après activation, seules les 5 versions les plus récentes sont gardées (`KEEP_RELEASES`), `current` et `previous` comprises.
 
 Après extraction, le script rétablit les permissions de traversée des répertoires publics pour le serveur Web Hostinger. Le répertoire partagé reste privé (`700`), ainsi que `.env` et le cache de configuration (`600`).
 
@@ -94,7 +96,7 @@ Les mêmes scripts s’appliquent à la préproduction avec sa racine et sa conf
 
 ## Mises à jour, sauvegardes et retour arrière
 
-Les mises à jour d’une installation existante déclenchent désormais `backup.sh` avant les migrations : export MySQL et copie de la configuration dans `.mds/backups/`, en permissions privées. Le déploiement s’arrête si la préparation, l’export ou la vérification du fichier échoue. L’export est lancé par SSH et reste compatible avec la désactivation de `proc_open` dans PHP chez Hostinger. Les paramètres MySQL temporaires sont supprimés à la fin ; aucun mot de passe n’est placé dans les arguments de commande. Prévoir une copie sécurisée hors serveur et une rotation de ces sauvegardes selon le quota.
+Les mises à jour d’une installation existante déclenchent `backup.sh` après validation de l’archive et avant les migrations : export MySQL compressé (`database-<horodatage>.sql.gz`), copie de la configuration et des fichiers privés dans `.mds/backups/`, en permissions privées. Le déploiement s’arrête si la préparation ou l’export échoue, ou si le dump ne se termine pas par la ligne `-- Dump completed` de mysqldump (export tronqué). Seuls les 10 jeux de sauvegarde les plus récents sont conservés (`KEEP_BACKUPS`) ; les autres éléments de `.mds/backups/`, comme `public_html-default-…`, ne sont jamais supprimés. Ces copies contiennent les secrets du `.env` : les rapatrier hors serveur de façon chiffrée. L’export est lancé par SSH et reste compatible avec la désactivation de `proc_open` dans PHP chez Hostinger. Les paramètres MySQL temporaires sont supprimés à la fin ; aucun mot de passe n’est placé dans les arguments de commande. Ces sauvegardes restent sur le même serveur que le site : prévoir une copie sécurisée hors serveur.
 
 La première migration de l’espace interne change la réservation des créneaux tout en conservant les annulations. Un retour au code antérieur à cette migration nécessite une restauration compatible de la base ; le simple script de retour arrière ne suffit pas. Voir [Backend/ADMIN.md](../../Backend/ADMIN.md).
 
@@ -106,7 +108,22 @@ Pour réactiver le code précédent, en SSH :
 bash rollback.sh /home/UTILISATEUR_HOSTINGER/domains/maisondustoream.com
 ```
 
-Ce retour arrière change uniquement le code. Il ne restaure pas la base : toute migration doit rester compatible avec la version précédente ; une restauration de données exige une décision séparée. Les sauvegardes de `.mds/backups/` ne sont pas supprimées automatiquement. Surveiller l’espace disque et les journaux, avec une rotation adaptée au quota hPanel.
+Chaque version fige le `.env` dans son cache de configuration au moment du déploiement. Après une modification de `.mds/shared/.env`, la rafraîchir dans la version en ligne :
+
+```bash
+cd /home/UTILISATEUR_HOSTINGER/domains/maisondustoream.com/.mds/current
+php artisan config:cache && chmod 600 bootstrap/cache/config.php
+```
+
+Un retour arrière réactive le cache de l’ancienne version : relancer ces deux commandes après `rollback.sh` si le `.env` a changé depuis.
+
+Restauration de la base, après décision explicite et de préférence testée d’abord en préproduction (le mot de passe est demandé, jamais passé en argument) :
+
+```bash
+gunzip -c .mds/backups/database-<horodatage>.sql.gz | mysql -h 127.0.0.1 -u UTILISATEUR_DB -p NOM_DB
+```
+
+Ce retour arrière change uniquement le code. Il ne restaure pas la base : toute migration doit rester compatible avec la version précédente ; une restauration de données exige une décision séparée. Surveiller l’espace disque et les journaux, avec une rotation adaptée au quota hPanel.
 
 ## Publication GitHub
 

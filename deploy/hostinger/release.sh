@@ -24,11 +24,6 @@ if [[ -e "$public" || -L "$public" ]]; then
 fi
 [[ -f "$shared/.env" ]] || { echo 'Create the private shared/.env using the environment template first.' >&2; exit 1; }
 [[ ! -e "$release" ]] || { echo 'This revision is already extracted. Use rollback.sh or a new commit.' >&2; exit 1; }
-# Back up an existing installation before applying any new migration. Shell
-# mysqldump works on Hostinger even when PHP proc_open is disabled.
-if [[ -L "$private/current" ]]; then
-    bash "$(dirname "$0")/backup.sh" "$domain_root"
-fi
 activated=0
 cleanup() {
     # Un échec avant l'activation ne doit pas bloquer un nouvel essai du même commit.
@@ -53,6 +48,12 @@ ln -s "$shared/.env" "$release/.env"
 # Package deliberately omits storage; all releases share sessions and logs.
 ln -s "$shared/storage" "$release/storage"
 chmod 600 "$shared/.env"
+# Back up an existing installation before applying any new migration. Shell
+# mysqldump works on Hostinger even when PHP proc_open is disabled. It runs only
+# once the archive is validated, and before the working directory changes.
+if [[ -L "$private/current" ]]; then
+    bash "$(dirname "$0")/backup.sh" "$domain_root"
+fi
 cd "$release"
 "$php_bin" vendor/composer/platform_check.php
 "$php_bin" artisan config:cache
