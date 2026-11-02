@@ -1,0 +1,3 @@
+<div class="opening-title"><h3>{{ $opening['label'] }}</h3><p class="muted">{{ $opening['dimensions'] }}@if($opening['hasArea']) · Surface unitaire : {{ \App\Services\Quotes\QuoteFinancials::quantity($opening['unitArea']) }} m² · Surface totale : {{ \App\Services\Quotes\QuoteFinancials::quantity($opening['totalArea']) }} m²@endif</p></div>
+@include('documents.partials.table',['documentLines'=>$opening['lines']])
+<p class="opening-subtotal">@if($opening['quantity']>1)Un exemplaire : {{ \App\Services\DocumentViewModel::money($opening['unitSubtotal']) }} · @endif SOUS-TOTAL DE L’OUVERTURE : {{ \App\Services\DocumentViewModel::money($opening['subtotal']) }}</p>

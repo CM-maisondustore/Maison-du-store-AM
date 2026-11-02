@@ -1,0 +1,36 @@
+<?php
+namespace App\Http\Controllers;
+use App\Models\{MediaAsset, Product, SiteContent};
+use Illuminate\Http\Request;
+class MediaController
+{
+    public function quoteMaterial(\App\Models\QuoteOption $option)
+    {
+        abort_unless($option->active && $option->public_choice && $option->kind==='material' && $option->media_asset_id,404);
+        return $this->preview($option->media_asset_id);
+    }
+    public function quoteProduct(Product $product)
+    {
+        abort_unless($product->published && !empty($product->details['available']) && $product->media_asset_id,404);
+        return $this->preview($product->media_asset_id);
+    }
+    public function staffProduct(Product $product)
+    {
+        abort_unless($product->media_asset_id,404);
+        return $this->preview($product->media_asset_id);
+    }
+    public function show(Request $request, int $media, string $hash)
+    {
+        abort_unless(SiteContent::where('media_asset_id', $media)->where('published', true)->exists()
+            || (\App\Models\SiteSetting::catalogueVisible() && Product::where('media_asset_id', $media)->where('published', true)->exists()), 404);
+        $asset = MediaAsset::whereKey($media)->where('sha256', $hash)->firstOrFail();
+        $response = response(base64_decode($asset->payload), 200, ['Content-Type' => $asset->mime, 'Cache-Control' => 'public, max-age=0, must-revalidate', 'Content-Security-Policy' => "default-src 'none'"])->setEtag($asset->sha256);
+        $response->isNotModified($request);
+        return $response;
+    }
+    public function preview(int $media)
+    {
+        $asset = MediaAsset::findOrFail($media);
+        return response(base64_decode($asset->payload), 200, ['Content-Type' => $asset->mime, 'Cache-Control' => 'private, no-store', 'Content-Security-Policy' => "default-src 'none'"]);
+    }
+}

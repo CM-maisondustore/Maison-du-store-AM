@@ -1,0 +1,584 @@
+{
+  "title": "Maison du Store — Espace Pro",
+  "pages": [
+    {
+      "id": "pro",
+      "name": "Espace Pro"
+    }
+  ],
+  "boards": {
+    "ProAdminHomeMobile.dc.html": {
+      "h": 1250,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Admin · Accueil — mobile",
+      "w": 390,
+      "x": 4394,
+      "y": 5540
+    },
+    "ProAgentToday.dc.html": {
+      "h": 1400,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Agent · Aujourd'hui — mobile",
+      "w": 390,
+      "x": 470,
+      "y": 5540
+    },
+    "ProAutomatisations.dc.html": {
+      "expand": "fill",
+      "h": 1800,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Documents et automatisations — desktop",
+      "w": 1440,
+      "x": 7600,
+      "y": 3320
+    },
+    "ProCatalogue.dc.html": {
+      "expand": "fill",
+      "h": 1350,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Catalogue — desktop",
+      "w": 1440,
+      "x": 3040,
+      "y": 3320
+    },
+    "ProClient.dc.html": {
+      "expand": "fill",
+      "h": 1300,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Client 360° — desktop",
+      "w": 1440,
+      "x": 1520,
+      "y": 3320
+    },
+    "ProClients.dc.html": {
+      "expand": "fill",
+      "h": 1150,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Clients et contacts — desktop",
+      "w": 1440,
+      "x": 12160,
+      "y": 3320
+    },
+    "ProClientsMobile.dc.html": {
+      "h": 1100,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Admin · Clients — mobile",
+      "w": 390,
+      "x": 4864,
+      "y": 5540
+    },
+    "ProComponents.dc.html": {
+      "h": 3200,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Planche de composants",
+      "w": 1440,
+      "x": 0,
+      "y": 8060
+    },
+    "ProDashboard.dc.html": {
+      "expand": "fill",
+      "h": 1400,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Vue d'ensemble Admin — desktop",
+      "w": 1440,
+      "x": 1520,
+      "y": 0
+    },
+    "ProDevisFiche.dc.html": {
+      "expand": "fill",
+      "h": 1700,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Devis — fiche — desktop",
+      "w": 1440,
+      "x": 6080,
+      "y": 0
+    },
+    "ProDevisForm.dc.html": {
+      "expand": "fill",
+      "h": 2900,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Devis — formulaire et chiffrage — desktop",
+      "w": 1440,
+      "x": 4560,
+      "y": 0
+    },
+    "ProDevisList.dc.html": {
+      "expand": "fill",
+      "h": 1100,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Devis — liste — desktop",
+      "w": 1440,
+      "x": 3040,
+      "y": 0
+    },
+    "ProDevisListMobile.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Devis — liste — mobile",
+      "w": 390,
+      "x": 1880,
+      "y": 5540
+    },
+    "ProDevisListTablet.dc.html": {
+      "h": 1200,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Devis — liste — tablette 1024 (barre repliée)",
+      "w": 1024,
+      "x": 3290,
+      "y": 5540
+    },
+    "ProDevisMobile.dc.html": {
+      "h": 1500,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Devis sur place — mobile",
+      "w": 390,
+      "x": 1410,
+      "y": 5540
+    },
+    "ProDevisNew.dc.html": {
+      "expand": "fill",
+      "h": 2600,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Nouveau devis — Admin, desktop",
+      "w": 1440,
+      "x": 0,
+      "y": 11700
+    },
+    "ProDevisNewAgent.dc.html": {
+      "expand": "fill",
+      "h": 1900,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Devis sur place — Agent, desktop",
+      "w": 1440,
+      "x": 1520,
+      "y": 11700
+    },
+    "ProDevisNewMobile.dc.html": {
+      "h": 3000,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Devis sur place — Agent, mobile",
+      "w": 390,
+      "x": 0,
+      "y": 14700
+    },
+    "ProDevisNewMobileAdmin.dc.html": {
+      "h": 2300,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Nouveau devis — Admin, mobile",
+      "w": 390,
+      "x": 470,
+      "y": 14700
+    },
+    "ProEquipe.dc.html": {
+      "expand": "fill",
+      "h": 1250,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Équipe — desktop",
+      "w": 1440,
+      "x": 15200,
+      "y": 3320
+    },
+    "ProFacture.dc.html": {
+      "expand": "fill",
+      "h": 1500,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Facture — desktop",
+      "w": 1440,
+      "x": 4560,
+      "y": 3320
+    },
+    "ProImages.dc.html": {
+      "expand": "fill",
+      "h": 1500,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Images et portfolio — desktop",
+      "w": 1440,
+      "x": 13680,
+      "y": 3320
+    },
+    "ProLogin.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Connexion — desktop",
+      "w": 1440,
+      "x": 0,
+      "y": 0
+    },
+    "ProLoginMobile.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Connexion — mobile",
+      "w": 390,
+      "x": 0,
+      "y": 5540
+    },
+    "ProMateriaux.dc.html": {
+      "expand": "fill",
+      "h": 1150,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Matériaux et finitions — desktop",
+      "w": 1440,
+      "x": 10640,
+      "y": 3320
+    },
+    "ProMessagerie.dc.html": {
+      "expand": "fill",
+      "h": 1000,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Messagerie — desktop",
+      "w": 1440,
+      "x": 6080,
+      "y": 3320
+    },
+    "ProParametres.dc.html": {
+      "expand": "fill",
+      "h": 2300,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Paramètres — Admin, desktop",
+      "w": 1440,
+      "x": 6080,
+      "y": 11700
+    },
+    "ProParametresAgent.dc.html": {
+      "expand": "fill",
+      "h": 1900,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Paramètres — Agent, desktop",
+      "w": 1440,
+      "x": 7600,
+      "y": 11700
+    },
+    "ProParametresMobile.dc.html": {
+      "h": 2600,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Paramètres — Agent, mobile",
+      "w": 390,
+      "x": 1880,
+      "y": 14700
+    },
+    "ProParametresMobileAdmin.dc.html": {
+      "h": 3000,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Paramètres — Admin, mobile",
+      "w": 390,
+      "x": 2350,
+      "y": 14700
+    },
+    "ProParametresSombre.dc.html": {
+      "expand": "fill",
+      "h": 2500,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Paramètres en mode sombre — Admin, desktop",
+      "w": 1440,
+      "x": 9120,
+      "y": 11700
+    },
+    "ProParametresSombreMobile.dc.html": {
+      "h": 2900,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Paramètres en mode sombre — Agent, mobile",
+      "w": 390,
+      "x": 2820,
+      "y": 14700
+    },
+    "ProPassword.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Mot de passe à changer — desktop",
+      "w": 1440,
+      "x": 0,
+      "y": 1020
+    },
+    "ProPlusMobile.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Admin · Feuille « Plus » — mobile",
+      "w": 390,
+      "x": 2820,
+      "y": 5540
+    },
+    "ProPrestation.dc.html": {
+      "h": 1060,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Agent · Fiche prestation et compte rendu — mobile",
+      "w": 390,
+      "x": 940,
+      "y": 5540
+    },
+    "ProPrestations.dc.html": {
+      "expand": "fill",
+      "h": 1200,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Prestations — desktop",
+      "w": 1440,
+      "x": 9120,
+      "y": 3320
+    },
+    "ProProfilCarte.dc.html": {
+      "expand": "fill",
+      "h": 1000,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Carte de profil à partager — Admin, desktop",
+      "w": 1440,
+      "x": 10640,
+      "y": 11700
+    },
+    "ProProfilCarteMobile.dc.html": {
+      "h": 1700,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Carte de profil à partager — Agent, mobile",
+      "w": 390,
+      "x": 3290,
+      "y": 14700
+    },
+    "ProProfilEdit.dc.html": {
+      "expand": "fill",
+      "h": 1300,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Modifier mon profil — Admin, desktop",
+      "w": 1440,
+      "x": 3040,
+      "y": 11700
+    },
+    "ProProfilEditAgent.dc.html": {
+      "expand": "fill",
+      "h": 1300,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Modifier mon profil — Agent, desktop",
+      "w": 1440,
+      "x": 4560,
+      "y": 11700
+    },
+    "ProProfilEditMobile.dc.html": {
+      "h": 2300,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Modifier mon profil — Agent, mobile",
+      "w": 390,
+      "x": 940,
+      "y": 14700
+    },
+    "ProProfilEditMobileAdmin.dc.html": {
+      "h": 1900,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Modifier mon profil — Admin, mobile",
+      "w": 390,
+      "x": 1410,
+      "y": 14700
+    },
+    "ProProfilMobile.dc.html": {
+      "h": 1150,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Agent · Profil — mobile",
+      "w": 390,
+      "x": 5334,
+      "y": 5540
+    },
+    "ProRdv.dc.html": {
+      "expand": "fill",
+      "h": 1150,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Rendez-vous — calendrier — desktop",
+      "w": 1440,
+      "x": 0,
+      "y": 3320
+    },
+    "ProRdvMobile.dc.html": {
+      "h": 1300,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Agenda des RDV — mobile",
+      "w": 390,
+      "x": 2350,
+      "y": 5540
+    },
+    "ProSidebar.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Composant · Barre latérale",
+      "w": 240,
+      "x": 1520,
+      "y": 8060
+    },
+    "ProTabbar.dc.html": {
+      "h": 84,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Composant · Onglets mobile",
+      "w": 390,
+      "x": 1840,
+      "y": 8244
+    },
+    "ProTokens.dc.html": {
+      "h": 2000,
+      "page": "pro",
+      "title": "Tokens — admin.css",
+      "w": 1440,
+      "x": 3120,
+      "y": 8060
+    },
+    "ProTopbar.dc.html": {
+      "expand": "fill",
+      "h": 64,
+      "is_interactive": true,
+      "page": "pro",
+      "title": "Composant · Barre du haut",
+      "w": 1200,
+      "x": 1840,
+      "y": 8060
+    }
+  },
+  "order": [
+    "ProLogin.dc.html",
+    "ProPassword.dc.html",
+    "ProDashboard.dc.html",
+    "ProDevisList.dc.html",
+    "ProDevisForm.dc.html",
+    "ProDevisFiche.dc.html",
+    "ProRdv.dc.html",
+    "ProClient.dc.html",
+    "ProCatalogue.dc.html",
+    "ProFacture.dc.html",
+    "ProMessagerie.dc.html",
+    "ProAutomatisations.dc.html",
+    "ProLoginMobile.dc.html",
+    "ProAgentToday.dc.html",
+    "ProPrestation.dc.html",
+    "ProDevisMobile.dc.html",
+    "ProDevisListMobile.dc.html",
+    "ProRdvMobile.dc.html",
+    "ProPlusMobile.dc.html",
+    "ProDevisListTablet.dc.html",
+    "ProComponents.dc.html",
+    "ProSidebar.dc.html",
+    "ProTopbar.dc.html",
+    "ProTabbar.dc.html",
+    "ProTokens.dc.html",
+    "ProPrestations.dc.html",
+    "ProMateriaux.dc.html",
+    "ProClients.dc.html",
+    "ProImages.dc.html",
+    "ProEquipe.dc.html",
+    "ProAdminHomeMobile.dc.html",
+    "ProClientsMobile.dc.html",
+    "ProProfilMobile.dc.html",
+    "ProDevisNew.dc.html",
+    "ProDevisNewAgent.dc.html",
+    "ProProfilEdit.dc.html",
+    "ProProfilEditAgent.dc.html",
+    "ProParametres.dc.html",
+    "ProParametresAgent.dc.html",
+    "ProDevisNewMobile.dc.html",
+    "ProDevisNewMobileAdmin.dc.html",
+    "ProProfilEditMobile.dc.html",
+    "ProProfilEditMobileAdmin.dc.html",
+    "ProParametresMobile.dc.html",
+    "ProParametresMobileAdmin.dc.html",
+    "ProParametresSombre.dc.html",
+    "ProProfilCarte.dc.html",
+    "ProParametresSombreMobile.dc.html",
+    "ProProfilCarteMobile.dc.html"
+  ],
+  "notes": {
+    "p1": {
+      "kind": "title1",
+      "maxW": 7520,
+      "page": "pro",
+      "text": "Espace Pro — desktop 1440 (Admin-CM)",
+      "w": 240,
+      "x": 0,
+      "y": -320
+    },
+    "p2": {
+      "kind": "title1",
+      "maxW": 8000,
+      "page": "pro",
+      "text": "Espace Pro — modules de gestion",
+      "w": 240,
+      "x": 0,
+      "y": 3000
+    },
+    "p3": {
+      "kind": "title1",
+      "maxW": 5724,
+      "page": "pro",
+      "text": "Espace Pro — mobile 390 (Agent et Admin) et tablette",
+      "w": 240,
+      "x": 0,
+      "y": 5220
+    },
+    "p4": {
+      "kind": "title1",
+      "maxW": 4560,
+      "page": "pro",
+      "text": "Espace Pro — composants et tokens",
+      "w": 240,
+      "x": 0,
+      "y": 7740
+    },
+    "p5": {
+      "kind": "title1",
+      "maxW": 8000,
+      "page": "pro",
+      "text": "Espace Pro — nouveau devis, profil, carte à partager et paramètres (clair et sombre)",
+      "w": 240,
+      "x": 0,
+      "y": 11380
+    },
+    "pnote": {
+      "fill": "teal",
+      "page": "pro",
+      "size": 24,
+      "text": "NOTE — ESPACE PRO\n\n1 · Navigation. Desktop : barre latérale vert sapin repliable (240 px ↔ 68 px), modules groupés en Activité / Gestion / Site et réglages, compteurs sur Devis, Rendez-vous et Messagerie. Barre du haut : recherche globale, « Nouveau », rôle affiché, menu utilisateur. Sous 1024 px la barre se replie en icônes ; sous 768 px elle disparaît au profit d’onglets en bas d’écran.\n\n2 · Vert sapin conservé pour la barre latérale : c’est le repère que l’équipe connaît déjà, et il sépare nettement les coulisses (sapin) de la vitrine (encre et or). Tout le reste reprend la charte du site : Inter, Cormorant pour les titres, IBM Plex Mono pour références et montants, or pour l’action principale.\n\n3 · Rôles. Ce qu’un rôle ne peut pas faire n’apparaît pas : un Agent ne voit ni modules ★, ni prix, ni totaux, ni paiements, ni PDF chiffré. Le rôle est indiqué en petit à côté du nom.\n\n4 · Parcours terrain de l’Agent. Onglet « Aujourd’hui » → prochaine intervention en grand (Appeler, Itinéraire) → fiche prestation : Démarrer, créer le devis sur place, compte rendu obligatoire, Terminer. Actions dans la zone du pouce, cibles de 48 px, formulaires qui ne perdent rien si le réseau coupe.\n\n5 · La tringle. Seul ornement : la frise d’avancement (Reçu → Facturé, Planifié → Terminé) et l’anneau qui marque l’entrée active du menu.",
+      "w": 680,
+      "x": -800,
+      "y": 0
+    }
+  }
+}

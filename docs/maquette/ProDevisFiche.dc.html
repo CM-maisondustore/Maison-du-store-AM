@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Espace Pro — fiche devis D-2026-0139</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="color-scheme: {{colorScheme}}; font-family: Inter, system-ui, sans-serif; color: {{pal.t353535}}; background: {{pal.sf4f4f1}}; min-height: 100vh; display: flex; position: relative">
+<dc-import name="ProSidebar" active="devis" role="{{role}}" hint-size="240px,100%"></dc-import>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+<dc-import name="ProTopbar" role="{{role}}" hint-size="100%,64px"></dc-import>
+<main id="contenu" style="padding: 24px 32px 56px; display: flex; flex-direction: column; gap: 22px">
+
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<nav aria-label="Fil d’Ariane" style="font-size: 13px; color: {{pal.t6b665e}}"><a href="ProDevisList.dc.html" style="color: {{pal.t6b665e}}">Devis</a> / <span aria-current="page" style="font-family: 'IBM Plex Mono', monospace">D-2026-0139</span></nav>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px">
+<h1 style="margin: 0; font-family: 'Cormorant Garamond', serif; font-size: 34px; font-weight: 500; color: {{pal.t1c1c1c}}">Mme Ouattara Fatou</h1>
+<span style="{{badge}}"><span aria-hidden="true">{{badgeGlyph}}</span>{{badgeLabel}}</span>
+</div>
+<p style="margin: 0; font-size: 14px; color: {{pal.t6b665e}}">Rideaux et voilages, devis <span style="font-family: 'IBM Plex Mono', monospace">D-2026-0139</span> demandé sur le site le 23/10/2026.</p>
+</div>
+<sc-if value="{{isAdmin}}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<button type="button" style="display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px; background: {{pal.sffffff}}; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; color: {{pal.t1c1c1c}}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M4 20h16"></path></svg>PDF</button>
+<a href="ProMessagerie.dc.html" style="display: inline-flex; align-items: center; height: 40px; padding: 0 14px; background: {{pal.sffffff}}; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font-size: 14px; font-weight: 600; color: {{pal.t1c1c1c}}; text-decoration: none">Préparer un message</a>
+<a href="ProDevisForm.dc.html" style="display: inline-flex; align-items: center; height: 40px; padding: 0 14px; background: {{pal.sffffff}}; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font-size: 14px; font-weight: 600; color: {{pal.t1c1c1c}}; text-decoration: none">Modifier</a>
+<button type="button" onClick="{{openAccept}}" style="height: 40px; padding: 0 16px; background: #c09f6a; border: 0; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; color: #161616; cursor: pointer">{{acceptLabel}}</button>
+</div>
+</sc-if>
+</div>
+
+<section aria-label="Avancement du devis" style="background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 10px; padding: 18px 24px 14px">
+<ol style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr))">
+<sc-for list="{{steps}}" as="st" hint-placeholder-count="6">
+<li aria-current="{{st.current}}" style="display: flex; flex-direction: column; gap: 4px; min-width: 0; padding-right: 8px">
+<span aria-hidden="true" style="position: relative; display: block; height: 3px; margin: 8px 0 14px; background: {{st.rail}}; border-radius: 2px"><span style="{{st.ring}}"></span></span>
+<span style="{{st.labelStyle}}">{{st.label}}</span>
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: {{pal.t6b665e}}">{{st.date}}</span>
+<span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">{{st.sr}}</span>
+</li>
+</sc-for>
+</ol>
+</section>
+
+<div style="display: flex; flex-wrap: wrap; gap: 22px; align-items: flex-start">
+<div style="flex: 999 1 640px; min-width: 0; display: flex; flex-direction: column; gap: 22px">
+
+<section aria-labelledby="h-win" style="background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 10px; overflow: hidden">
+<div style="padding: 16px 20px; border-bottom: 1px solid {{pal.be8e4db}}; display: flex; justify-content: space-between; gap: 12px"><h2 id="h-win" style="margin: 0; font-size: 16px; font-weight: 600; color: {{pal.t1c1c1c}}">Fenêtres</h2><span style="font-size: 13px; color: {{pal.t6b665e}}">2 fenêtres, 4 unités</span></div>
+<div style="padding: 14px 20px; border-bottom: 1px solid {{pal.be8e4db}}; background: {{pal.sf9f8f4}}; font-size: 14px; line-height: 1.6"><strong style="color: {{pal.t1c1c1c}}">Choix communs :</strong> rideau occultant velours Bleu nuit, voilage lin naturel, rail aluminium double, plis flamands, sans motorisation.</div>
+<table style="width: 100%; border-collapse: collapse; font-size: 14px">
+<thead><tr style="text-align: left"><th scope="col" style="padding: 10px 20px; font-size: 13px; font-weight: 600; color: {{pal.t6b665e}}">N°</th><th scope="col" style="padding: 10px 12px; font-size: 13px; font-weight: 600; color: {{pal.t6b665e}}">Largeur × hauteur</th><th scope="col" style="padding: 10px 12px; font-size: 13px; font-weight: 600; color: {{pal.t6b665e}}">Identiques</th><th scope="col" style="padding: 10px 12px; font-size: 13px; font-weight: 600; color: {{pal.t6b665e}}">Choix</th><th scope="col" style="padding: 10px 20px 10px 12px; font-size: 13px; font-weight: 600; color: {{pal.t6b665e}}">Notes</th></tr></thead>
+<tbody>
+<tr style="border-top: 1px solid {{pal.befece5}}"><td style="padding: 12px 20px; font-family: 'IBM Plex Mono', monospace; color: {{pal.t6b665e}}">01</td><td style="padding: 12px; font-family: 'IBM Plex Mono', monospace; color: {{pal.t1c1c1c}}">260 × 240 cm</td><td style="padding: 12px; font-family: 'IBM Plex Mono', monospace">2</td><td style="padding: 12px">Communs</td><td style="padding: 12px 20px 12px 12px">Salon, double baie vitrée côté jardin</td></tr>
+<tr style="border-top: 1px solid {{pal.befece5}}"><td style="padding: 12px 20px; font-family: 'IBM Plex Mono', monospace; color: {{pal.t6b665e}}">02</td><td style="padding: 12px; font-family: 'IBM Plex Mono', monospace; color: {{pal.t1c1c1c}}">140 × 240 cm</td><td style="padding: 12px; font-family: 'IBM Plex Mono', monospace">2</td><td style="padding: 12px">Communs</td><td style="padding: 12px 20px 12px 12px">Chambre parentale, fixation au plafond</td></tr>
+</tbody>
+</table>
+</section>
+
+<sc-if value="{{isAdmin}}" hint-placeholder-val="{{ true }}">
+<section aria-labelledby="h-chif" style="background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 10px; overflow: hidden">
+<div style="padding: 16px 20px; border-bottom: 1px solid {{pal.be8e4db}}"><h2 id="h-chif" style="margin: 0; font-size: 16px; font-weight: 600; color: {{pal.t1c1c1c}}">Chiffrage</h2></div>
+<table style="width: 100%; border-collapse: collapse; font-size: 14px">
+<thead><tr style="text-align: left; background: {{pal.sf9f8f4}}"><th scope="col" style="padding: 9px 20px; font-size: 13px; font-weight: 600; color: {{pal.t6b665e}}">Désignation</th><th scope="col" style="padding: 9px 12px; font-size: 13px; font-weight: 600; color: {{pal.t6b665e}}; text-align: right">Quantité</th><th scope="col" style="padding: 9px 12px; font-size: 13px; font-weight: 600; color: {{pal.t6b665e}}; text-align: right">Prix unitaire</th><th scope="col" style="padding: 9px 20px 9px 12px; font-size: 13px; font-weight: 600; color: {{pal.t6b665e}}; text-align: right">Total</th></tr></thead>
+<tbody>
+<sc-for list="{{lines}}" as="l" hint-placeholder-count="5">
+<tr style="border-top: 1px solid {{pal.befece5}}"><td style="padding: 10px 20px">{{l.label}}</td><td style="padding: 10px 12px; text-align: right; font-family: 'IBM Plex Mono', monospace; font-size: 13px; white-space: nowrap">{{l.q}}</td><td style="padding: 10px 12px; text-align: right; font-family: 'IBM Plex Mono', monospace; font-size: 13px; white-space: nowrap">{{l.p}}</td><td style="padding: 10px 20px 10px 12px; text-align: right; font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: {{pal.t1c1c1c}}; white-space: nowrap">{{l.t}}</td></tr>
+</sc-for>
+</tbody>
+</table>
+<dl style="margin: 0 0 0 auto; max-width: 360px; padding: 12px 20px 16px; display: flex; flex-direction: column; font-size: 14px">
+<div style="display: flex; justify-content: space-between; padding: 4px 0"><dt>Sous-total HT</dt><dd style="margin: 0; font-family: 'IBM Plex Mono', monospace">412 000 FCFA</dd></div>
+<div style="display: flex; justify-content: space-between; padding: 4px 0"><dt>TVA 18 %</dt><dd style="margin: 0; font-family: 'IBM Plex Mono', monospace">74 160 FCFA</dd></div>
+<div style="display: flex; justify-content: space-between; padding: 10px 0 0; margin-top: 4px; border-top: 2px solid {{pal.b1c1c1c}}"><dt style="font-weight: 600; color: {{pal.t1c1c1c}}">Total TTC</dt><dd style="margin: 0; font-family: 'IBM Plex Mono', monospace; font-size: 18px; color: {{pal.t1c1c1c}}">486 160 FCFA</dd></div>
+</dl>
+</section>
+</sc-if>
+
+<section aria-labelledby="h-notes" style="background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 10px; padding: 16px 20px; display: flex; flex-direction: column; gap: 14px">
+<h2 id="h-notes" style="margin: 0; font-size: 16px; font-weight: 600; color: {{pal.t1c1c1c}}">Notes internes</h2>
+<ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px">
+<li style="display: flex; flex-direction: column; gap: 3px; padding-left: 12px; border-left: 2px solid {{pal.be8e4db}}"><span style="font-size: 13px; color: {{pal.t6b665e}}">Yao Serge, <span style="font-family: 'IBM Plex Mono', monospace">23/10/2026 16:20</span></span><span style="font-size: 14px; line-height: 1.5">Plafond en dalle béton : prévoir chevilles longues pour la chambre. Cliente souhaite une pose avant le 15/11.</span></li>
+</ul>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 500; color: {{pal.t1c1c1c}}">Ajouter une note
+<textarea rows="3" placeholder="Visible uniquement par l’équipe" style="box-sizing: border-box; padding: 10px 12px; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font: inherit; font-weight: 400; font-size: 14px; resize: vertical"></textarea></label>
+<button type="button" style="align-self: flex-start; height: 40px; padding: 0 14px; background: {{pal.sffffff}}; border: 1px solid {{pal.b20332c}}; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; color: {{pal.t20332c}}">Ajouter la note</button>
+</section>
+</div>
+
+<aside style="flex: 1 1 300px; min-width: 0; display: flex; flex-direction: column; gap: 22px">
+<section aria-labelledby="h-cli" style="background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 10px; padding: 16px 20px; display: flex; flex-direction: column; gap: 10px">
+<h2 id="h-cli" style="margin: 0; font-size: 16px; font-weight: 600; color: {{pal.t1c1c1c}}">Client</h2>
+<dl style="margin: 0; display: flex; flex-direction: column; gap: 8px; font-size: 14px">
+<div><dt style="font-size: 13px; color: {{pal.t6b665e}}">Téléphone</dt><dd style="margin: 0"><a href="tel:+2250758442109" style="color: {{pal.t20332c}}; font-family: 'IBM Plex Mono', monospace">07 58 44 21 09</a></dd></div>
+<div><dt style="font-size: 13px; color: {{pal.t6b665e}}">E-mail</dt><dd style="margin: 0">fatou.ouattara@exemple.ci</dd></div>
+<div><dt style="font-size: 13px; color: {{pal.t6b665e}}">Adresse</dt><dd style="margin: 0; line-height: 1.5">Villa 112, Angré 7e tranche, Cocody</dd></div>
+</dl>
+<sc-if value="{{isAdmin}}" hint-placeholder-val="{{ true }}"><a href="ProClient.dc.html" style="font-size: 14px; font-weight: 600; color: {{pal.t20332c}}">Ouvrir la fiche client</a></sc-if>
+</section>
+<section aria-labelledby="h-plan" style="background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 10px; padding: 16px 20px; display: flex; flex-direction: column; gap: 10px">
+<h2 id="h-plan" style="margin: 0; font-size: 16px; font-weight: 600; color: {{pal.t1c1c1c}}">Planification</h2>
+<dl style="margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 8px 16px; font-size: 14px">
+<dt style="color: {{pal.t6b665e}}">Agent</dt><dd style="margin: 0">Koffi Brou</dd>
+<dt style="color: {{pal.t6b665e}}">Valable jusqu’au</dt><dd style="margin: 0; font-family: 'IBM Plex Mono', monospace">22/11/2026</dd>
+<dt style="color: {{pal.t6b665e}}">Livraison</dt><dd style="margin: 0; font-family: 'IBM Plex Mono', monospace">05/11/2026</dd>
+<dt style="color: {{pal.t6b665e}}">Pose</dt><dd style="margin: 0; font-family: 'IBM Plex Mono', monospace">06/11/2026</dd>
+</dl>
+</section>
+<sc-if value="{{isAdmin}}" hint-placeholder-val="{{ true }}">
+<section aria-labelledby="h-pay" style="background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 10px; padding: 16px 20px; display: flex; flex-direction: column; gap: 8px">
+<h2 id="h-pay" style="margin: 0; font-size: 16px; font-weight: 600; color: {{pal.t1c1c1c}}">Paiements</h2>
+<p style="margin: 0; font-size: 14px; line-height: 1.5">Avance de 50 % attendue à l’acceptation : <span style="font-family: 'IBM Plex Mono', monospace; color: {{pal.t1c1c1c}}">243 080 FCFA</span>.</p>
+<p style="margin: 0; font-size: 13px; color: {{pal.t6b665e}}">Aucun versement enregistré.</p>
+</section>
+</sc-if>
+<section aria-labelledby="h-hist" style="background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 10px; padding: 16px 20px; display: flex; flex-direction: column; gap: 12px">
+<h2 id="h-hist" style="margin: 0; font-size: 16px; font-weight: 600; color: {{pal.t1c1c1c}}">Historique</h2>
+<ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column">
+<sc-for list="{{history}}" as="h" hint-placeholder-count="4">
+<li style="display: grid; grid-template-columns: 14px 1fr; gap: 10px; padding-bottom: 12px"><span aria-hidden="true" style="width: 10px; height: 10px; margin-top: 4px; box-sizing: border-box; border-radius: 50%; border: 2px solid #c09f6a; background: {{h.dot}}"></span><span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 14px; color: {{pal.t1c1c1c}}">{{h.t}}</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: {{pal.t6b665e}}">{{h.d}}</span></span></li>
+</sc-for>
+</ol>
+</section>
+</aside>
+</div>
+</main>
+</div>
+
+<sc-if value="{{acceptOpen}}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; inset: 0; z-index: 20; background: rgba(28,28,28,0.45); display: flex; align-items: flex-start; justify-content: center; padding: 120px 16px">
+<div role="dialog" aria-modal="true" aria-labelledby="acc-title" style="width: 100%; max-width: 520px; background: {{pal.sffffff}}; border-radius: 12px; box-shadow: 0 24px 60px -20px rgba(0,0,0,0.4); padding: 24px; display: flex; flex-direction: column; gap: 16px">
+<h2 id="acc-title" style="margin: 0; font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 500; color: {{pal.t1c1c1c}}">Enregistrer l’acceptation</h2>
+<p style="margin: 0; font-size: 14px; line-height: 1.55; color: {{pal.t6b665e}}">Une fois acceptés, les montants et les fenêtres du devis sont verrouillés.</p>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 500; color: {{pal.t1c1c1c}}">Date d’acceptation<input type="text" value="26/10/2026" style="height: 42px; box-sizing: border-box; padding: 0 12px; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font-family: 'IBM Plex Mono', monospace; font-size: 14px"></label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 500; color: {{pal.t1c1c1c}}">Comment le client a-t-il accepté ?<select style="height: 42px; padding: 0 10px; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font: inherit; font-size: 14px"><option>Devis papier signé</option><option>Réponse par e-mail</option><option>Message WhatsApp</option></select></label>
+<div style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 14px; font-weight: 500; color: {{pal.t1c1c1c}}">Preuve</span>
+<label style="display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 18px; border: 1px dashed {{pal.bb9b4aa}}; border-radius: 6px; background: {{pal.sf9f8f4}}; font-size: 14px; color: {{pal.t353535}}; cursor: pointer"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="{{pal.t20332c}}" stroke-width="1.6" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"></path></svg><span><strong>Choisir un fichier</strong> ou le déposer ici</span><span style="font-size: 12px; color: {{pal.t6b665e}}">PDF, JPG ou PNG, 2 Mo maximum</span><input type="file" style="position: absolute; width: 1px; height: 1px; opacity: 0"></label></div>
+<div style="display: flex; justify-content: flex-end; gap: 8px; padding-top: 4px">
+<button type="button" onClick="{{closeAccept}}" style="height: 44px; padding: 0 16px; background: {{pal.sffffff}}; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600">Annuler</button>
+<button type="button" onClick="{{confirmAccept}}" style="height: 44px; padding: 0 16px; background: #c09f6a; border: 0; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; color: #161616">Enregistrer l’acceptation</button>
+</div>
+</div>
+</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"role":{"editor":"enum","options":["admin","agent"],"default":"admin"},"$preview":{"width":1440,"height":1700}}'>
+class Component extends DCLogic {
+constructor(props) {
+super(props);
+this.state = { open: false, accepted: false };
+}
+isDark() {
+const t = this.props.theme;
+if (t === 'dark') return true;
+if (t === 'light') return false;
+let v = 'light';
+try { v = window.localStorage.getItem('mds-pro-theme') || 'light'; } catch (e) {}
+if (v === 'dark') return true;
+if (v === 'auto') { try { return window.matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) {} }
+return false;
+}
+themeMaps() { return { s: {"#ffffff": "#1b2220", "#f4f4f1": "#121816", "#f9f8f4": "#202825", "#fbfaf7": "#1e2623", "#fdfbf6": "#222a27", "#fcfbf8": "#1e2623", "#faf9f7": "#1e2623", "#fffcf5": "#2b2618", "#f1f0ec": "#262e2b", "#ece9e2": "#2a322f", "#e9e8e2": "#2a302d", "#e9e6df": "#0f1412", "#eef0ec": "#232b28", "#eef1ef": "#202826", "#edf1f4": "#1d2530", "#e8e4db": "#313a36", "#dcd6cb": "#3b4540", "#f1eee8": "#29312e", "#efece5": "#29312e", "#cfc9bd": "#4c5751", "#cfc8bb": "#4c5751", "#e1ddd3": "#3b4540", "#b9b4aa": "#5a645e", "#20332c": "#2b4a3e", "#2b4239": "#34574a", "#e5f1ea": "#1d3a2b", "#b7d6c3": "#2f5a43", "#fdf8ec": "#2d2717", "#ecd7a8": "#5b4a25", "#fbf1dc": "#382d15", "#e3c2bd": "#5e302b", "#e3c3bf": "#5e302b", "#fbeceb": "#3a1f1c", "#e8eef5": "#1d2a38", "#eeede8": "#2a302d", "#f6f0e4": "#2f2a1f", "#f3f3f3": "#262e2b", "#cccccc": "#46504b", "#fdf6f5": "#33201e", "#f8e6e4": "#3a2220", "#fbf6ea": "#2d2717", "#ecdcb9": "#5b4a25", "#f6ece5": "#33241d", "#efe9dd": "#2a2620", "#d9b26a": "#8a6a2c", "#b98a2e": "#8a6a2c"}, b: {"#ffffff": "#1b2220", "#f4f4f1": "#121816", "#f9f8f4": "#202825", "#fbfaf7": "#1e2623", "#fdfbf6": "#222a27", "#fcfbf8": "#1e2623", "#faf9f7": "#1e2623", "#fffcf5": "#2b2618", "#f1f0ec": "#262e2b", "#ece9e2": "#2a322f", "#e9e8e2": "#2a302d", "#e9e6df": "#0f1412", "#eef0ec": "#232b28", "#eef1ef": "#202826", "#edf1f4": "#1d2530", "#e8e4db": "#313a36", "#dcd6cb": "#3b4540", "#f1eee8": "#29312e", "#efece5": "#29312e", "#cfc9bd": "#4c5751", "#cfc8bb": "#4c5751", "#e1ddd3": "#3b4540", "#b9b4aa": "#5a645e", "#20332c": "#5d8a76", "#2b4239": "#34574a", "#e5f1ea": "#1d3a2b", "#b7d6c3": "#2f5a43", "#fdf8ec": "#2d2717", "#ecd7a8": "#5b4a25", "#fbf1dc": "#382d15", "#e3c2bd": "#5e302b", "#e3c3bf": "#5e302b", "#fbeceb": "#3a1f1c", "#e8eef5": "#1d2a38", "#eeede8": "#2a302d", "#f6f0e4": "#2f2a1f", "#f3f3f3": "#262e2b", "#cccccc": "#46504b", "#fdf6f5": "#33201e", "#f8e6e4": "#3a2220", "#fbf6ea": "#2d2717", "#ecdcb9": "#5b4a25", "#f6ece5": "#33241d", "#efe9dd": "#2a2620", "#d9b26a": "#8a6a2c", "#b98a2e": "#8a6a2c", "#1c1c1c": "#d6d2c9", "#b3392f": "#f28b80"}, t: {"#1c1c1c": "#f1eee8", "#353535": "#d6d2c9", "#6b665e": "#a8a296", "#20332c": "#bfd8cb", "#84642f": "#d8b47a", "#2f7350": "#86cfa3", "#8c5f0e": "#e6b862", "#5e4108": "#f0d39a", "#b3392f": "#f28b80", "#7c241c": "#f5b0a8", "#3f6285": "#9ec0e3", "#2c4866": "#bcd3ea", "#5c5852": "#c9c4ba", "#b0aaa0": "#6c736e", "#3d2b06": "#f0dcb3", "#1f4d35": "#bfe3cc", "#8f2c24": "#f5b0a8", "#6e4a0b": "#e6c27a", "#3f5a72": "#a9c3dc", "#3f5a73": "#a9c3dc", "#8e4529": "#e0a084", "#5a5248": "#cfc8bb", "#b98a2e": "#d9ac57", "#2c4660": "#a9c3dc"} }; }
+themeWatch() {
+if (this.__thw || typeof window === 'undefined') return;
+this.__thw = true;
+const bump = () => this.setState({ __th: Date.now() });
+try { window.addEventListener('storage', (e) => { if (e.key === 'mds-pro-theme') bump(); }); } catch (e) {}
+try { window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', bump); } catch (e) {}
+}
+dmap(v) {
+const T = this.themeMaps();
+const cv = (str) => str.split(';').map((seg) => {
+const i = seg.indexOf(':');
+let M = T.s;
+if (i > -1) { const p = seg.slice(0, i).trim().toLowerCase(); M = /^(color|stroke|fill|caret-color|accent-color|text-decoration-color)$/.test(p) ? T.t : /^(border|outline|box-shadow)/.test(p) ? T.b : T.s; }
+return seg.replace(/#[0-9a-fA-F]{6}/g, (h) => M[h.toLowerCase()] || h);
+}).join(';');
+const go = (x) => (typeof x === 'string' ? cv(x) : Array.isArray(x) ? x.map(go) : x && typeof x === 'object' && Object.prototype.toString.call(x) === '[object Object]' ? Object.keys(x).reduce((o, k) => { o[k] = go(x[k]); return o; }, {}) : x);
+return go(v);
+}
+renderVals() {
+this.themeWatch();
+const dark = this.isDark();
+let v = this.renderValsLight();
+if (dark) v = this.dmap(v);
+const T = this.themeMaps();
+const pal = {};
+['s', 'b', 't'].forEach((k) => { Object.keys(T[k]).forEach((h) => { pal[k + h.slice(1)] = dark ? T[k][h] : h; }); });
+v.pal = pal;
+v.themeDark = dark;
+v.colorScheme = dark ? 'dark' : 'light';
+return v;
+}
+renderValsLight() {
+const s = this.state;
+const role = this.props.role ?? 'admin';
+const acc = s.accepted;
+const B = acc ? ['Accepté', '#2f7350', '#e5f1ea', '✓'] : ['Validé', '#3f6285', '#e8eef5', '◆'];
+const S = [['Reçu', '23/10/2026'], ['Brouillon', '23/10/2026'], ['Validé', '24/10/2026'], ['Envoyé', '24/10/2026'], ['Accepté', acc ? '26/10/2026' : 'en attente'], ['Facturé', '—']];
+const doneUpTo = acc ? 4 : 3;
+return {
+role,
+isAdmin: role !== 'agent',
+badge: 'display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font-size:13px;font-weight:600;color:' + B[1] + ';background:' + B[2],
+badgeLabel: B[0], badgeGlyph: B[3],
+acceptLabel: acc ? 'Créer la facture' : 'Enregistrer l’acceptation',
+steps: S.map(([label, date], i) => {
+const done = i <= doneUpTo;
+const next = i === doneUpTo + 1;
+return {
+label, date,
+current: next ? 'step' : undefined,
+rail: done ? '#c09f6a' : '#e8e4db',
+ring: 'position:absolute;left:0;top:-7px;width:17px;height:17px;box-sizing:border-box;border-radius:50%;border:2px solid ' + (done || next ? '#c09f6a' : '#cfc8bb') + ';background:' + (done ? '#c09f6a' : '#ffffff'),
+labelStyle: 'font-size:14px;font-weight:' + (next ? '600' : '500') + ';color:' + (done || next ? '#1c1c1c' : '#6b665e'),
+sr: done ? ' (étape franchie)' : next ? ' (prochaine étape)' : ' (à venir)'
+};
+}),
+lines: [
+['Rideau occultant velours, Bleu nuit', '14 m', 12000, 168000],
+['Voilage lin naturel', '14 m', 7000, 98000],
+['Rail aluminium double', '8 m', 6500, 52000],
+['Confection plis flamands', '4 pièces', 15000, 60000],
+['Pose', '1 forfait', 34000, 34000]
+].map(([label, q, p, t]) => ({ label, q, p: String(p).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' FCFA', t: String(t).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' FCFA' })),
+history: [
+['Demande reçue depuis le site', '23/10/2026 09:14', false],
+['Brouillon chiffré par Aïcha Diabaté', '23/10/2026 17:02', false],
+['Validé par Aïcha Diabaté', '24/10/2026 10:30', false],
+['Envoyé par e-mail avec le PDF', '24/10/2026 10:31', !acc]
+].concat(acc ? [['Acceptation enregistrée, devis verrouillé', '26/10/2026', true]] : []).map(([t, d, last]) => ({ t, d, dot: last ? '#c09f6a' : '#ffffff' })),
+acceptOpen: s.open,
+openAccept: () => { if (!acc) this.setState({ open: true }); },
+closeAccept: () => this.setState({ open: false }),
+confirmAccept: () => this.setState({ open: false, accepted: true })
+};
+}
+}
+</script>
+</body>
+</html>

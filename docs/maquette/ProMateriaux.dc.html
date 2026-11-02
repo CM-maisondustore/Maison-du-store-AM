@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Espace Pro — matériaux et finitions</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="color-scheme: {{colorScheme}}; font-family: Inter, system-ui, sans-serif; color: {{pal.t353535}}; background: {{pal.sf4f4f1}}; min-height: 100vh; display: flex">
+<dc-import name="ProSidebar" active="materiaux" hint-size="240px,100%"></dc-import>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+<dc-import name="ProTopbar" role="admin" hint-size="100%,64px"></dc-import>
+<main id="contenu" style="flex: 1; padding: 24px clamp(16px, 3vw, 32px) 96px; display: flex; flex-direction: column; gap: 18px">
+
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 16px">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<h1 style="margin: 0; font-family: 'Cormorant Garamond', serif; font-size: 34px; font-weight: 500; color: {{pal.t1c1c1c}}">Matériaux et finitions</h1>
+<span style="font-size: 14px; color: {{pal.t6b665e}}">Tarifs utilisés par « Calculer depuis le catalogue » dans le chiffrage des devis.</span>
+</div>
+<button type="button" onClick="{{addItem}}" style="display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 16px 0 14px; background: #c09f6a; border: 0; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; color: #161616; cursor: pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>Ajouter un matériau</button>
+</div>
+
+<sc-if value="{{hasMissing}}" hint-placeholder-val="{{ true }}">
+<div role="status" style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding: 12px 16px; border-radius: 10px; background: {{pal.sfbf1dc}}; border: 1px solid {{pal.becd7a8}}; color: {{pal.t5e4108}}; font-size: 14px">
+<span style="font-weight: 600">! {{missingLabel}}</span><span>Les lignes de devis qui les utilisent restent « À définir » jusqu’à ce qu’un prix soit saisi.</span>
+</div>
+</sc-if>
+
+<div role="tablist" aria-label="Familles" style="display: flex; gap: 0; border-bottom: 1px solid {{pal.be8e4db}}; overflow-x: auto; overflow-y: hidden">
+<sc-for list="{{tabs}}" as="t" hint-placeholder-count="4">
+<button type="button" role="tab" aria-selected="{{t.sel}}" onClick="{{t.pick}}" style="{{t.style}}">{{t.label}}<span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: {{pal.t6b665e}}">{{t.count}}</span></button>
+</sc-for>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+<section aria-label="Matériaux" style="flex: 999 1 600px; min-width: 0; background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 10px; overflow: hidden">
+<div aria-hidden="true" style="{{headStyle}}"><span style="flex: 1 1 220px">Matériau</span><span style="flex: 0 0 120px">Coloris</span><span style="flex: 0 0 150px; text-align: right">Prix de vente</span><span style="flex: 0 0 96px">Statut</span></div>
+<ul style="list-style: none; margin: 0; padding: 0">
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="6">
+<li style="{{r.rowStyle}}">
+<button type="button" onClick="{{r.pick}}" aria-current="{{r.current}}" style="width: 100%; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding: 12px 16px; background: transparent; border: 0; font: inherit; text-align: left; color: {{pal.t353535}}; cursor: pointer">
+<span style="flex: 1 1 220px; min-width: 0; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px; font-weight: 600; color: {{pal.t1c1c1c}}">{{r.name}}</span><span style="font-size: 13px; color: {{pal.t6b665e}}">{{r.sub}}</span></span>
+<span style="flex: 0 0 120px; display: flex; gap: 4px" aria-label="{{r.colorsLabel}}"><sc-for list="{{r.colors}}" as="c" hint-placeholder-count="3"><span title="{{c.n}}" style="{{c.style}}"></span></sc-for></span>
+<span style="{{r.priceStyle}}">{{r.price}}</span>
+<span style="{{r.badge}}"><span aria-hidden="true">{{r.glyph}}</span>{{r.st}}</span>
+</button>
+</li>
+</sc-for>
+</ul>
+</section>
+
+<aside aria-labelledby="m-t" style="flex: 1 1 340px; min-width: 0; background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 10px; padding: 18px 20px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 13px; color: {{pal.t6b665e}}">{{sel.family}}</span><h2 id="m-t" style="margin: 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 500; color: {{pal.t1c1c1c}}">{{sel.name}}</h2><span style="font-size: 13px; color: {{pal.t6b665e}}">{{sel.usage}}</span></div>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 500; color: {{pal.t1c1c1c}}">Nom affiché dans le devis<input type="text" value="{{sel.name}}" onChange="{{setName}}" style="height: 40px; box-sizing: border-box; padding: 0 12px; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font: inherit; font-size: 14px"></label>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px">
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 500; color: {{pal.t1c1c1c}}">Prix de vente HT
+<span style="{{sel.priceBox}}"><input type="text" inputmode="numeric" placeholder="À définir" value="{{sel.priceVal}}" onChange="{{setPrice}}" style="width: 100%; min-width: 0; height: 38px; box-sizing: border-box; padding: 0 8px; border: 0; background: transparent; font-family: 'IBM Plex Mono', monospace; font-size: 14px; text-align: right"><span style="padding: 0 8px; height: 38px; display: inline-flex; align-items: center; background: {{pal.sf4f4f1}}; font-size: 12px; color: {{pal.t6b665e}}; white-space: nowrap">{{sel.unit}}</span></span></label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 500; color: {{pal.t1c1c1c}}">Unité
+<select value="{{sel.unitKey}}" onChange="{{setUnit}}" style="height: 40px; padding: 0 8px; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font: inherit; font-size: 14px; color: {{pal.t1c1c1c}}; background: {{pal.sffffff}}"><option value="m2">au m²</option><option value="ml">au mètre linéaire</option><option value="piece">à la pièce</option></select></label>
+</div>
+<sc-if value="{{sel.noPrice}}" hint-placeholder-val="{{ false }}"><p role="status" style="margin: -6px 0 0; font-size: 13px; font-weight: 600; color: {{pal.t8c5f0e}}">! Prix à définir : laisser vide n’est pas un prix nul.</p></sc-if>
+<div style="display: flex; flex-direction: column; gap: 8px"><span style="font-size: 14px; font-weight: 500; color: {{pal.t1c1c1c}}">Coloris proposés</span>
+<span style="display: flex; flex-wrap: wrap; gap: 6px"><sc-for list="{{sel.colors}}" as="c" hint-placeholder-count="3"><span style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px 4px 4px; border: 1px solid {{pal.be8e4db}}; border-radius: 999px; font-size: 13px"><span aria-hidden="true" style="{{c.style}}"></span>{{c.n}}</span></sc-for><button type="button" style="height: 30px; padding: 0 10px; border: 1px dashed {{pal.bb9b4aa}}; border-radius: 999px; background: {{pal.sffffff}}; font: inherit; font-size: 13px; color: {{pal.t6b665e}}">+ Coloris</button></span></div>
+<fieldset style="margin: 0; padding: 10px 14px 12px; border: 1px solid {{pal.be8e4db}}; border-radius: 6px; display: flex; flex-wrap: wrap; gap: 8px 14px">
+<legend style="padding: 0 6px; font-size: 14px; font-weight: 600; color: {{pal.t1c1c1c}}">Compatible avec</legend>
+<label style="display: inline-flex; align-items: center; gap: 8px; min-height: 32px; font-size: 14px"><input type="checkbox" checked style="width: 18px; height: 18px; margin: 0; accent-color: {{pal.t20332c}}">Store enrouleur</label>
+<label style="display: inline-flex; align-items: center; gap: 8px; min-height: 32px; font-size: 14px"><input type="checkbox" checked style="width: 18px; height: 18px; margin: 0; accent-color: {{pal.t20332c}}">Store californien</label>
+<label style="display: inline-flex; align-items: center; gap: 8px; min-height: 32px; font-size: 14px"><input type="checkbox" style="width: 18px; height: 18px; margin: 0; accent-color: {{pal.t20332c}}">Rideau</label>
+</fieldset>
+<label style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px; border-radius: 8px; background: {{pal.sf9f8f4}}; font-size: 14px; color: {{pal.t1c1c1c}}"><span style="display: flex; flex-direction: column"><span style="font-weight: 600">Proposé dans les nouveaux devis</span><span style="font-size: 12.5px; color: {{pal.t6b665e}}">Retirer n’affecte pas les devis déjà émis.</span></span><button type="button" role="switch" aria-checked="{{sel.activeChecked}}" aria-label="Proposé dans les nouveaux devis" onClick="{{toggleActive}}" style="{{sel.sw}}"><span style="{{sel.kn}}"></span></button></label>
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; padding-top: 10px; border-top: 1px solid {{pal.bf1eee8}}">
+<span role="status" style="font-size: 13px; color: {{pal.t6b665e}}">{{savedLabel}}</span>
+<button type="button" onClick="{{save}}" style="height: 40px; padding: 0 16px; border: 0; border-radius: 6px; background: {{pal.s20332c}}; font: inherit; font-size: 14px; font-weight: 600; color: #ffffff; cursor: pointer">Enregistrer</button>
+</div>
+</aside>
+</div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1150}}'>
+class Component extends DCLogic {
+constructor(props) {
+super(props);
+this.state = { tab: 'toiles', sel: 0, edits: {}, saved: '' };
+}
+isDark() {
+const t = this.props.theme;
+if (t === 'dark') return true;
+if (t === 'light') return false;
+let v = 'light';
+try { v = window.localStorage.getItem('mds-pro-theme') || 'light'; } catch (e) {}
+if (v === 'dark') return true;
+if (v === 'auto') { try { return window.matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) {} }
+return false;
+}
+themeMaps() { return { s: {"#ffffff": "#1b2220", "#f4f4f1": "#121816", "#f9f8f4": "#202825", "#fbfaf7": "#1e2623", "#fdfbf6": "#222a27", "#fcfbf8": "#1e2623", "#faf9f7": "#1e2623", "#fffcf5": "#2b2618", "#f1f0ec": "#262e2b", "#ece9e2": "#2a322f", "#e9e8e2": "#2a302d", "#e9e6df": "#0f1412", "#eef0ec": "#232b28", "#eef1ef": "#202826", "#edf1f4": "#1d2530", "#e8e4db": "#313a36", "#dcd6cb": "#3b4540", "#f1eee8": "#29312e", "#efece5": "#29312e", "#cfc9bd": "#4c5751", "#cfc8bb": "#4c5751", "#e1ddd3": "#3b4540", "#b9b4aa": "#5a645e", "#20332c": "#2b4a3e", "#2b4239": "#34574a", "#e5f1ea": "#1d3a2b", "#b7d6c3": "#2f5a43", "#fdf8ec": "#2d2717", "#ecd7a8": "#5b4a25", "#fbf1dc": "#382d15", "#e3c2bd": "#5e302b", "#e3c3bf": "#5e302b", "#fbeceb": "#3a1f1c", "#e8eef5": "#1d2a38", "#eeede8": "#2a302d", "#f6f0e4": "#2f2a1f", "#f3f3f3": "#262e2b", "#cccccc": "#46504b", "#fdf6f5": "#33201e", "#f8e6e4": "#3a2220", "#fbf6ea": "#2d2717", "#ecdcb9": "#5b4a25", "#f6ece5": "#33241d", "#efe9dd": "#2a2620", "#d9b26a": "#8a6a2c", "#b98a2e": "#8a6a2c"}, b: {"#ffffff": "#1b2220", "#f4f4f1": "#121816", "#f9f8f4": "#202825", "#fbfaf7": "#1e2623", "#fdfbf6": "#222a27", "#fcfbf8": "#1e2623", "#faf9f7": "#1e2623", "#fffcf5": "#2b2618", "#f1f0ec": "#262e2b", "#ece9e2": "#2a322f", "#e9e8e2": "#2a302d", "#e9e6df": "#0f1412", "#eef0ec": "#232b28", "#eef1ef": "#202826", "#edf1f4": "#1d2530", "#e8e4db": "#313a36", "#dcd6cb": "#3b4540", "#f1eee8": "#29312e", "#efece5": "#29312e", "#cfc9bd": "#4c5751", "#cfc8bb": "#4c5751", "#e1ddd3": "#3b4540", "#b9b4aa": "#5a645e", "#20332c": "#5d8a76", "#2b4239": "#34574a", "#e5f1ea": "#1d3a2b", "#b7d6c3": "#2f5a43", "#fdf8ec": "#2d2717", "#ecd7a8": "#5b4a25", "#fbf1dc": "#382d15", "#e3c2bd": "#5e302b", "#e3c3bf": "#5e302b", "#fbeceb": "#3a1f1c", "#e8eef5": "#1d2a38", "#eeede8": "#2a302d", "#f6f0e4": "#2f2a1f", "#f3f3f3": "#262e2b", "#cccccc": "#46504b", "#fdf6f5": "#33201e", "#f8e6e4": "#3a2220", "#fbf6ea": "#2d2717", "#ecdcb9": "#5b4a25", "#f6ece5": "#33241d", "#efe9dd": "#2a2620", "#d9b26a": "#8a6a2c", "#b98a2e": "#8a6a2c", "#1c1c1c": "#d6d2c9", "#b3392f": "#f28b80"}, t: {"#1c1c1c": "#f1eee8", "#353535": "#d6d2c9", "#6b665e": "#a8a296", "#20332c": "#bfd8cb", "#84642f": "#d8b47a", "#2f7350": "#86cfa3", "#8c5f0e": "#e6b862", "#5e4108": "#f0d39a", "#b3392f": "#f28b80", "#7c241c": "#f5b0a8", "#3f6285": "#9ec0e3", "#2c4866": "#bcd3ea", "#5c5852": "#c9c4ba", "#b0aaa0": "#6c736e", "#3d2b06": "#f0dcb3", "#1f4d35": "#bfe3cc", "#8f2c24": "#f5b0a8", "#6e4a0b": "#e6c27a", "#3f5a72": "#a9c3dc", "#3f5a73": "#a9c3dc", "#8e4529": "#e0a084", "#5a5248": "#cfc8bb", "#b98a2e": "#d9ac57", "#2c4660": "#a9c3dc"} }; }
+themeWatch() {
+if (this.__thw || typeof window === 'undefined') return;
+this.__thw = true;
+const bump = () => this.setState({ __th: Date.now() });
+try { window.addEventListener('storage', (e) => { if (e.key === 'mds-pro-theme') bump(); }); } catch (e) {}
+try { window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', bump); } catch (e) {}
+}
+dmap(v) {
+const T = this.themeMaps();
+const cv = (str) => str.split(';').map((seg) => {
+const i = seg.indexOf(':');
+let M = T.s;
+if (i > -1) { const p = seg.slice(0, i).trim().toLowerCase(); M = /^(color|stroke|fill|caret-color|accent-color|text-decoration-color)$/.test(p) ? T.t : /^(border|outline|box-shadow)/.test(p) ? T.b : T.s; }
+return seg.replace(/#[0-9a-fA-F]{6}/g, (h) => M[h.toLowerCase()] || h);
+}).join(';');
+const go = (x) => (typeof x === 'string' ? cv(x) : Array.isArray(x) ? x.map(go) : x && typeof x === 'object' && Object.prototype.toString.call(x) === '[object Object]' ? Object.keys(x).reduce((o, k) => { o[k] = go(x[k]); return o; }, {}) : x);
+return go(v);
+}
+renderVals() {
+this.themeWatch();
+const dark = this.isDark();
+let v = this.renderValsLight();
+if (dark) v = this.dmap(v);
+const T = this.themeMaps();
+const pal = {};
+['s', 'b', 't'].forEach((k) => { Object.keys(T[k]).forEach((h) => { pal[k + h.slice(1)] = dark ? T[k][h] : h; }); });
+v.pal = pal;
+v.themeDark = dark;
+v.colorScheme = dark ? 'dark' : 'light';
+return v;
+}
+renderValsLight() {
+const s = this.state;
+const COL = { Lin: '#e8dcc6', 'Gris perle': '#c9c9c4', Anthracite: '#3a3a3a', Blanc: '#ffffff', Sable: '#d8c7a3', Chêne: '#a7845a', Noir: '#1f1f1f', Alu: '#b8bcc0', Bronze: '#7a5b3a' };
+const FAM = [['toiles', 'Toiles et tissus'], ['meca', 'Mécanismes'], ['moteurs', 'Motorisations'], ['finitions', 'Finitions et pose']];
+const BASE = [
+['toiles', 'Occultant Lin', 'Toile polyester enduite, 100 % occultante', ['Lin', 'Gris perle', 'Anthracite'], '14500', 'm2', true, 23],
+['toiles', 'Tamisant Gris perle', 'Laisse passer la lumière, préserve l’intimité', ['Gris perle', 'Blanc', 'Sable'], '12000', 'm2', true, 11],
+['toiles', 'Screen 5 %', 'Toile technique anti-chaleur, vue sur l’extérieur', ['Anthracite', 'Blanc'], '18500', 'm2', true, 8],
+['toiles', 'Lin lavé naturel', 'Pour rideaux et voilages', ['Lin', 'Sable'], '', 'ml', true, 2],
+['toiles', 'Velours occultant', 'Rideaux de chambre', ['Anthracite', 'Bronze'], '21000', 'ml', false, 0],
+['meca', 'Tube Ø 32 mm', 'Jusqu’à 180 cm de large', ['Alu'], '9000', 'piece', true, 19],
+['meca', 'Tube Ø 45 mm', 'De 180 à 300 cm de large', ['Alu'], '13500', 'piece', true, 7],
+['meca', 'Tringle double', 'Rideau et voilage', ['Noir', 'Alu', 'Chêne'], '', 'ml', true, 3],
+['moteurs', 'Moteur radio', 'Avec télécommande 1 canal', ['Blanc'], '70000', 'piece', true, 9],
+['moteurs', 'Moteur filaire', 'Inverseur mural', ['Blanc'], '52000', 'piece', true, 2],
+['finitions', 'Embouts de finition', 'Lot de 2', ['Blanc', 'Noir', 'Alu'], '1500', 'piece', true, 15],
+['finitions', 'Pose standard', 'Par fenêtre, fixation en tableau ou en façade', [], '12000', 'piece', true, 26],
+['finitions', 'Pose en hauteur', 'Au-delà de 3 m, échafaudage', [], '', 'piece', true, 1]
+];
+const L = BASE.map((b, i) => ({ ...{ fam: b[0], name: b[1], sub: b[2], colors: b[3], price: b[4], unit: b[5], active: b[6], used: b[7] }, ...(s.edits[i] || {}) }));
+const UNIT = { m2: 'FCFA / m²', ml: 'FCFA / ml', piece: 'FCFA / pièce' };
+const fmt = (v) => String(v).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+const dot = (n, size) => 'display:inline-block;flex:none;width:' + size + 'px;height:' + size + 'px;border-radius:50%;background:' + COL[n] + ';box-shadow:inset 0 0 0 1px rgba(0,0,0,0.18)';
+const sw = (on) => ({ sw: 'position:relative;flex:none;width:44px;height:26px;border-radius:999px;border:0;padding:0;cursor:pointer;background:' + (on ? '#20332c' : '#cfc9bd'), kn: 'position:absolute;top:3px;left:' + (on ? '21px' : '3px') + ';width:20px;height:20px;border-radius:50%;background:#ffffff' });
+const missing = L.filter((x) => x.active && x.price === '').length;
+const rows = L.map((m, i) => ({ m, i })).filter(({ m }) => m.fam === s.tab).map(({ m, i }) => {
+const none = m.price === '';
+const st = !m.active ? 'Retiré' : none ? 'À définir' : 'Actif';
+const SC = { Actif: ['#2f7350', '#e5f1ea', '●'], 'À définir': ['#8c5f0e', '#fbf1dc', '!'], Retiré: ['#5c5852', '#eeede8', '○'] };
+return {
+name: m.name, sub: m.sub,
+colors: m.colors.map((n) => ({ n, style: dot(n, 18) })), colorsLabel: m.colors.length ? 'Coloris : ' + m.colors.join(', ') : 'Sans coloris',
+price: none ? 'À définir' : fmt(m.price) + ' ' + UNIT[m.unit].replace('FCFA ', 'FCFA '),
+priceStyle: 'flex:0 0 150px;text-align:right;font-family:\'IBM Plex Mono\',monospace;font-size:13.5px;white-space:nowrap;' + (none ? 'color:#8c5f0e;font-style:italic' : 'color:#1c1c1c'),
+st, glyph: SC[st][2],
+badge: 'flex:0 0 auto;min-width:80px;display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font-size:12.5px;font-weight:600;white-space:nowrap;color:' + SC[st][0] + ';background:' + SC[st][1],
+current: s.sel === i ? 'true' : undefined,
+rowStyle: 'border-top:1px solid #efece5;' + (s.sel === i ? 'box-shadow:inset 3px 0 0 #c09f6a;background:#fdfbf6;' : '') + (m.active ? '' : 'opacity:0.72'),
+pick: () => this.setState({ sel: i, saved: '' })
+};
+});
+const m = L[s.sel];
+const upd = (patch) => this.setState({ edits: { ...s.edits, [s.sel]: { ...(s.edits[s.sel] || {}), ...patch } }, saved: '' });
+const a = sw(m.active);
+return {
+hasMissing: missing > 0,
+missingLabel: missing + (missing > 1 ? ' matériaux actifs sans prix.' : ' matériau actif sans prix.'),
+tabs: FAM.map(([k, label]) => ({ label, count: L.filter((x) => x.fam === k).length, sel: s.tab === k ? 'true' : 'false',
+pick: () => { const first = L.findIndex((x) => x.fam === k); this.setState({ tab: k, sel: first, saved: '' }); },
+style: 'flex:none;display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 16px;background:transparent;border:0;border-bottom:2px solid ' + (s.tab === k ? '#c09f6a' : 'transparent') + ';margin-bottom:-1px;font:inherit;font-size:14px;cursor:pointer;' + (s.tab === k ? 'font-weight:600;color:#1c1c1c' : 'color:#6b665e') })),
+headStyle: 'display:flex;flex-wrap:wrap;gap:16px;padding:10px 16px;background:#f9f8f4;font-size:13px;font-weight:600;color:#6b665e',
+rows,
+sel: {
+family: FAM.find((f) => f[0] === m.fam)[1], name: m.name,
+usage: m.used ? 'Utilisé dans ' + m.used + ' devis cette année' : 'Pas encore utilisé dans un devis',
+priceVal: m.price, unit: UNIT[m.unit], unitKey: m.unit, noPrice: m.price === '',
+priceBox: 'display:flex;align-items:center;border-radius:6px;overflow:hidden;' + (m.price === '' ? 'border:1px dashed #b98a2e;background:#fdf8ec' : 'border:1px solid #dcd6cb'),
+colors: m.colors.map((n) => ({ n, style: dot(n, 20) })),
+activeChecked: m.active ? 'true' : 'false', sw: a.sw, kn: a.kn
+},
+setName: (e) => upd({ name: e.target.value }),
+setPrice: (e) => upd({ price: e.target.value.replace(/[^0-9]/g, '') }),
+setUnit: (e) => upd({ unit: e.target.value }),
+toggleActive: () => upd({ active: !m.active }),
+save: () => this.setState({ saved: 'Enregistré à ' + new Date().toTimeString().slice(0, 5) + '. Les prochains chiffrages utiliseront ce tarif.' }),
+savedLabel: s.saved || 'Les devis déjà émis gardent leur prix d’origine.',
+addItem: () => this.setState({ saved: '' })
+};
+}
+}
+</script>
+</body>
+</html>

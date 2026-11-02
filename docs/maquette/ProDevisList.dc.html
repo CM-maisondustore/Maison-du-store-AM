@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Espace Pro — devis</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div ref="{{setRoot}}" style="color-scheme: {{colorScheme}}; font-family: Inter, system-ui, sans-serif; color: {{pal.t353535}}; background: {{pal.sf4f4f1}}; min-height: 100vh; display: flex; position: relative">
+<sc-if value="{{notMobile}}" hint-placeholder-val="{{ true }}">
+<dc-import name="ProSidebar" active="devis" role="{{role}}" collapsed="{{collapsed}}" hint-size="240px,100%"></dc-import>
+</sc-if>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+<sc-if value="{{notMobile}}" hint-placeholder-val="{{ true }}">
+<dc-import name="ProTopbar" role="{{role}}" hint-size="100%,64px"></dc-import>
+</sc-if>
+<sc-if value="{{mobile}}" hint-placeholder-val="{{ false }}">
+<header style="position: sticky; top: 0; z-index: 4; background: {{pal.sffffff}}; border-bottom: 1px solid {{pal.be8e4db}}; height: 56px; padding: 0 8px 0 16px; display: flex; align-items: center; gap: 8px">
+<h1 style="margin: 0; flex: 1; font-size: 18px; font-weight: 600; color: {{pal.t1c1c1c}}">{{title}}</h1>
+<button type="button" aria-label="Rechercher un devis" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; background: transparent; border: 0; color: {{pal.t1c1c1c}}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 11a7 7 0 1 0 14 0a7 7 0 1 0-14 0M20 20l-3.5-3.5"></path></svg></button>
+</header>
+</sc-if>
+
+<main id="contenu" style="{{mainStyle}}">
+<sc-if value="{{notMobile}}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px">
+<h1 style="margin: 0; font-family: 'Cormorant Garamond', serif; font-size: 34px; font-weight: 500; color: {{pal.t1c1c1c}}">{{title}} <span style="font-family: Inter, sans-serif; font-size: 15px; font-weight: 400; color: {{pal.t6b665e}}">{{totalLabel}}</span></h1>
+<a href="ProDevisNew.dc.html" style="display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px 0 12px; background: #c09f6a; border-radius: 6px; color: #161616; text-decoration: none; font-size: 14px; font-weight: 600"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>Nouveau devis</a>
+</div>
+</sc-if>
+
+<div role="group" aria-label="Filtrer par état" style="{{filtersRow}}">
+<sc-for list="{{filters}}" as="f" hint-placeholder-count="7">
+<button type="button" aria-pressed="{{f.pressed}}" onClick="{{f.pick}}" style="{{f.style}}">{{f.label}}<span style="{{f.countStyle}}">{{f.n}}</span></button>
+</sc-for>
+</div>
+
+<sc-if value="{{notMobile}}" hint-placeholder-val="{{ true }}">
+<section aria-label="Liste des devis" style="background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 10px; overflow: hidden">
+<div style="display: flex; flex-wrap: wrap; gap: 10px; padding: 12px 16px; border-bottom: 1px solid {{pal.be8e4db}}">
+<label style="flex: 1 1 260px; position: relative; display: flex; align-items: center"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Rechercher dans les devis</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="{{pal.t6b665e}}" stroke-width="1.6" aria-hidden="true" style="position: absolute; left: 10px"><path d="M4 11a7 7 0 1 0 14 0a7 7 0 1 0-14 0M20 20l-3.5-3.5"></path></svg><input type="search" placeholder="Client ou référence" style="width: 100%; height: 36px; box-sizing: border-box; padding: 0 10px 0 34px; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font: inherit; font-size: 14px"></label>
+<label style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: {{pal.t6b665e}}">Type<select style="height: 36px; padding: 0 8px; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font: inherit; font-size: 14px; color: {{pal.t1c1c1c}}; background: {{pal.sffffff}}"><option>Tous</option><option>Store</option><option>Rideau</option></select></label>
+<label style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: {{pal.t6b665e}}">Source<select style="height: 36px; padding: 0 8px; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font: inherit; font-size: 14px; color: {{pal.t1c1c1c}}; background: {{pal.sffffff}}"><option>Toutes</option><option>Site</option><option>Espace interne</option><option>Sur place</option></select></label>
+<label style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: {{pal.t6b665e}}">Agent<select style="height: 36px; padding: 0 8px; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font: inherit; font-size: 14px; color: {{pal.t1c1c1c}}; background: {{pal.sffffff}}"><option>Tous</option><option>Koffi Brou</option><option>Yao Serge</option><option>Non affecté</option></select></label>
+</div>
+<div style="overflow-x: auto">
+<table style="width: 100%; border-collapse: collapse; font-size: 14px">
+<thead><tr style="background: {{pal.sf9f8f4}}; text-align: left">
+<th scope="col" style="padding: 10px 16px; font-size: 13px; font-weight: 600; color: {{pal.t6b665e}}">Référence</th>
+<th scope="col" style="padding: 10px 12px; font-size: 13px; font-weight: 600; color: {{pal.t6b665e}}">Client</th>
+<th scope="col" style="padding: 10px 12px; font-size: 13px; font-weight: 600; color: {{pal.t6b665e}}">Type</th>
+<th scope="col" style="padding: 10px 12px; font-size: 13px; font-weight: 600; color: {{pal.t6b665e}}">Source</th>
+<th scope="col" aria-sort="{{sortAria}}" style="padding: 4px 12px"><button type="button" onClick="{{toggleSort}}" style="display: inline-flex; align-items: center; gap: 4px; height: 32px; padding: 0; background: transparent; border: 0; font: inherit; font-size: 13px; font-weight: 600; color: {{pal.t1c1c1c}}; cursor: pointer">Date<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="{{sortIcon}}"></path></svg></button></th>
+<th scope="col" style="padding: 10px 12px; font-size: 13px; font-weight: 600; color: {{pal.t6b665e}}">Agent</th>
+<th scope="col" style="padding: 10px 16px 10px 12px; font-size: 13px; font-weight: 600; color: {{pal.t6b665e}}">État</th>
+</tr></thead>
+<tbody>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="10">
+<tr style="border-top: 1px solid {{pal.befece5}}">
+<td style="padding: 0 16px; height: 46px; white-space: nowrap"><a href="ProDevisFiche.dc.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: {{pal.t20332c}}; font-weight: 500">{{r.ref}}</a></td>
+<td style="padding: 0 12px; color: {{pal.t1c1c1c}}; font-weight: 500">{{r.client}}</td>
+<td style="padding: 0 12px">{{r.type}}</td>
+<td style="padding: 0 12px; color: {{pal.t6b665e}}">{{r.source}}</td>
+<td style="padding: 0 12px; font-family: 'IBM Plex Mono', monospace; font-size: 13px">{{r.date}}</td>
+<td style="padding: 0 12px; color: {{r.agentColor}}">{{r.agent}}</td>
+<td style="padding: 0 16px 0 12px"><span style="{{r.st.style}}"><span aria-hidden="true">{{r.st.glyph}}</span>{{r.st.label}}</span></td>
+</tr>
+</sc-for>
+</tbody>
+</table>
+</div>
+<sc-if value="{{empty}}" hint-placeholder-val="{{ false }}">
+<div style="padding: 40px 20px; text-align: center; display: flex; flex-direction: column; gap: 8px; align-items: center"><span style="font-size: 15px; font-weight: 600; color: {{pal.t1c1c1c}}">Aucun devis dans cet état.</span><span style="font-size: 14px; color: {{pal.t6b665e}}">Choisissez un autre filtre ou créez un devis.</span></div>
+</sc-if>
+<nav aria-label="Pagination" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; border-top: 1px solid {{pal.be8e4db}}; font-size: 14px; color: {{pal.t6b665e}}">
+<span>{{pageLabel}}</span>
+<span style="display: flex; gap: 4px">
+<button type="button" aria-label="Page précédente" style="width: 36px; height: 36px; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; background: {{pal.sffffff}}; color: {{pal.t1c1c1c}}">‹</button>
+<button type="button" aria-current="page" style="width: 36px; height: 36px; border: 1px solid {{pal.b20332c}}; border-radius: 6px; background: {{pal.s20332c}}; color: #ffffff; font-family: 'IBM Plex Mono', monospace">1</button>
+<button type="button" style="width: 36px; height: 36px; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; background: {{pal.sffffff}}; color: {{pal.t1c1c1c}}; font-family: 'IBM Plex Mono', monospace">2</button>
+<button type="button" style="width: 36px; height: 36px; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; background: {{pal.sffffff}}; color: {{pal.t1c1c1c}}; font-family: 'IBM Plex Mono', monospace">3</button>
+<button type="button" aria-label="Page suivante" style="width: 36px; height: 36px; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; background: {{pal.sffffff}}; color: {{pal.t1c1c1c}}">›</button>
+</span>
+</nav>
+</section>
+</sc-if>
+
+<sc-if value="{{mobile}}" hint-placeholder-val="{{ false }}">
+<ul aria-label="Liste des devis" style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px">
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="6">
+<li><a href="ProDevisFiche.dc.html" style="display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 10px; text-decoration: none; color: {{pal.t353535}}">
+<span style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px"><span style="font-size: 16px; font-weight: 600; color: {{pal.t1c1c1c}}">{{r.client}}</span><span style="{{r.st.style}}"><span aria-hidden="true">{{r.st.glyph}}</span>{{r.st.label}}</span></span>
+<span style="display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 14px; color: {{pal.t6b665e}}"><span style="font-family: 'IBM Plex Mono', monospace; color: {{pal.t20332c}}">{{r.ref}}</span><span>{{r.type}}</span><span>{{r.source}}</span><span style="font-family: 'IBM Plex Mono', monospace">{{r.date}}</span></span>
+</a></li>
+</sc-for>
+</ul>
+<sc-if value="{{empty}}" hint-placeholder-val="{{ false }}"><p style="margin: 24px 0; text-align: center; font-size: 15px; color: {{pal.t6b665e}}">Aucun devis dans cet état.</p></sc-if>
+</sc-if>
+</main>
+
+<sc-if value="{{mobile}}" hint-placeholder-val="{{ false }}">
+<a href="ProDevisNewMobile.dc.html" style="position: sticky; bottom: 96px; z-index: 6; align-self: flex-end; margin: -72px 16px 16px 0; display: inline-flex; align-items: center; gap: 8px; height: 56px; padding: 0 20px 0 16px; border-radius: 999px; background: #c09f6a; color: #161616; text-decoration: none; font-size: 15px; font-weight: 600; box-shadow: 0 10px 24px -10px rgba(32,51,44,0.5)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>Nouveau devis</a>
+<div style="position: sticky; bottom: 0; z-index: 5; margin-top: auto"><dc-import name="ProTabbar" role="{{role}}" active="devis" hint-size="100%,84px"></dc-import></div>
+</sc-if>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"layout":{"editor":"enum","options":["auto","mobile"],"default":"auto"},"role":{"editor":"enum","options":["admin","agent"],"default":"admin"},"$preview":{"width":1440,"height":1100}}'>
+class Component extends DCLogic {
+constructor(props) {
+super(props);
+this.state = { f: 'all', asc: false, w: 0 };
+this.setRootFn = (el) => {
+if (this.ro) { this.ro.disconnect(); this.ro = null; }
+if (el && typeof ResizeObserver !== 'undefined') {
+this.ro = new ResizeObserver((en) => { const cw = Math.round(en[0].contentRect.width); if (cw && cw !== this.state.w) this.setState({ w: cw }); });
+this.ro.observe(el);
+}
+};
+}
+componentWillUnmount() { if (this.ro) this.ro.disconnect(); }
+isDark() {
+const t = this.props.theme;
+if (t === 'dark') return true;
+if (t === 'light') return false;
+let v = 'light';
+try { v = window.localStorage.getItem('mds-pro-theme') || 'light'; } catch (e) {}
+if (v === 'dark') return true;
+if (v === 'auto') { try { return window.matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) {} }
+return false;
+}
+themeMaps() { return { s: {"#ffffff": "#1b2220", "#f4f4f1": "#121816", "#f9f8f4": "#202825", "#fbfaf7": "#1e2623", "#fdfbf6": "#222a27", "#fcfbf8": "#1e2623", "#faf9f7": "#1e2623", "#fffcf5": "#2b2618", "#f1f0ec": "#262e2b", "#ece9e2": "#2a322f", "#e9e8e2": "#2a302d", "#e9e6df": "#0f1412", "#eef0ec": "#232b28", "#eef1ef": "#202826", "#edf1f4": "#1d2530", "#e8e4db": "#313a36", "#dcd6cb": "#3b4540", "#f1eee8": "#29312e", "#efece5": "#29312e", "#cfc9bd": "#4c5751", "#cfc8bb": "#4c5751", "#e1ddd3": "#3b4540", "#b9b4aa": "#5a645e", "#20332c": "#2b4a3e", "#2b4239": "#34574a", "#e5f1ea": "#1d3a2b", "#b7d6c3": "#2f5a43", "#fdf8ec": "#2d2717", "#ecd7a8": "#5b4a25", "#fbf1dc": "#382d15", "#e3c2bd": "#5e302b", "#e3c3bf": "#5e302b", "#fbeceb": "#3a1f1c", "#e8eef5": "#1d2a38", "#eeede8": "#2a302d", "#f6f0e4": "#2f2a1f", "#f3f3f3": "#262e2b", "#cccccc": "#46504b", "#fdf6f5": "#33201e", "#f8e6e4": "#3a2220", "#fbf6ea": "#2d2717", "#ecdcb9": "#5b4a25", "#f6ece5": "#33241d", "#efe9dd": "#2a2620", "#d9b26a": "#8a6a2c", "#b98a2e": "#8a6a2c"}, b: {"#ffffff": "#1b2220", "#f4f4f1": "#121816", "#f9f8f4": "#202825", "#fbfaf7": "#1e2623", "#fdfbf6": "#222a27", "#fcfbf8": "#1e2623", "#faf9f7": "#1e2623", "#fffcf5": "#2b2618", "#f1f0ec": "#262e2b", "#ece9e2": "#2a322f", "#e9e8e2": "#2a302d", "#e9e6df": "#0f1412", "#eef0ec": "#232b28", "#eef1ef": "#202826", "#edf1f4": "#1d2530", "#e8e4db": "#313a36", "#dcd6cb": "#3b4540", "#f1eee8": "#29312e", "#efece5": "#29312e", "#cfc9bd": "#4c5751", "#cfc8bb": "#4c5751", "#e1ddd3": "#3b4540", "#b9b4aa": "#5a645e", "#20332c": "#5d8a76", "#2b4239": "#34574a", "#e5f1ea": "#1d3a2b", "#b7d6c3": "#2f5a43", "#fdf8ec": "#2d2717", "#ecd7a8": "#5b4a25", "#fbf1dc": "#382d15", "#e3c2bd": "#5e302b", "#e3c3bf": "#5e302b", "#fbeceb": "#3a1f1c", "#e8eef5": "#1d2a38", "#eeede8": "#2a302d", "#f6f0e4": "#2f2a1f", "#f3f3f3": "#262e2b", "#cccccc": "#46504b", "#fdf6f5": "#33201e", "#f8e6e4": "#3a2220", "#fbf6ea": "#2d2717", "#ecdcb9": "#5b4a25", "#f6ece5": "#33241d", "#efe9dd": "#2a2620", "#d9b26a": "#8a6a2c", "#b98a2e": "#8a6a2c", "#1c1c1c": "#d6d2c9", "#b3392f": "#f28b80"}, t: {"#1c1c1c": "#f1eee8", "#353535": "#d6d2c9", "#6b665e": "#a8a296", "#20332c": "#bfd8cb", "#84642f": "#d8b47a", "#2f7350": "#86cfa3", "#8c5f0e": "#e6b862", "#5e4108": "#f0d39a", "#b3392f": "#f28b80", "#7c241c": "#f5b0a8", "#3f6285": "#9ec0e3", "#2c4866": "#bcd3ea", "#5c5852": "#c9c4ba", "#b0aaa0": "#6c736e", "#3d2b06": "#f0dcb3", "#1f4d35": "#bfe3cc", "#8f2c24": "#f5b0a8", "#6e4a0b": "#e6c27a", "#3f5a72": "#a9c3dc", "#3f5a73": "#a9c3dc", "#8e4529": "#e0a084", "#5a5248": "#cfc8bb", "#b98a2e": "#d9ac57", "#2c4660": "#a9c3dc"} }; }
+themeWatch() {
+if (this.__thw || typeof window === 'undefined') return;
+this.__thw = true;
+const bump = () => this.setState({ __th: Date.now() });
+try { window.addEventListener('storage', (e) => { if (e.key === 'mds-pro-theme') bump(); }); } catch (e) {}
+try { window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', bump); } catch (e) {}
+}
+dmap(v) {
+const T = this.themeMaps();
+const cv = (str) => str.split(';').map((seg) => {
+const i = seg.indexOf(':');
+let M = T.s;
+if (i > -1) { const p = seg.slice(0, i).trim().toLowerCase(); M = /^(color|stroke|fill|caret-color|accent-color|text-decoration-color)$/.test(p) ? T.t : /^(border|outline|box-shadow)/.test(p) ? T.b : T.s; }
+return seg.replace(/#[0-9a-fA-F]{6}/g, (h) => M[h.toLowerCase()] || h);
+}).join(';');
+const go = (x) => (typeof x === 'string' ? cv(x) : Array.isArray(x) ? x.map(go) : x && typeof x === 'object' && Object.prototype.toString.call(x) === '[object Object]' ? Object.keys(x).reduce((o, k) => { o[k] = go(x[k]); return o; }, {}) : x);
+return go(v);
+}
+renderVals() {
+this.themeWatch();
+const dark = this.isDark();
+let v = this.renderValsLight();
+if (dark) v = this.dmap(v);
+const T = this.themeMaps();
+const pal = {};
+['s', 'b', 't'].forEach((k) => { Object.keys(T[k]).forEach((h) => { pal[k + h.slice(1)] = dark ? T[k][h] : h; }); });
+v.pal = pal;
+v.themeDark = dark;
+v.colorScheme = dark ? 'dark' : 'light';
+return v;
+}
+renderValsLight() {
+const s = this.state;
+const vw = s.w || (typeof window !== 'undefined' ? window.innerWidth : 1440);
+const mobile = this.props.layout === 'mobile' || vw < 768;
+const collapsed = !mobile && vw < 1200;
+const role = this.props.role ?? 'admin';
+const agent = role === 'agent';
+const SC = { 'À traiter': ['#8c5f0e', '#fbf1dc', '!'], 'Brouillon': ['#5c5852', '#f1f0ec', '○'], 'Validé': ['#3f6285', '#e8eef5', '◆'], 'Accepté': ['#2f7350', '#e5f1ea', '✓'], 'Refusé': ['#b3392f', '#f8e6e4', '✕'], 'Annulé': ['#5c5852', '#f1f0ec', '–'] };
+const badge = (st) => ({ label: st, glyph: SC[st][2], style: 'display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:999px;font-size:12.5px;font-weight:600;white-space:nowrap;color:' + SC[st][0] + ';background:' + SC[st][1] + (st === 'Brouillon' ? ';box-shadow:inset 0 0 0 1px #b9b4aa' : '') });
+let D = [
+['D-2026-0142', 'Mme Koné Mariam', 'Rideau', 'Site', '26/10/2026', 'Yao Serge', 'À traiter'],
+['D-2026-0141', 'M. Kacou Hervé', 'Store', 'Site', '25/10/2026', '', 'À traiter'],
+['D-2026-0140', 'Cabinet Traoré & Associés', 'Store', 'Sur place', '24/10/2026', 'Yao Serge', 'Brouillon'],
+['D-2026-0139', 'Mme Ouattara Fatou', 'Rideau', 'Espace interne', '23/10/2026', 'Koffi Brou', 'Validé'],
+['D-2026-0138', 'M. Bamba Ibrahim', 'Store', 'Site', '22/10/2026', 'Koffi Brou', 'Accepté'],
+['D-2026-0137', 'Résidence Azur', 'Rideau', 'Sur place', '21/10/2026', 'Yao Serge', 'Validé'],
+['D-2026-0136', 'Mme Yapi Christelle', 'Store', 'Site', '20/10/2026', '', 'Refusé'],
+['D-2026-0135', 'M. Diallo Moussa', 'Rideau', 'Espace interne', '19/10/2026', 'Koffi Brou', 'À traiter'],
+['D-2026-0134', 'Clinique des Lagunes', 'Store', 'Sur place', '17/10/2026', 'Koffi Brou', 'Accepté'],
+['D-2026-0133', 'M. Assi Jean-Marc', 'Rideau', 'Site', '16/10/2026', '', 'Annulé']
+];
+if (agent) D = D.filter((d) => d[5] === 'Koffi Brou');
+const F = [['all', 'Tous', agent ? D.length : 142], ['À traiter', 'À traiter', agent ? 1 : 12], ['Brouillon', 'Brouillon', agent ? 0 : 9], ['Validé', 'Validé', agent ? 1 : 7], ['Accepté', 'Accepté', agent ? 2 : 98], ['Refusé', 'Refusé', agent ? 0 : 11], ['Annulé', 'Annulé', agent ? 0 : 5]];
+let rows = D.filter((d) => s.f === 'all' || d[6] === s.f);
+if (s.asc) rows = rows.slice().reverse();
+return {
+setRoot: this.setRootFn,
+mobile, notMobile: !mobile, collapsed, role,
+title: agent ? 'Mes devis' : 'Devis',
+totalLabel: agent ? '' : '142 au total',
+mainStyle: 'flex:1;display:flex;flex-direction:column;gap:' + (mobile ? '14px;padding:14px 16px 170px' : '20px;padding:' + (collapsed ? '24px 24px 48px' : '28px 32px 48px')),
+filtersRow: 'display:flex;gap:8px;' + (mobile ? 'overflow-x:auto;margin:0 -16px;padding:0 16px 2px' : 'flex-wrap:wrap'),
+filters: F.map(([k, label, n]) => {
+const on = s.f === k;
+return { label, n, pressed: on ? 'true' : 'false', pick: () => this.setState({ f: k }),
+style: 'flex:none;display:inline-flex;align-items:center;gap:8px;height:' + (mobile ? '44px' : '36px') + ';padding:0 12px;border-radius:999px;font:inherit;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;' + (on ? 'background:#20332c;color:#ffffff;border:1px solid #20332c' : 'background:#ffffff;color:#353535;border:1px solid #dcd6cb'),
+countStyle: "font-family:'IBM Plex Mono',monospace;font-size:12px;color:" + (on ? '#d9c39b' : '#6b665e') };
+}),
+rows: rows.map(([ref, client, type, source, date, ag, st]) => ({ ref, client, type, source, date, agent: ag || 'Non affecté', agentColor: ag ? '#353535' : '#8c5f0e', st: badge(st) })),
+empty: rows.length === 0,
+sortAria: s.asc ? 'ascending' : 'descending',
+sortIcon: s.asc ? 'M6 15l6-6 6 6' : 'M6 9l6 6 6-6',
+toggleSort: () => this.setState({ asc: !s.asc }),
+pageLabel: rows.length ? '1 à ' + rows.length + ' sur ' + (F.find((x) => x[0] === s.f)[2]) + ' devis' : 'Aucun résultat'
+};
+}
+}
+</script>
+</body>
+</html>

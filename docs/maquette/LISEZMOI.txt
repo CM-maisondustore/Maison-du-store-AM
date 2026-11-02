@@ -1,0 +1,26 @@
+ESPACE PRO, MAISON DU STORE AM : VOIR LA MAQUETTE
+
+Ce dossier contient la maquette complète de la feuille « Espace Pro » : 49 écrans et composants.
+
+POUR L'OUVRIR
+Les fichiers doivent passer par un petit serveur local. Un double-clic sur un fichier ne suffit pas.
+
+1. Ouvrez un terminal dans ce dossier.
+2. Lancez :   python -m http.server 8765
+3. Ouvrez dans le navigateur :   http://localhost:8765
+
+Une connexion Internet est utile pour charger les polices. Sans elle, le contenu s'affiche avec des polices de remplacement.
+
+CONTENU
+index.html          sommaire des écrans
+*.dc.html           écrans et composants
+canvas-pro.json     titres, tailles et notes de conception
+support.js          moteur de rendu, pour la consultation seulement
+assets/             logo
+
+DIFFÉRENCES AVEC LE CANEVAS
+- Le logo pointe vers assets/ au lieu de la réserve d'images du canevas.
+- Le lien « Voir le site » renvoie vers ce sommaire, car le site public n'est pas dans ce dossier.
+
+À SAVOIR
+Tous les noms, clients, montants et tarifs sont des données de démonstration. Le RCCM, le numéro de compte contribuable, l'adresse « Boulevard Latrille » et le téléphone 27 20 21 98 74 de l'écran Paramètres sont fictifs : ils ne doivent jamais servir sur un vrai document.

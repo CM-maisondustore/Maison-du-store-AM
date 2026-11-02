@@ -1,0 +1,189 @@
+/* ==========================================================================
+   services.css
+   Sections de présentation de l'entreprise : services, processus (« à
+   propos ») et réalisations. Les trois partagent le même vocabulaire de
+   cartes ; la maquette n'ayant pas de feuille dédiée, elles sont ici.
+   ========================================================================== */
+
+/* --- Services ---------------------------------------------------------------- */
+.service-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-5);
+}
+
+.service-card {
+  display: grid;
+  gap: var(--space-3);
+  align-content: start;
+  padding: var(--space-5);
+  background: var(--color-white);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+}
+
+.service-card__icon {
+  display: grid;
+  place-items: center;
+  justify-self: center;
+  width: 48px;
+  height: 48px;
+  margin-bottom: var(--space-2);
+  background: var(--color-gold-tint);
+  border-radius: 50%;
+  color: var(--color-gold-text);
+}
+
+.service-card__text {
+  font-size: var(--text-sm);
+  color: var(--color-text-soft);
+}
+
+/* --- Processus --------------------------------------------------------------- */
+.process__intro {
+  max-width: 44rem;
+}
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-5);
+  counter-reset: none;
+}
+
+.step {
+  display: grid;
+  gap: var(--space-3);
+  align-content: start;
+  padding: var(--space-5);
+  background: var(--color-white);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+}
+
+.step__number {
+  text-align: center;
+  font-family: var(--font-label);
+  font-size: var(--text-lg);
+  font-weight: 500;
+  color: var(--color-gold);
+  line-height: 1;
+}
+
+.step__text {
+  font-size: var(--text-sm);
+  color: var(--color-text-soft);
+}
+
+/* --- Réalisations ------------------------------------------------------------ */
+.gallery-grid {
+  display: flex;
+  gap: var(--space-5);
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  padding: var(--space-2) var(--space-1) var(--space-4);
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--space-1);
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-gold) var(--color-line);
+}
+
+.gallery-grid:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 4px;
+}
+
+.gallery-item {
+  flex: 0 0 clamp(260px, 34vw, 390px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  overflow: hidden;
+  padding: var(--space-3);
+  background: var(--color-white);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  scroll-snap-align: start;
+}
+
+.gallery-item .image-placeholder {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  flex: 0 0 auto;
+  border-radius: var(--radius-md);
+}
+
+.gallery-item .site-image {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.gallery-item__title {
+  text-align: left;
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 500;
+  color: var(--color-ink);
+  line-height: var(--leading-snug);
+}
+
+.gallery-item__text {
+  font-size: var(--text-sm);
+  color: var(--color-text-soft);
+  line-height: var(--leading-normal);
+}
+
+.gallery-item__description {
+  border-top: 1px solid var(--color-line);
+  padding-top: var(--space-2);
+}
+
+.gallery-item__description summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  cursor: pointer;
+  color: var(--color-ink);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  list-style: none;
+}
+
+.gallery-item__description summary::-webkit-details-marker {
+  display: none;
+}
+
+.gallery-item__description summary svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  flex: 0 0 auto;
+  transition: transform var(--transition-fast);
+}
+
+.gallery-item__description[open] summary svg {
+  transform: rotate(180deg);
+}
+
+.gallery-item__description .gallery-item__text {
+  margin-top: var(--space-2);
+}
+
+@media (max-width: 600px) {
+  .gallery-grid {
+    gap: var(--space-3);
+    padding-inline: 0;
+  }
+
+  .gallery-item {
+    flex-basis: 100%;
+  }
+
+  .gallery-item .site-image,
+  .gallery-item .image-placeholder {
+    height: clamp(320px, 60svh, 600px);
+    aspect-ratio: auto;
+  }
+}

@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Espace Pro — planche de composants</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 1440px; box-sizing: border-box; padding: 56px 64px 72px; font-family: Inter, system-ui, sans-serif; color: #353535; background: #f4f4f1; display: flex; flex-direction: column; gap: 48px">
+<header style="display: flex; flex-direction: column; gap: 6px"><h1 style="margin: 0; font-family: 'Cormorant Garamond', serif; font-size: 48px; font-weight: 500; color: #1c1c1c">Espace Pro, planche de composants</h1><p style="margin: 0; font-size: 15px; color: #6b665e">Chaque composant s’écrit en HTML et CSS simples (admin.css), sans framework.</p></header>
+
+<section style="display: flex; flex-direction: column; gap: 16px">
+<h2 style="{{h2}}">Navigation</h2>
+<div style="display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap">
+<div style="display: flex; flex-direction: column; gap: 8px"><span style="{{cap}}">Barre latérale dépliée, Admin-CM</span><div style="width: 240px; height: 640px; overflow: hidden; border-radius: 10px"><dc-import name="ProSidebar" active="devis" collapsed="{{ false }}" embedded="{{ true }}" hint-size="240px,640px"></dc-import></div></div>
+<div style="display: flex; flex-direction: column; gap: 8px"><span style="{{cap}}">Repliée</span><div style="width: 68px; height: 640px; overflow: hidden; border-radius: 10px"><dc-import name="ProSidebar" active="devis" collapsed="{{ true }}" embedded="{{ true }}" hint-size="68px,640px"></dc-import></div></div>
+<div style="display: flex; flex-direction: column; gap: 8px"><span style="{{cap}}">Agent</span><div style="width: 240px; height: 640px; overflow: hidden; border-radius: 10px"><dc-import name="ProSidebar" role="agent" active="today" collapsed="{{ false }}" embedded="{{ true }}" hint-size="240px,640px"></dc-import></div></div>
+<div style="flex: 1 1 420px; display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; flex-direction: column; gap: 8px"><span style="{{cap}}">Barre du haut, Admin-CM</span><div style="border-radius: 10px; overflow: visible; border: 1px solid #e8e4db"><dc-import name="ProTopbar" role="admin" hint-size="100%,64px"></dc-import></div></div>
+<div style="display: flex; flex-direction: column; gap: 8px"><span style="{{cap}}">Barre du haut, Agent : pas de bouton « Nouveau »</span><div style="border-radius: 10px; border: 1px solid #e8e4db"><dc-import name="ProTopbar" role="agent" hint-size="100%,64px"></dc-import></div></div>
+<div style="display: flex; gap: 20px; flex-wrap: wrap">
+<div style="display: flex; flex-direction: column; gap: 8px"><span style="{{cap}}">Onglets mobile, Agent</span><div style="width: 390px; border: 1px solid #e8e4db"><dc-import name="ProTabbar" role="agent" active="today" hint-size="390px,84px"></dc-import></div></div>
+<div style="display: flex; flex-direction: column; gap: 8px"><span style="{{cap}}">Onglets mobile, Admin (« Plus » ouvre la feuille)</span><div style="width: 390px; border: 1px solid #e8e4db"><dc-import name="ProTabbar" role="admin" active="devis" hint-size="390px,84px"></dc-import></div></div>
+</div>
+</div>
+</div>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 16px">
+<h2 style="{{h2}}">Badges de statut, 17 états</h2>
+<p style="margin: -8px 0 0; font-size: 14px; color: #6b665e; max-width: 70ch">Une couleur par sens, toujours doublée d’un symbole et d’un libellé : le statut se lit sans la couleur. Le même badge sert dans tous les modules.</p>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px">
+<sc-for list="{{badgeGroups}}" as="g" hint-placeholder-count="6">
+<div style="background: #ffffff; border: 1px solid #e8e4db; border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px">
+<span style="display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; color: #1c1c1c">{{g.title}}<span style="font-weight: 400; font-size: 13px; color: #6b665e">{{g.meaning}}</span></span>
+<span style="display: flex; flex-wrap: wrap; gap: 8px"><sc-for list="{{g.items}}" as="b" hint-placeholder-count="3"><span style="{{b.style}}"><span aria-hidden="true">{{b.glyph}}</span>{{b.label}}</span></sc-for></span>
+</div>
+</sc-for>
+</div>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 16px">
+<h2 style="{{h2}}">Indicateurs, tableau dense, carte de liste mobile</h2>
+<div style="display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start">
+<a href="#k" style="width: 260px; display: flex; flex-direction: column; gap: 8px; padding: 18px 20px; background: #ffffff; border: 1px solid #e8e4db; border-radius: 10px; text-decoration: none; color: #353535"><span style="display: flex; align-items: baseline; gap: 10px"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 30px; font-weight: 500; color: #1c1c1c">12</span><span style="font-size: 15px; font-weight: 600; color: #1c1c1c">devis à traiter</span></span><span style="font-size: 13px; color: #6b665e">Le plus ancien attend depuis 3 jours.</span><span style="font-size: 13px; font-weight: 600; color: #20332c; text-decoration: underline; text-decoration-color: #c09f6a; text-underline-offset: 4px">Ouvrir la liste filtrée</span></a>
+<div style="flex: 1 1 560px; background: #ffffff; border: 1px solid #e8e4db; border-radius: 10px; overflow: hidden">
+<table style="width: 100%; border-collapse: collapse; font-size: 14px">
+<thead><tr style="background: #f9f8f4; text-align: left"><th scope="col" style="padding: 10px 16px; font-size: 13px; font-weight: 600; color: #6b665e">Référence</th><th scope="col" style="padding: 10px 12px; font-size: 13px; font-weight: 600; color: #6b665e">Client</th><th scope="col" aria-sort="descending" style="padding: 10px 12px; font-size: 13px; font-weight: 600; color: #1c1c1c">Date ▾</th><th scope="col" style="padding: 10px 16px 10px 12px; font-size: 13px; font-weight: 600; color: #6b665e; text-align: right">Montant</th></tr></thead>
+<tbody>
+<tr style="border-top: 1px solid #efece5"><td style="padding: 0 16px; height: 44px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #20332c">D-2026-0142</td><td style="padding: 0 12px; font-weight: 500; color: #1c1c1c">Mme Koné Mariam</td><td style="padding: 0 12px; font-family: 'IBM Plex Mono', monospace; font-size: 13px">26/10/2026</td><td style="padding: 0 16px 0 12px; text-align: right; font-size: 13px; font-style: italic; color: #8c5f0e">Prix à définir</td></tr>
+<tr style="border-top: 1px solid #efece5; background: #fcfbf8"><td style="padding: 0 16px; height: 44px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #20332c">D-2026-0140</td><td style="padding: 0 12px; font-weight: 500; color: #1c1c1c">Cabinet Traoré &amp; Associés</td><td style="padding: 0 12px; font-family: 'IBM Plex Mono', monospace; font-size: 13px">24/10/2026</td><td style="padding: 0 16px 0 12px; text-align: right; font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #1c1c1c">622 568 FCFA</td></tr>
+</tbody>
+</table>
+<p style="margin: 0; padding: 10px 16px; border-top: 1px solid #e8e4db; font-size: 12.5px; color: #6b665e">Lignes de 44 px, montants en IBM Plex Mono alignés à droite. Sous 768 px, chaque ligne devient une carte.</p>
+</div>
+<a href="#c" style="width: 358px; display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; background: #ffffff; border: 1px solid #e8e4db; border-radius: 10px; text-decoration: none; color: #353535"><span style="display: flex; justify-content: space-between; gap: 10px"><span style="font-size: 16px; font-weight: 600; color: #1c1c1c">Mme Koné Mariam</span><span style="{{bTodo}}"><span aria-hidden="true">!</span>À traiter</span></span><span style="display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 14px; color: #6b665e"><span style="font-family: 'IBM Plex Mono', monospace; color: #20332c">D-2026-0142</span><span>Rideau</span><span>Site</span><span style="font-family: 'IBM Plex Mono', monospace">26/10/2026</span></span></a>
+</div>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 16px">
+<h2 style="{{h2}}">Frise d’avancement et historique</h2>
+<div style="display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start">
+<div style="flex: 2 1 640px; background: #ffffff; border: 1px solid #e8e4db; border-radius: 10px; padding: 18px 22px 14px">
+<ol style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr))">
+<sc-for list="{{frise}}" as="st" hint-placeholder-count="6"><li style="display: flex; flex-direction: column; gap: 4px; padding-right: 8px"><span aria-hidden="true" style="position: relative; display: block; height: 3px; margin: 8px 0 14px; border-radius: 2px; background: {{st.rail}}"><span style="{{st.ring}}"></span></span><span style="{{st.lbl}}">{{st.label}}</span></li></sc-for>
+</ol>
+<p style="margin: 10px 0 0; font-size: 12.5px; color: #6b665e">La tringle : anneau plein = étape franchie, anneau or vide = prochaine étape, anneau gris = à venir.</p>
+</div>
+<ol style="flex: 1 1 320px; list-style: none; margin: 0; padding: 16px 20px; background: #ffffff; border: 1px solid #e8e4db; border-radius: 10px; display: flex; flex-direction: column">
+<li style="display: grid; grid-template-columns: 14px 1fr; gap: 10px; padding-bottom: 12px"><span aria-hidden="true" style="width: 10px; height: 10px; margin-top: 4px; box-sizing: border-box; border-radius: 50%; border: 2px solid #c09f6a"></span><span style="display: flex; flex-direction: column"><span style="font-size: 14px">Validé par Aïcha Diabaté</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b665e">24/10/2026 10:30</span></span></li>
+<li style="display: grid; grid-template-columns: 14px 1fr; gap: 10px"><span aria-hidden="true" style="width: 10px; height: 10px; margin-top: 4px; box-sizing: border-box; border-radius: 50%; border: 2px solid #c09f6a; background: #c09f6a"></span><span style="display: flex; flex-direction: column"><span style="font-size: 14px">Envoyé par e-mail avec le PDF</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b665e">24/10/2026 10:31</span></span></li>
+</ol>
+</div>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 16px">
+<h2 style="{{h2}}">Champs</h2>
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; background: #ffffff; border: 1px solid #e8e4db; border-radius: 10px; padding: 22px">
+<label style="{{lab}}">Texte<input type="text" value="Cabinet Traoré &amp; Associés" style="{{inp}}"></label>
+<label style="{{lab}}">Texte, focus clavier<input type="text" value="07 08 12 34 56" style="{{inpFocus}}"></label>
+<label style="{{lab}}">Texte, erreur<input type="email" value="secretariat@" aria-invalid="true" aria-describedby="err-ex" style="{{inpErr}}"><span id="err-ex" style="font-size: 12.5px; font-weight: 400; color: #b3392f">Adresse incomplète : ajoutez le domaine (ex. @gmail.com).</span></label>
+<label style="{{lab}}">Sélecteur<select style="{{inp}}"><option>Moteur radio et télécommande</option></select></label>
+<label style="{{lab}}">Numérique en cm<span style="display: inline-flex; border: 1px solid #dcd6cb; border-radius: 6px; overflow: hidden"><input type="number" value="180" style="width: 100%; height: 40px; box-sizing: border-box; padding: 0 10px; border: 0; font-family: 'IBM Plex Mono', monospace; text-align: right"><span style="{{tag}}">cm</span></span></label>
+<label style="{{lab}}">Montant en FCFA<span style="display: inline-flex; border: 1px solid #dcd6cb; border-radius: 6px; overflow: hidden"><input type="number" value="18500" style="width: 100%; height: 40px; box-sizing: border-box; padding: 0 10px; border: 0; font-family: 'IBM Plex Mono', monospace; text-align: right"><span style="{{tag}}">FCFA</span></span></label>
+<label style="{{lab}}">Prix vide = « à définir »<span style="display: inline-flex; border: 1px dashed #b98a2e; border-radius: 6px; overflow: hidden; background: #fdf8ec"><input type="number" placeholder="À définir" style="width: 100%; height: 40px; box-sizing: border-box; padding: 0 10px; border: 0; background: transparent; font-family: 'IBM Plex Mono', monospace; text-align: right"><span style="{{tag}}">FCFA</span></span></label>
+<label style="{{lab}}">Coût 0 = « coût nul »<span style="display: inline-flex; border: 1px solid #dcd6cb; border-radius: 6px; overflow: hidden"><input type="number" value="0" style="width: 100%; height: 40px; box-sizing: border-box; padding: 0 10px; border: 0; font-family: 'IBM Plex Mono', monospace; text-align: right"><span style="{{tag}}">FCFA / pièce</span></span><span style="font-size: 12.5px; font-weight: 400; color: #6b665e">Coût nul</span></label>
+<div style="display: flex; flex-direction: column; gap: 10px; font-size: 14px"><span style="font-weight: 500; color: #1c1c1c">Cases à cocher</span><label style="display: flex; align-items: center; gap: 10px"><input type="checkbox" checked style="width: 18px; height: 18px; margin: 0; accent-color: #20332c">Rail aluminium</label><label style="display: flex; align-items: center; gap: 10px"><input type="checkbox" style="width: 18px; height: 18px; margin: 0; accent-color: #20332c">Crochets, lot de 100</label></div>
+<div style="display: flex; flex-direction: column; gap: 10px; font-size: 14px"><span style="font-weight: 500; color: #1c1c1c">Interrupteurs</span><span style="display: flex; align-items: center; gap: 10px"><span role="switch" aria-checked="true" style="position: relative; width: 40px; height: 24px; border-radius: 999px; background: #20332c"><span style="position: absolute; top: 3px; left: 19px; width: 18px; height: 18px; border-radius: 50%; background: #ffffff"></span></span>Visible</span><span style="display: flex; align-items: center; gap: 10px"><span role="switch" aria-checked="false" style="position: relative; width: 40px; height: 24px; border-radius: 999px; background: #cfc9bd"><span style="position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #ffffff"></span></span>Masqué</span></div>
+<div style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 500; color: #1c1c1c">Import d’image<span style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 16px; border: 1px dashed #b9b4aa; border-radius: 6px; background: #f9f8f4; font-weight: 400; text-align: center"><span><strong>Choisir un fichier</strong> ou le déposer</span><span style="font-size: 12px; color: #6b665e">JPG, PNG ou WebP, 2 Mo et 6000 px maximum</span></span></div>
+<label style="{{lab}}">Zone de texte<textarea rows="3" style="box-sizing: border-box; padding: 10px 12px; border: 1px solid #dcd6cb; border-radius: 6px; font: inherit; font-weight: 400; font-size: 14px">3 stores posés et réglés.</textarea></label>
+</div>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 16px">
+<h2 style="{{h2}}">Chiffrage et carte fenêtre</h2>
+<div style="display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start">
+<div style="flex: 2 1 620px; background: #ffffff; border: 1px solid #e8e4db; border-radius: 10px; padding: 16px 20px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: grid; grid-template-columns: 1fr 90px 150px 130px; gap: 10px; align-items: center; font-size: 14px"><span style="padding: 9px 10px; border: 1px solid #dcd6cb; border-radius: 6px">Toile occultante polyester, Lin</span><span style="padding: 9px 8px; border: 1px solid #dcd6cb; border-radius: 6px; font-family: 'IBM Plex Mono', monospace; text-align: right">9.6 m²</span><span style="padding: 9px 8px; border: 1px solid #dcd6cb; border-radius: 6px; font-family: 'IBM Plex Mono', monospace; text-align: right">18 500 FCFA</span><span style="font-family: 'IBM Plex Mono', monospace; text-align: right; color: #1c1c1c">177 600 FCFA</span></div>
+<div style="display: grid; grid-template-columns: 1fr 90px 150px 130px; gap: 10px; align-items: center; font-size: 14px"><span style="padding: 9px 10px; border: 1px solid #dcd6cb; border-radius: 6px">Pose</span><span style="padding: 9px 8px; border: 1px solid #dcd6cb; border-radius: 6px; font-family: 'IBM Plex Mono', monospace; text-align: right">4</span><span style="padding: 9px 8px; border: 1px dashed #b98a2e; background: #fdf8ec; border-radius: 6px; font-family: 'IBM Plex Mono', monospace; text-align: right; color: #8c5f0e">À définir</span><span style="font-style: italic; text-align: right; color: #8c5f0e">À définir</span></div>
+<dl style="margin: 4px 0 0 auto; width: 340px; display: flex; flex-direction: column; font-size: 14px"><div style="display: flex; justify-content: space-between; padding: 4px 0"><dt>Sous-total HT</dt><dd style="margin: 0; font-family: 'IBM Plex Mono', monospace">527 600 FCFA</dd></div><div style="display: flex; justify-content: space-between; padding: 4px 0"><dt>TVA 18 %</dt><dd style="margin: 0; font-family: 'IBM Plex Mono', monospace">94 968 FCFA</dd></div><div style="display: flex; justify-content: space-between; padding: 8px 0 0; border-top: 2px solid #1c1c1c"><dt style="font-weight: 600; color: #1c1c1c">Total TTC provisoire</dt><dd style="margin: 0; font-family: 'IBM Plex Mono', monospace; font-size: 17px; color: #1c1c1c">622 568 FCFA</dd></div><div style="padding-top: 6px; font-size: 13px; color: #8c5f0e">! 1 ligne sans prix : le total est incomplet.</div></dl>
+</div>
+<div style="width: 358px; border: 1px solid #e8e4db; border-radius: 10px; background: #ffffff; overflow: hidden">
+<div style="min-height: 56px; display: flex; align-items: center; gap: 10px; padding: 0 12px"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #6b665e">01</span><span style="flex: 1; font-size: 15px; font-weight: 600; color: #1c1c1c">Fenêtre 1 ×2</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px">180 × 220</span><span aria-hidden="true">˄</span></div>
+<div style="padding: 12px; border-top: 1px solid #efece5; display: grid; grid-template-columns: 1fr 1fr; gap: 10px"><span style="display: flex; border: 1px solid #cfc9bd; border-radius: 10px; overflow: hidden"><span style="flex: 1; height: 56px; display: flex; align-items: center; justify-content: flex-end; padding: 0 10px; font-family: 'IBM Plex Mono', monospace; font-size: 22px">180</span><span style="{{tagBig}}">cm</span></span><span style="display: flex; border: 1px solid #cfc9bd; border-radius: 10px; overflow: hidden"><span style="flex: 1; height: 56px; display: flex; align-items: center; justify-content: flex-end; padding: 0 10px; font-family: 'IBM Plex Mono', monospace; font-size: 22px">220</span><span style="{{tagBig}}">cm</span></span></div>
+<div style="padding: 0 12px 12px; font-size: 13px; color: #6b665e">Carte repliable : en-tête de 56 px, gros clavier numérique, stepper −/+ pour les fenêtres identiques.</div>
+</div>
+</div>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 16px">
+<h2 style="{{h2}}">Notifications, confirmation, état vide, chargement, pagination</h2>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+<sc-for list="{{toasts}}" as="t" hint-placeholder-count="4">
+<div role="status" style="{{t.style}}"><span aria-hidden="true" style="font-weight: 700">{{t.glyph}}</span><span style="flex: 1"><strong>{{t.title}}</strong> {{t.text}}</span></div>
+</sc-for>
+</div>
+<div style="display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start">
+<div role="dialog" aria-labelledby="mod-ex" style="width: 440px; background: #ffffff; border-radius: 12px; box-shadow: 0 24px 60px -20px rgba(0,0,0,0.3); border: 1px solid #e8e4db; padding: 22px; display: flex; flex-direction: column; gap: 12px"><h3 id="mod-ex" style="margin: 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 500; color: #1c1c1c">Annuler ce rendez-vous ?</h3><p style="margin: 0; font-size: 14px; line-height: 1.5">Le créneau du mardi 27/10 à 10:00 sera libéré et M. Bamba recevra un e-mail.</p><div style="display: flex; justify-content: flex-end; gap: 8px"><span style="display: inline-flex; align-items: center; height: 42px; padding: 0 14px; border: 1px solid #dcd6cb; border-radius: 6px; font-size: 14px; font-weight: 600">Garder le rendez-vous</span><span style="display: inline-flex; align-items: center; height: 42px; padding: 0 14px; border-radius: 6px; background: #b3392f; color: #ffffff; font-size: 14px; font-weight: 600">Annuler le rendez-vous</span></div></div>
+<div style="width: 320px; padding: 28px 20px; background: #ffffff; border: 1px dashed #dcd6cb; border-radius: 10px; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center"><span style="font-size: 15px; font-weight: 600; color: #1c1c1c">Aucune facture impayée.</span><span style="font-size: 14px; color: #6b665e">Les factures émises non réglées apparaîtront ici.</span></div>
+<div aria-busy="true" aria-label="Chargement" style="width: 340px; padding: 16px; background: #ffffff; border: 1px solid #e8e4db; border-radius: 10px; display: flex; flex-direction: column; gap: 12px"><span style="height: 14px; width: 60%; border-radius: 4px; background: #ece9e2"></span><span style="height: 12px; width: 90%; border-radius: 4px; background: #f1eee8"></span><span style="height: 12px; width: 80%; border-radius: 4px; background: #f1eee8"></span><span style="height: 12px; width: 70%; border-radius: 4px; background: #f1eee8"></span></div>
+<nav aria-label="Pagination" style="display: flex; gap: 4px; align-self: center"><span style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border: 1px solid #dcd6cb; border-radius: 6px; background: #ffffff">‹</span><span aria-current="page" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: #20332c; color: #ffffff; font-family: 'IBM Plex Mono', monospace">1</span><span style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border: 1px solid #dcd6cb; border-radius: 6px; background: #ffffff; font-family: 'IBM Plex Mono', monospace">2</span><span style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border: 1px solid #dcd6cb; border-radius: 6px; background: #ffffff; font-family: 'IBM Plex Mono', monospace">3</span><span style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border: 1px solid #dcd6cb; border-radius: 6px; background: #ffffff">›</span></nav>
+</div>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":3200}}'>
+class Component extends DCLogic {
+renderVals() {
+const C = { warn: ['#8c5f0e', '#fbf1dc'], gold: ['#84642f', '#f6f0e4'], neutral: ['#5c5852', '#f1f0ec'], info: ['#3f6285', '#e8eef5'], ok: ['#2f7350', '#e5f1ea'], err: ['#b3392f', '#f8e6e4'] };
+const b = (label, glyph, k) => ({ label, glyph, style: 'display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:999px;font-size:12.5px;font-weight:600;white-space:nowrap;color:' + C[k][0] + ';background:' + C[k][1] + (label === 'Brouillon' ? ';box-shadow:inset 0 0 0 1px #b9b4aa' : '') });
+const inpBase = 'height:40px;box-sizing:border-box;padding:0 10px;border-radius:6px;font:inherit;font-weight:400;font-size:14px;';
+return {
+h2: 'margin:0;padding-bottom:10px;border-bottom:1px solid #dcd6cb;font-family:\'Cormorant Garamond\',serif;font-size:30px;font-weight:500;color:#1c1c1c',
+cap: 'font-size:13px;color:#6b665e',
+lab: 'display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:500;color:#1c1c1c',
+inp: inpBase + 'border:1px solid #dcd6cb',
+inpFocus: inpBase + 'border:1px solid #20332c;outline:2px solid #c09f6a;outline-offset:1px',
+inpErr: inpBase + 'border:1px solid #b3392f;background:#fdf6f5',
+tag: 'padding:0 8px;height:40px;display:inline-flex;align-items:center;background:#f4f4f1;font-size:12px;color:#6b665e;white-space:nowrap',
+tagBig: 'padding:0 10px;height:56px;display:inline-flex;align-items:center;background:#f4f4f1;font-size:14px;color:#6b665e',
+bTodo: b('À traiter', '!', 'warn').style,
+badgeGroups: [
+['Attention', 'une action est attendue', [b('À traiter', '!', 'warn'), b('Envoi à vérifier', '!', 'warn')]],
+['En cours', 'quelque chose avance', [b('En cours', '◐', 'gold'), b('Envoi en cours', '◐', 'info')]],
+['Neutre', 'pas encore engagé ou abandonné', [b('Brouillon', '○', 'neutral'), b('Annulé', '–', 'neutral')]],
+['Engagé', 'validé ou programmé', [b('Validé', '◆', 'info'), b('Planifié', '○', 'info'), b('Émise', '◆', 'info'), b('Reçu', '●', 'info')]],
+['Réussi', 'terminé sans souci', [b('Accepté', '✓', 'ok'), b('Confirmé', '✓', 'ok'), b('Terminé', '●', 'ok'), b('Payée', '✓', 'ok'), b('Envoyé', '✓', 'ok'), b('Partagé manuellement', '↗', 'ok')]],
+['Échec', 'refus du client', [b('Refusé', '✕', 'err')]]
+].map(([title, meaning, items]) => ({ title, meaning, items })),
+frise: ['Reçu', 'Brouillon', 'Validé', 'Envoyé', 'Accepté', 'Facturé'].map((label, i) => ({ label, rail: i <= 3 ? '#c09f6a' : '#e8e4db',
+ring: 'position:absolute;left:0;top:-7px;width:17px;height:17px;box-sizing:border-box;border-radius:50%;border:2px solid ' + (i <= 4 ? '#c09f6a' : '#cfc8bb') + ';background:' + (i <= 3 ? '#c09f6a' : '#ffffff'),
+lbl: 'font-size:14px;font-weight:' + (i === 4 ? '600' : '500') + ';color:' + (i <= 4 ? '#1c1c1c' : '#6b665e') })),
+toasts: [
+['✓', 'Devis enregistré.', 'D-2026-0140 est visible par Yao Serge.', '#1f4d35', '#e5f1ea', '#b7d6c3'],
+['✕', 'Envoi impossible.', 'Le serveur SMTP ne répond pas : vérifiez la connexion dans Documents et automatisations.', '#8f2c24', '#f8e6e4', '#e8c2bd'],
+['!', 'Rendez-vous qui se chevauchent.', 'Koffi Brou a déjà une installation de 08:30 à 12:30 ce jour-là.', '#5e4108', '#fbf1dc', '#ecd7a8'],
+['i', 'Synchronisation terminée.', '2 nouveaux messages dans la messagerie.', '#2c4660', '#e8eef5', '#c9d6e5']
+].map(([glyph, title, text, fg, bg, bd]) => ({ glyph, title, text, style: 'display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:8px;font-size:14px;line-height:1.5;color:' + fg + ';background:' + bg + ';border:1px solid ' + bd }))
+};
+}
+}
+</script>
+</body>
+</html>

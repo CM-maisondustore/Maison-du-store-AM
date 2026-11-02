@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Espace Pro — connexion</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="color-scheme: {{colorScheme}}; {{root}}">
+
+<section aria-hidden="{{decoHidden}}" style="{{brandPanel}}">
+<div style="display: flex; align-items: center; gap: 12px">
+<span style="width: 44px; height: 44px; border-radius: 50%; background: {{pal.sffffff}}; display: flex; align-items: center; justify-content: center; overflow: hidden; flex: none"><img src="assets/logo-maison-du-store-am.jpg" alt="" style="width: 40px; height: 40px; object-fit: contain"></span>
+<span style="font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; color: #ffffff">Maison du Store AM</span>
+</div>
+<sc-if value="{{desktop}}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; flex-direction: column; gap: 28px; max-width: 460px">
+<div aria-hidden="true" style="position: relative; height: 18px; margin: 0 6px">
+<span style="position: absolute; left: -6px; right: -6px; top: 7px; height: 3px; border-radius: 2px; background: #c09f6a"></span>
+<span style="position: absolute; left: -12px; top: 3px; width: 11px; height: 11px; border-radius: 50%; background: #c09f6a"></span>
+<span style="position: absolute; right: -12px; top: 3px; width: 11px; height: 11px; border-radius: 50%; background: #c09f6a"></span>
+<span style="position: absolute; left: 12%; top: 1px; width: 15px; height: 15px; box-sizing: border-box; border-radius: 50%; border: 2px solid #c09f6a; background: {{pal.s20332c}}"></span>
+<span style="position: absolute; left: 28%; top: 1px; width: 15px; height: 15px; box-sizing: border-box; border-radius: 50%; border: 2px solid #c09f6a; background: {{pal.s20332c}}"></span>
+<span style="position: absolute; left: 44%; top: 1px; width: 15px; height: 15px; box-sizing: border-box; border-radius: 50%; border: 2px solid #c09f6a; background: {{pal.s20332c}}"></span>
+<span style="position: absolute; left: 60%; top: 1px; width: 15px; height: 15px; box-sizing: border-box; border-radius: 50%; border: 2px solid #c09f6a; background: {{pal.s20332c}}"></span>
+</div>
+<p style="margin: 0; font-family: 'Cormorant Garamond', serif; font-size: 44px; font-weight: 500; line-height: 1.1; color: #ffffff">L’atelier, le planning et les chantiers, au même endroit.</p>
+<p style="margin: 0; font-size: 15px; line-height: 1.6; color: #b9c8c1">Accès réservé à l’équipe. Un compte est créé par l’administrateur depuis le module Équipe.</p>
+</div>
+</sc-if>
+<sc-if value="{{desktop}}" hint-placeholder-val="{{ true }}">
+<span style="font-size: 13px; color: #8fa49b">Cocody — Marché Saint Jean, Abidjan</span>
+</sc-if>
+</section>
+
+<main style="{{formPanel}}">
+<div style="width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 24px">
+
+<sc-if value="{{isLogin}}" hint-placeholder-val="{{ true }}">
+<form onSubmit="{{submit}}" style="display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<h1 style="{{h1}}">Connexion à l’Espace Pro</h1>
+<p style="margin: 0; font-size: 15px; color: {{pal.t6b665e}}">Entrez l’adresse e-mail et le mot de passe de votre compte.</p>
+</div>
+<sc-if value="{{hasError}}" hint-placeholder-val="{{ false }}">
+<p role="alert" style="margin: 0; display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: 6px; background: {{pal.sf8e6e4}}; color: {{pal.t8f2c24}}; font-size: 14px; line-height: 1.5"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" style="flex: none; margin-top: 1px"><path d="M12 3l10 18H2zM12 10v5M12 18h.01"></path></svg><span>{{errorText}}</span></p>
+</sc-if>
+<sc-if value="{{locked}}" hint-placeholder-val="{{ false }}">
+<p role="alert" style="margin: 0; display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: 6px; background: {{pal.sfbf1dc}}; color: {{pal.t6e4a0b}}; font-size: 14px; line-height: 1.5"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" style="flex: none; margin-top: 1px"><path d="M12 7v5l3 2M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18"></path></svg><span>Trop de tentatives, réessayez dans 1 minute.</span></p>
+</sc-if>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 500; color: {{pal.t1c1c1c}}">Adresse e-mail
+<input type="email" autocomplete="username" value="{{email}}" onChange="{{setEmail}}" placeholder="prenom@maisondustoream.com" style="{{input}}"></label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 500; color: {{pal.t1c1c1c}}">Mot de passe
+<input type="password" autocomplete="current-password" value="{{pwd}}" onChange="{{setPwd}}" style="{{input}}"></label>
+<button type="submit" disabled="{{locked}}" style="{{submitStyle}}">Se connecter</button>
+<p style="margin: 0; font-size: 14px; color: {{pal.t6b665e}}">Mot de passe oublié ? Demandez à l’administrateur de le réinitialiser.</p>
+</form>
+</sc-if>
+
+<sc-if value="{{isPassword}}" hint-placeholder-val="{{ false }}">
+<form onSubmit="{{noSubmit}}" style="display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<h1 style="{{h1}}">Choisissez votre mot de passe</h1>
+<p style="margin: 0; font-size: 15px; line-height: 1.55; color: {{pal.t6b665e}}">C’est votre première connexion : remplacez le mot de passe temporaire avant de continuer.</p>
+</div>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 500; color: {{pal.t1c1c1c}}">Nouveau mot de passe
+<input type="password" autocomplete="new-password" value="{{np}}" onChange="{{setNp}}" style="{{input}}"></label>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div aria-hidden="true" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px">
+<sc-for list="{{meter}}" as="m" hint-placeholder-count="4"><span style="{{m}}"></span></sc-for>
+</div>
+<span aria-live="polite" style="font-size: 13px; color: {{strengthColor}}; font-weight: 600">Robustesse : {{strengthLabel}}</span>
+<ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; font-size: 13px">
+<sc-for list="{{rules}}" as="r" hint-placeholder-count="4">
+<li style="{{r.style}}"><span aria-hidden="true" style="width: 14px; text-align: center">{{r.glyph}}</span>{{r.label}}<span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">{{r.sr}}</span></li>
+</sc-for>
+</ul>
+</div>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 500; color: {{pal.t1c1c1c}}">Confirmer le mot de passe
+<input type="password" autocomplete="new-password" value="{{cp}}" onChange="{{setCp}}" style="{{input}}"></label>
+<sc-if value="{{mismatch}}" hint-placeholder-val="{{ false }}"><span role="alert" style="font-size: 13px; color: {{pal.tb3392f}}">Les deux mots de passe ne sont pas identiques.</span></sc-if>
+<button type="submit" style="{{saveStyle}}">Enregistrer et continuer</button>
+</form>
+</sc-if>
+
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["login","password"],"default":"login"},"layout":{"editor":"enum","options":["desktop","mobile"],"default":"desktop"},"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+constructor(props) {
+super(props);
+this.state = { email: '', pwd: '', tries: 0, np: '', cp: '' };
+}
+isDark() {
+const t = this.props.theme;
+if (t === 'dark') return true;
+if (t === 'light') return false;
+let v = 'light';
+try { v = window.localStorage.getItem('mds-pro-theme') || 'light'; } catch (e) {}
+if (v === 'dark') return true;
+if (v === 'auto') { try { return window.matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) {} }
+return false;
+}
+themeMaps() { return { s: {"#ffffff": "#1b2220", "#f4f4f1": "#121816", "#f9f8f4": "#202825", "#fbfaf7": "#1e2623", "#fdfbf6": "#222a27", "#fcfbf8": "#1e2623", "#faf9f7": "#1e2623", "#fffcf5": "#2b2618", "#f1f0ec": "#262e2b", "#ece9e2": "#2a322f", "#e9e8e2": "#2a302d", "#e9e6df": "#0f1412", "#eef0ec": "#232b28", "#eef1ef": "#202826", "#edf1f4": "#1d2530", "#e8e4db": "#313a36", "#dcd6cb": "#3b4540", "#f1eee8": "#29312e", "#efece5": "#29312e", "#cfc9bd": "#4c5751", "#cfc8bb": "#4c5751", "#e1ddd3": "#3b4540", "#b9b4aa": "#5a645e", "#20332c": "#2b4a3e", "#2b4239": "#34574a", "#e5f1ea": "#1d3a2b", "#b7d6c3": "#2f5a43", "#fdf8ec": "#2d2717", "#ecd7a8": "#5b4a25", "#fbf1dc": "#382d15", "#e3c2bd": "#5e302b", "#e3c3bf": "#5e302b", "#fbeceb": "#3a1f1c", "#e8eef5": "#1d2a38", "#eeede8": "#2a302d", "#f6f0e4": "#2f2a1f", "#f3f3f3": "#262e2b", "#cccccc": "#46504b", "#fdf6f5": "#33201e", "#f8e6e4": "#3a2220", "#fbf6ea": "#2d2717", "#ecdcb9": "#5b4a25", "#f6ece5": "#33241d", "#efe9dd": "#2a2620", "#d9b26a": "#8a6a2c", "#b98a2e": "#8a6a2c"}, b: {"#ffffff": "#1b2220", "#f4f4f1": "#121816", "#f9f8f4": "#202825", "#fbfaf7": "#1e2623", "#fdfbf6": "#222a27", "#fcfbf8": "#1e2623", "#faf9f7": "#1e2623", "#fffcf5": "#2b2618", "#f1f0ec": "#262e2b", "#ece9e2": "#2a322f", "#e9e8e2": "#2a302d", "#e9e6df": "#0f1412", "#eef0ec": "#232b28", "#eef1ef": "#202826", "#edf1f4": "#1d2530", "#e8e4db": "#313a36", "#dcd6cb": "#3b4540", "#f1eee8": "#29312e", "#efece5": "#29312e", "#cfc9bd": "#4c5751", "#cfc8bb": "#4c5751", "#e1ddd3": "#3b4540", "#b9b4aa": "#5a645e", "#20332c": "#5d8a76", "#2b4239": "#34574a", "#e5f1ea": "#1d3a2b", "#b7d6c3": "#2f5a43", "#fdf8ec": "#2d2717", "#ecd7a8": "#5b4a25", "#fbf1dc": "#382d15", "#e3c2bd": "#5e302b", "#e3c3bf": "#5e302b", "#fbeceb": "#3a1f1c", "#e8eef5": "#1d2a38", "#eeede8": "#2a302d", "#f6f0e4": "#2f2a1f", "#f3f3f3": "#262e2b", "#cccccc": "#46504b", "#fdf6f5": "#33201e", "#f8e6e4": "#3a2220", "#fbf6ea": "#2d2717", "#ecdcb9": "#5b4a25", "#f6ece5": "#33241d", "#efe9dd": "#2a2620", "#d9b26a": "#8a6a2c", "#b98a2e": "#8a6a2c", "#1c1c1c": "#d6d2c9", "#b3392f": "#f28b80"}, t: {"#1c1c1c": "#f1eee8", "#353535": "#d6d2c9", "#6b665e": "#a8a296", "#20332c": "#bfd8cb", "#84642f": "#d8b47a", "#2f7350": "#86cfa3", "#8c5f0e": "#e6b862", "#5e4108": "#f0d39a", "#b3392f": "#f28b80", "#7c241c": "#f5b0a8", "#3f6285": "#9ec0e3", "#2c4866": "#bcd3ea", "#5c5852": "#c9c4ba", "#b0aaa0": "#6c736e", "#3d2b06": "#f0dcb3", "#1f4d35": "#bfe3cc", "#8f2c24": "#f5b0a8", "#6e4a0b": "#e6c27a", "#3f5a72": "#a9c3dc", "#3f5a73": "#a9c3dc", "#8e4529": "#e0a084", "#5a5248": "#cfc8bb", "#b98a2e": "#d9ac57", "#2c4660": "#a9c3dc"} }; }
+themeWatch() {
+if (this.__thw || typeof window === 'undefined') return;
+this.__thw = true;
+const bump = () => this.setState({ __th: Date.now() });
+try { window.addEventListener('storage', (e) => { if (e.key === 'mds-pro-theme') bump(); }); } catch (e) {}
+try { window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', bump); } catch (e) {}
+}
+dmap(v) {
+const T = this.themeMaps();
+const cv = (str) => str.split(';').map((seg) => {
+const i = seg.indexOf(':');
+let M = T.s;
+if (i > -1) { const p = seg.slice(0, i).trim().toLowerCase(); M = /^(color|stroke|fill|caret-color|accent-color|text-decoration-color)$/.test(p) ? T.t : /^(border|outline|box-shadow)/.test(p) ? T.b : T.s; }
+return seg.replace(/#[0-9a-fA-F]{6}/g, (h) => M[h.toLowerCase()] || h);
+}).join(';');
+const go = (x) => (typeof x === 'string' ? cv(x) : Array.isArray(x) ? x.map(go) : x && typeof x === 'object' && Object.prototype.toString.call(x) === '[object Object]' ? Object.keys(x).reduce((o, k) => { o[k] = go(x[k]); return o; }, {}) : x);
+return go(v);
+}
+renderVals() {
+this.themeWatch();
+const dark = this.isDark();
+let v = this.renderValsLight();
+if (dark) v = this.dmap(v);
+const T = this.themeMaps();
+const pal = {};
+['s', 'b', 't'].forEach((k) => { Object.keys(T[k]).forEach((h) => { pal[k + h.slice(1)] = dark ? T[k][h] : h; }); });
+v.pal = pal;
+v.themeDark = dark;
+v.colorScheme = dark ? 'dark' : 'light';
+return v;
+}
+renderValsLight() {
+const s = this.state;
+const mobile = this.props.layout === 'mobile';
+const isPassword = this.props.mode === 'password';
+const locked = s.tries >= 3;
+const left = 3 - s.tries;
+const r = [
+['12 caractères au moins', s.np.length >= 12],
+['Une majuscule et une minuscule', /[A-Z]/.test(s.np) && /[a-z]/.test(s.np)],
+['Un chiffre', /\d/.test(s.np)],
+['Un caractère spécial (! ? @ # …)', /[^A-Za-z0-9]/.test(s.np)]
+];
+const score = r.filter((x) => x[1]).length;
+const LBL = ['à saisir', 'faible', 'moyenne', 'bonne', 'excellente'];
+const COL = ['#6b665e', '#b3392f', '#8c5f0e', '#3f6285', '#2f7350'];
+const ok = score === 4 && s.np === s.cp;
+return {
+root: 'font-family:Inter,system-ui,sans-serif;color:#353535;background:#f4f4f1;min-height:' + (mobile ? '844px' : '100vh') + ';display:flex;' + (mobile ? 'flex-direction:column' : 'flex-wrap:wrap'),
+desktop: !mobile,
+decoHidden: 'false',
+brandPanel: 'background:#20332c;color:#ffffff;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between;gap:32px;' + (mobile ? 'padding:20px' : 'flex:1 1 480px;padding:48px 56px'),
+formPanel: 'box-sizing:border-box;display:flex;justify-content:center;' + (mobile ? 'padding:32px 20px;flex:1' : 'flex:1 1 520px;align-items:center;padding:48px 32px'),
+h1: "margin:0;font-family:'Cormorant Garamond',serif;font-weight:500;line-height:1.1;color:#1c1c1c;font-size:" + (mobile ? '32px' : '38px'),
+input: 'height:48px;box-sizing:border-box;padding:0 14px;background:#ffffff;border:1px solid #cfc9bd;border-radius:6px;font:inherit;font-weight:400;font-size:16px;color:#1c1c1c',
+isLogin: !isPassword,
+isPassword,
+hasError: s.tries > 0 && !locked,
+errorText: 'Adresse e-mail ou mot de passe incorrect. ' + (left === 1 ? 'Dernier essai avant blocage d’une minute.' : 'Il vous reste ' + left + ' essais.'),
+locked,
+email: s.email, pwd: s.pwd,
+setEmail: (e) => this.setState({ email: e.target.value }),
+setPwd: (e) => this.setState({ pwd: e.target.value }),
+submit: (e) => { e.preventDefault(); if (!locked) this.setState({ tries: s.tries + 1 }); },
+submitStyle: 'height:48px;border:0;border-radius:6px;font:inherit;font-size:15px;font-weight:600;cursor:pointer;' + (locked ? 'background:#e8e4db;color:#6b665e;cursor:not-allowed' : 'background:#c09f6a;color:#161616'),
+noSubmit: (e) => e.preventDefault(),
+np: s.np, cp: s.cp,
+setNp: (e) => this.setState({ np: e.target.value }),
+setCp: (e) => this.setState({ cp: e.target.value }),
+meter: [0, 1, 2, 3].map((i) => 'height:6px;border-radius:3px;background:' + (i < score ? COL[score] : '#e8e4db')),
+strengthLabel: LBL[score],
+strengthColor: COL[score],
+rules: r.map(([label, met]) => ({ label, glyph: met ? '✓' : '○', sr: met ? ' (respecté)' : ' (à respecter)', style: 'position:relative;display:flex;gap:8px;align-items:center;color:' + (met ? '#2f7350' : '#6b665e') })),
+mismatch: s.cp.length > 0 && s.np !== s.cp,
+saveStyle: 'height:48px;border:0;border-radius:6px;font:inherit;font-size:15px;font-weight:600;cursor:pointer;' + (ok ? 'background:#c09f6a;color:#161616' : 'background:#e8e4db;color:#6b665e')
+};
+}
+}
+</script>
+</body>
+</html>

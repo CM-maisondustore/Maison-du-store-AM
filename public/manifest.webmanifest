@@ -1,0 +1,10 @@
+{
+  "name": "Maison du Store AM — Espace pro",
+  "short_name": "MDS Pro",
+  "start_url": "/admin/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f5f2ed",
+  "theme_color": "#163b35",
+  "lang": "fr"
+}

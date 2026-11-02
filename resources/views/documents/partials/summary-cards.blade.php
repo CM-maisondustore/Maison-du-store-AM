@@ -1,0 +1,1 @@
+<table class="cards"><tr><td>OUVERTURES<strong>{{ $opening_count }}</strong></td><td>SOUS-TOTAL<strong>{{ \App\Services\DocumentViewModel::money($totals['suppliesAndConfectionTotal'] ?? $totals['subtotal']) }}</strong></td><td class="grand">TOTAL GÉNÉRAL<strong>{{ \App\Services\DocumentViewModel::money($totals['total']) }}</strong></td></tr></table>

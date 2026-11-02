@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Espace Pro — équipe</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="color-scheme: {{colorScheme}}; font-family: Inter, system-ui, sans-serif; color: {{pal.t353535}}; background: {{pal.sf4f4f1}}; min-height: 100vh; display: flex">
+<dc-import name="ProSidebar" active="equipe" hint-size="240px,100%"></dc-import>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+<dc-import name="ProTopbar" role="admin" hint-size="100%,64px"></dc-import>
+<main id="contenu" style="flex: 1; padding: 24px clamp(16px, 3vw, 32px) 96px; display: flex; flex-direction: column; gap: 18px">
+
+<div style="display: flex; flex-direction: column; gap: 2px">
+<h1 style="margin: 0; font-family: 'Cormorant Garamond', serif; font-size: 34px; font-weight: 500; color: {{pal.t1c1c1c}}">Équipe</h1>
+<span style="font-size: 14px; color: {{pal.t6b665e}}">Comptes de l’Espace Pro et ce que chaque rôle peut voir.</span>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+<section aria-label="Membres" style="flex: 999 1 600px; min-width: 0; background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 10px; overflow: hidden">
+<ul style="list-style: none; margin: 0; padding: 0">
+<sc-for list="{{members}}" as="m" hint-placeholder-count="5">
+<li style="{{m.rowStyle}}">
+<span style="flex: 1 1 230px; min-width: 0; display: flex; align-items: center; gap: 12px">
+<span aria-hidden="true" style="{{m.avatar}}">{{m.ini}}</span>
+<span style="min-width: 0; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px; font-weight: 600; color: {{pal.t1c1c1c}}">{{m.name}}</span><span style="font-size: 13px; color: {{pal.t6b665e}}; overflow-wrap: anywhere">{{m.email}}</span></span>
+</span>
+<label style="flex: 0 0 150px; display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: {{pal.t6b665e}}">Rôle
+<select value="{{m.role}}" onChange="{{m.setRole}}" disabled="{{m.locked}}" aria-label="{{m.roleAria}}" style="height: 36px; padding: 0 8px; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font: inherit; font-size: 14px; color: {{pal.t1c1c1c}}; background: {{pal.sffffff}}"><option value="Admin-CM">Admin-CM</option><option value="Agent">Agent</option></select></label>
+<span style="flex: 0 0 150px; display: flex; flex-direction: column; gap: 4px"><span style="{{m.badge}}"><span aria-hidden="true">{{m.glyph}}</span>{{m.st}}</span><span style="font-size: 12px; color: {{pal.t6b665e}}">{{m.last}}</span></span>
+<span style="flex: 0 0 auto; margin-left: auto; display: flex; gap: 6px">
+<sc-if value="{{m.isInvite}}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{m.resend}}" style="height: 36px; padding: 0 12px; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; background: {{pal.sffffff}}; font: inherit; font-size: 13px; color: {{pal.t1c1c1c}}">Renvoyer</button></sc-if>
+<sc-if value="{{m.canToggle}}" hint-placeholder-val="{{ true }}"><button type="button" onClick="{{m.toggle}}" style="{{m.toggleStyle}}">{{m.toggleLabel}}</button></sc-if>
+<sc-if value="{{m.locked}}" hint-placeholder-val="{{ false }}"><span style="font-size: 12.5px; color: {{pal.t6b665e}}">Votre compte</span></sc-if>
+</span>
+</li>
+</sc-for>
+</ul>
+<p role="status" style="margin: 0; padding: 12px 16px; border-top: 1px solid {{pal.be8e4db}}; font-size: 13px; color: {{pal.t6b665e}}">{{status}}</p>
+</section>
+
+<aside aria-labelledby="inv-t" style="flex: 1 1 340px; min-width: 0; background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 10px; padding: 18px 20px; display: flex; flex-direction: column; gap: 14px">
+<h2 id="inv-t" style="margin: 0; font-size: 17px; font-weight: 600; color: {{pal.t1c1c1c}}">Inviter un membre</h2>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 500; color: {{pal.t1c1c1c}}">Nom et prénom<input type="text" value="{{invName}}" onChange="{{setInvName}}" autocomplete="off" style="height: 40px; box-sizing: border-box; padding: 0 12px; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font: inherit; font-size: 14px"></label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 500; color: {{pal.t1c1c1c}}">Adresse e-mail<input type="email" value="{{invMail}}" onChange="{{setInvMail}}" autocomplete="off" placeholder="prenom@maisondustoream.com" style="height: 40px; box-sizing: border-box; padding: 0 12px; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font: inherit; font-size: 14px"></label>
+<fieldset style="margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 8px">
+<legend style="padding: 0 0 6px; font-size: 14px; font-weight: 500; color: {{pal.t1c1c1c}}">Rôle</legend>
+<sc-for list="{{roleCards}}" as="r" hint-placeholder-count="2">
+<label style="{{r.style}}"><input type="radio" name="inv-role" checked="{{r.on}}" onChange="{{r.pick}}" style="width: 18px; height: 18px; margin: 2px 0 0; accent-color: {{pal.t20332c}}"><span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 14.5px; font-weight: 600; color: {{pal.t1c1c1c}}">{{r.name}}</span><span style="font-size: 13px; line-height: 1.45; color: {{pal.t6b665e}}">{{r.desc}}</span></span></label>
+</sc-for>
+</fieldset>
+<sc-if value="{{invError}}" hint-placeholder-val="{{ false }}"><p role="alert" style="margin: 0; font-size: 13px; font-weight: 600; color: {{pal.tb3392f}}">{{invErrorText}}</p></sc-if>
+<button type="button" onClick="{{invite}}" style="height: 44px; border: 0; border-radius: 6px; background: #c09f6a; font: inherit; font-size: 14px; font-weight: 600; color: #161616; cursor: pointer">Envoyer l’invitation</button>
+<span style="font-size: 12.5px; color: {{pal.t6b665e}}">Le lien d’invitation est valable 72 h. Le mot de passe est choisi à la première connexion.</span>
+</aside>
+</div>
+
+<section aria-labelledby="perm-t" style="background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 10px; overflow: hidden">
+<h2 id="perm-t" style="margin: 0; padding: 14px 16px; font-size: 17px; font-weight: 600; color: {{pal.t1c1c1c}}; border-bottom: 1px solid {{pal.be8e4db}}">Ce que voit chaque rôle</h2>
+<div style="overflow-x: auto">
+<table style="width: 100%; min-width: 520px; border-collapse: collapse; font-size: 14px">
+<thead><tr style="text-align: left; background: {{pal.sf9f8f4}}"><th scope="col" style="padding: 10px 16px; font-size: 13px; font-weight: 600; color: {{pal.t6b665e}}">Accès</th><th scope="col" style="padding: 10px 12px; width: 130px; font-size: 13px; font-weight: 600; color: {{pal.t6b665e}}">Admin-CM</th><th scope="col" style="padding: 10px 16px 10px 12px; width: 130px; font-size: 13px; font-weight: 600; color: {{pal.t6b665e}}">Agent</th></tr></thead>
+<tbody>
+<sc-for list="{{perms}}" as="p" hint-placeholder-count="7">
+<tr style="border-top: 1px solid {{pal.befece5}}"><th scope="row" style="padding: 10px 16px; font-weight: 400; text-align: left; color: {{pal.t1c1c1c}}">{{p.label}}</th><td style="{{p.aStyle}}">{{p.a}}</td><td style="{{p.gStyle}}">{{p.g}}</td></tr>
+</sc-for>
+</tbody>
+</table>
+</div>
+</section>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1250}}'>
+class Component extends DCLogic {
+constructor(props) {
+super(props);
+this.state = {
+m: [
+{ name: 'Aïcha Diabaté', email: 'aicha.diabate@maisondustoream.com', role: 'Admin-CM', st: 'Actif', last: 'En ligne maintenant', me: true },
+{ name: 'Mariam Koné', email: 'mariam.kone@maisondustoream.com', role: 'Admin-CM', st: 'Actif', last: 'Vu le 25/10/2026 à 18:42' },
+{ name: 'Koffi Brou', email: 'koffi.brou@maisondustoream.com', role: 'Agent', st: 'Actif', last: 'Vu aujourd’hui à 08:58' },
+{ name: 'Yao Serge', email: 'yao.serge@maisondustoream.com', role: 'Agent', st: 'Actif', last: 'Vu le 24/10/2026 à 16:20' },
+{ name: 'Ange Kouamé', email: 'ange.kouame@maisondustoream.com', role: 'Agent', st: 'Invitation envoyée', last: 'Expire le 28/10/2026' },
+{ name: 'Didier Gnahoré', email: 'didier.gnahore@maisondustoream.com', role: 'Agent', st: 'Désactivé', last: 'Depuis le 30/09/2026' }
+],
+invName: '', invMail: '', invRole: 'Agent', tried: false, status: ''
+};
+}
+isDark() {
+const t = this.props.theme;
+if (t === 'dark') return true;
+if (t === 'light') return false;
+let v = 'light';
+try { v = window.localStorage.getItem('mds-pro-theme') || 'light'; } catch (e) {}
+if (v === 'dark') return true;
+if (v === 'auto') { try { return window.matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) {} }
+return false;
+}
+themeMaps() { return { s: {"#ffffff": "#1b2220", "#f4f4f1": "#121816", "#f9f8f4": "#202825", "#fbfaf7": "#1e2623", "#fdfbf6": "#222a27", "#fcfbf8": "#1e2623", "#faf9f7": "#1e2623", "#fffcf5": "#2b2618", "#f1f0ec": "#262e2b", "#ece9e2": "#2a322f", "#e9e8e2": "#2a302d", "#e9e6df": "#0f1412", "#eef0ec": "#232b28", "#eef1ef": "#202826", "#edf1f4": "#1d2530", "#e8e4db": "#313a36", "#dcd6cb": "#3b4540", "#f1eee8": "#29312e", "#efece5": "#29312e", "#cfc9bd": "#4c5751", "#cfc8bb": "#4c5751", "#e1ddd3": "#3b4540", "#b9b4aa": "#5a645e", "#20332c": "#2b4a3e", "#2b4239": "#34574a", "#e5f1ea": "#1d3a2b", "#b7d6c3": "#2f5a43", "#fdf8ec": "#2d2717", "#ecd7a8": "#5b4a25", "#fbf1dc": "#382d15", "#e3c2bd": "#5e302b", "#e3c3bf": "#5e302b", "#fbeceb": "#3a1f1c", "#e8eef5": "#1d2a38", "#eeede8": "#2a302d", "#f6f0e4": "#2f2a1f", "#f3f3f3": "#262e2b", "#cccccc": "#46504b", "#fdf6f5": "#33201e", "#f8e6e4": "#3a2220", "#fbf6ea": "#2d2717", "#ecdcb9": "#5b4a25", "#f6ece5": "#33241d", "#efe9dd": "#2a2620", "#d9b26a": "#8a6a2c", "#b98a2e": "#8a6a2c"}, b: {"#ffffff": "#1b2220", "#f4f4f1": "#121816", "#f9f8f4": "#202825", "#fbfaf7": "#1e2623", "#fdfbf6": "#222a27", "#fcfbf8": "#1e2623", "#faf9f7": "#1e2623", "#fffcf5": "#2b2618", "#f1f0ec": "#262e2b", "#ece9e2": "#2a322f", "#e9e8e2": "#2a302d", "#e9e6df": "#0f1412", "#eef0ec": "#232b28", "#eef1ef": "#202826", "#edf1f4": "#1d2530", "#e8e4db": "#313a36", "#dcd6cb": "#3b4540", "#f1eee8": "#29312e", "#efece5": "#29312e", "#cfc9bd": "#4c5751", "#cfc8bb": "#4c5751", "#e1ddd3": "#3b4540", "#b9b4aa": "#5a645e", "#20332c": "#5d8a76", "#2b4239": "#34574a", "#e5f1ea": "#1d3a2b", "#b7d6c3": "#2f5a43", "#fdf8ec": "#2d2717", "#ecd7a8": "#5b4a25", "#fbf1dc": "#382d15", "#e3c2bd": "#5e302b", "#e3c3bf": "#5e302b", "#fbeceb": "#3a1f1c", "#e8eef5": "#1d2a38", "#eeede8": "#2a302d", "#f6f0e4": "#2f2a1f", "#f3f3f3": "#262e2b", "#cccccc": "#46504b", "#fdf6f5": "#33201e", "#f8e6e4": "#3a2220", "#fbf6ea": "#2d2717", "#ecdcb9": "#5b4a25", "#f6ece5": "#33241d", "#efe9dd": "#2a2620", "#d9b26a": "#8a6a2c", "#b98a2e": "#8a6a2c", "#1c1c1c": "#d6d2c9", "#b3392f": "#f28b80"}, t: {"#1c1c1c": "#f1eee8", "#353535": "#d6d2c9", "#6b665e": "#a8a296", "#20332c": "#bfd8cb", "#84642f": "#d8b47a", "#2f7350": "#86cfa3", "#8c5f0e": "#e6b862", "#5e4108": "#f0d39a", "#b3392f": "#f28b80", "#7c241c": "#f5b0a8", "#3f6285": "#9ec0e3", "#2c4866": "#bcd3ea", "#5c5852": "#c9c4ba", "#b0aaa0": "#6c736e", "#3d2b06": "#f0dcb3", "#1f4d35": "#bfe3cc", "#8f2c24": "#f5b0a8", "#6e4a0b": "#e6c27a", "#3f5a72": "#a9c3dc", "#3f5a73": "#a9c3dc", "#8e4529": "#e0a084", "#5a5248": "#cfc8bb", "#b98a2e": "#d9ac57", "#2c4660": "#a9c3dc"} }; }
+themeWatch() {
+if (this.__thw || typeof window === 'undefined') return;
+this.__thw = true;
+const bump = () => this.setState({ __th: Date.now() });
+try { window.addEventListener('storage', (e) => { if (e.key === 'mds-pro-theme') bump(); }); } catch (e) {}
+try { window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', bump); } catch (e) {}
+}
+dmap(v) {
+const T = this.themeMaps();
+const cv = (str) => str.split(';').map((seg) => {
+const i = seg.indexOf(':');
+let M = T.s;
+if (i > -1) { const p = seg.slice(0, i).trim().toLowerCase(); M = /^(color|stroke|fill|caret-color|accent-color|text-decoration-color)$/.test(p) ? T.t : /^(border|outline|box-shadow)/.test(p) ? T.b : T.s; }
+return seg.replace(/#[0-9a-fA-F]{6}/g, (h) => M[h.toLowerCase()] || h);
+}).join(';');
+const go = (x) => (typeof x === 'string' ? cv(x) : Array.isArray(x) ? x.map(go) : x && typeof x === 'object' && Object.prototype.toString.call(x) === '[object Object]' ? Object.keys(x).reduce((o, k) => { o[k] = go(x[k]); return o; }, {}) : x);
+return go(v);
+}
+renderVals() {
+this.themeWatch();
+const dark = this.isDark();
+let v = this.renderValsLight();
+if (dark) v = this.dmap(v);
+const T = this.themeMaps();
+const pal = {};
+['s', 'b', 't'].forEach((k) => { Object.keys(T[k]).forEach((h) => { pal[k + h.slice(1)] = dark ? T[k][h] : h; }); });
+v.pal = pal;
+v.themeDark = dark;
+v.colorScheme = dark ? 'dark' : 'light';
+return v;
+}
+renderValsLight() {
+const s = this.state;
+const SC = { 'Actif': ['#2f7350', '#e5f1ea', '●'], 'Invitation envoyée': ['#3f6285', '#e8eef5', '◐'], 'Désactivé': ['#5c5852', '#eeede8', '○'] };
+const M = s.m;
+const upd = (i, patch, status) => { const a = M.slice(); a[i] = { ...a[i], ...patch }; this.setState({ m: a, status: status || '' }); };
+const mailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.invMail.trim());
+const nameOk = s.invName.trim().length > 1;
+const yes = 'padding:10px 12px;color:#2f7350;font-weight:600';
+const no = 'padding:10px 16px 10px 12px;color:#6b665e';
+const P = [
+['Tableau de bord, file des devis et planning', 'Oui', 'Ses prestations'],
+['Prix, totaux, paiements et factures', 'Oui', 'Jamais'],
+['PDF de devis chiffré', 'Oui', 'Jamais'],
+['Créer un devis sur place (mesures, choix)', 'Oui', 'Oui, sans prix'],
+['Compte rendu d’intervention', 'Lecture', 'Oui'],
+['Catalogue, images, documents et automatisations', 'Oui', 'Non'],
+['Équipe et rôles', 'Oui', 'Non']
+];
+return {
+members: M.map((m, i) => ({
+name: m.name, email: m.email, role: m.role, st: m.st, last: m.last, glyph: SC[m.st][2],
+ini: m.name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase(),
+avatar: 'flex:none;width:38px;height:38px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;' + (m.st === 'Désactivé' ? 'background:#eeede8;color:#6b665e' : m.role === 'Agent' ? 'background:#f6f0e4;color:#84642f' : 'background:#20332c;color:#ffffff'),
+badge: 'align-self:flex-start;display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font-size:12.5px;font-weight:600;white-space:nowrap;color:' + SC[m.st][0] + ';background:' + SC[m.st][1],
+rowStyle: 'display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;padding:14px 16px;border-top:' + (i ? '1px solid #efece5' : '0') + (m.st === 'Désactivé' ? ';background:#fbfaf7' : ''),
+locked: !!m.me, roleAria: 'Rôle de ' + m.name,
+setRole: (e) => upd(i, { role: e.target.value }, 'Rôle de ' + m.name + ' : ' + e.target.value + '. Effectif à sa prochaine action.'),
+isInvite: m.st === 'Invitation envoyée',
+resend: () => upd(i, { last: 'Renvoyée, expire le 29/10/2026' }, 'Invitation renvoyée à ' + m.email + '.'),
+canToggle: !m.me && m.st !== 'Invitation envoyée',
+toggleLabel: m.st === 'Désactivé' ? 'Réactiver' : 'Désactiver',
+toggleStyle: 'height:36px;padding:0 12px;border-radius:6px;font:inherit;font-size:13px;cursor:pointer;' + (m.st === 'Désactivé' ? 'border:1px solid #20332c;background:#ffffff;color:#20332c' : 'border:1px solid #e3c2bd;background:#ffffff;color:#b3392f'),
+toggle: () => upd(i, m.st === 'Désactivé' ? { st: 'Actif', last: 'Réactivé aujourd’hui' } : { st: 'Désactivé', last: 'Depuis aujourd’hui' }, m.st === 'Désactivé' ? m.name + ' peut de nouveau se connecter.' : m.name + ' est déconnecté de tous ses appareils.')
+})),
+status: s.status || '6 comptes, dont 2 Admin-CM. Un compte désactivé garde son historique.',
+invName: s.invName, invMail: s.invMail,
+setInvName: (e) => this.setState({ invName: e.target.value }),
+setInvMail: (e) => this.setState({ invMail: e.target.value }),
+roleCards: [['Agent', 'Terrain : voit ses rendez-vous et prestations, crée des devis sur place. Ne voit jamais les prix, totaux ni paiements.'], ['Admin-CM', 'Gestion complète : devis chiffrés, factures, catalogue, site et équipe.']].map(([name, desc]) => ({ name, desc, on: s.invRole === name,
+pick: () => this.setState({ invRole: name }),
+style: 'display:flex;gap:10px;padding:12px;border-radius:8px;cursor:pointer;border:1px solid ' + (s.invRole === name ? '#20332c' : '#e8e4db') + ';background:' + (s.invRole === name ? '#f9f8f4' : '#ffffff') })),
+invError: s.tried && (!nameOk || !mailOk),
+invErrorText: !nameOk ? 'Indiquez le nom du membre.' : 'Cette adresse e-mail n’est pas valide.',
+invite: () => {
+if (!nameOk || !mailOk) { this.setState({ tried: true }); return; }
+this.setState({ m: M.concat([{ name: s.invName.trim(), email: s.invMail.trim(), role: s.invRole, st: 'Invitation envoyée', last: 'Expire le 29/10/2026' }]), invName: '', invMail: '', tried: false, status: 'Invitation envoyée à ' + s.invMail.trim() + '.' });
+},
+perms: P.map(([label, a, g]) => ({ label, a, g, aStyle: a === 'Oui' ? yes : 'padding:10px 12px;color:#1c1c1c', gStyle: g === 'Jamais' ? 'padding:10px 16px 10px 12px;color:#b3392f;font-weight:600' : g === 'Non' ? no : 'padding:10px 16px 10px 12px;color:#1c1c1c' }))
+};
+}
+}
+</script>
+</body>
+</html>

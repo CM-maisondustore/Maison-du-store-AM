@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Espace Pro — accueil Admin (mobile)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="color-scheme: {{colorScheme}}; width: 100%; box-sizing: border-box; min-height: 100vh; font-family: Inter, system-ui, sans-serif; color: {{pal.t353535}}; background: {{pal.sf4f4f1}}; display: flex; flex-direction: column">
+<header style="position: sticky; top: 0; z-index: 4; background: {{pal.sffffff}}; border-bottom: 1px solid {{pal.be8e4db}}; padding: 10px 16px 12px; display: flex; justify-content: space-between; align-items: center; gap: 12px">
+<span style="display: flex; flex-direction: column; gap: 2px"><h1 style="margin: 0; font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 500; color: {{pal.t1c1c1c}}">Bonjour Aïcha</h1><span style="font-size: 14px; color: {{pal.t6b665e}}">Lundi 26/10/2026, Admin-CM</span></span>
+<button type="button" aria-label="Recherche globale" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 10px; background: {{pal.sf4f4f1}}; color: {{pal.t1c1c1c}}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 11a7 7 0 1 0 14 0a7 7 0 1 0-14 0M20 20l-3.5-3.5"></path></svg></button>
+</header>
+
+<main id="contenu" style="flex: 1; padding: 16px 16px 24px; display: flex; flex-direction: column; gap: 20px">
+<section aria-labelledby="q-t" style="display: flex; flex-direction: column; gap: 10px">
+<h2 id="q-t" style="margin: 0; font-size: 16px; font-weight: 600; color: {{pal.t1c1c1c}}">À traiter</h2>
+<ul style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<sc-for list="{{queues}}" as="q" hint-placeholder-count="4">
+<li style="display: flex"><a href="{{q.href}}" style="flex: 1; min-height: 104px; box-sizing: border-box; padding: 14px; background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 12px; text-decoration: none; color: {{pal.t353535}}; display: flex; flex-direction: column; justify-content: space-between; gap: 6px">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 30px; font-weight: 500; line-height: 1; color: {{pal.t1c1c1c}}">{{q.n}}</span>
+<span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 14.5px; font-weight: 600; color: {{pal.t1c1c1c}}">{{q.label}}</span><span style="{{q.subStyle}}">{{q.sub}}</span></span>
+</a></li>
+</sc-for>
+</ul>
+</section>
+
+<section aria-labelledby="d-t" style="display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; justify-content: space-between; align-items: baseline"><h2 id="d-t" style="margin: 0; font-size: 16px; font-weight: 600; color: {{pal.t1c1c1c}}">Aujourd’hui sur le terrain</h2><a href="ProRdvMobile.dc.html" style="font-size: 14px; color: {{pal.t84642f}}">Planning</a></div>
+<ol style="list-style: none; margin: 0; padding: 0; background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 12px">
+<sc-for list="{{today}}" as="e" hint-placeholder-count="3">
+<li style="border-bottom: 1px solid {{pal.bf1eee8}}"><a href="ProPrestations.dc.html" style="display: grid; grid-template-columns: 52px 1fr auto; gap: 10px; align-items: center; min-height: 64px; padding: 10px 14px; text-decoration: none; color: {{pal.t353535}}">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 500; color: {{pal.t1c1c1c}}">{{e.h}}</span>
+<span style="min-width: 0; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px; font-weight: 600; color: {{pal.t1c1c1c}}">{{e.client}}</span><span style="font-size: 13px; color: {{pal.t6b665e}}">{{e.meta}}</span></span>
+<span style="{{e.badge}}"><span aria-hidden="true">{{e.glyph}}</span>{{e.st}}</span>
+</a></li>
+</sc-for>
+</ol>
+</section>
+
+<section aria-labelledby="v-t" style="display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; justify-content: space-between; align-items: baseline"><h2 id="v-t" style="margin: 0; font-size: 16px; font-weight: 600; color: {{pal.t1c1c1c}}">Devis à valider</h2><a href="ProDevisListMobile.dc.html" style="font-size: 14px; color: {{pal.t84642f}}">Tous les devis</a></div>
+<ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px">
+<sc-for list="{{devis}}" as="d" hint-placeholder-count="3">
+<li><a href="ProDevisFiche.dc.html" style="display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 12px; text-decoration: none; color: {{pal.t353535}}">
+<span style="display: flex; justify-content: space-between; gap: 10px"><span style="font-size: 15px; font-weight: 600; color: {{pal.t1c1c1c}}">{{d.client}}</span><span style="{{d.amountStyle}}">{{d.amount}}</span></span>
+<span style="display: flex; justify-content: space-between; gap: 10px; font-size: 13px; color: {{pal.t6b665e}}"><span style="font-family: 'IBM Plex Mono', monospace">{{d.ref}}</span><span>{{d.when}}</span></span>
+</a></li>
+</sc-for>
+</ul>
+</section>
+</main>
+
+<div style="position: sticky; bottom: 0; z-index: 5"><dc-import name="ProTabbar" role="admin" active="home" hint-size="390px,84px"></dc-import></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1250}}'>
+class Component extends DCLogic {
+isDark() {
+const t = this.props.theme;
+if (t === 'dark') return true;
+if (t === 'light') return false;
+let v = 'light';
+try { v = window.localStorage.getItem('mds-pro-theme') || 'light'; } catch (e) {}
+if (v === 'dark') return true;
+if (v === 'auto') { try { return window.matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) {} }
+return false;
+}
+themeMaps() { return { s: {"#ffffff": "#1b2220", "#f4f4f1": "#121816", "#f9f8f4": "#202825", "#fbfaf7": "#1e2623", "#fdfbf6": "#222a27", "#fcfbf8": "#1e2623", "#faf9f7": "#1e2623", "#fffcf5": "#2b2618", "#f1f0ec": "#262e2b", "#ece9e2": "#2a322f", "#e9e8e2": "#2a302d", "#e9e6df": "#0f1412", "#eef0ec": "#232b28", "#eef1ef": "#202826", "#edf1f4": "#1d2530", "#e8e4db": "#313a36", "#dcd6cb": "#3b4540", "#f1eee8": "#29312e", "#efece5": "#29312e", "#cfc9bd": "#4c5751", "#cfc8bb": "#4c5751", "#e1ddd3": "#3b4540", "#b9b4aa": "#5a645e", "#20332c": "#2b4a3e", "#2b4239": "#34574a", "#e5f1ea": "#1d3a2b", "#b7d6c3": "#2f5a43", "#fdf8ec": "#2d2717", "#ecd7a8": "#5b4a25", "#fbf1dc": "#382d15", "#e3c2bd": "#5e302b", "#e3c3bf": "#5e302b", "#fbeceb": "#3a1f1c", "#e8eef5": "#1d2a38", "#eeede8": "#2a302d", "#f6f0e4": "#2f2a1f", "#f3f3f3": "#262e2b", "#cccccc": "#46504b", "#fdf6f5": "#33201e", "#f8e6e4": "#3a2220", "#fbf6ea": "#2d2717", "#ecdcb9": "#5b4a25", "#f6ece5": "#33241d", "#efe9dd": "#2a2620", "#d9b26a": "#8a6a2c", "#b98a2e": "#8a6a2c"}, b: {"#ffffff": "#1b2220", "#f4f4f1": "#121816", "#f9f8f4": "#202825", "#fbfaf7": "#1e2623", "#fdfbf6": "#222a27", "#fcfbf8": "#1e2623", "#faf9f7": "#1e2623", "#fffcf5": "#2b2618", "#f1f0ec": "#262e2b", "#ece9e2": "#2a322f", "#e9e8e2": "#2a302d", "#e9e6df": "#0f1412", "#eef0ec": "#232b28", "#eef1ef": "#202826", "#edf1f4": "#1d2530", "#e8e4db": "#313a36", "#dcd6cb": "#3b4540", "#f1eee8": "#29312e", "#efece5": "#29312e", "#cfc9bd": "#4c5751", "#cfc8bb": "#4c5751", "#e1ddd3": "#3b4540", "#b9b4aa": "#5a645e", "#20332c": "#5d8a76", "#2b4239": "#34574a", "#e5f1ea": "#1d3a2b", "#b7d6c3": "#2f5a43", "#fdf8ec": "#2d2717", "#ecd7a8": "#5b4a25", "#fbf1dc": "#382d15", "#e3c2bd": "#5e302b", "#e3c3bf": "#5e302b", "#fbeceb": "#3a1f1c", "#e8eef5": "#1d2a38", "#eeede8": "#2a302d", "#f6f0e4": "#2f2a1f", "#f3f3f3": "#262e2b", "#cccccc": "#46504b", "#fdf6f5": "#33201e", "#f8e6e4": "#3a2220", "#fbf6ea": "#2d2717", "#ecdcb9": "#5b4a25", "#f6ece5": "#33241d", "#efe9dd": "#2a2620", "#d9b26a": "#8a6a2c", "#b98a2e": "#8a6a2c", "#1c1c1c": "#d6d2c9", "#b3392f": "#f28b80"}, t: {"#1c1c1c": "#f1eee8", "#353535": "#d6d2c9", "#6b665e": "#a8a296", "#20332c": "#bfd8cb", "#84642f": "#d8b47a", "#2f7350": "#86cfa3", "#8c5f0e": "#e6b862", "#5e4108": "#f0d39a", "#b3392f": "#f28b80", "#7c241c": "#f5b0a8", "#3f6285": "#9ec0e3", "#2c4866": "#bcd3ea", "#5c5852": "#c9c4ba", "#b0aaa0": "#6c736e", "#3d2b06": "#f0dcb3", "#1f4d35": "#bfe3cc", "#8f2c24": "#f5b0a8", "#6e4a0b": "#e6c27a", "#3f5a72": "#a9c3dc", "#3f5a73": "#a9c3dc", "#8e4529": "#e0a084", "#5a5248": "#cfc8bb", "#b98a2e": "#d9ac57", "#2c4660": "#a9c3dc"} }; }
+themeWatch() {
+if (this.__thw || typeof window === 'undefined') return;
+this.__thw = true;
+const bump = () => this.setState({ __th: Date.now() });
+try { window.addEventListener('storage', (e) => { if (e.key === 'mds-pro-theme') bump(); }); } catch (e) {}
+try { window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', bump); } catch (e) {}
+}
+dmap(v) {
+const T = this.themeMaps();
+const cv = (str) => str.split(';').map((seg) => {
+const i = seg.indexOf(':');
+let M = T.s;
+if (i > -1) { const p = seg.slice(0, i).trim().toLowerCase(); M = /^(color|stroke|fill|caret-color|accent-color|text-decoration-color)$/.test(p) ? T.t : /^(border|outline|box-shadow)/.test(p) ? T.b : T.s; }
+return seg.replace(/#[0-9a-fA-F]{6}/g, (h) => M[h.toLowerCase()] || h);
+}).join(';');
+const go = (x) => (typeof x === 'string' ? cv(x) : Array.isArray(x) ? x.map(go) : x && typeof x === 'object' && Object.prototype.toString.call(x) === '[object Object]' ? Object.keys(x).reduce((o, k) => { o[k] = go(x[k]); return o; }, {}) : x);
+return go(v);
+}
+renderVals() {
+this.themeWatch();
+const dark = this.isDark();
+let v = this.renderValsLight();
+if (dark) v = this.dmap(v);
+const T = this.themeMaps();
+const pal = {};
+['s', 'b', 't'].forEach((k) => { Object.keys(T[k]).forEach((h) => { pal[k + h.slice(1)] = dark ? T[k][h] : h; }); });
+v.pal = pal;
+v.themeDark = dark;
+v.colorScheme = dark ? 'dark' : 'light';
+return v;
+}
+renderValsLight() {
+const SC = { 'Terminée': ['#2f7350', '#e5f1ea', '●'], 'En cours': ['#84642f', '#f6f0e4', '◐'], 'Planifiée': ['#3f6285', '#e8eef5', '○'] };
+return {
+queues: [
+['4', 'Devis à valider', 'dont 1 prix à définir', 'ProDevisListMobile.dc.html', true],
+['3', 'RDV à confirmer', 'cette semaine', 'ProRdvMobile.dc.html', false],
+['5', 'Messages', 'non lus', 'ProMessagerie.dc.html', false],
+['2', 'Factures impayées', '1 455 600 FCFA', 'ProFacture.dc.html', true]
+].map(([n, label, sub, href, warn]) => ({ n, label, sub, href, subStyle: 'font-size:12.5px;' + (warn ? 'color:#8c5f0e;font-weight:600' : 'color:#6b665e') })),
+today: [['09:00', 'Mme Kouassi Aya', 'Installation, Koffi B.', 'Terminée'], ['13:30', 'Mme Diomandé Salimata', 'SAV, Koffi B.', 'En cours'], ['16:00', 'M. Kacou Hervé', 'Devis sur place, Koffi B.', 'Planifiée']].map(([h, client, meta, st]) => ({ h, client, meta, st, glyph: SC[st][2],
+badge: 'flex:none;display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap;color:' + SC[st][0] + ';background:' + SC[st][1] })),
+devis: [['Cabinet Traoré & Associés', 'D-2026-0140', '622 568 FCFA', 'reçu le 24/10'], ['Résidence Les Palmiers', 'D-2026-0131', '1 120 000 FCFA', 'reçu le 22/10'], ['Clinique des Lagunes', 'D-2026-0135', 'Prix à définir', 'reçu le 21/10']].map(([client, ref, amount, when]) => ({ client, ref, amount, when,
+amountStyle: 'flex:none;font-family:\'IBM Plex Mono\',monospace;font-size:14px;white-space:nowrap;' + (amount === 'Prix à définir' ? 'color:#8c5f0e;font-style:italic' : 'color:#1c1c1c') }))
+};
+}
+}
+</script>
+</body>
+</html>
