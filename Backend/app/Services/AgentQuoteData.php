@@ -7,7 +7,7 @@ class AgentQuoteData
 {
     public const TYPES=['rideau'=>'Rideaux','voilage'=>'Voilages','rideau_voilage'=>'Rideaux et voilages','store'=>'Stores'];
     public static function catalogue(): array {
-        return ['options'=>QuoteOption::where('active',true)->where('kind','finish')->whereIn('category',['store','rideau'])->orderBy('label')->get(['id','code','kind','label','active','category','motorization'])->map(fn($o)=>['id'=>$o->id,'code'=>$o->code,'kind'=>$o->kind,'label'=>$o->label,'active'=>$o->active,'category'=>$o->category,'motorization'=>$o->motorization])->all()];
+        return ['options'=>QuoteOption::where('active',true)->where('kind','finish')->whereIn('category',['store','rideau'])->orderBy('label')->get(['id','code','label','category','motorization'])->map(fn($o)=>['id'=>$o->id,'code'=>$o->code,'label'=>$o->label,'category'=>$o->category,'motorization'=>$o->motorization])->all()];
     }
     public static function validate(Request $r): array {
         QuotePhone::prepare($r);

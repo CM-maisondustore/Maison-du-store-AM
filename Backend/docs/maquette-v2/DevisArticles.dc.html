@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Nouveau devis, électroménager</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./assets/espace-pro.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="shell">
+<dc-import name="Navigation" active="devis" hint-size="240px,900px"></dc-import>
+<div class="workspace">
+<dc-import name="Haut" hint-size="100%,64px"></dc-import>
+<main class="main" id="contenu">
+<div class="page-head"><div>
+<nav class="crumbs" aria-label="Fil d’Ariane"><a href="#contenu">Devis</a></nav>
+<h1>Nouveau devis — Électroménager</h1>
+<p class="sub">Un prix vide signifie « à définir », jamais gratuit : le devis ne peut pas être validé tant qu’il en reste un.</p>
+</div></div>
+<div class="form-narrow">
+<section class="shop-picker" aria-labelledby="s-shop">
+<h2 id="s-shop">Boutique</h2>
+<nav class="tile-group" aria-label="Boutique">
+<a class="tile plain shop-tile" href="Main.dc.html"><span><strong class="uni uni-stores">Stores &amp; Rideaux</strong><small>Fenêtres et mesures</small></span></a>
+<a class="tile plain shop-tile" href="#contenu" aria-current="true"><span><strong class="uni uni-electro">Électroménager</strong><small>Articles, livraison, installation</small></span></a>
+<a class="tile plain shop-tile" href="#contenu"><span><strong class="uni uni-meubles">Meubles</strong><small>Articles, livraison, montage</small></span></a>
+</nav>
+</section>
+<section class="panel"><h2 class="section-title"><span class="step" aria-hidden="true">1</span>Client</h2>
+<div class="grid client-grid">
+<label>Prénom<input type="text" value="Ibrahim"></label>
+<label>Nom / raison sociale<input type="text" value="Bamba"></label>
+<div class="quote-phone"><label>Pays / indicatif<input type="tel" value="+225"></label><label>Téléphone<input type="tel" value="07 00 00 00 02"></label><p class="muted">Choisissez un indicatif ou saisissez-le. Un numéro international complet (+…) est aussi accepté.</p></div>
+<label>E-mail (facultatif)<input type="email"></label>
+<label>Adresse de livraison<input type="text" value="Marcory, Zone 4"></label>
+<label>Ville<input type="text" value="Abidjan"></label>
+</div></section>
+<section class="panel" aria-labelledby="s-art"><h2 id="s-art" class="section-title"><span class="step" aria-hidden="true">2</span>Articles</h2>
+<label>Ajouter depuis le catalogue<input type="search" placeholder="Nom ou référence d’un produit"></label>
+<div id="articles">
+<div class="article-row">
+<label class="wide">Désignation<input value="Réfrigérateur 300 L"></label>
+<label>Quantité<span class="stepper"><input type="number" value="1"><button type="button" class="minus" aria-label="Un article de moins">−</button><button type="button" class="plus" aria-label="Un article de plus">+</button></span></label>
+<label>Modèle / couleur<input value="Inox"></label>
+<label class="price-cell">Prix unitaire<span class="field-unit is-price"><input type="number" value="450000"><span class="unit">FCFA</span></span></label>
+<button type="button" class="quiet icon-btn remove" aria-label="Retirer cet article"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+</div>
+<div class="article-row">
+<label class="wide">Désignation<input value="Cuisinière 4 feux"></label>
+<label>Quantité<span class="stepper"><input type="number" value="1"><button type="button" class="minus" aria-label="Un article de moins">−</button><button type="button" class="plus" aria-label="Un article de plus">+</button></span></label>
+<label>Modèle / couleur<input></label>
+<label class="price-cell">Prix unitaire<span class="field-unit is-price"><input type="number" placeholder="À définir"><span class="unit">FCFA</span></span></label>
+<button type="button" class="quiet icon-btn remove" aria-label="Retirer cet article"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+</div>
+</div>
+<div class="actions"><button type="button" class="secondary">+ Article hors catalogue</button></div>
+</section>
+<section class="panel" aria-labelledby="s-svc"><h2 id="s-svc" class="section-title"><span class="step" aria-hidden="true">3</span>Livraison et services</h2>
+<div class="service-row"><label class="toggle-row"><input class="switch" type="checkbox" checked><span>Livraison</span></label><label>Prix<span class="field-unit is-price"><input type="number" placeholder="À définir"><span class="unit">FCFA</span></span></label></div>
+<div class="service-row"><label class="toggle-row"><input class="switch" type="checkbox"><span>Installation par appareil</span></label><label>Prix<span class="field-unit is-price"><input type="number" placeholder="À définir"><span class="unit">FCFA</span></span></label></div>
+<div class="service-row"><label class="toggle-row"><input class="switch" type="checkbox"><span>Reprise de l’ancien appareil</span></label><label>Prix<span class="field-unit is-price"><input type="number" placeholder="À définir"><span class="unit">FCFA</span></span></label></div>
+<div class="grid mt-12">
+<label class="mt-0">Étage<select><option>2e étage</option><option>Rez-de-chaussée</option></select></label>
+<div><label class="toggle-row"><span>Ascenseur disponible</span><input class="switch" type="checkbox"></label></div>
+</div>
+</section>
+<section class="panel" aria-labelledby="s-tax"><h2 id="s-tax" class="section-title"><span class="step" aria-hidden="true">4</span>Dates et chiffrage</h2>
+<div class="grid">
+<label>Date du devis<input type="date" value="2026-11-02"></label>
+<label>Valable jusqu’au<input type="date" value="2026-12-02"></label>
+<label>Livraison prévue<input type="date"></label>
+<label>Pose ou montage prévu<input type="date"></label>
+<label>Agent<select><option>Non affecté</option></select></label>
+<label>Taux de taxe<span class="field-unit"><input type="number" value="18"><span class="unit">%</span></span></label>
+<label>Mode de paiement<select><option>Avance puis solde</option></select></label>
+<label>Avance prévue<span class="field-unit"><input type="number" value="0"><span class="unit">FCFA</span></span></label>
+</div>
+<details class="fold"><summary>Nouveau paiement déjà reçu<small>Seulement si un versement vient d’être encaissé</small></summary><p class="muted mt-0">Montant, date, moyen de paiement et référence.</p></details>
+</section>
+<section class="panel" aria-label="Notes"><div class="internal-block mt-0"><p class="internal-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 11h12v10H6zM8 11V7a4 4 0 0 1 8 0v4"></path></svg>Réservé à l’équipe</p><label>Notes internes<textarea></textarea></label></div>
+<label>Notes de terrain<textarea></textarea></label></section>
+</div>
+<div class="action-bar"><span class="status" role="status">Enregistré en brouillon, jamais envoyé sans action de votre part.</span><button type="button">Enregistrer le devis</button></div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":2200}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

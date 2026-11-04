@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Relevé de l’agent</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./assets/espace-pro.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.terrain{--control-h:48px;background:var(--pro-bg)}
+.terrain input,.terrain select,.terrain textarea{font-size:16px}
+</style>
+</helmet>
+<div class="terrain" style="width: 390px; min-height: 2300px; display: flex; flex-direction: column">
+<div style="display: flex; align-items: center; gap: 8px; min-height: 56px; padding: 8px 12px; background: var(--pro-panel); border-bottom: 1px solid var(--pro-line)">
+<a href="#releve" aria-label="Retour" style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; color: var(--pro-ink)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></a>
+<strong style="flex: 1; min-width: 0; font: 600 18px/1.2 var(--font-ui); color: var(--pro-ink)">Relevé sur place</strong>
+</div>
+<div id="releve" style="flex: 1; padding: 14px">
+<p class="muted mt-0">Renseignez les coordonnées du client, les ouvertures et vos observations. Admin-CM complétera les matériaux, les quantités, le chiffrage et les dates.</p>
+<section class="shop-picker" aria-labelledby="s-shop">
+<h2 id="s-shop">Boutique</h2>
+<nav class="tile-group" aria-label="Boutique" style="grid-template-columns: minmax(0, 1fr)">
+<a class="tile plain shop-tile" href="#releve" aria-current="true"><span><strong class="uni uni-stores">Stores &amp; Rideaux</strong><small>Fenêtres et mesures</small></span></a>
+<a class="tile plain shop-tile" href="#releve"><span><strong class="uni uni-electro">Électroménager</strong><small>Articles, livraison, installation</small></span></a>
+<a class="tile plain shop-tile" href="#releve"><span><strong class="uni uni-meubles">Meubles</strong><small>Articles, livraison, montage</small></span></a>
+</nav>
+</section>
+<section class="panel" style="padding: 16px; margin-bottom: 14px"><h2 class="section-title"><span class="step" aria-hidden="true">1</span>Client</h2>
+<div class="grid" style="grid-template-columns: minmax(0, 1fr)">
+<label>Prénom<input type="text" value="Fatou"></label>
+<label>Nom / raison sociale<input type="text" value="Ouattara"></label>
+<div class="quote-phone"><label>Pays / indicatif<input type="tel" value="+225"></label><label>Téléphone<input type="tel" value="07 00 00 00 03"></label></div>
+<label>E-mail (facultatif)<input type="email"></label>
+<label>Adresse de pose<input type="text" value="Cocody Danga"></label>
+<label>Ville<input type="text" value="Abidjan"></label>
+</div></section>
+<section class="panel" style="padding: 16px; margin-bottom: 14px"><h2 class="section-title"><span class="step" aria-hidden="true">2</span>Choix communs</h2>
+<div class="grid" style="grid-template-columns: minmax(0, 1fr)">
+<label>Type de projet<select><option>Rideaux et voilages</option><option>Stores</option></select></label>
+<label>Motorisation<select><option>Non</option><option>Oui</option></select></label>
+<label>Finition<select><option>Wave</option><option>Plis flamands</option></select></label>
+<label>Zone de pose<select><option>Abidjan</option><option>Hors Abidjan</option></select></label>
+</div></section>
+<h2 class="section-title mb-8"><span class="step" aria-hidden="true">3</span>Mesures des ouvertures</h2>
+<div id="agent-openings">
+<section class="panel opening">
+<details class="opening-card" open="{{ true }}">
+<summary><span class="opening-name">Salon</span><span class="opening-sum">180 × 220 cm</span></summary>
+<div class="opening-body">
+<label>Désignation de l’ouverture<input value="Salon — fenêtre sur rue" style="font-size: 17px; font-weight: 600"></label>
+<div class="opening-measures">
+<label>Largeur<span class="field-unit measure"><input inputmode="decimal" value="180"><span class="unit">cm</span></span></label>
+<label>Hauteur<span class="field-unit measure"><input inputmode="decimal" value="220"><span class="unit">cm</span></span></label>
+</div>
+<label>Notes de l’ouverture<textarea rows="2">Prise électrique à droite, mur en béton.</textarea></label>
+<label class="check" style="min-height: 44px"><input type="checkbox" checked>Utiliser les choix communs</label>
+<details class="quote-opening-details"><summary>Type, motorisation, finition et zone de pose</summary><p class="muted">Pour personnaliser cette ouverture seulement.</p></details>
+<p class="hint">Pour les rideaux ou voilages de plus de 2,80 m, Admin-CM effectuera le calcul manuellement.</p>
+<div class="opening-foot"><button type="button" class="quiet">Retirer cette ouverture</button></div>
+</div>
+</details>
+</section>
+<section class="panel opening">
+<details class="opening-card"><summary><span class="opening-name">Chambre</span><span class="opening-sum">120 × 200 cm</span></summary><div class="opening-body"><p class="muted">Carte repliée : ses mesures restent lisibles.</p></div></details>
+</section>
+</div>
+<div class="actions"><button type="button" class="secondary block">Ajouter une ouverture</button></div>
+<section class="panel" style="padding: 16px"><label class="mt-0">Notes de terrain<textarea placeholder="Accès, contraintes, souhaits du client…"></textarea></label></section>
+<p class="muted">Le chiffrage est fait au bureau.</p>
+</div>
+<div style="position: sticky; bottom: 64px; display: flex; flex-wrap: wrap; gap: 8px; padding: 10px 14px; background: var(--pro-panel); border-top: 1px solid var(--pro-line)">
+<span class="status" role="status" style="flex: 1 1 100%; font-size: 13px; color: var(--pro-text-2)">Enregistré sur cet appareil : rien n’est perdu si le réseau coupe.</span>
+<button type="button" class="block">Enregistrer le devis</button>
+</div>
+<nav aria-label="Navigation principale" style="position: sticky; bottom: 0; display: flex; background: var(--pro-panel); border-top: 1px solid var(--pro-line)">
+<a href="#releve" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 64px; color: var(--pro-text-2); font-size: 11.5px; font-weight: 500; text-decoration: none">Aujourd’hui</a>
+<a href="#releve" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 64px; color: var(--pro-text-2); font-size: 11.5px; font-weight: 500; text-decoration: none">Prestations</a>
+<a href="#releve" aria-current="page" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 64px; color: var(--pro-ink); font-size: 11.5px; font-weight: 600; text-decoration: none">Devis</a>
+<a href="#releve" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 64px; color: var(--pro-text-2); font-size: 11.5px; font-weight: 500; text-decoration: none">RDV</a>
+<a href="#releve" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 64px; color: var(--pro-text-2); font-size: 11.5px; font-weight: 500; text-decoration: none">Profil</a>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":2300}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

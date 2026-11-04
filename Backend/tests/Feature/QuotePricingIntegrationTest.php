@@ -169,4 +169,100 @@ class QuotePricingIntegrationTest extends TestCase
         $this->post($url.'/avancement',['stage'=>'paid','edit_version'=>$q->fresh()->edit_version])->assertSessionHasErrors('stage');
         $this->post($url.'/paiements',[...$payment,'receipt_token'=>(string)Str::uuid(),'receipt_amount'=>81563])->assertSessionHasErrors('receipt_amount');
     }
+
+    public function test_installment_schedule_is_saved_with_the_quote_and_shown_on_documents(): void
+    {
+        $this->seed(); $this->login();
+        $data=$this->payload();
+        // Sans choix d'échéancier (ancien formulaire), le devis garde son acompte unique.
+        $old=$this->save($data);
+        $this->assertArrayNotHasKey('schedule',$old->configuration['calculation']['financial']);
+        $this->assertStringContainsString('name="pricing[schedule]" value="two" checked',$this->get('/admin/devis/'.$old->id.'/formulaire')->assertOk()->getContent());
+        // 3 échéances : l'acompte enregistré est la première, et la somme des échéances fait le total.
+        $q=$this->save([...$data,'submission_token'=>(string)Str::uuid(),'pricing'=>[...$data['pricing'],'schedule'=>'three']]);
+        $financial=$q->configuration['calculation']['financial'];
+        $this->assertSame(['50','30','20'],array_column($financial['schedule'],'percent'));
+        $this->assertSame($financial['finalTotal'],array_sum(array_column($financial['schedule'],'amount')));
+        $this->assertSame($financial['schedule'][0]['amount'],$q->deposit_amount);
+        $this->assertSame('three',$q->configuration['calculation']['pricing']['schedule']);
+        $html=view('documents.pdf',\App\Services\DocumentViewModel::prepare(app(Documents::class)->quoteData($q)))->render();
+        $this->assertStringContainsString('APRÈS INSTALLATION DES RAILS (30 %)',$html);
+        $this->assertStringContainsString('Notre engagement.',$html);
+        $this->assertStringStartsWith('Échéancier : 50 % à la validation du chantier',CommunicationTemplates::context($q)['conditions_paiement'] ?? '');
+        $this->assertStringContainsString('name="pricing[schedule]" value="three" checked',$this->get('/admin/devis/'.$q->id.'/formulaire')->assertOk()->getContent());
+        $this->assertStringContainsString('name="pricing[schedule]" value="auto" checked',$this->get('/admin/devis/nouveau')->assertOk()->getContent());
+        $this->postJson('/admin/devis/chiffrer',[...$data,'pricing'=>[...$data['pricing'],'schedule'=>'four']])->assertStatus(422)->assertJsonValidationErrors('pricing.schedule');
+        // Un agent ne voit ni échéancier ni montant.
+        $this->login('agent');
+        $agent=$this->get('/admin/devis/nouveau')->assertOk();
+        foreach (['pricing[schedule]','Notre engagement','FCFA'] as $secret) $agent->assertDontSee($secret,false);
+    }
+
+    public function test_step_three_sewing_counts_the_sheer_only_through_existing_fields(): void
+    {
+        $this->seed(); $this->login();
+        $form=$this->get('/admin/devis/nouveau')->assertOk();
+        foreach (['data-sewing="curtain"','data-sewing="sheer"','data-sewing="store"','name="sewing_ui[curtain]" value="manual"','name="zone_ui" value="other"','data-install-count','data-set-coef="1.5"','name="windows[0][costing][sewing][basis]" value="primary"','data-step3'] as $html) $form->assertSee($html,false);
+        $data=$this->payload(); $voile=$this->id('voilage-luxe');
+        $data['windows'][0]=[...$data['windows'][0],'inherit_defaults'=>0,'sheer_id'=>$voile];
+        $data['windows'][0]['costing']['secondary_material']=['option_id'=>$voile,'quantity'=>'4'];
+        $total=fn(array $d)=>$this->postJson('/admin/devis/chiffrer',$d)->assertOk()->json('financial.finalTotal');
+        $primary=$total($data);
+        // Voilage compté avec le rideau : 4 m de plus à la confection (1 000 FCFA / m), pour 2 exemplaires.
+        $data['windows'][0]['costing']['sewing']['basis']='all_fabrics';
+        $this->assertSame($primary+8000,$total($data));
+        // Prix saisi à l'étape 3 : il remplace le tarif par mètre de la confection (9 m × 1 500 × 2 au lieu de 9 m × 1 000 × 2).
+        $data['windows'][0]['costing']['sewing']['unit_price']=1500;
+        $this->assertSame($primary+8000+9000,$total($data));
+        // Les pastilles de l'étape 3 ne sont jamais lues par le serveur.
+        $this->assertSame($primary+17000,$total([...$data,'sewing_ui'=>['curtain'=>'none','sheer'=>'manual'],'sewing_ui_price'=>['curtain'=>1],'zone_ui'=>'other']));
+        $this->post('/admin/devis',$this->calculated([...$data,'sewing_ui'=>['curtain'=>'manual']]))->assertSessionHasNoErrors();
+        $q=Quote::latest('id')->firstOrFail();
+        $this->assertSame('all_fabrics',$q->dimensions[0]['costing']['sewing']['basis']);
+        $this->assertArrayNotHasKey('sewing_ui',$q->configuration);
+    }
+
+    public function test_opening_photos_and_commune_are_saved_only_for_their_quote(): void
+    {
+        $this->seed(); $owner=$this->login();
+        $data=$this->payload(); $data['contact']=[...$data['contact'],'city'=>'Cocody','address'=>'Riviera 3, rue des Jardins'];
+        $form=$this->get('/admin/devis/nouveau')->assertOk();
+        foreach (['name="contact[city]" required data-commune','<option value="Yopougon"','<option value="Hors Abidjan"','name="contact[address]"','name="windows[0][photo]"','capture="environment"','enctype="multipart/form-data"','data-choice-board','data-supply-board','data-calc-form hidden','name="coefficient_ui[material]" value="2.5"','name="install_ui" value="manual"'] as $html) $form->assertSee($html,false);
+        // Les pastilles des étapes 2 et 3 ne sont pas enregistrées : le calcul reste celui des champs de chaque ouverture.
+        $plain=$this->postJson('/admin/devis/chiffrer',$data)->json('financial.finalTotal');
+        $this->assertSame($plain,$this->postJson('/admin/devis/chiffrer',[...$data,'coefficient_ui'=>['material'=>'3'],'install_ui'=>'manual','install_ui_price'=>1])->json('financial.finalTotal'));
+        // Le calcul n'a pas besoin de la photo ; l'enregistrement la range dans l'ouverture.
+        $calculated=$this->calculated([...$data,'coefficient_ui'=>['material'=>'3']]); $calculated['windows'][0]['photo']=\Illuminate\Http\UploadedFile::fake()->image('salon.png',400,300);
+        $this->post('/admin/devis',$calculated)->assertSessionHasNoErrors();
+        $q=Quote::latest('id')->firstOrFail();
+        $this->assertSame('Cocody',$q->contact['city']);
+        $photo=$q->dimensions[0]['photo_media_id']; $this->assertIsInt($photo); $this->assertArrayNotHasKey('photo_media_id',$q->dimensions[1]);
+        $this->get('/admin/devis/'.$q->id.'/photos/'.$photo)->assertOk()->assertHeader('Content-Type','image/png');
+        $this->get('/admin/devis/'.$q->id)->assertSee('/admin/devis/'.$q->id.'/photos/'.$photo,false);
+        $edit=$this->get('/admin/devis/'.$q->id.'/formulaire')->assertOk()->assertSee('name="windows[0][photo_media_id]" value="'.$photo.'"',false);
+        $edit->assertSee('<option value="Cocody" selected>',false);
+        // Une ancienne ville hors liste reste proposée.
+        $old=$q->replicate(['reference','submission_token']); $old->contact=[...$q->contact,'city'=>'Grand-Bassam']; $old->save();
+        $this->get('/admin/devis/'.$old->id.'/formulaire')->assertSee('<option value="Grand-Bassam" selected>',false);
+        // Une photo d'un autre devis ou d'un produit n'est jamais reprise, ni lisible depuis ce devis.
+        $foreign=\App\Models\MediaAsset::create(['mime'=>'image/png','width'=>1,'height'=>1,'bytes'=>1,'sha256'=>str_repeat('a',64),'payload'=>base64_encode('x')])->id;
+        $next=$this->calculated([...$data,'edit_version'=>$q->edit_version]);
+        $next['windows'][0]['photo_media_id']=$photo; $next['windows'][1]['photo_media_id']=$foreign;
+        $this->put('/admin/devis/'.$q->id.'/formulaire',$next)->assertSessionHasNoErrors();
+        $q->refresh();
+        $this->assertSame($photo,$q->dimensions[0]['photo_media_id']); $this->assertArrayNotHasKey('photo_media_id',$q->dimensions[1]);
+        $this->get('/admin/devis/'.$q->id.'/photos/'.$foreign)->assertNotFound();
+        // Retirer la photo la supprime.
+        $remove=$this->calculated([...$data,'edit_version'=>$q->edit_version]); $remove['windows'][0]['photo_media_id']=$photo; $remove['windows'][0]['photo_remove']=1;
+        $this->put('/admin/devis/'.$q->id.'/formulaire',$remove)->assertSessionHasNoErrors();
+        $this->assertArrayNotHasKey('photo_media_id',$q->fresh()->dimensions[0]);
+        $this->assertNull(\App\Models\MediaAsset::find($photo));
+        $bad=$this->calculated([...$data,'submission_token'=>(string)Str::uuid()]); $bad['windows'][0]['photo']=\Illuminate\Http\UploadedFile::fake()->create('notes.pdf',10,'application/pdf');
+        $this->post('/admin/devis',$bad)->assertSessionHasErrors('windows.0.photo');
+        // Un agent qui n'a pas créé le devis ne lit pas ses photos.
+        $kept=$this->calculated([...$data,'submission_token'=>(string)Str::uuid()]); $kept['windows'][0]['photo']=\Illuminate\Http\UploadedFile::fake()->image('o.png',40,30);
+        $this->post('/admin/devis',$kept); $other=Quote::latest('id')->firstOrFail();
+        $this->login('agent');
+        $this->get('/admin/devis/'.$other->id.'/photos/'.$other->dimensions[0]['photo_media_id'])->assertForbidden();
+    }
 }

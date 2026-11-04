@@ -1,0 +1,5 @@
+@extends('errors.layout')
+@section('code','403')
+@section('tone','clay')
+@section('heading','Accès réservé')
+@section('message','Votre compte ne donne pas accès à cette page. Demandez à un administrateur si vous en avez besoin.')

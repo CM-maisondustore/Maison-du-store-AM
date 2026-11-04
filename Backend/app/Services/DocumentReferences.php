@@ -15,7 +15,7 @@ final class DocumentReferences
             DB::table('document_sequences')->where('name','quotes')->update(['next_value'=>$number+1]);
             // Use the document date; mixed quotes follow their main category.
             $date=$quote->quote_date ?: now()->toDateString();
-            $category=$quote->type==='store' ? 'ST' : 'RV';
+            $category=match($quote->type) {'store'=>'ST','electromenager'=>'EL','meubles'=>'MB',default=>'RV'};
             return 'AM-'.$date.'-'.$category.'-'.str_pad((string)$number,3,'0',STR_PAD_LEFT);
         });
     }

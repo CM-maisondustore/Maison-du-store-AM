@@ -1,0 +1,5 @@
+@extends('errors.layout')
+@section('code','500')
+@section('tone','clay')
+@section('heading','Le serveur a rencontré une erreur')
+@section('message','Votre action n’a peut-être pas été enregistrée. Vérifiez-la avant de recommencer.')

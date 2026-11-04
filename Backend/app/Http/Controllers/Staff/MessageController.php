@@ -63,7 +63,7 @@ class MessageController
         $message = CommercialMessage::create([...$data, 'sender' => $channel==='whatsapp' ? config('workspace.whatsapp_number') : config('mail.from.address'), 'user_id' => $r->user()->id]);
         Audit::record('brouillon_cree', $message); return redirect()->route('staff.messages.show', $message);
     }
-    public function show(CommercialMessage $message) { if ($message->direction === 'incoming' && !$message->read_at) $message->update(['read_at' => now()]); return view('staff.message', compact('message')); }
+    public function show(CommercialMessage $message) { if ($message->direction === 'incoming' && !$message->read_at) $message->update(['read_at' => now()]); return view('staff.message', ['message' => $message, 'threads' => CommercialMessage::with('contact')->latest()->limit(25)->get()]); }
     public function update(Request $r, CommercialMessage $message)
     {
         $data = $r->validate(['subject' => 'required|string|max:200|not_regex:/[\r\n]/', 'body' => 'required|string|max:'.($message->channel==='whatsapp'?'3000':'30000')]);

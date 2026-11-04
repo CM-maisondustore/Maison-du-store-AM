@@ -1,0 +1,5 @@
+@extends('errors.layout')
+@section('code','503')
+@section('tone','gold')
+@section('heading','Service momentanément indisponible')
+@section('message','Une opération est en cours sur le serveur. Réessayez dans quelques minutes.')

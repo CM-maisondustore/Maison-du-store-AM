@@ -15,7 +15,8 @@ class ProductRequest extends FormRequest
         $rules = [
             ...\App\Services\MediaStorage::rules(),
             'reference' => ['required', 'string', 'max:50', Rule::unique('products')->ignore($this->route('product'))],
-            'name' => 'required|string|max:150', 'type' => 'required|in:store,rideau',
+            'name' => 'required|string|max:150', 'type' => 'required|in:store,rideau,electromenager,meuble',
+            'universe' => 'nullable|in:stores_rideaux,electromenager,meubles_bureau,meubles_domicile',
             'category' => 'required|string|max:150', 'description' => 'required|string|max:3000',
             'quoteModel' => 'required|string|max:150',
             'features' => 'nullable|array', 'features.*' => 'in:occultant,tamisant,motorise,decoratif',
@@ -60,6 +61,7 @@ class ProductRequest extends FormRequest
             ...$costs, 'reference' => $data['reference'], 'published' => $this->boolean('published'),
             'details' => [
                 ...collect($data)->only(['name', 'type', 'category', 'description', 'quoteModel'])->all(),
+                'universe' => $data['universe'] ?? 'stores_rideaux',
                 'features' => $data['features'] ?? [], 'colors' => $data['colors'] ?? [], 'specs' => $specs,
                 'available' => $this->boolean('available'), 'featured' => $this->boolean('featured'), 'price' => 'Prix',
             ],

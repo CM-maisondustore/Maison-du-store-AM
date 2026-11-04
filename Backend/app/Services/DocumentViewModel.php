@@ -34,7 +34,9 @@ final class DocumentViewModel
         $data['fee_rows']=array_map(fn($fee)=>['label'=>self::lineLabel($fee),'displayQuantity'=>$fee['quantity'],'unit'=>'','unitPrice'=>$fee['unitPrice'],'displayAmount'=>$fee['amount']],$data['totals']['fees'] ?? []);
         $data['document_title']=match($data['kind']) {'invoice'=>'FACTURE','receipt'=>'REÇU DE PAIEMENT',default=>'DEVIS PROFESSIONNEL'};
         $data['conditions']=$data['style']['issuer_payment_terms'] ?? $data['issuer']['payment_terms'] ?? '';
-        if (isset($data['totals']['depositPercent'])) {
+        if ($schedule=QuoteFinancials::scheduleText($data['totals'] ?? [])) {
+            $data['conditions']='Échéancier : '.$schedule.($data['conditions'] ? "\n".$data['conditions'] : '');
+        } elseif (isset($data['totals']['depositPercent'])) {
             $deposit=QuoteFinancials::quantity($data['totals']['depositPercent']); $balance=QuoteFinancials::quantity($data['totals']['balancePercent']);
             $extra=preg_replace('/(acompte\s*(?:de\s*)?)\d+(?:[.,]\d+)?\s*%/iu','${1}'.$deposit.' %',$data['conditions']);
             $extra=preg_replace('/(solde\s*(?:de\s*)?)\d+(?:[.,]\d+)?\s*%/iu','${1}'.$balance.' %',$extra);

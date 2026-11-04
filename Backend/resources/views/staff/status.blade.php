@@ -1,1 +1,2 @@
-<span class="badge">{{ ['pending'=>'À traiter','draft'=>'Brouillon','approved'=>'Validé','accepted'=>'Accepté','rejected'=>'Refusé','cancelled'=>'Annulé','confirmed'=>'Confirmé','completed'=>'Terminé','planned'=>'Planifié','in_progress'=>'En cours','issued'=>'Émise','paid'=>'Payée','sent'=>'Envoyé','sending'=>'Envoi en cours','uncertain'=>'Envoi à vérifier','received'=>'Reçu','shared'=>'Partagé manuellement'][$status] ?? $status }}</span>
+@php($badge=\App\Services\StaffInterface::status($status))
+<span class="badge st-{{ $badge['tone'] }}"><span aria-hidden="true">{{ $badge['glyph'] }}</span>{{ $badge['label'] }}</span>

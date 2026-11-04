@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Ajouter un produit</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./assets/espace-pro.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="shell">
+<dc-import name="Navigation" active="catalogue" hint-size="240px,900px"></dc-import>
+<div class="workspace">
+<dc-import name="Haut" hint-size="100%,64px"></dc-import>
+<main class="main" id="contenu">
+<div class="page-head"><div><nav class="crumbs" aria-label="Fil d’Ariane"><a href="#contenu">Catalogue</a></nav><h1>Nouveau produit</h1></div></div>
+<div class="form-toc-layout">
+<nav class="form-toc" aria-label="Étapes de la fiche produit"><ol>
+<li class="is-done"><a href="#s-fiche" aria-current="step"><strong>Fiche</strong><small>Complet</small></a></li>
+<li><a href="#s-image"><strong>Image</strong><small>Facultatif</small></a></li>
+<li class="is-done"><a href="#s-dispo"><strong>Disponibilité</strong><small>Complet</small></a></li>
+<li class="is-done"><a href="#s-carac"><strong>Caractéristiques</strong><small>Complet</small></a></li>
+<li class="is-done"><a href="#s-couts"><strong>Coûts internes</strong><small>Complet</small></a></li>
+</ol></nav>
+<div class="form-steps form-narrow">
+<section class="panel" id="s-fiche" aria-labelledby="h-fiche">
+<h2 id="h-fiche" class="section-title"><span class="step" aria-hidden="true">1</span>Fiche produit</h2>
+<div class="grid">
+<label>Référence<input value="STR-ENR-01"></label>
+<label>Nom<input value="Store enrouleur"></label>
+</div>
+<fieldset class="bare mt-12"><legend>Type</legend>
+<div class="tile-group">
+<label class="tile"><input type="radio" name="type" checked><span><strong>Store</strong></span></label>
+<label class="tile"><input type="radio" name="type"><span><strong>Rideau</strong></span></label>
+<label class="tile"><input type="radio" name="type"><span><strong>Électroménager</strong></span></label>
+<label class="tile"><input type="radio" name="type"><span><strong>Meuble</strong></span></label>
+</div></fieldset>
+<div class="grid">
+<label>Univers<select><option>Stores &amp; Rideaux</option></select><span class="hint">Proposé selon le type choisi.</span></label>
+<label>Catégorie<input value="Stores intérieurs"></label>
+</div>
+<label>Modèle du formulaire de devis<input value="Store enrouleur"></label>
+<label>Description<textarea rows="4">Store sur mesure à enroulement, pour fenêtres et baies vitrées.</textarea></label>
+</section>
+<section class="panel" id="s-image" aria-labelledby="h-image">
+<h2 id="h-image" class="section-title mb-8"><span class="step" aria-hidden="true">2</span>Image d’illustration</h2>
+<div class="drop">
+<span class="drop-empty" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V5M7 9l5-5 5 5M5 20h14"></path></svg><span><strong>Choisir un fichier</strong> ou le déposer ici</span><small>JPG, PNG ou WebP, 2 Mo et 6000 pixels maximum par côté</small></span>
+<label class="drop-input"><span class="sr-only">Importer ou remplacer l’image</span><input type="file" accept="image/jpeg,image/png,image/webp"></label>
+</div>
+<div class="alt-block"><label>Texte alternatif de l’image<span class="hint">Décrit la photo pour les lecteurs d’écran et le référencement.</span><input placeholder="Décrivez brièvement ce que montre l’image"></label></div>
+</section>
+<section class="panel" id="s-dispo" aria-labelledby="h-dispo">
+<h2 id="h-dispo" class="section-title"><span class="step" aria-hidden="true">3</span>Disponibilité et visibilité</h2>
+<p class="muted">Un produit masqué reste enregistré dans le catalogue interne. Un produit visible sans disponibilité apparaît sur commande sur le site.</p>
+<label class="toggle-row"><span>Visible sur le site</span><input class="switch" type="checkbox"></label>
+<label class="toggle-row"><span>Disponible</span><input class="switch" type="checkbox" checked></label>
+<label class="toggle-row"><span>Mis en avant</span><input class="switch" type="checkbox"></label>
+</section>
+<section class="panel" id="s-carac" aria-labelledby="h-carac">
+<h2 id="h-carac" class="section-title"><span class="step" aria-hidden="true">4</span>Caractéristiques et coloris</h2>
+<fieldset class="bare mt-12"><legend>Caractéristiques</legend><div class="pills">
+<label class="pill plain"><input type="checkbox" checked><span>Occultant</span></label>
+<label class="pill plain"><input type="checkbox"><span>Tamisant</span></label>
+<label class="pill plain"><input type="checkbox" checked><span>Motorise</span></label>
+<label class="pill plain"><input type="checkbox"><span>Decoratif</span></label>
+</div></fieldset>
+<fieldset class="bare mt-12"><legend>Coloris</legend><div class="pills">
+<sc-for list="{{colors}}" as="c" hint-placeholder-count="9"><label class="pill"><input type="checkbox" checked="{{c.on}}"><span><i class="{{c.dot}}" aria-hidden="true"></i>{{c.label}}</span></label></sc-for>
+</div></fieldset>
+<div class="mt-12">
+<p class="legend mb-0">Fiche technique</p>
+<p class="hint mt-0">Une ligne par caractéristique, par exemple Largeur maximale et 3 m.</p>
+<div class="spec-rows">
+<div class="spec-row"><input aria-label="Libellé de la caractéristique" value="Largeur maximale"><input aria-label="Valeur de la caractéristique" value="3 m"><button type="button" class="quiet" aria-label="Retirer cette ligne"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>
+<div class="spec-row"><input aria-label="Libellé de la caractéristique" placeholder="Libellé"><input aria-label="Valeur de la caractéristique" placeholder="Valeur"><button type="button" class="quiet" aria-label="Retirer cette ligne"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>
+</div>
+<div class="actions"><button type="button" class="quiet">Ajouter une ligne</button></div>
+</div>
+</section>
+<section class="panel" id="s-couts" aria-labelledby="h-couts">
+<h2 id="h-couts" class="section-title"><span class="step" aria-hidden="true">5</span>Coûts internes</h2>
+<p class="notice info mt-12">Prix relevé à titre indicatif : [PRIX RELEVÉ] FCFA ([SOURCE]). Ce n’est pas un prix de vente et il n’est jamais affiché sur le site.</p>
+<p class="muted">Réservés à Admin-CM. Laissez un montant vide s’il n’est pas encore renseigné ; saisissez 0 pour un coût nul. Les prix du site restent sur devis.</p>
+<div class="costs">
+<div class="cost-card"><label>Matériel<span class="field-unit is-cost"><input type="number" value="12500"><span class="unit">FCFA</span></span><span class="cost-state"></span></label><label>Unité — matériel<select><option>Par m²</option></select></label></div>
+<div class="cost-card"><label>Confection<span class="field-unit is-cost"><input type="number" value="0"><span class="unit">FCFA</span></span><span class="cost-state">Coût nul</span></label><label>Unité — confection<select><option>Par article</option></select></label></div>
+<div class="cost-card"><label>Livraison<span class="field-unit is-cost"><input type="number" placeholder="Non renseigné"><span class="unit">FCFA</span></span><span class="cost-state">Non renseigné</span></label><label>Unité — livraison<select><option>Au forfait</option></select></label></div>
+<div class="cost-card"><label>Pose<span class="field-unit is-cost"><input type="number" placeholder="Non renseigné"><span class="unit">FCFA</span></span><span class="cost-state">Non renseigné</span></label><label>Unité — pose<select><option>Au forfait</option></select></label></div>
+</div>
+<p class="muted">Ces coûts servent de référence pour préparer les devis. Le montant du devis dépend des quantités et des prestations retenues.</p>
+</section>
+</div>
+</div>
+<div class="action-bar"><a class="button quiet" href="#contenu">Retour au catalogue</a><button type="button">Enregistrer le produit et les coûts</button></div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":2700}}'>
+class Component extends DCLogic {
+renderVals() {
+const chosen = ['blanc', 'beige', 'gris'];
+const names = { blanc: 'Blanc', ecru: 'Ecru', beige: 'Beige', taupe: 'Taupe', gris: 'Gris', anthracite: 'Anthracite', bleu: 'Bleu', vert: 'Vert', bordeaux: 'Bordeaux' };
+return { colors: Object.keys(names).map((key) => ({ label: names[key], dot: 'dot dot-' + key, on: chosen.includes(key) })) };
+}
+}
+</script>
+</body>
+</html>

@@ -1,56 +1,63 @@
 <?php
-
 namespace App\Http\Controllers\Staff;
 
-use App\Services\Audit;
+use App\Models\MediaAsset;
+use App\Services\{Audit, MediaStorage};
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\{Auth, DB};
 use Illuminate\Validation\Rule;
 
 class ProfileController
 {
-    public function edit(Request $request)
+    /** Savoir-faire et jours proposés à l'agent en cases à cocher. */
+    public const SKILLS = ['stores' => 'Stores', 'rideaux' => 'Rideaux et voilages', 'motorisation' => 'Motorisation', 'electromenager' => 'Installation électroménager', 'meubles' => 'Montage de meubles', 'sav' => 'Service après-vente'];
+    public const DAYS = ['lun' => 'Lundi', 'mar' => 'Mardi', 'mer' => 'Mercredi', 'jeu' => 'Jeudi', 'ven' => 'Vendredi', 'sam' => 'Samedi', 'dim' => 'Dimanche'];
+
+    public function profile() { return view('staff.profile'); }
+    public function updateProfile(Request $r)
     {
-        return view('staff.profile', ['user' => $request->user()]);
+        $rules = ['name' => 'required|string|max:150', 'civility' => 'nullable|in:M.,Mme', 'title' => 'nullable|string|max:100', 'phone' => 'nullable|string|max:30', 'whatsapp' => 'nullable|boolean',
+            'availability' => 'nullable|in:available,away', 'cover' => MediaStorage::rules()['image'], 'remove_cover' => 'nullable|boolean'];
+        $rules += $r->user()->isAdmin()
+            ? ['signature' => 'nullable|string|max:500', 'back_on' => 'nullable|date_format:Y-m-d']
+            : ['zones' => 'nullable|string|max:300', 'skills' => 'nullable|string|max:300', 'hours' => 'nullable|string|max:150', 'emergency_name' => 'nullable|string|max:150', 'emergency_phone' => 'nullable|string|max:30',
+                'skill_list' => 'nullable|array', 'skill_list.*' => [Rule::in(array_keys(self::SKILLS))], 'days' => 'nullable|array', 'days.*' => [Rule::in(array_keys(self::DAYS))]];
+        $data = $r->validate($rules);
+        $name = $data['name']; unset($data['name'], $data['cover'], $data['remove_cover']);
+        $profile = [...($r->user()->profile ?? []), ...$data, 'whatsapp' => $r->boolean('whatsapp')];
+        // Cases décochées : le navigateur n'envoie rien, la liste devient vide.
+        if (!$r->user()->isAdmin()) $profile = [...$profile, 'skill_list' => array_values($data['skill_list'] ?? []), 'days' => array_values($data['days'] ?? [])];
+        $old = $profile['cover_media_id'] ?? null;
+        DB::transaction(function () use ($r, $name, $profile, $old) {
+            if ($r->hasFile('cover')) $profile['cover_media_id'] = MediaStorage::fromBytes($r->file('cover')->get())->id;
+            elseif ($r->boolean('remove_cover')) unset($profile['cover_media_id']);
+            $r->user()->update(['name' => $name, 'profile' => $profile]);
+            if ($old && $old !== ($profile['cover_media_id'] ?? null)) MediaAsset::whereKey($old)->delete();
+        });
+        Audit::record('profil_modifie', $r->user());
+        return back()->with('success', 'Profil enregistré.');
     }
-
-    public function update(Request $request)
+    /** Photo de couverture : chacun ne lit que la sienne. */
+    public function cover(Request $r)
     {
-        $user = $request->user();
-        $data = $request->validate([
-            'name' => ['required', 'string', 'max:150'],
-            'email' => ['required', 'email', 'max:200', Rule::unique('users', 'email')->ignore($user->id)],
-            'phone' => ['nullable', 'string', 'max:32', 'regex:/^\+?[0-9\s().-]+$/'],
-            'profile_photo' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:2048', 'dimensions:max_width=2048,max_height=2048'],
-            'remove_profile_photo' => ['sometimes', 'boolean'],
-        ]);
-
-        $photo = $request->file('profile_photo');
-        unset($data['profile_photo'], $data['remove_profile_photo']);
-        if ($photo) {
-            $data['profile_photo'] = base64_encode($photo->getContent());
-            $data['profile_photo_mime'] = $photo->getMimeType();
-        } elseif ($request->boolean('remove_profile_photo')) {
-            $data['profile_photo'] = null;
-            $data['profile_photo_mime'] = null;
-        }
-
-        $user->update($data);
-        Audit::record('profil_modifie', $user);
-
-        return redirect()->route('staff.profile.edit')->with('success', 'Votre profil a été enregistré.');
+        $id = $r->user()->profile['cover_media_id'] ?? null;
+        abort_unless($id, 404);
+        $asset = MediaAsset::findOrFail($id);
+        return response(base64_decode($asset->payload), 200, ['Content-Type' => $asset->mime, 'Cache-Control' => 'private, no-store', 'Content-Security-Policy' => "default-src 'none'"]);
     }
-
-    public function settings(Request $request)
+    public function settings() { return view('staff.settings'); }
+    public function updateSettings(Request $r)
     {
-        return view('staff.settings', ['user' => $request->user()]);
+        $data = $r->validate(['theme' => 'required|in:light,dark,auto', 'reduce_motion' => 'nullable|boolean']);
+        $r->user()->update(['preferences' => [...($r->user()->preferences ?? []), 'theme' => $data['theme'], 'reduce_motion' => $r->boolean('reduce_motion')]]);
+        return back()->with('success', 'Paramètres enregistrés.');
     }
-
-    public function updateSettings(Request $request)
+    public function logoutOthers(Request $r)
     {
-        $data = $request->validate(['theme' => ['required', Rule::in(['light', 'dark'])]]);
-        $request->user()->update($data);
-        Audit::record('preferences_modifiees', $request->user());
-
-        return redirect()->route('staff.settings.edit')->with('success', 'Votre préférence d’affichage a été enregistrée.');
+        $r->validate(['password' => 'required|current_password']);
+        Auth::logoutOtherDevices($r->input('password'));
+        $r->session()->put('password_hash_web', $r->user()->fresh()->password);
+        Audit::record('deconnexion_autres_appareils', $r->user());
+        return back()->with('success', 'Les autres appareils sont déconnectés.');
     }
 }

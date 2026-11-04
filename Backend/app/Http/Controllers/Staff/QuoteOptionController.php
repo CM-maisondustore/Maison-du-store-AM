@@ -9,7 +9,7 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Rule;
 class QuoteOptionController
 {
-    public function index() { return view('staff.quote-options',['options'=>QuoteOption::orderBy('category')->orderBy('kind')->orderBy('label')->get(),'products'=>Product::select('id','reference','details')->get()]); }
+    public function index() { return view('staff.quote-options',['options'=>QuoteOption::orderBy('category')->orderBy('kind')->orderBy('label')->get(),'products'=>Product::select('id','reference','details')->whereIn('details->type',['store','rideau'])->get()]); }
     private function data(Request $r): array
     {
         $r->validate(MediaStorage::rules());

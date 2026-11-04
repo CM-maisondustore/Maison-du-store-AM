@@ -1,0 +1,734 @@
+diff --git a/docs/ECARTS.md b/docs/ECARTS.md
+index 383a280..c5dbccb 100644
+--- a/docs/ECARTS.md
++++ b/docs/ECARTS.md
+@@ -82,6 +82,23 @@ Aucune route, aucune migration, aucune règle de validation ni aucun calcul modi
+ 
+ - Dans l’aperçu du modèle « Devis » aux réglages historiques, le bloc « Total général » s’affiche en texte sombre sur fond sapin, peu lisible. Il vient du rendu PDF, exclu de cette refonte : à vérifier dans les réglages du modèle.
+ 
++## Nouveau devis en 4 étapes, client et prestation en formulaire flottant (03/11/2026)
++
++Demandé après revue de la maquette. Aucune route, migration, règle de validation ni calcul modifié. Le devis de référence, refait dans le nouveau parcours, donne les mêmes lignes et les mêmes montants au franc près (443 916 FCFA, acompte 266 350, solde 177 566).
++
++- **Nouveau devis, stores et rideaux (admin)** : client et ouvertures, matériaux et finitions, affectation et chiffrage, paiement. Les 4 étapes restent un seul formulaire, enregistré d’un bloc : passer d’une étape à l’autre n’enregistre rien. Une erreur du serveur ou du navigateur rouvre l’étape concernée. Sans JavaScript, toutes les étapes s’affichent, avec le message existant.
++- **Menus déroulants** pour les tissus, voilages, matériaux de store et fournitures (rail, reflète, motorisation, confection, pose). Les champs envoyés restent les mêmes champs cachés.
++- **Ouvertures** : désignation en gros, schéma à l’échelle, notes de l’ouverture visibles dès l’étape 1, aussi sur le relevé de l’agent.
++- **Client et prestation** : formulaire flottant au-dessus de la liste, toujours ouvert par ancre (`#nouveau-contact`, `#planifier`), aussi sans JavaScript. Échap le ferme, le focus reste dedans. Durées courantes en raccourcis : elles remplissent le même champ en minutes.
++- Identifiants retirés : `s-notes` et `h-notes` (ancres du sommaire du devis, utilisées nulle part ailleurs). Les notes internes sont à l’étape 3, les notes de terrain à l’étape 1.
++
++| Maquette | Non construit | Raison |
++|---|---|---|
++| Planning de l’agent dans la nouvelle prestation, premier créneau libre | Le message de chevauchement reste sous le créneau | Demande les prestations de l’agent par jour : donnée ou route à ajouter |
++| Paiement en 3 échéances (50 / 30 / 20 au-delà de 500 000 F) et mention « Notre engagement » | Acompte unique en pourcentage, comme avant | Change le calcul et le PDF : à valider avant de toucher `QuoteCosting` |
++| Éditeur libre de mise en page | Écran de réglages actuel | Chantier à part : position des blocs à enregistrer, rendu PDF à refaire |
++| Étapes pour le devis par articles et le relevé de l’agent | Formulaire en une page, inchangé | Hors de cette demande |
++
+ ## Encore à faire
+ 
+ - Brancher les demandes du nouveau site (dépôt Refonte V2) sur cet espace pro, puis retirer le `/admin` minimal de cette refonte.
+diff --git a/public/admin.css b/public/admin.css
+index a5f4b09..2b3c26f 100644
+--- a/public/admin.css
++++ b/public/admin.css
+@@ -881,6 +881,83 @@ html[data-theme=dark] .dot{border-color:rgba(255,255,255,.3)}
+   body:has(.create-panel:target) .main,body:has(.create-panel[data-open]) .main{padding-bottom:calc(var(--tabbar-h) + 110px + env(safe-area-inset-bottom))}
+ }
+ 
++/* ---- Assistant en etapes (nouveau devis) : un seul formulaire, une etape visible a la fois ---- */
++.wizard{margin-bottom:20px;padding:12px 16px 8px;background:var(--pro-panel);border:1px solid var(--pro-line);border-radius:var(--r-12);overflow-x:auto;scrollbar-width:thin;scroll-margin-top:calc(var(--topbar-h) + 12px)}
++.wizard ol{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(150px,1fr))}
++.wizard button{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:1px;width:100%;min-height:76px;padding:26px 14px 4px 0;border:0;border-radius:0;background:none;color:var(--pro-text);font:inherit;text-align:left;cursor:pointer}
++.wizard button:hover{filter:none}
++.wizard button:hover strong{text-decoration:underline}
++.wizard button::before{content:"";position:absolute;left:0;right:0;top:9px;height:2px;background:var(--pro-line-strong)}
++.wizard li.is-done button::before{background:var(--pro-gold)}
++.wizard-ring{position:absolute;left:0;top:2px;width:16px;height:16px;box-sizing:border-box;border-radius:50%;border:2px solid var(--pro-line-strong);background:var(--pro-panel)}
++.wizard li.is-done .wizard-ring{background:var(--pro-gold);border-color:var(--pro-gold)}
++.wizard button[aria-current=step] .wizard-ring{border-color:var(--pro-gold-text);box-shadow:0 0 0 4px var(--pro-gold-tint)}
++.wizard small{font-size:12.5px;color:var(--pro-text-2)}
++.wizard strong{font-size:14px;font-weight:500;color:var(--pro-ink)}
++.wizard button[aria-current=step] strong{font-weight:600}
++.wizard [data-wizard-state=todo],.wizard [data-wizard-state=calculate]{color:var(--st-warn)}
++form[data-step="1"] [data-step-section]:not([data-step-section~="1"]),form[data-step="1"] [data-step-part]:not([data-step-part~="1"]),
++form[data-step="2"] [data-step-section]:not([data-step-section~="2"]),form[data-step="2"] [data-step-part]:not([data-step-part~="2"]),
++form[data-step="3"] [data-step-section]:not([data-step-section~="3"]),form[data-step="3"] [data-step-part]:not([data-step-part~="3"]),
++form[data-step="4"] [data-step-section]:not([data-step-section~="4"]),form[data-step="4"] [data-step-part]:not([data-step-part~="4"]){display:none!important}
++.wizard-row{display:flex;flex-wrap:wrap;align-items:flex-start;gap:20px;margin-bottom:20px}
++.wizard-row>.panel,.wizard-row>section{margin-bottom:0}
++.wizard-side{flex:1 1 300px;max-width:400px}
++.wizard-main{flex:999 1 560px;min-width:0}
++.wizard-head{margin-bottom:12px}
++.wizard-head p{margin:4px 0 0}
++form[data-step="1"] #quote-windows{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;align-items:start}
++form[data-step="1"] #quote-windows>.opening{margin:0}
++#s-fen>.panel{margin-top:16px}
++.opening{border-top:3px solid var(--pro-gold)}
++.opening-top{display:flex;align-items:flex-end;gap:14px}
++.opening-top label{flex:1;min-width:0}
++input.opening-title{font-size:17px;font-weight:600}
++.opening-shape{flex:none;display:flex;align-items:center;justify-content:center;width:64px;height:64px;border-radius:var(--r-10);background:var(--pro-panel-alt)}
++.opening-shape i{display:block;width:48px;height:48px;box-sizing:border-box;border:2px solid var(--pro-gold-text);background:var(--pro-panel) linear-gradient(var(--pro-line-strong),var(--pro-line-strong)) center/1.5px 100% no-repeat}
++.choice-row{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
++.fabric-select{display:block}
++.dates-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
++
++/* ---- Formulaire flottant (client, prestation) : ouvert par ancre, sans JavaScript ---- */
++.float-panel{display:none;position:fixed;inset:0;z-index:45;align-items:center;justify-content:center;padding:24px;background:rgba(20,28,25,.5)}
++.float-panel:target,.float-panel[data-open]{display:flex}
++body:has(.float-panel:target),body:has(.float-panel[data-open]){overflow:hidden}
++.float-form{display:flex;flex-direction:column;width:min(860px,100%);max-height:calc(100vh - 48px);margin:0;background:var(--pro-panel);border-radius:14px;box-shadow:var(--sh-modal);overflow:hidden}
++.float-form.wide{width:min(980px,100%)}
++.float-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:20px 24px 16px;border-bottom:1px solid var(--pro-line)}
++.float-head h2{font:500 30px/1.1 var(--font-title)}
++.float-head p{margin:4px 0 0}
++.float-body{flex:1;min-height:0;overflow:auto;padding:0 24px 22px}
++.float-cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 32px}
++.fields-col{min-width:0}
++.fields-col>.fgroup:first-child{margin-top:18px}
++.fields-col+.fields-col>.fgroup:first-child{margin-top:20px;padding-top:20px;border-top:1px solid var(--pro-line)}
++.float-cols .fields-col+.fields-col>.fgroup:first-child{margin-top:18px;padding-top:0;border-top:0}
++.float-foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:10px;padding:14px 24px;border-top:1px solid var(--pro-line);background:var(--pro-panel-alt)}
++.float-foot .status{margin-right:auto;font-size:13px;color:var(--pro-text-2)}
++.kind-tiles{grid-template-columns:repeat(auto-fit,minmax(110px,1fr))}
++.kind-tiles .tile span{padding:10px 12px}
++.duration-chips{margin:10px 0 0}
++@media (max-width:767px){
++  .float-panel{padding:0;align-items:stretch;z-index:60}
++  .float-form,.float-form.wide{width:100%;max-height:none;border-radius:0}
++  .float-head{padding:14px 16px 12px}
++  .float-head h2{font-size:26px}
++  .float-body{padding:0 16px 18px}
++  .float-cols{grid-template-columns:minmax(0,1fr)}
++  .float-cols .fields-col+.fields-col>.fgroup:first-child{margin-top:20px;padding-top:20px;border-top:1px solid var(--pro-line)}
++  .float-foot{padding:10px 16px}
++  .float-foot .status{flex:1 1 100%;margin:0}
++  .float-foot .button,.float-foot button{flex:1 1 40%}
++  .duration-chips{margin:10px 0 0;padding:0}
++  .wizard{padding:10px 14px 6px}
++  .wizard ol{grid-template-columns:repeat(4,minmax(132px,1fr))}
++  .wizard-side{max-width:none}
++  .dates-grid{grid-template-columns:minmax(0,1fr)}
++}
++
++
+ /* ---- Impression : fiches sans menus ---- */
+ @media print{
+   .sidebar,.topbar,.mobile-head,.tabbar,.fab,.action-bar,.page-actions,.actions,.no-print,dialog,button,.bubble-tray,.bubble-flash,.bell-pop{display:none!important}
+diff --git a/public/admin.js b/public/admin.js
+index 8a36451..31fc21c 100644
+--- a/public/admin.js
++++ b/public/admin.js
+@@ -280,15 +280,65 @@ document.querySelectorAll('[data-flash-bubble]').forEach(flash => {
+   document.addEventListener('keydown', event => { if (event.key === 'Escape' && !pop.hidden) { closePop(); bell.focus(); } });
+ })();
+ 
+-/* Révéler un champ replié : section, carte d'ouverture ou onglet. */
++/* Révéler un champ replié : section, carte d'ouverture, onglet ou étape d'un assistant. */
+ const revealField = field => {
++  let allowed = null;
+   for (let node = field.parentElement; node; node = node.parentElement) {
+     if (node.tagName === 'DETAILS') node.open = true;
+     if (node.getAttribute('role') === 'tabpanel' && node.hidden) document.querySelector(`[aria-controls="${node.id}"]`)?.click();
++    const steps = node.dataset?.stepPart || node.dataset?.stepSection;
++    if (steps) allowed = allowed ? allowed.filter(step => steps.split(' ').includes(step)) : steps.split(' ');
++    if (node.wizardGo && allowed?.length && !allowed.includes(node.dataset.step)) node.wizardGo(allowed[0]);
+   }
+ };
+ document.addEventListener('invalid', event => revealField(event.target), true);
+ 
++/* Assistant en étapes : un seul formulaire, enregistré d'un bloc ; seule l'étape en cours s'affiche. Sans JavaScript, tout reste visible. */
++document.querySelectorAll('form[data-wizard]').forEach(form => {
++  const nav = document.querySelector(`[data-wizard-for="${form.id}"]`);
++  const tabs = [...nav.querySelectorAll('[data-wizard-go]')];
++  const prev = form.querySelector('[data-wizard-prev]'), next = form.querySelector('[data-wizard-next]'), save = form.querySelector('[data-wizard-save]');
++  const inStep = (el, step) => {
++    for (let node = el; node && node !== form; node = node.parentElement) {
++      const steps = node.dataset?.stepPart || node.dataset?.stepSection;
++      if (steps && !steps.split(' ').includes(String(step))) return false;
++    }
++    return true;
++  };
++  const stateOf = step => {
++    const fields = [...form.elements].filter(el => el.name && el.type !== 'hidden' && !el.disabled && el.closest('[data-step-section]') && inStep(el, step));
++    const needs = [...form.querySelectorAll('[data-step-needs]')].filter(section => inStep(section, step));
++    if (needs.some(section => !form.elements[section.dataset.stepNeeds]?.value)) return 'calculate';
++    const required = fields.filter(el => el.required || el.validationMessage);
++    if (required.length) return required.every(el => el.validity.valid) ? 'done' : 'todo';
++    return needs.length ? 'done' : 'optional';
++  };
++  const update = () => tabs.forEach(tab => {
++    const state = stateOf(tab.dataset.wizardGo), note = tab.querySelector('[data-wizard-state]');
++    tab.closest('li').classList.toggle('is-done', state === 'done');
++    note.dataset.wizardState = state;
++    note.textContent = { done: 'Complet', todo: 'À compléter', calculate: 'À calculer', optional: 'Facultatif' }[state];
++  });
++  form.wizardGo = (step, scroll) => {
++    step = String(Math.min(tabs.length, Math.max(1, Number(step))));
++    form.dataset.step = step;
++    tabs.forEach(tab => { if (tab.dataset.wizardGo === step) tab.setAttribute('aria-current', 'step'); else tab.removeAttribute('aria-current'); });
++    const index = Number(step);
++    prev.hidden = index === 1; next.hidden = index === tabs.length;
++    if (index < tabs.length) next.textContent = 'Suivant : ' + tabs[index].querySelector('strong').textContent.toLowerCase();
++    save.classList.toggle('secondary', index < tabs.length);
++    update();
++    if (scroll) nav.scrollIntoView({ block: 'start' });
++  };
++  nav.addEventListener('click', event => { const tab = event.target.closest('[data-wizard-go]'); if (tab) form.wizardGo(tab.dataset.wizardGo, true); });
++  prev.addEventListener('click', () => form.wizardGo(Number(form.dataset.step) - 1, true));
++  next.addEventListener('click', () => form.wizardGo(Number(form.dataset.step) + 1, true));
++  ['input', 'change', 'mds:calculated'].forEach(type => form.addEventListener(type, update));
++  form.addEventListener('click', () => setTimeout(update));
++  document.addEventListener('DOMContentLoaded', update);
++  form.wizardGo(1);
++});
++
+ /* Erreurs du serveur : message sous le champ, aria-invalid, sections rouvertes, focus sur le premier champ fautif. */
+ (() => {
+   const box = document.getElementById('form-errors');
+@@ -321,26 +371,51 @@ document.addEventListener('invalid', event => revealField(event.target), true);
+     revealField(field);
+   });
+   const first = controls.find(el => flagged.has(el));
+-  if (first) { first.focus({ preventScroll: true }); first.scrollIntoView({ block: 'center' }); }
++  if (first) { revealField(first); first.focus({ preventScroll: true }); first.scrollIntoView({ block: 'center' }); }
+ })();
+ 
+-/* Panneau de création : focus au premier champ à l'ouverture par ancre, fermeture sans recharger. */
++/* Panneaux de création, latéral ou flottant : ouverts par ancre, même sans JavaScript.
++   Ici : focus au premier champ, fermeture sans recharger, Échap et focus gardé dans le formulaire flottant. */
+ (() => {
++  const panels = '.create-panel,.float-panel';
++  const focusables = panel => [...panel.querySelectorAll('a[href],button:not([disabled]),input:not([type=hidden]):not([disabled]),select:not([disabled]),textarea:not([disabled])')].filter(el => el.getClientRects().length);
++  const openFloat = () => [...document.querySelectorAll('.float-panel')].find(panel => panel.hasAttribute('data-open') || location.hash === '#' + panel.id);
++  /* Le navigateur replace le focus après le défilement vers l'ancre : on attend la fin du chargement. */
++  const focusFirst = panel => {
++    const go = () => panel.querySelector('input:not([type=hidden]),select,textarea')?.focus({ preventScroll: true });
++    if (document.readyState === 'complete') go(); else addEventListener('load', () => setTimeout(go), { once: true });
++  };
+   const opened = () => {
+-    const panel = document.getElementById(location.hash.slice(1));
+-    if (panel?.matches('.create-panel') && !document.getElementById('form-errors')) panel.querySelector('input:not([type=hidden]),select,textarea')?.focus({ preventScroll: true });
+-    return panel;
++    const panel = document.getElementById(location.hash.slice(1)) || openFloat();
++    if (panel?.matches(panels) && !document.getElementById('form-errors')) focusFirst(panel);
++    return panel?.matches(panels) ? panel : null;
++  };
++  const close = panel => {
++    const y = scrollY;
++    panel.removeAttribute('data-open');
++    if (location.hash === '#' + panel.id) location.hash = '';
++    scrollTo(0, y);
++    document.querySelector(`.page-actions [href$="#${panel.id}"]`)?.focus();
+   };
+-  window.addEventListener('hashchange', () => { opened()?.scrollIntoView({ block: 'start' }); });
+-  /* À partir de 1200 px, le panneau suit la page : inutile de masquer le titre et la liste à l'arrivée. */
++  window.addEventListener('hashchange', () => { const panel = opened(); if (panel?.matches('.create-panel')) panel.scrollIntoView({ block: 'start' }); });
++  /* À partir de 1200 px, le panneau latéral suit la page : inutile de masquer le titre et la liste à l'arrivée. */
+   if (opened()?.matches('.create-panel') && matchMedia('(min-width:1200px)').matches) window.scrollTo(0, 0);
+   document.addEventListener('click', event => {
+-    const close = event.target.closest('[data-close-panel]');
+-    if (!close) return;
++    const button = event.target.closest('[data-close-panel]');
++    const backdrop = event.target.matches?.('.float-panel') ? event.target : null;
++    if (!button && !backdrop) return;
+     event.preventDefault();
+-    close.closest('.create-panel').removeAttribute('data-open');
+-    location.hash = '';
+-    document.querySelector(`.page-actions [href$="#${close.closest('.create-panel').id}"]`)?.focus();
++    close(backdrop || button.closest(panels));
++  });
++  document.addEventListener('keydown', event => {
++    const panel = openFloat();
++    if (!panel) return;
++    if (event.key === 'Escape') { close(panel); return; }
++    if (event.key !== 'Tab') return;
++    const items = focusables(panel), first = items[0], last = items[items.length - 1];
++    if (!panel.contains(document.activeElement)) { event.preventDefault(); first?.focus(); }
++    else if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
++    else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+   });
+ })();
+ 
+@@ -393,6 +468,13 @@ document.addEventListener('click', event => {
+     const quantity = Number(value('quantity')) || 1;
+     name.textContent = value('label') || 'Ouverture';
+     sum.textContent = (value('width') || value('height') ? `${value('width') || '?'} × ${value('height') || '?'} cm` : 'Mesures à saisir') + (quantity > 1 ? ` ×${quantity}` : '');
++    /* Schéma à l'échelle de l'ouverture, pour repérer une mesure inversée d'un coup d'œil. */
++    const shape = card.querySelector('[data-opening-shape] i');
++    const width = parseFloat(value('width').replace(',', '.')), height = parseFloat(value('height').replace(',', '.'));
++    if (shape && width > 0 && height > 0) {
++      const scale = 48 / Math.max(width, height);
++      shape.style.width = Math.max(8, Math.round(width * scale)) + 'px'; shape.style.height = Math.max(8, Math.round(height * scale)) + 'px';
++    }
+   };
+   document.querySelectorAll(cards).forEach(sync);
+   document.addEventListener('input', event => { const card = event.target.closest(cards); if (card) sync(card); });
+@@ -421,6 +503,19 @@ document.querySelectorAll('[data-image-block]').forEach(block => {
+   refresh();
+ });
+ 
++/* Durée d'une prestation : raccourcis qui remplissent le même champ en minutes. */
++document.querySelectorAll('[data-duration-chips]').forEach(group => {
++  const input = group.closest('form').elements.duration_minutes;
++  const sync = () => group.querySelectorAll('[data-minutes]').forEach(chip => chip.setAttribute('aria-pressed', String(chip.dataset.minutes === input.value)));
++  group.hidden = false;
++  group.addEventListener('click', event => {
++    const chip = event.target.closest('[data-minutes]');
++    if (!chip) return;
++    input.value = chip.dataset.minutes; input.dispatchEvent(new Event('input', { bubbles: true })); sync();
++  });
++  input.addEventListener('input', sync); sync();
++});
++
+ /* Client : l'origine du consentement devient obligatoire dès que le consentement est coché. */
+ document.querySelectorAll('[data-consent]').forEach(box => {
+   const check = box.querySelector('[name=marketing]'), source = box.querySelector('[name=consent_source]');
+diff --git a/public/quote-editor.js b/public/quote-editor.js
+index 8143bbe..33192b3 100644
+--- a/public/quote-editor.js
++++ b/public/quote-editor.js
+@@ -11,21 +11,22 @@
+   const compatible=(o,v)=>o.active&&o.category===v.category&&(o.motorization==='any'||o.motorization===(v.motorized==='1'?'yes':'no'));
+   const finishLabel=o=>({'wave-manuel':'Wave manuel','wave-electric':'Wave motoris\u00e9','ruflette-wave':'Ruflette Wave','reflete-manuel':'Ruflette','barre-fer':'Barre de fer'}[o.code]||o.label);
+   const label=o=>o.label+(Object.hasOwn(o,'unit_price')?' — '+(o.unit_price===null?'à définir':o.unit_price.toLocaleString('fr-FR')+' FCFA / '+units[o.unit]):'');
+-  function checkbox(container,o,checked,key,attribute){
+-    const el=document.createElement('label');el.className='check';
+-    const input=document.createElement('input');input.type='checkbox';input.value=o.id;input.checked=checked;input.dataset[attribute]=key;
+-    el.append(input);
+-    el.append(document.createTextNode(label(o)));container.append(el);
++  // Un menu déroulant par choix ; il est réutilisé pour garder le focus pendant la saisie.
++  function choices(container,options,value,key,attribute,empty,name){
++    let select=container.querySelector('select');
++    if(!select){select=document.createElement('select');select.dataset[attribute]=key;if(name)select.setAttribute('aria-label',name);container.append(select);}
++    select.replaceChildren(new Option(empty,''),...options.map(o=>new Option(label(o),String(o.id))));
++    select.value=String(value||'');if(select.selectedIndex<0)select.value='';
+   }
+   function refresh(root,current=values(root)){
+     keys.forEach(key=>field(root,key).value=String(current[key]??''));
+     const v=values(root);v.category=v.category||'rideau';v.motorized=v.motorized||'0';field(root,'category').value=v.category;field(root,'motorized').value=v.motorized;
+     for(const [key,group] of Object.entries({curtain_id:'rideau',sheer_id:'voilage',store_id:'store'})){
+       const box=root.querySelector('[data-fabric-group="'+key+'"]'),list=box.querySelector('[data-fabric-list]');
+-      box.hidden=(group==='store')!==(v.category==='store');list.replaceChildren();
++      box.hidden=(group==='store')!==(v.category==='store');
+       const options=box.hidden?[]:data.options.filter(o=>o.kind==='material'&&(o.fabric_group||o.category)===group&&compatible(o,v));
+       if(!options.some(o=>String(o.id)===field(root,key).value))field(root,key).value='';
+-      options.forEach(o=>checkbox(list,o,String(o.id)===field(root,key).value,key,'fabric'));
++      choices(list,options,field(root,key).value,key,'fabric',group==='store'?'Choisir le matériau…':'Aucun');
+     }
+     const select=field(root,'finish_id'),selected=current.finish_id;
+     select.replaceChildren(new Option('Sélectionner une finition…',''));
+@@ -57,9 +58,9 @@
+       }
+       if(!options.some(o=>String(o.id)===String(selected)))selected='';
+       if(!selected&&!input.dataset.userChoice&&['sewing','installation','motor'].includes(kind)&&options.length===1)selected=String(options[0].id);
+-      input.value=selected||'';part.hidden=options.length===0;list.replaceChildren();
++      input.value=selected||'';part.hidden=options.length===0;
+       if(kind==='secondary_material')list.textContent=options[0]?.label||'';
+-      else options.forEach(o=>checkbox(list,o,String(o.id)===input.value,kind,'part'));
++      else choices(list,options,input.value,kind,'part','Aucun',part.querySelector('h4')?.textContent);
+       const chosen=options.find(o=>String(o.id)===input.value);
+       part.querySelector('[data-unit-label]').textContent=chosen?'('+units[chosen.unit]+')':'';
+     });
+@@ -101,10 +102,10 @@
+   form.addEventListener('input',event=>{dirty=true;revision++;invalidate(event.target);});
+   form.addEventListener('change',event=>{
+     dirty=true;revision++;const target=event.target,root=target.closest('[data-selection]');invalidate(target);
+-    if(target.dataset.fabric)field(root,target.dataset.fabric).value=target.checked?target.value:'';
++    if(target.dataset.fabric)field(root,target.dataset.fabric).value=target.type==='checkbox'?(target.checked?target.value:''):target.value;
+     if(root){alignFinish(root,target);if(root!==defaults)root.closest('[data-window]').querySelector('[data-inherit]').checked=false;refresh(root);if(root===defaults)windows.querySelectorAll('[data-window]').forEach(inherit);}
+     if(target.matches('[data-inherit]'))inherit(target.closest('[data-window]'));
+-    if(target.dataset.part){const input=target.closest('[data-cost-part]').querySelector('[data-component]');input.value=target.checked?target.value:'';input.dataset.userChoice='1';}
++    if(target.dataset.part){const input=target.closest('[data-cost-part]').querySelector('[data-component]');input.value=target.type==='checkbox'?(target.checked?target.value:''):target.value;input.dataset.userChoice='1';}
+     if(root||target.matches('[data-inherit],[data-material-mode]')||target.dataset.part)windows.querySelectorAll('[data-window]').forEach(row=>components(row));
+     selectionValidity();
+     if(target.name==='payment_mode'&&target.value==='full')form.elements.deposit_amount.value=0;
+@@ -138,7 +139,7 @@
+     }catch(error){status.textContent=error.message;}finally{calculating=false;calculate.disabled=false;}
+   });
+   form.addEventListener('submit',event=>{
+-    if(calculate&&(calculating||(form.elements.use_catalogue.value==='1'&&!form.elements.calculation_token.value))){event.preventDefault();status.textContent='Calculez le chiffrage avant enregistrement.';status.scrollIntoView({block:'center'});}
++    if(calculate&&(calculating||(form.elements.use_catalogue.value==='1'&&!form.elements.calculation_token.value))){event.preventDefault();status.textContent='Calculez le chiffrage avant enregistrement.';if(typeof revealField==='function')revealField(status);status.scrollIntoView({block:'center'});}
+     if(!event.defaultPrevented)dirty=false;
+   });
+   window.addEventListener('beforeunload',event=>{if(dirty){event.preventDefault();event.returnValue='';}});
+diff --git a/resources/views/staff/agent-quote-window.blade.php b/resources/views/staff/agent-quote-window.blade.php
+index d0eab22..40d8be1 100644
+--- a/resources/views/staff/agent-quote-window.blade.php
++++ b/resources/views/staff/agent-quote-window.blade.php
+@@ -3,14 +3,14 @@
+ <details class="opening-card" open>
+ <summary><span class="opening-name" data-opening-name>{{ $window['label'] ?? 'Ouverture' }}</span><span class="opening-sum" data-opening-sum>{{ $hasMeasures ? ($window['width'] ?? '?').' × '.($window['height'] ?? '?').' cm' : 'Mesures à saisir' }}</span></summary>
+ <div class="opening-body">
+-<label>Pièce / description de l’ouverture<input required name="windows[{{ $index }}][label]" maxlength="100" value="{{ $window['label'] ?? '' }}" placeholder="Salon — ouverture 1"></label>
++<div class="opening-top"><span class="opening-shape" data-opening-shape aria-hidden="true"><i></i></span><label>Désignation<input class="opening-title" required name="windows[{{ $index }}][label]" maxlength="100" value="{{ $window['label'] ?? '' }}" placeholder="Salon — fenêtre sur rue"></label></div>
+ <div class="opening-measures">
+ @foreach(['width'=>'Largeur','height'=>'Hauteur'] as $key=>$label)<label>{{ $label }}<span class="field-unit measure"><input required inputmode="decimal" name="windows[{{ $index }}][{{ $key }}]" value="{{ $window[$key] ?? '' }}"><span class="unit">cm</span></span></label>@endforeach
+ </div>
++<label>Notes de l’ouverture<textarea name="windows[{{ $index }}][notes]" rows="2" maxlength="1000" placeholder="Accès, prise électrique, contrainte de pose…">{{ $window['notes'] ?? '' }}</textarea></label>
+ <input type="hidden" name="windows[{{ $index }}][inherit_defaults]" value="0"><label class="check"><input type="checkbox" data-agent-inherit name="windows[{{ $index }}][inherit_defaults]" value="1" @checked($window['inherit_defaults'] ?? true)>Utiliser les choix communs</label>
+ <details class="quote-opening-details"><summary>Type, motorisation, finition et zone de pose</summary>
+ @include('staff.agent-quote-selection',['prefix'=>'windows['.$index.']','selection'=>$window])
+-<label>Description / précisions<textarea name="windows[{{ $index }}][notes]" maxlength="1000">{{ $window['notes'] ?? '' }}</textarea></label>
+ </details>
+ <p class="hint">Pour les rideaux ou voilages de plus de 2,80 m, Admin-CM effectuera le calcul manuellement.</p>
+ <div class="opening-foot"><button type="button" class="quiet" data-remove-opening>Retirer cette ouverture</button></div>
+diff --git a/resources/views/staff/contact-fields.blade.php b/resources/views/staff/contact-fields.blade.php
+index f43e887..ff501fd 100644
+--- a/resources/views/staff/contact-fields.blade.php
++++ b/resources/views/staff/contact-fields.blade.php
+@@ -1,21 +1,21 @@
+ @php($kindNow=old('kind',$contact->kind ?: 'client'))
++<div class="fields-col">
+ <section class="fgroup">
+-<h3 class="section-title"><span class="step" aria-hidden="true">1</span>Catégorie</h3>
+-<fieldset class="bare"><legend class="sr-only">Catégorie du dossier</legend>
+-<div class="segmented">
+-@foreach(['client'=>'Client','fournisseur'=>'Fournisseur','partenaire'=>'Partenaire'] as $value=>$label)<label><input type="radio" name="kind" value="{{ $value }}" @checked($kindNow===$value)><span>{{ $label }}</span></label>
++<fieldset class="bare"><legend class="section-title"><span class="step" aria-hidden="true">1</span>Catégorie</legend>
++<div class="tile-group kind-tiles">
++@foreach(['client'=>['Client','Particulier ou entreprise'],'fournisseur'=>['Fournisseur','Tissus, rails, moteurs'],'partenaire'=>['Partenaire','Architecte, décorateur']] as $value=>$kind)<label class="tile"><input type="radio" name="kind" value="{{ $value }}" @checked($kindNow===$value)><span><strong>{{ $kind[0] }}</strong><small>{{ $kind[1] }}</small></span></label>
+ @endforeach</div>
+ </fieldset>
+ </section>
+ <section class="fgroup">
+ <h3 class="section-title"><span class="step" aria-hidden="true">2</span>Coordonnées</h3>
+-<div class="grid">
+ <label>Nom / raison sociale<input name="name" required maxlength="200" autocomplete="off" value="{{ old('name', $contact->name) }}"></label>
+ <label>Téléphone<input type="tel" name="phone" maxlength="50" autocomplete="off" value="{{ old('phone', $contact->phone) }}"></label>
+ <label>E-mail<input type="email" name="email" maxlength="200" autocomplete="off" value="{{ old('email', $contact->email) }}"><span class="hint">Facultatif. Chaque adresse ne sert qu’à un seul dossier.</span>@error('email')<a class="hint link" href="{{ route('staff.contacts.index',['q'=>old('email')]) }}">Rechercher le dossier qui utilise cette adresse</a>@enderror</label>
+-</div>
+ <label>Adresse<textarea name="address" rows="2" maxlength="1000">{{ old('address', $contact->address) }}</textarea></label>
+ </section>
++</div>
++<div class="fields-col">
+ <section class="fgroup" data-consent>
+ <h3 class="section-title"><span class="step" aria-hidden="true">3</span>Promotions</h3>
+ <label class="check"><input type="checkbox" name="marketing" value="1" @checked(old('marketing', (bool)$contact->marketing_consent_at))> Consentement aux offres et promotions recueilli</label>
+@@ -23,8 +23,9 @@
+ </section>
+ <div class="internal-block">
+ <p class="internal-title">@include('staff.partials.icon',['n'=>'lock','s'=>16])Réservé à l’équipe</p>
+-<label>Notes internes<textarea name="notes" rows="3" maxlength="10000">{{ old('notes', $contact->notes) }}</textarea><span class="hint">Jamais transmises au client.</span></label>
++<label>Notes internes<textarea name="notes" rows="4" maxlength="10000" placeholder="Préférences, historique, points d’attention…">{{ old('notes', $contact->notes) }}</textarea><span class="hint">Jamais transmises au client.</span></label>
+ </div>
+ @if($contact->exists)<label class="check mt-12">
+ <input type="checkbox" name="archived" value="1" @checked(old('archived', (bool)$contact->archived_at))> Dossier archivé (historique conservé)</label>
+ @endif
++</div>
+diff --git a/resources/views/staff/contacts.blade.php b/resources/views/staff/contacts.blade.php
+index 7d19076..94b9964 100644
+--- a/resources/views/staff/contacts.blade.php
++++ b/resources/views/staff/contacts.blade.php
+@@ -4,8 +4,6 @@
+ @section('page-actions')<a class="button" href="#nouveau-contact">@include('staff.partials.icon',['n'=>'plus','s'=>18])Créer un client</a>@endsection
+ @section('content')
+ @php($keep=request()->except(['type','page']))
+-<div class="create-layout">
+-<div class="create-list">
+ <nav class="chips" aria-label="Type de contact">
+ <a class="chip" href="{{ route('staff.contacts.index',$keep) }}" @if(!request('type')) aria-current="true" @endif>Tous<b>{{ $total }}</b></a>
+ @foreach(['client'=>'Clients','fournisseur'=>'Fournisseurs','partenaire'=>'Partenaires','archive'=>'Archivés'] as $value=>$label)
+@@ -34,14 +32,12 @@
+ </div>
+ @include('staff.pagination',['paginator'=>$contacts])
+ </section>
+-</div>
+-<section class="panel create-panel" id="nouveau-contact" aria-labelledby="h-nouveau-contact" @if($errors->any()) data-open @endif>
+-<div class="create-head"><div><h2 id="h-nouveau-contact">Créer un client</h2><p class="muted">Client, fournisseur ou partenaire : aucun message n’est envoyé.</p></div><a class="button quiet icon-btn" href="{{ route('staff.contacts.index') }}" data-close-panel aria-label="Fermer sans créer">@include('staff.partials.icon',['n'=>'close','s'=>18])</a></div>
+-<form method="post" action="{{ route('staff.contacts.store') }}">
++<section class="float-panel" id="nouveau-contact" @if($errors->any()) data-open @endif>
++<form class="float-form" method="post" action="{{ route('staff.contacts.store') }}" role="dialog" aria-modal="true" aria-labelledby="h-nouveau-contact">
+ @csrf
+-@include('staff.contact-fields',['contact'=>new \App\Models\Contact()])
+-<div class="action-bar"><button>Créer un client</button></div>
++<div class="float-head"><div><h2 id="h-nouveau-contact">Créer un client</h2><p class="muted">Client, fournisseur ou partenaire. Aucun message n’est envoyé.</p></div><a class="button quiet icon-btn" href="{{ route('staff.contacts.index') }}" data-close-panel aria-label="Fermer sans créer">@include('staff.partials.icon',['n'=>'close','s'=>18])</a></div>
++<div class="float-body"><div class="float-cols">@include('staff.contact-fields',['contact'=>new \App\Models\Contact()])</div></div>
++<div class="float-foot"><span class="status">Le dossier s’ouvre après la création.</span><a class="button quiet" href="{{ route('staff.contacts.index') }}" data-close-panel>Annuler</a><button>Créer un client</button></div>
+ </form>
+ </section>
+-</div>
+ @endsection
+diff --git a/resources/views/staff/interventions.blade.php b/resources/views/staff/interventions.blade.php
+index 7ceac34..52bf3e6 100644
+--- a/resources/views/staff/interventions.blade.php
++++ b/resources/views/staff/interventions.blade.php
+@@ -7,8 +7,6 @@
+ @endif
+ @section('content')
+ @php($keep=request()->except(['status','page']))
+-<div class="create-layout">
+-<div class="create-list">
+ <nav class="chips" aria-label="Filtrer par statut">
+ <a class="chip" href="{{ route('staff.interventions.index',$keep) }}" @if(!request('status')) aria-current="true" @endif>Toutes<b>{{ $counts->sum() }}</b></a>
+ @foreach(['planned'=>'Planifié','in_progress'=>'En cours','completed'=>'Terminé','cancelled'=>'Annulé'] as $value=>$label)
+@@ -25,16 +23,17 @@
+ @include('staff.jobs-table')
+ @include('staff.pagination',['paginator'=>$jobs])
+ </section>
+-</div>
+ @if($admin)
+ @php($linked=old('quote_id',request('quote_id')) || old('appointment_id',request('appointment_id')))
+-<section class="panel create-panel" id="planifier" aria-labelledby="h-planifier" @if(request('contact_id') || request('quote_id') || request('appointment_id') || $errors->any()) data-open @endif>
+-<div class="create-head"><div><h2 id="h-planifier">Nouvelle prestation</h2><p class="muted">L’agent choisi est prévenu sur son compte. Le client ne reçoit aucun message.</p></div><a class="button quiet icon-btn" href="{{ route('staff.interventions.index') }}" data-close-panel aria-label="Fermer sans planifier">@include('staff.partials.icon',['n'=>'close','s'=>18])</a></div>
+-<form id="planifier-form" method="post" action="{{ route('staff.interventions.store') }}">
++<section class="float-panel" id="planifier" @if(request('contact_id') || request('quote_id') || request('appointment_id') || $errors->any()) data-open @endif>
++<form id="planifier-form" class="float-form wide" method="post" action="{{ route('staff.interventions.store') }}" role="dialog" aria-modal="true" aria-labelledby="h-planifier">
+ @csrf
++<div class="float-head"><div><h2 id="h-planifier">Nouvelle prestation</h2><p class="muted">L’agent choisi est prévenu sur son compte. Le client ne reçoit aucun message.</p></div><a class="button quiet icon-btn" href="{{ route('staff.interventions.index') }}" data-close-panel aria-label="Fermer sans planifier">@include('staff.partials.icon',['n'=>'close','s'=>18])</a></div>
++<div class="float-body"><div class="float-cols">
++<div class="fields-col">
+ <section class="fgroup">
+ <h3 class="section-title"><span class="step" aria-hidden="true">1</span>Client</h3>
+-<label class="mt-0">Client<select name="contact_id" required>
++<label>Client<select name="contact_id" required>
+ <option value="">Choisir le dossier</option>
+ @foreach($contacts as $contact)<option value="{{ $contact->id }}" data-address="{{ $contact->address }}" @selected(old('contact_id',request('contact_id'))==$contact->id)>{{ $contact->name }}</option>
+ @endforeach</select>
+@@ -44,11 +43,13 @@
+ <section class="fgroup">
+ <fieldset class="bare">
+ <legend class="section-title"><span class="step" aria-hidden="true">2</span>Type de prestation</legend>
+-<div class="tile-group stack">
+-@foreach(\App\Services\StaffInterface::JOB_KINDS as $value=>$label)<label class="tile"><input type="radio" name="kind" value="{{ $value }}" @checked(old('kind',array_key_first(\App\Services\StaffInterface::JOB_KINDS))===$value)><span><strong>{{ $label }}</strong></span></label>
++<div class="tile-group kind-tiles">
++@foreach(\App\Services\StaffInterface::JOB_KINDS as $value=>$label)<label class="tile"><input type="radio" name="kind" value="{{ $value }}" @checked(old('kind',array_key_first(\App\Services\StaffInterface::JOB_KINDS))===$value)><span><strong>{{ $label }}</strong><small>{{ ['devis_sur_place'=>'Relevé et mesures','installation'=>'Pose chez le client','sav'=>'Réglage ou réparation'][$value] ?? '' }}</small></span></label>
+ @endforeach</div>
+ </fieldset>
+ </section>
++</div>
++<div class="fields-col">
+ @include('staff.planning-fields',['job'=>new \App\Models\Intervention(),'stepped'=>true])
+ <details class="fold" @if($linked || $errors->hasAny(['quote_id','appointment_id'])) open @endif>
+ <summary>Liens optionnels<small>Devis et rendez-vous du client choisi</small></summary>
+@@ -61,9 +62,10 @@
+ @endforeach</select>
+ </label>
+ </details>
+-<div class="action-bar"><button>Planifier la prestation</button></div>
++</div>
++</div></div>
++<div class="float-foot"><span class="status">La fiche de la prestation s’ouvre après l’enregistrement.</span><a class="button quiet" href="{{ route('staff.interventions.index') }}" data-close-panel>Annuler</a><button>Planifier la prestation</button></div>
+ </form>
+ </section>
+ @endif
+-</div>
+ @endsection
+diff --git a/resources/views/staff/planning-fields.blade.php b/resources/views/staff/planning-fields.blade.php
+index 4b8d973..c179350 100644
+--- a/resources/views/staff/planning-fields.blade.php
++++ b/resources/views/staff/planning-fields.blade.php
+@@ -11,7 +11,8 @@
+ <label>Durée<span class="field-unit"><input name="duration_minutes" type="number" inputmode="numeric" min="15" max="480" required value="{{ old('duration_minutes',$job->duration_minutes ?? 60) }}"><span class="unit">minutes</span></span>
+ </label>
+ </div>
+-@if($stepped)<p class="hint">Un agent ne peut pas avoir deux prestations sur le même créneau.</p></section>
++@if($stepped)<div class="chips duration-chips" data-duration-chips hidden role="group" aria-label="Durées courantes">@foreach([30=>'30 min',60=>'1 h',120=>'2 h',240=>'4 h'] as $minutes=>$label)<button type="button" class="chip" data-minutes="{{ $minutes }}" aria-pressed="false">{{ $label }}</button>@endforeach</div>
++<p class="hint">Un agent ne peut pas avoir deux prestations sur le même créneau.</p></section>
+ <section class="fgroup"><h3 class="section-title"><span class="step" aria-hidden="true">4</span>Adresse et consignes</h3>@endif
+ <label>Adresse d’intervention<textarea name="address" rows="2" required>{{ old('address',$job->address) }}</textarea>@if($stepped)<span class="hint">Reprise du dossier client quand le champ est vide.</span>@endif
+ </label>
+diff --git a/resources/views/staff/quote-form.blade.php b/resources/views/staff/quote-form.blade.php
+index 1975bf0..7042c99 100644
+--- a/resources/views/staff/quote-form.blade.php
++++ b/resources/views/staff/quote-form.blade.php
+@@ -2,7 +2,7 @@
+ @section('title',$quote->exists ? 'Préparer le devis' : 'Nouveau devis')
+ @section('back',$quote->exists ? route('staff.quotes.show',$quote) : route('staff.quotes.index'))
+ @section('crumbs')<a href="{{ route('staff.quotes.index') }}">Devis</a>@if($quote->exists) / <a class="mono" href="{{ route('staff.quotes.show',$quote) }}">{{ \App\Services\StaffInterface::ref($quote->reference) }}</a>@endif @endsection
+-@section('subtitle','Modifiez librement les choix et les mesures, puis enregistrez. Le devis restera en brouillon pour vérification.')
++@section('subtitle','Quatre étapes. Le devis reste en brouillon : rien n’est envoyé au client sans action de votre part.')
+ @section('body-class','has-action-bar')
+ @section('content')
+ @php
+@@ -12,45 +12,59 @@
+  $financial=$quote->configuration['calculation']['financial'] ?? null;
+  $liveTotal=$financial && old('calculation_token',true);
+  $pendingLines=$quote->configuration['calculation']['pending'] ?? [];
++ $steps=[1=>'Client et ouvertures',2=>'Matériaux et finitions',3=>'Affectation et chiffrage',4=>'Paiement'];
+ @endphp
+ <noscript><p class="notice">Activez JavaScript pour afficher les choix adaptés et ajouter des ouvertures.</p></noscript>
+ @unless($quote->exists)@include('staff.partials.boutique-picker',['active'=>''])@endunless
+-<form id="staff-quote-form" method="post" action="{{ $quote->exists ? route('staff.quotes.form.update',$quote) : route('staff.quotes.store') }}">
++<nav class="wizard" data-wizard-for="staff-quote-form" aria-label="Étapes du devis"><ol>
++@foreach($steps as $n=>$label)<li><button type="button" data-wizard-go="{{ $n }}"><span class="wizard-ring" aria-hidden="true"></span><small>Étape {{ $n }}</small><strong>{{ $label }}</strong><small data-wizard-state></small></button></li>@endforeach
++</ol></nav>
++<form id="staff-quote-form" data-wizard method="post" action="{{ $quote->exists ? route('staff.quotes.form.update',$quote) : route('staff.quotes.store') }}">
+ @csrf @if($quote->exists) @method('PUT') @endif
+ <input type="hidden" name="submission_token" value="{{ old('submission_token',$quote->submission_token ?: (string)\Illuminate\Support\Str::uuid()) }}">
+ <input type="hidden" name="edit_version" value="{{ old('edit_version',$quote->edit_version ?? 0) }}">
+ <input type="hidden" name="calculation_token" value="{{ old('calculation_token',!empty($quote->configuration['calculation']['financial']) ? \App\Services\QuoteCosting::token($quote->configuration['calculation']) : '') }}">
+-<div class="form-toc-layout">
+-<nav class="form-toc" aria-label="Sommaire du devis" data-step-nav="staff-quote-form"><ol>
+-@foreach(['s-client'=>'Client','quote-defaults'=>'Choix communs','s-fen'=>'Mesures','s-dates'=>'Dates et affectation','s-prix'=>'Chiffrage','s-pay'=>'Paiements','s-notes'=>'Notes'] as $anchor=>$label)<li><a href="#{{ $anchor }}"><strong>{{ $label }}</strong><small></small></a></li>@endforeach
+-</ol></nav>
+-<div class="form-steps">
+-<section class="panel" id="s-client" aria-labelledby="h-client"><h2 id="h-client" class="section-title"><span class="step" aria-hidden="true">1</span>Client</h2><div class="grid client-grid">
+-@foreach(['firstName'=>'Prénom','lastName'=>'Nom / raison sociale','phone'=>'Téléphone','email'=>'E-mail (facultatif)','address'=>'Adresse de livraison et de pose','city'=>'Ville'] as $key=>$label)
++
++<section class="panel" id="quote-defaults" data-step-section="2" aria-labelledby="h-choix"><h2 id="h-choix">Choix communs</h2>
++<p class="muted">Appliqués à toutes les ouvertures qui gardent « Utiliser les choix communs ». Ils sont facultatifs si vous personnalisez chaque ouverture.</p>
++@include('staff.quote-selection',['prefix'=>'defaults','selection'=>$defaults])
++</section>
++
++<div class="wizard-row">
++<section class="panel wizard-side" id="s-client" data-step-section="1" aria-labelledby="h-client"><h2 id="h-client">Client</h2><div class="grid">
++@foreach(['lastName'=>'Nom / raison sociale','firstName'=>'Prénom','phone'=>'Téléphone','email'=>'E-mail (facultatif)','address'=>'Adresse de livraison et de pose','city'=>'Ville'] as $key=>$label)
+ @if($key==='phone')
+ @include('staff.quote-phone')
+ @else
+ <label>{{ $label }}<input name="contact[{{ $key }}]" type="{{ $key==='email' ? 'email' : 'text' }}" @required(in_array($key,['lastName','phone','address'])) maxlength="{{ $key==='address' ? 1000 : ($key==='email' ? 255 : ($key==='phone' ? 50 : 100)) }}" value="{{ old('contact.'.$key,$quote->contact[$key] ?? '') }}"></label>
+ @endif
+ @endforeach
+-</div></section>
+-<section class="panel" id="quote-defaults" aria-labelledby="h-choix"><h2 id="h-choix" class="section-title"><span class="step" aria-hidden="true">2</span>Choix communs</h2>
+-<p class="muted">Sélectionnez séparément les tissus rideaux et les voilages, ou choisissez un store. Ces choix sont facultatifs si vous personnalisez chaque ouverture ; ils restent nécessaires pour les ouvertures utilisant les choix communs.</p>
+-@include('staff.quote-selection',['prefix'=>'defaults','selection'=>$defaults])
+-</section>
+-<section id="s-fen" aria-labelledby="h-fen" class="mb-20">
+-<h2 id="h-fen" class="section-title mb-8"><span class="step" aria-hidden="true">3</span>Mesures ouverture par ouverture</h2><p class="muted">Mesures en centimètres, de 1 à 2000 cm. Ajoutez une ouverture pour chaque configuration différente.</p>
+-<div id="quote-windows">@foreach($windows as $index=>$window) @include('staff.quote-window',['openCard'=>$loop->first || count($windows)<=3 || $errors->any()]) @endforeach</div>
++</div><p class="hint">Le dossier client est créé, ou retrouvé par son e-mail, à l’enregistrement.</p></section>
++
++<section class="wizard-main" id="s-fen" data-step-section="1 2" aria-labelledby="h-fen">
++<div class="wizard-head" data-step-part="1"><h2 id="h-fen">Ouvertures</h2><p class="muted">Désignation, mesures en centimètres (de 1 à 2000 cm) et notes de chaque ouverture.</p></div>
++<div class="wizard-head" data-step-part="2"><h2>Par ouverture</h2><p class="muted">Gardez les choix communs, ou décochez-les pour choisir les matériaux d’une seule ouverture.</p></div>
++<div id="quote-windows">@foreach($windows as $index=>$window) @include('staff.quote-window',['openCard'=>true]) @endforeach</div>
+ <template id="quote-window-template">@include('staff.quote-window',['index'=>'__INDEX__','window'=>['inherit_defaults'=>true],'openCard'=>true])</template>
+-<div class="actions"><button type="button" class="secondary" id="add-quote-window">Ajouter une ouverture</button><span class="muted">30 ouvertures maximum</span></div>
++<div class="actions" data-step-part="1"><button type="button" class="secondary" id="add-quote-window">Ajouter une ouverture</button><span class="muted">30 ouvertures maximum</span></div>
++<section class="panel" data-step-part="1"><label class="mt-0">Notes de terrain<textarea name="field_notes" rows="2" maxlength="10000" placeholder="Accès, étage, contraintes de pose, souhaits du client…">{{ old('field_notes',$quote->configuration['field_notes'] ?? '') }}</textarea></label></section>
+ </section>
+-<section class="panel" id="s-dates" aria-labelledby="h-dates"><h2 id="h-dates" class="section-title"><span class="step" aria-hidden="true">4</span>Dates et affectation</h2><div class="grid">
++</div>
++
++<div class="wizard-row">
++<section class="panel wizard-side" id="s-dates" data-step-section="3" aria-labelledby="h-dates"><h2 id="h-dates">Affectation</h2>
++<label>Agent<select name="agent_id"><option value="">Non affecté</option>@foreach($agents as $agent)<option value="{{ $agent->id }}" @selected(old('agent_id',$quote->agent_id)==$agent->id)>{{ $agent->name }}</option>@endforeach</select></label>
++<div class="grid dates-grid">
+ @foreach(['quote_date'=>'Date du devis','valid_until'=>'Valable jusqu’au','delivery_date'=>'Livraison prévue','installation_date'=>'Pose prévue'] as $key=>$label)
+ <label>{{ $label }}<input name="{{ $key }}" type="date" @required(in_array($key,['quote_date','valid_until'])) value="{{ old($key,$quote->$key ?: ($key==='quote_date' ? now()->format('Y-m-d') : ($key==='valid_until' ? now()->addDays(30)->format('Y-m-d') : ''))) }}"></label>
+ @endforeach
+-<label>Agent<select name="agent_id"><option value="">Non affecté</option>@foreach($agents as $agent)<option value="{{ $agent->id }}" @selected(old('agent_id',$quote->agent_id)==$agent->id)>{{ $agent->name }}</option>@endforeach</select></label>
+-</div><p class="muted">Ces dates sont prévisionnelles. La planification d’une intervention se fait dans Prestations.</p></section>
+-<section class="panel" id="s-prix" aria-labelledby="h-prix" data-step-needs="calculation_token" data-step-todo="À calculer" data-step-done="Calculé"><h2 id="h-prix" class="section-title"><span class="step" aria-hidden="true">5</span>Chiffrage du devis</h2><p class="muted">Ajustez les quantités et les prix dans chaque ouverture. Un champ prix vide reprend le catalogue ; vos prix saisis sont conservés lors du recalcul. Les remises s’appliquent au total sans modifier les fournitures.</p>
++</div>
++<p class="hint">Dates prévisionnelles. La prestation se planifie ensuite dans Prestations.</p>
++<div class="internal-block"><p class="internal-title">@include('staff.partials.icon',['n'=>'lock','s'=>16])Réservé à l’équipe</p>
++<label for="quote-internal-notes">Notes internes</label><textarea id="quote-internal-notes" name="internal_notes" rows="3" maxlength="10000">{{ old('internal_notes',$quote->internal_notes) }}</textarea></div>
++</section>
++
++<section class="panel wizard-main" id="s-prix" data-step-section="3" aria-labelledby="h-prix" data-step-needs="calculation_token"><h2 id="h-prix">Chiffrage</h2><p class="muted">Un champ prix vide reprend le catalogue ; vos prix saisis sont conservés lors du recalcul. Les remises s’appliquent au total sans modifier les fournitures. Quantités et prix ouverture par ouverture : étape 2, « Quantités, fournitures et prix ».</p>
+ @if(!empty($quote->configuration['pricing_review_required']))<p class="notice">Les choix de l’agent sont à vérifier avant validation du chiffrage.</p>@endif
+ @include('staff.quote-pricing-settings')
+ <label>Taux de taxe<span class="field-unit"><input type="number" name="tax_rate" min="0" max="100" step="0.01" required value="{{ old('tax_rate',($quote->tax_basis_points ?? 0)/100) }}"><span class="unit">%</span></span></label>
+@@ -59,19 +73,16 @@
+ <template id="lines-template">@include('staff.quote-calculated-line',['index'=>'__INDEX__','line'=>[]])</template>
+ <div id="quote-financial-result" aria-live="polite">@if(!empty($quote->configuration['calculation']['financial'])) @include('staff.quote-financial-summary',['financial'=>$quote->configuration['calculation']['financial']]) @elseif($quote->exists)<p class="notice">Le chiffrage historique est conservé jusqu’à l’enregistrement. Vérifiez chaque poste avant de le remplacer par un nouveau calcul.</p>@endif</div>
+ </section>
+-<section class="panel" id="s-pay" aria-labelledby="h-pay"><h2 id="h-pay" class="section-title"><span class="step" aria-hidden="true">6</span>Conditions de paiement prévues</h2>
++</div>
++
++<section class="panel form-narrow" id="s-pay" data-step-section="4" aria-labelledby="h-pay"><h2 id="h-pay">Conditions de paiement prévues</h2>
+ <input type="hidden" name="payment_mode" value="advance"><input type="hidden" name="deposit_amount" value="{{ old('deposit_amount',$quote->deposit_amount ?? 0) }}">
+-<p>L’acompte et le solde sont calculés sur le montant définitif après remise. Le pourcentage d’acompte se règle dans le chiffrage ci-dessus.</p>
++<p>L’acompte et le solde sont calculés sur le montant définitif après remise. Le pourcentage d’acompte se règle à l’étape 3, dans le chiffrage.</p>
+ <p class="muted">Déjà reçu : {{ number_format($quote->exists ? $quote->receivedAmount() : 0,0,',',' ') }} FCFA</p>
+ <details class="fold" @if(old('receipt_amount') || $errors->hasAny(['receipt_amount','receipt_date','receipt_method','receipt_reference','receipt_confirmed'])) open @endif><summary>Nouveau paiement déjà reçu<small>Seulement si un versement vient d’être encaissé</small></summary>@include('staff.quote-receipt-fields')</details>
+ </section>
+-<section class="panel" id="s-notes" aria-labelledby="h-notes"><h2 id="h-notes" class="section-title"><span class="step" aria-hidden="true">7</span>Notes</h2>
+-<div class="internal-block"><p class="internal-title">@include('staff.partials.icon',['n'=>'lock','s'=>16])Réservé à l’équipe</p>
+-<label for="quote-internal-notes">Notes internes</label><textarea id="quote-internal-notes" name="internal_notes" maxlength="10000">{{ old('internal_notes',$quote->internal_notes) }}</textarea></div>
+-<label>Notes de terrain<textarea name="field_notes" maxlength="10000">{{ old('field_notes',$quote->configuration['field_notes'] ?? '') }}</textarea></label></section>
+-</div>
+-</div>
+-<div class="action-bar"><div class="live-total" id="quote-live-total" data-state="{{ $pendingLines ? 'pending' : 'ok' }}" role="status" @unless($liveTotal) hidden @endunless><small data-live-label>{{ $pendingLines ? 'Total provisoire' : 'Total définitif' }}</small><strong data-live-amount>{{ $financial ? number_format($financial['finalTotal'],0,',',' ').' FCFA' : '' }}</strong></div><span class="status">Enregistré en brouillon, jamais envoyé sans action de votre part.</span><a class="button quiet" href="{{ $quote->exists ? route('staff.quotes.show',$quote) : route('staff.quotes.index') }}">Retour aux devis</a><button>Enregistrer le devis</button></div>
++
++<div class="action-bar"><div class="live-total" id="quote-live-total" data-state="{{ $pendingLines ? 'pending' : 'ok' }}" role="status" @unless($liveTotal) hidden @endunless><small data-live-label>{{ $pendingLines ? 'Total provisoire' : 'Total définitif' }}</small><strong data-live-amount>{{ $financial ? number_format($financial['finalTotal'],0,',',' ').' FCFA' : '' }}</strong></div><span class="status">Enregistré en brouillon, jamais envoyé sans action de votre part.</span><button type="button" class="quiet" data-wizard-prev hidden>Précédent</button><button type="button" data-wizard-next hidden>Suivant</button><button data-wizard-save>Enregistrer le devis</button></div>
+ </form>
+ <script type="application/json" id="quote-catalogue-data">@json($catalogue)</script>
+ <script src="{{ asset('quote-editor.js') }}?v={{ filemtime(public_path('quote-editor.js')) }}" defer></script>
+diff --git a/resources/views/staff/quote-selection.blade.php b/resources/views/staff/quote-selection.blade.php
+index a92ef7d..933a868 100644
+--- a/resources/views/staff/quote-selection.blade.php
++++ b/resources/views/staff/quote-selection.blade.php
+@@ -1,12 +1,12 @@
+ <div data-selection data-material="{{ $selection['material_id'] ?? '' }}">
+ @if(!empty($selection['project_type']))<p class="notice">Relevé de l’agent : {{ \App\Services\AgentQuoteData::TYPES[$selection['project_type']] ?? $selection['product_name'] ?? '' }}. Complétez les tissus et fournitures pour ce projet.</p>@endif
+-<div class="grid">
++<div class="grid choice-row">
+ <label>Projet<select required data-choice="category" name="{{ $prefix }}[category]" data-value="{{ $selection['category'] ?? 'rideau' }}"><option value="rideau">Rideaux et / ou voilages</option><option value="store">Store</option></select></label>
+ <label>Motorisé<select required data-choice="motorized" name="{{ $prefix }}[motorized]" data-value="{{ !empty($selection['motorized']) ? 1 : 0 }}"><option value="0">Non</option><option value="1">Oui</option></select></label>
+-</div>
+ @foreach(['curtain_id'=>'Rideaux — type de tissu','sheer_id'=>'Voilages — type de tissu','store_id'=>'Store — matériau'] as $key=>$label)
+-<div data-fabric-group="{{ $key }}"><h4>{{ $label }}</h4><input type="hidden" data-choice="{{ $key }}" name="{{ $prefix }}[{{ $key }}]" data-value="{{ $selection[$key] ?? '' }}"><div class="grid" data-fabric-list></div></div>
++<label data-fabric-group="{{ $key }}">{{ $label }}<input type="hidden" data-choice="{{ $key }}" name="{{ $prefix }}[{{ $key }}]" data-value="{{ $selection[$key] ?? '' }}"><span class="fabric-select" data-fabric-list></span></label>
+ @endforeach
+-<p class="muted">Cochez un tissu rideau, un voilage, ou les deux. Pour un store, cochez le matériau souhaité.</p>
+ <label>Finition<select required data-choice="finish_id" name="{{ $prefix }}[finish_id]" data-value="{{ $selection['finish_id'] ?? '' }}"></select></label>
+ </div>
++<p class="hint">Choisissez un tissu rideau, un voilage ou les deux. Pour un store, choisissez son matériau.</p>
++</div>
+diff --git a/resources/views/staff/quote-window.blade.php b/resources/views/staff/quote-window.blade.php
+index 1554dcc..6ac5d52 100644
+--- a/resources/views/staff/quote-window.blade.php
++++ b/resources/views/staff/quote-window.blade.php
+@@ -3,20 +3,24 @@
+ <details class="opening-card" @if($openCard ?? true) open @endif>
+ <summary><span class="opening-name" data-opening-name>{{ $window['label'] ?? 'Ouverture' }}</span><span class="opening-sum" data-opening-sum>{{ $hasMeasures ? ($window['width'] ?? '?').' × '.($window['height'] ?? '?').' cm' : 'Mesures à saisir' }}</span></summary>
+ <div class="opening-body">
+-<label>Pièce / repère<input required maxlength="100" name="windows[{{ $index }}][label]" value="{{ $window['label'] ?? '' }}" placeholder="Salon — ouverture 1"></label>
++<div data-step-part="1">
++<div class="opening-top"><span class="opening-shape" data-opening-shape aria-hidden="true"><i></i></span><label>Désignation<input class="opening-title" required maxlength="100" name="windows[{{ $index }}][label]" value="{{ $window['label'] ?? '' }}" placeholder="Salon — baie vitrée"></label></div>
+ <div class="opening-measures">
+ <label>Largeur<span class="field-unit measure"><input required inputmode="decimal" name="windows[{{ $index }}][width]" value="{{ $window['width'] ?? '' }}"><span class="unit">cm</span></span></label>
+ <label>Hauteur<span class="field-unit measure"><input required inputmode="decimal" name="windows[{{ $index }}][height]" value="{{ $window['height'] ?? '' }}"><span class="unit">cm</span></span></label>
+ </div>
+-<label>Quantité identique<span class="stepper"><input required type="number" min="1" max="20" step="1" inputmode="numeric" name="windows[{{ $index }}][quantity]" value="{{ $window['quantity'] ?? 1 }}"><button type="button" class="minus" data-step-by="-1" aria-label="Une ouverture identique de moins">−</button><button type="button" class="plus" data-step-by="1" aria-label="Une ouverture identique de plus">+</button></span></label>
++<label>Exemplaires identiques<span class="stepper"><input required type="number" min="1" max="20" step="1" inputmode="numeric" name="windows[{{ $index }}][quantity]" value="{{ $window['quantity'] ?? 1 }}"><button type="button" class="minus" data-step-by="-1" aria-label="Un exemplaire de moins">−</button><button type="button" class="plus" data-step-by="1" aria-label="Un exemplaire de plus">+</button></span></label>
++<label>Notes de l’ouverture<textarea name="windows[{{ $index }}][notes]" rows="2" maxlength="1000" placeholder="Accès, prise électrique, contrainte de pose…">{{ $window['notes'] ?? '' }}</textarea></label>
++</div>
++<div data-step-part="2">
+ <input type="hidden" name="windows[{{ $index }}][inherit_defaults]" value="0">
+ <label class="check"><input type="checkbox" data-inherit name="windows[{{ $index }}][inherit_defaults]" value="1" @checked($window['inherit_defaults'] ?? !isset($window['product_id']))>Utiliser les choix communs (décochez pour personnaliser cette ouverture)</label>
+-<details class="quote-opening-details"><summary>Choix techniques, quantités et prestations</summary>
+ @include('staff.quote-selection',['prefix'=>'windows['.$index.']','selection'=>$window])
++<details class="quote-opening-details"><summary>Quantités, fournitures et prix de cette ouverture</summary>
+ @include('staff.quote-costing')
+-<label>Précisions pour cette ouverture<textarea name="windows[{{ $index }}][notes]" maxlength="1000">{{ $window['notes'] ?? '' }}</textarea></label>
+ </details>
+-<div class="opening-foot"><button type="button" class="quiet" data-remove-window>Retirer cette ouverture</button></div>
++</div>
++<div class="opening-foot" data-step-part="1"><button type="button" class="quiet" data-remove-window>Retirer cette ouverture</button></div>
+ </div>
+ </details>
+ </section>
+diff --git a/tests/Feature/StaffInterfaceTest.php b/tests/Feature/StaffInterfaceTest.php
+index ae16cfd..c882e6d 100644
+--- a/tests/Feature/StaffInterfaceTest.php
++++ b/tests/Feature/StaffInterfaceTest.php
+@@ -343,12 +343,13 @@ class StaffInterfaceTest extends TestCase
+         $this->actingAs($this->user());
+         $this->contact('Dossier existant')->update(['email'=>'deja@example.com']);
+         $this->from('/admin/contacts')->post('/admin/contacts',['name'=>'Nouveau','kind'=>'client','email'=>'DEJA@example.com','marketing'=>1,'notes'=>'Note gardée'])->assertRedirect('/admin/contacts')->assertSessionHasErrors(['email','consent_source']);
+-        $this->get('/admin/contacts')->assertOk()
++        $html=$this->get('/admin/contacts')->assertOk()
+             ->assertSee('Cette adresse e-mail est déjà utilisée par un autre dossier.')
+             ->assertSee('Indiquez l’origine du consentement')
+             ->assertSee('Note gardée')
+             ->assertSee('Rechercher le dossier qui utilise cette adresse')
+-            ->assertSee('aria-labelledby="h-nouveau-contact"  data-open',false);
++            ->getContent();
++        $this->assertMatchesRegularExpression('/class="float-panel" id="nouveau-contact"\s+data-open/',$html);
+     }
+ 
+     public function test_agent_overlap_is_refused_and_the_planning_panel_reopens(): void
+@@ -358,7 +359,8 @@ class StaffInterfaceTest extends TestCase
+         $payload=['contact_id'=>$contact->id,'agent_id'=>$agent->id,'kind'=>'installation','scheduled_at'=>'2030-01-15T09:00','duration_minutes'=>60,'address'=>'Cocody'];
+         $this->post('/admin/prestations',$payload)->assertRedirect()->assertSessionHasNoErrors();
+         $this->from('/admin/prestations')->post('/admin/prestations',[...$payload,'scheduled_at'=>'2030-01-15T09:30','instructions'=>'Consigne gardée'])->assertSessionHasErrors('scheduled_at');
+-        $this->get('/admin/prestations')->assertOk()->assertSee('Cet agent a déjà une prestation sur ce créneau.')->assertSee('Consigne gardée')->assertSee('aria-labelledby="h-planifier"  data-open',false);
++        $html=$this->get('/admin/prestations')->assertOk()->assertSee('Cet agent a déjà une prestation sur ce créneau.')->assertSee('Consigne gardée')->getContent();
++        $this->assertMatchesRegularExpression('/class="float-panel" id="planifier"\s+data-open/',$html);
+     }
+ 
+     public function test_creation_screens_stay_refused_to_agents_and_their_forms_show_no_price(): void

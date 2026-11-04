@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><title>{{ $document_title }} {{ $number }}</title>
+@if(!empty($style['blocks']['items']))@include('documents.blocks')@else<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><title>{{ $document_title }} {{ $number }}</title>
 @include('documents.partials.styles')
 </head><body>
 @include('documents.partials.header')
@@ -21,9 +21,11 @@
     @include('documents.partials.financial-summary')
     @if(!empty($schedule['delivery']) || !empty($schedule['installation']))<p>Livraison prévue : {{ $schedule['delivery'] ?: 'À préciser' }} · Pose prévue : {{ $schedule['installation'] ?: 'À préciser' }}</p>@endif
     @if($style['show_conditions'] && $conditions)<section class="conditions"><h2>CONDITIONS COMMERCIALES</h2><p class="prose">{{ $conditions }}</p></section>@endif
+@if($kind==='quote' && !empty($totals['schedule']) && trim($style['commitment_text'] ?? '')!=='')<section class="conditions"><p class="prose"><strong>Notre engagement.</strong> {{ $style['commitment_text'] }}</p></section>@endif
 @endif
 <section class="closing">
 @include('documents.partials.signatures')
 @include('documents.partials.footer')
 </section>
 </body></html>
+@endif

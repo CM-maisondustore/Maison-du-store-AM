@@ -13,6 +13,6 @@ class CatalogueController
             return response()->json(['data' => []])->header('Cache-Control', 'no-store');
         }
         return response()->json(['data' => Product::with('media')->where('published', true)->orderBy('id')->get()->map(fn ($product) =>
-            array_merge($product->details, ['id' => $product->id, 'reference' => $product->reference, 'imageUrl' => $product->media?->url(), 'imageAlt' => $product->image_alt ?: ($product->details['name'] ?? '')]))]);
+            array_merge(\Illuminate\Support\Arr::except($product->details, ['reference_price', 'reference_source']), ['id' => $product->id, 'reference' => $product->reference, 'imageUrl' => $product->media?->url(), 'imageAlt' => $product->image_alt ?: ($product->details['name'] ?? '')]))]);
     }
 }

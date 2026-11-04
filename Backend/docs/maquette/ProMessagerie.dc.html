@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Espace Pro — messagerie</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="color-scheme: {{colorScheme}}; font-family: Inter, system-ui, sans-serif; color: {{pal.t353535}}; background: {{pal.sf4f4f1}}; min-height: 100vh; display: flex">
+<dc-import name="ProSidebar" active="messagerie" hint-size="240px,100%"></dc-import>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+<dc-import name="ProTopbar" role="admin" hint-size="100%,64px"></dc-import>
+<main id="contenu" style="flex: 1; padding: 20px 24px 24px; display: flex; flex-wrap: wrap; gap: 16px; align-items: stretch">
+
+<section aria-labelledby="inbox-t" style="flex: 1 1 340px; min-width: 0; background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 10px; display: flex; flex-direction: column; overflow: hidden">
+<div style="padding: 14px 16px; border-bottom: 1px solid {{pal.be8e4db}}; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px">
+<h1 id="inbox-t" style="margin: 0; font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 500; color: {{pal.t1c1c1c}}">Messagerie</h1>
+<button type="button" onClick="{{sync}}" style="display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 12px; background: {{pal.sffffff}}; border: 1px solid {{pal.b20332c}}; border-radius: 6px; font: inherit; font-size: 13px; font-weight: 600; color: {{pal.t20332c}}; cursor: pointer"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20 12a8 8 0 0 1-14.3 4.9M4 12a8 8 0 0 1 14.3-4.9M18 3v4h-4M6 21v-4h4"></path></svg>Synchroniser</button>
+</div>
+<span role="status" style="font-size: 12.5px; color: {{pal.t6b665e}}">{{syncLabel}}</span>
+<div role="group" aria-label="Filtrer" style="display: flex; gap: 6px; overflow-x: auto">
+<sc-for list="{{filters}}" as="f" hint-placeholder-count="5"><button type="button" aria-pressed="{{f.pressed}}" onClick="{{f.pick}}" style="{{f.style}}">{{f.label}}</button></sc-for>
+</div>
+</div>
+<ul style="list-style: none; margin: 0; padding: 0; overflow-y: auto">
+<sc-for list="{{threads}}" as="t" hint-placeholder-count="7">
+<li><button type="button" onClick="{{t.pick}}" aria-current="{{t.current}}" style="{{t.row}}">
+<span aria-hidden="true" style="{{t.icon}}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="{{t.d}}"></path></svg></span>
+<span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+<span style="display: flex; justify-content: space-between; gap: 8px"><span style="{{t.nameStyle}}">{{t.name}}</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: {{pal.t6b665e}}">{{t.time}}</span></span>
+<span style="font-size: 13.5px; color: {{pal.t1c1c1c}}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{t.subject}}</span>
+<span style="display: flex; justify-content: space-between; align-items: center; gap: 8px"><span style="font-size: 12.5px; color: {{pal.t6b665e}}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{t.preview}}</span><span style="{{t.badge}}"><span aria-hidden="true">{{t.glyph}}</span>{{t.st}}</span></span>
+</span>
+</button></li>
+</sc-for>
+</ul>
+</section>
+
+<section aria-labelledby="read-t" style="flex: 999 1 560px; min-width: 0; background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 10px; display: flex; flex-direction: column">
+<div style="padding: 16px 20px; border-bottom: 1px solid {{pal.be8e4db}}; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px">
+<div style="display: flex; flex-direction: column; gap: 3px"><h2 id="read-t" style="margin: 0; font-size: 18px; font-weight: 600; color: {{pal.t1c1c1c}}">{{cur.subject}}</h2><span style="font-size: 13px; color: {{pal.t6b665e}}">{{cur.name}}, {{cur.addr}}</span></div>
+<span style="display: flex; gap: 8px; align-items: center"><a href="ProClient.dc.html" style="font-size: 13px; font-weight: 600; color: {{pal.t20332c}}">Fiche client</a><a href="ProDevisFiche.dc.html" style="font-size: 13px; font-weight: 600; color: {{pal.t20332c}}">Devis lié</a></span>
+</div>
+
+<sc-if value="{{cur.obsolete}}" hint-placeholder-val="{{ false }}">
+<div role="alert" style="margin: 16px 20px 0; display: flex; gap: 10px; padding: 12px 14px; border-radius: 6px; background: {{pal.sfbf1dc}}; border: 1px solid {{pal.becd7a8}}; color: {{pal.t5e4108}}; font-size: 14px; line-height: 1.5"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M12 3l10 18H2zM12 10v5M12 18h.01"></path></svg><span><strong>Envoi bloqué : ce brouillon est obsolète.</strong> Le devis D-2026-0140 a été modifié le 24/10/2026 à 10:47, après la rédaction de ce message. Le PDF joint ne correspond plus. Régénérez le message pour joindre la version à jour.</span></div>
+</sc-if>
+
+<div style="flex: 1; padding: 16px 20px; display: flex; flex-direction: column; gap: 14px; background: {{pal.sfcfbf8}}; overflow-y: auto">
+<sc-for list="{{cur.msgs}}" as="m" hint-placeholder-count="2">
+<article style="{{m.style}}">
+<span style="display: flex; justify-content: space-between; gap: 12px; font-size: 12.5px; color: {{pal.t6b665e}}"><span style="font-weight: 600; color: {{pal.t1c1c1c}}">{{m.from}}</span><span style="font-family: 'IBM Plex Mono', monospace">{{m.at}}</span></span>
+<p style="margin: 0; font-size: 14px; line-height: 1.6; color: {{pal.t353535}}; white-space: pre-line">{{m.body}}</p>
+</article>
+</sc-for>
+</div>
+
+<form onSubmit="{{noSubmit}}" aria-label="Répondre" style="border-top: 1px solid {{pal.be8e4db}}; padding: 14px 20px 18px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center">
+<div role="radiogroup" aria-label="Canal" style="display: inline-flex; padding: 3px; border-radius: 999px; background: {{pal.sf4f4f1}}; gap: 2px">
+<sc-for list="{{channels}}" as="c" hint-placeholder-count="2"><button type="button" role="radio" aria-checked="{{c.checked}}" onClick="{{c.pick}}" style="{{c.style}}">{{c.label}}</button></sc-for>
+</div>
+<label style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: {{pal.t6b665e}}">Modèle<select style="height: 36px; padding: 0 8px; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font: inherit; font-size: 14px; color: {{pal.t1c1c1c}}; background: {{pal.sffffff}}"><option>Envoi de devis</option><option>Confirmation de rendez-vous</option><option>Rappel de pose</option><option>Sans modèle</option></select></label>
+<span style="display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 10px; border-radius: 6px; background: {{pal.sf4f4f1}}; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: {{pal.t1c1c1c}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M21 12l-8.5 8.5a5 5 0 0 1-7-7L14 5a3.5 3.5 0 0 1 5 5l-8.5 8.5a2 2 0 0 1-3-3L15 8"></path></svg>{{attach}}</span>
+</div>
+<label style="position: relative"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Message</span>
+<textarea rows="4" value="{{draft}}" onChange="{{setDraft}}" style="width: 100%; box-sizing: border-box; padding: 10px 12px; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font: inherit; font-size: 14px; line-height: 1.55; resize: vertical"></textarea></label>
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px">
+<span role="status" style="font-size: 13px; color: {{pal.t6b665e}}">{{composeStatus}}</span>
+<span style="display: flex; gap: 8px">
+<button type="button" style="height: 42px; padding: 0 14px; background: {{pal.sffffff}}; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600">Enregistrer le brouillon</button>
+<sc-if value="{{isMail}}" hint-placeholder-val="{{ true }}"><button type="button" onClick="{{send}}" disabled="{{cur.obsolete}}" style="{{sendStyle}}">{{sendLabel}}</button></sc-if>
+<sc-if value="{{isWa}}" hint-placeholder-val="{{ false }}">
+<a href="https://wa.me/2250749301158" target="_blank" rel="noopener" onClick="{{opened}}" style="display: inline-flex; align-items: center; height: 42px; padding: 0 14px; background: {{pal.sffffff}}; border: 1px solid {{pal.b20332c}}; border-radius: 6px; font-size: 14px; font-weight: 600; color: {{pal.t20332c}}; text-decoration: none">Ouvrir dans WhatsApp</a>
+<button type="button" onClick="{{shared}}" disabled="{{notOpened}}" style="{{shareStyle}}">Marquer comme partagé</button>
+</sc-if>
+</span>
+</div>
+</form>
+</section>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+constructor(props) {
+super(props);
+this.state = { sel: 't1', f: 'all', ch: 'mail', synced: false, sent: false, waOpened: false, waShared: false };
+}
+isDark() {
+const t = this.props.theme;
+if (t === 'dark') return true;
+if (t === 'light') return false;
+let v = 'light';
+try { v = window.localStorage.getItem('mds-pro-theme') || 'light'; } catch (e) {}
+if (v === 'dark') return true;
+if (v === 'auto') { try { return window.matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) {} }
+return false;
+}
+themeMaps() { return { s: {"#ffffff": "#1b2220", "#f4f4f1": "#121816", "#f9f8f4": "#202825", "#fbfaf7": "#1e2623", "#fdfbf6": "#222a27", "#fcfbf8": "#1e2623", "#faf9f7": "#1e2623", "#fffcf5": "#2b2618", "#f1f0ec": "#262e2b", "#ece9e2": "#2a322f", "#e9e8e2": "#2a302d", "#e9e6df": "#0f1412", "#eef0ec": "#232b28", "#eef1ef": "#202826", "#edf1f4": "#1d2530", "#e8e4db": "#313a36", "#dcd6cb": "#3b4540", "#f1eee8": "#29312e", "#efece5": "#29312e", "#cfc9bd": "#4c5751", "#cfc8bb": "#4c5751", "#e1ddd3": "#3b4540", "#b9b4aa": "#5a645e", "#20332c": "#2b4a3e", "#2b4239": "#34574a", "#e5f1ea": "#1d3a2b", "#b7d6c3": "#2f5a43", "#fdf8ec": "#2d2717", "#ecd7a8": "#5b4a25", "#fbf1dc": "#382d15", "#e3c2bd": "#5e302b", "#e3c3bf": "#5e302b", "#fbeceb": "#3a1f1c", "#e8eef5": "#1d2a38", "#eeede8": "#2a302d", "#f6f0e4": "#2f2a1f", "#f3f3f3": "#262e2b", "#cccccc": "#46504b", "#fdf6f5": "#33201e", "#f8e6e4": "#3a2220", "#fbf6ea": "#2d2717", "#ecdcb9": "#5b4a25", "#f6ece5": "#33241d", "#efe9dd": "#2a2620", "#d9b26a": "#8a6a2c", "#b98a2e": "#8a6a2c"}, b: {"#ffffff": "#1b2220", "#f4f4f1": "#121816", "#f9f8f4": "#202825", "#fbfaf7": "#1e2623", "#fdfbf6": "#222a27", "#fcfbf8": "#1e2623", "#faf9f7": "#1e2623", "#fffcf5": "#2b2618", "#f1f0ec": "#262e2b", "#ece9e2": "#2a322f", "#e9e8e2": "#2a302d", "#e9e6df": "#0f1412", "#eef0ec": "#232b28", "#eef1ef": "#202826", "#edf1f4": "#1d2530", "#e8e4db": "#313a36", "#dcd6cb": "#3b4540", "#f1eee8": "#29312e", "#efece5": "#29312e", "#cfc9bd": "#4c5751", "#cfc8bb": "#4c5751", "#e1ddd3": "#3b4540", "#b9b4aa": "#5a645e", "#20332c": "#5d8a76", "#2b4239": "#34574a", "#e5f1ea": "#1d3a2b", "#b7d6c3": "#2f5a43", "#fdf8ec": "#2d2717", "#ecd7a8": "#5b4a25", "#fbf1dc": "#382d15", "#e3c2bd": "#5e302b", "#e3c3bf": "#5e302b", "#fbeceb": "#3a1f1c", "#e8eef5": "#1d2a38", "#eeede8": "#2a302d", "#f6f0e4": "#2f2a1f", "#f3f3f3": "#262e2b", "#cccccc": "#46504b", "#fdf6f5": "#33201e", "#f8e6e4": "#3a2220", "#fbf6ea": "#2d2717", "#ecdcb9": "#5b4a25", "#f6ece5": "#33241d", "#efe9dd": "#2a2620", "#d9b26a": "#8a6a2c", "#b98a2e": "#8a6a2c", "#1c1c1c": "#d6d2c9", "#b3392f": "#f28b80"}, t: {"#1c1c1c": "#f1eee8", "#353535": "#d6d2c9", "#6b665e": "#a8a296", "#20332c": "#bfd8cb", "#84642f": "#d8b47a", "#2f7350": "#86cfa3", "#8c5f0e": "#e6b862", "#5e4108": "#f0d39a", "#b3392f": "#f28b80", "#7c241c": "#f5b0a8", "#3f6285": "#9ec0e3", "#2c4866": "#bcd3ea", "#5c5852": "#c9c4ba", "#b0aaa0": "#6c736e", "#3d2b06": "#f0dcb3", "#1f4d35": "#bfe3cc", "#8f2c24": "#f5b0a8", "#6e4a0b": "#e6c27a", "#3f5a72": "#a9c3dc", "#3f5a73": "#a9c3dc", "#8e4529": "#e0a084", "#5a5248": "#cfc8bb", "#b98a2e": "#d9ac57", "#2c4660": "#a9c3dc"} }; }
+themeWatch() {
+if (this.__thw || typeof window === 'undefined') return;
+this.__thw = true;
+const bump = () => this.setState({ __th: Date.now() });
+try { window.addEventListener('storage', (e) => { if (e.key === 'mds-pro-theme') bump(); }); } catch (e) {}
+try { window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', bump); } catch (e) {}
+}
+dmap(v) {
+const T = this.themeMaps();
+const cv = (str) => str.split(';').map((seg) => {
+const i = seg.indexOf(':');
+let M = T.s;
+if (i > -1) { const p = seg.slice(0, i).trim().toLowerCase(); M = /^(color|stroke|fill|caret-color|accent-color|text-decoration-color)$/.test(p) ? T.t : /^(border|outline|box-shadow)/.test(p) ? T.b : T.s; }
+return seg.replace(/#[0-9a-fA-F]{6}/g, (h) => M[h.toLowerCase()] || h);
+}).join(';');
+const go = (x) => (typeof x === 'string' ? cv(x) : Array.isArray(x) ? x.map(go) : x && typeof x === 'object' && Object.prototype.toString.call(x) === '[object Object]' ? Object.keys(x).reduce((o, k) => { o[k] = go(x[k]); return o; }, {}) : x);
+return go(v);
+}
+renderVals() {
+this.themeWatch();
+const dark = this.isDark();
+let v = this.renderValsLight();
+if (dark) v = this.dmap(v);
+const T = this.themeMaps();
+const pal = {};
+['s', 'b', 't'].forEach((k) => { Object.keys(T[k]).forEach((h) => { pal[k + h.slice(1)] = dark ? T[k][h] : h; }); });
+v.pal = pal;
+v.themeDark = dark;
+v.colorScheme = dark ? 'dark' : 'light';
+return v;
+}
+renderValsLight() {
+const s = this.state;
+const SC = { 'Reçu': ['#3f6285', '#e8eef5', '●'], 'Brouillon': ['#5c5852', '#f1f0ec', '○'], 'Partagé manuellement': ['#2f7350', '#e5f1ea', '↗'], 'Envoi à vérifier': ['#8c5f0e', '#fbf1dc', '!'], 'Envoyé': ['#2f7350', '#e5f1ea', '✓'], 'Envoi en cours': ['#3f6285', '#e8eef5', '◐'], 'Annulé': ['#5c5852', '#f1f0ec', '–'] };
+const MAIL = 'M3 5h18v14H3zM3 6l9 7 9-7';
+const WA = 'M4 20l1.5-4A8 8 0 1 1 8 19z';
+const T = [
+['t1', 'mail', 'Mme Koné Mariam', 'mariam.kone@exemple.ci', 'Demande de devis : rideaux pour 3 pièces', 'Bonjour, je souhaite des rideaux occultants pour le salon…', '09:12', 'Reçu', true, false, [['Mme Koné Mariam', '26/10/2026 09:12', 'Bonjour,\nJe souhaite des rideaux occultants et des voilages pour le salon et deux chambres, à Angré 8e tranche. Pouvez-vous passer prendre les mesures cette semaine ?\nMerci, Mariam Koné', false]]],
+['t2', 'wa', 'M. Gnagne Rodrigue', '07 89 14 03 22', 'WhatsApp', 'Ok pour jeudi 16 h en visio', '08:40', 'Reçu', true, false, [['Maison du Store AM', '25/10/2026 18:02', 'Bonjour M. Gnagne, nous vous proposons un rendez-vous en visio jeudi 29/10 à 16:00 pour vos rideaux.', true], ['M. Gnagne Rodrigue', '26/10/2026 08:40', 'Ok pour jeudi 16 h en visio, merci.', false]]],
+['t3', 'mail', 'Cabinet Traoré & Associés', 'secretariat@traore-associes.ci', 'Votre devis D-2026-0140', 'Brouillon rédigé par Aïcha Diabaté', 'hier', 'Brouillon', false, true, [['Brouillon, Aïcha Diabaté', '24/10/2026 10:20', 'Maître Traoré,\nVeuillez trouver ci-joint notre devis pour les stores de vos nouveaux bureaux.', true]]],
+['t4', 'wa', 'Mme Kouassi Aya', '07 42 18 66 05', 'Rappel de pose', 'Pose prévue lundi 26/10 à 09:00', '25/10', 'Partagé manuellement', false, false, [['Maison du Store AM', '25/10/2026 17:30', 'Bonjour Mme Kouassi, nous passons lundi 26/10 à 09:00 pour la pose de vos stores.', true]]],
+['t5', 'mail', 'M. Bamba Ibrahim', 'i.bamba@exemple.ci', 'Facture MDS-0000088', 'Le serveur n’a pas confirmé l’envoi', '24/10', 'Envoi à vérifier', false, false, [['Maison du Store AM', '24/10/2026 15:04', 'Bonjour M. Bamba, veuillez trouver ci-joint votre facture.', true]]],
+['t6', 'mail', 'Clinique des Lagunes', 'compta@clinique-lagunes.ci', 'Votre facture MDS-0000086', 'Envoyé avec le PDF', '22/10', 'Envoyé', false, false, [['Maison du Store AM', '22/10/2026 11:15', 'Bonjour, veuillez trouver ci-joint la facture MDS-0000086.', true]]],
+['t7', 'mail', 'Résidence Les Palmiers', 'syndic@palmiers-bingerville.ci', 'Confirmation de rendez-vous', 'En file d’envoi', '08:01', 'Envoi en cours', false, false, [['Maison du Store AM', '26/10/2026 08:01', 'Bonjour, nous confirmons notre passage jeudi 29/10 à 11:00.', true]]]
+];
+const F = [['all', 'Tout'], ['unread', 'Non lus'], ['mail', 'E-mail'], ['wa', 'WhatsApp'], ['draft', 'Brouillons']];
+const vis = T.filter((t) => s.f === 'all' || (s.f === 'unread' && t[8]) || (s.f === 'mail' && t[1] === 'mail') || (s.f === 'wa' && t[1] === 'wa') || (s.f === 'draft' && t[7] === 'Brouillon'));
+const c = T.find((t) => t[0] === s.sel) || T[0];
+const isWa = s.ch === 'wa';
+const sentLabel = s.sent ? 'Envoyé' : 'Envoyer';
+return {
+syncLabel: s.synced ? 'Synchronisé à l’instant, aucun nouveau message.' : 'Dernière synchronisation à 09:15 (boîte Hostinger).',
+sync: () => this.setState({ synced: true }),
+filters: F.map(([k, label]) => ({ label, pressed: s.f === k ? 'true' : 'false', pick: () => this.setState({ f: k }),
+style: 'flex:none;height:32px;padding:0 10px;border-radius:999px;font:inherit;font-size:13px;cursor:pointer;' + (s.f === k ? 'background:#20332c;color:#ffffff;border:1px solid #20332c' : 'background:#ffffff;color:#353535;border:1px solid #dcd6cb') })),
+threads: vis.map((t) => ({
+name: t[2], subject: t[4], preview: t[5], time: t[6], st: t[7], glyph: SC[t[7]][2], d: t[1] === 'wa' ? WA : MAIL,
+current: s.sel === t[0] ? 'true' : undefined,
+pick: () => this.setState({ sel: t[0], ch: t[1], sent: false, waOpened: false, waShared: false }),
+row: 'width:100%;display:flex;gap:12px;padding:12px 16px;border:0;border-bottom:1px solid #efece5;font:inherit;text-align:left;cursor:pointer;' + (s.sel === t[0] ? 'background:#f9f8f4;box-shadow:inset 3px 0 0 #c09f6a' : 'background:#ffffff'),
+icon: 'flex:none;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;' + (t[1] === 'wa' ? 'background:#e5f1ea;color:#2f7350' : 'background:#e8eef5;color:#3f6285'),
+nameStyle: 'font-size:14px;color:#1c1c1c;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:' + (t[8] ? '700' : '500'),
+badge: 'flex:none;display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border-radius:999px;font-size:11.5px;font-weight:600;white-space:nowrap;color:' + SC[t[7]][0] + ';background:' + SC[t[7]][1]
+})),
+cur: {
+subject: c[4], name: c[2], addr: c[3], obsolete: c[9],
+msgs: c[10].map(([from, at, body, ours]) => ({ from, at, body, style: 'max-width:78%;display:flex;flex-direction:column;gap:6px;padding:12px 14px;border-radius:10px;' + (ours ? 'align-self:flex-end;background:#ffffff;border:1px solid #e8e4db' : 'align-self:flex-start;background:#ffffff;border:1px solid #c9d6e5') }))
+},
+channels: [['mail', 'E-mail'], ['wa', 'WhatsApp']].map(([k, label]) => ({ label, checked: s.ch === k ? 'true' : 'false', pick: () => this.setState({ ch: k, waOpened: false, waShared: false }),
+style: 'height:32px;padding:0 12px;border-radius:999px;border:0;font:inherit;font-size:13px;font-weight:600;cursor:pointer;' + (s.ch === k ? 'background:#ffffff;color:#1c1c1c;box-shadow:0 1px 3px rgba(32,51,44,0.2)' : 'background:transparent;color:#6b665e') })),
+attach: c[0] === 't3' ? 'D-2026-0140.pdf (version du 24/10, 10:20)' : 'D-2026-0142.pdf',
+draft: s.draft !== undefined && s.draftFor === c[0] ? s.draft : (c[0] === 't1' ? 'Bonjour Mme Koné,\nMerci pour votre demande. Notre conseiller Yao Serge peut passer jeudi 29/10 à 15:00 à Angré pour prendre les mesures. Ce créneau vous convient-il ?' : c[10][c[10].length - 1][2]),
+setDraft: (e) => this.setState({ draft: e.target.value, draftFor: c[0] }),
+isMail: !isWa, isWa,
+noSubmit: (e) => e.preventDefault(),
+send: () => { if (!c[9]) this.setState({ sent: true }); },
+sendLabel: c[9] ? 'Envoi bloqué' : sentLabel,
+sendStyle: 'height:42px;padding:0 16px;border:0;border-radius:6px;font:inherit;font-size:14px;font-weight:600;' + (c[9] ? 'background:#e8e4db;color:#6b665e;cursor:not-allowed' : 'background:#c09f6a;color:#161616;cursor:pointer'),
+composeStatus: c[9] ? 'Régénérez le message depuis la fiche devis.' : isWa ? (s.waShared ? 'Message marqué comme partagé manuellement.' : s.waOpened ? 'Envoyez le message dans WhatsApp, puis revenez le marquer comme partagé.' : 'WhatsApp s’ouvre avec le message prérempli.') : s.sent ? 'Envoyé par e-mail à ' + c[3] + '.' : 'Envoi depuis contact@maisondustoream.com.',
+opened: () => this.setState({ waOpened: true }),
+notOpened: !s.waOpened,
+shared: () => this.setState({ waShared: true }),
+shareStyle: 'height:42px;padding:0 14px;border:0;border-radius:6px;font:inherit;font-size:14px;font-weight:600;' + (s.waOpened ? 'background:#c09f6a;color:#161616;cursor:pointer' : 'background:#e8e4db;color:#6b665e;cursor:not-allowed')
+};
+}
+}
+</script>
+</body>
+</html>

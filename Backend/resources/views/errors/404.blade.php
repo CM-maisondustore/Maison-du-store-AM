@@ -1,0 +1,5 @@
+@extends('errors.layout')
+@section('code','404')
+@section('tone','gold')
+@section('heading','Page introuvable')
+@section('message','Cette adresse n’existe pas ou l’élément a été retiré. Vérifiez le lien ou repartez de l’accueil.')

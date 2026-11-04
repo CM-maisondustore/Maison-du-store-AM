@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Espace Pro — mes rendez-vous (mobile)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="color-scheme: {{colorScheme}}; width: 100%; box-sizing: border-box; min-height: 100vh; font-family: Inter, system-ui, sans-serif; color: {{pal.t353535}}; background: {{pal.sf4f4f1}}; display: flex; flex-direction: column">
+<header style="position: sticky; top: 0; z-index: 4; background: {{pal.sffffff}}; border-bottom: 1px solid {{pal.be8e4db}}; padding: 10px 0 10px; display: flex; flex-direction: column; gap: 10px">
+<div style="padding: 0 16px; display: flex; justify-content: space-between; align-items: baseline"><h1 style="margin: 0; font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 500; color: {{pal.t1c1c1c}}">Mes rendez-vous</h1><span style="font-size: 13px; color: {{pal.t6b665e}}">Octobre 2026</span></div>
+<div role="tablist" aria-label="Jour" style="display: flex; gap: 6px; overflow-x: auto; padding: 0 16px 2px">
+<sc-for list="{{days}}" as="d" hint-placeholder-count="7">
+<button type="button" role="tab" aria-selected="{{d.sel}}" aria-label="{{d.aria}}" onClick="{{d.pick}}" style="{{d.style}}"><span style="font-size: 12px">{{d.dow}}</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 18px; font-weight: 500">{{d.n}}</span><span aria-hidden="true" style="{{d.dot}}"></span></button>
+</sc-for>
+</div>
+</header>
+
+<main id="contenu" role="tabpanel" style="flex: 1; padding: 18px 16px 120px; display: flex; flex-direction: column; gap: 6px">
+<h2 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: {{pal.t1c1c1c}}">{{dayTitle}}</h2>
+<sc-if value="{{empty}}" hint-placeholder-val="{{ false }}">
+<div style="padding: 28px 16px; text-align: center; background: {{pal.sffffff}}; border: 1px dashed {{pal.bdcd6cb}}; border-radius: 12px; display: flex; flex-direction: column; gap: 6px"><span style="font-size: 15px; font-weight: 600; color: {{pal.t1c1c1c}}">Aucun rendez-vous ce jour-là.</span><span style="font-size: 14px; color: {{pal.t6b665e}}">Le bureau vous préviendra si un créneau vous est affecté.</span></div>
+</sc-if>
+<ol style="list-style: none; margin: 0; padding: 0; position: relative">
+<sc-for list="{{items}}" as="e" hint-placeholder-count="3">
+<li style="display: grid; grid-template-columns: 54px 22px 1fr; gap: 0 8px; align-items: stretch">
+<span style="padding-top: 14px; font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 500; color: {{pal.t1c1c1c}}; text-align: right">{{e.h}}</span>
+<span aria-hidden="true" style="position: relative; display: flex; justify-content: center"><span style="position: absolute; top: 0; bottom: 0; width: 3px; border-radius: 2px; background: {{e.rail}}"></span><span style="{{e.ring}}"></span></span>
+<a href="ProPrestation.dc.html" style="margin: 6px 0 10px; padding: 12px 14px; background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 12px; display: flex; flex-direction: column; gap: 6px; text-decoration: none; color: {{pal.t353535}}">
+<span style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px"><span style="font-size: 16px; font-weight: 600; color: {{pal.t1c1c1c}}">{{e.client}}</span><span style="{{e.badge}}"><span aria-hidden="true">{{e.glyph}}</span>{{e.st}}</span></span>
+<span style="font-size: 14px; color: {{pal.t6b665e}}">{{e.kind}}, jusqu’à <span style="font-family: 'IBM Plex Mono', monospace">{{e.end}}</span></span>
+<span style="display: flex; gap: 8px; padding-top: 4px">
+<span style="flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 44px; border: 1px solid {{pal.bdcd6cb}}; border-radius: 8px; font-size: 14px; font-weight: 600; color: {{pal.t20332c}}"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"></path></svg>Appeler</span>
+<span style="flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 44px; border: 1px solid {{pal.bdcd6cb}}; border-radius: 8px; font-size: 14px; font-weight: 600; color: {{pal.t20332c}}"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3zM9 3v15M15 6v15"></path></svg>Itinéraire</span>
+</span>
+</a>
+</li>
+</sc-for>
+</ol>
+</main>
+<div style="position: sticky; bottom: 0; z-index: 5"><dc-import name="ProTabbar" role="agent" active="rdv" hint-size="390px,84px"></dc-import></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1300}}'>
+class Component extends DCLogic {
+constructor(props) {
+super(props);
+this.state = { d: 0 };
+}
+isDark() {
+const t = this.props.theme;
+if (t === 'dark') return true;
+if (t === 'light') return false;
+let v = 'light';
+try { v = window.localStorage.getItem('mds-pro-theme') || 'light'; } catch (e) {}
+if (v === 'dark') return true;
+if (v === 'auto') { try { return window.matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) {} }
+return false;
+}
+themeMaps() { return { s: {"#ffffff": "#1b2220", "#f4f4f1": "#121816", "#f9f8f4": "#202825", "#fbfaf7": "#1e2623", "#fdfbf6": "#222a27", "#fcfbf8": "#1e2623", "#faf9f7": "#1e2623", "#fffcf5": "#2b2618", "#f1f0ec": "#262e2b", "#ece9e2": "#2a322f", "#e9e8e2": "#2a302d", "#e9e6df": "#0f1412", "#eef0ec": "#232b28", "#eef1ef": "#202826", "#edf1f4": "#1d2530", "#e8e4db": "#313a36", "#dcd6cb": "#3b4540", "#f1eee8": "#29312e", "#efece5": "#29312e", "#cfc9bd": "#4c5751", "#cfc8bb": "#4c5751", "#e1ddd3": "#3b4540", "#b9b4aa": "#5a645e", "#20332c": "#2b4a3e", "#2b4239": "#34574a", "#e5f1ea": "#1d3a2b", "#b7d6c3": "#2f5a43", "#fdf8ec": "#2d2717", "#ecd7a8": "#5b4a25", "#fbf1dc": "#382d15", "#e3c2bd": "#5e302b", "#e3c3bf": "#5e302b", "#fbeceb": "#3a1f1c", "#e8eef5": "#1d2a38", "#eeede8": "#2a302d", "#f6f0e4": "#2f2a1f", "#f3f3f3": "#262e2b", "#cccccc": "#46504b", "#fdf6f5": "#33201e", "#f8e6e4": "#3a2220", "#fbf6ea": "#2d2717", "#ecdcb9": "#5b4a25", "#f6ece5": "#33241d", "#efe9dd": "#2a2620", "#d9b26a": "#8a6a2c", "#b98a2e": "#8a6a2c"}, b: {"#ffffff": "#1b2220", "#f4f4f1": "#121816", "#f9f8f4": "#202825", "#fbfaf7": "#1e2623", "#fdfbf6": "#222a27", "#fcfbf8": "#1e2623", "#faf9f7": "#1e2623", "#fffcf5": "#2b2618", "#f1f0ec": "#262e2b", "#ece9e2": "#2a322f", "#e9e8e2": "#2a302d", "#e9e6df": "#0f1412", "#eef0ec": "#232b28", "#eef1ef": "#202826", "#edf1f4": "#1d2530", "#e8e4db": "#313a36", "#dcd6cb": "#3b4540", "#f1eee8": "#29312e", "#efece5": "#29312e", "#cfc9bd": "#4c5751", "#cfc8bb": "#4c5751", "#e1ddd3": "#3b4540", "#b9b4aa": "#5a645e", "#20332c": "#5d8a76", "#2b4239": "#34574a", "#e5f1ea": "#1d3a2b", "#b7d6c3": "#2f5a43", "#fdf8ec": "#2d2717", "#ecd7a8": "#5b4a25", "#fbf1dc": "#382d15", "#e3c2bd": "#5e302b", "#e3c3bf": "#5e302b", "#fbeceb": "#3a1f1c", "#e8eef5": "#1d2a38", "#eeede8": "#2a302d", "#f6f0e4": "#2f2a1f", "#f3f3f3": "#262e2b", "#cccccc": "#46504b", "#fdf6f5": "#33201e", "#f8e6e4": "#3a2220", "#fbf6ea": "#2d2717", "#ecdcb9": "#5b4a25", "#f6ece5": "#33241d", "#efe9dd": "#2a2620", "#d9b26a": "#8a6a2c", "#b98a2e": "#8a6a2c", "#1c1c1c": "#d6d2c9", "#b3392f": "#f28b80"}, t: {"#1c1c1c": "#f1eee8", "#353535": "#d6d2c9", "#6b665e": "#a8a296", "#20332c": "#bfd8cb", "#84642f": "#d8b47a", "#2f7350": "#86cfa3", "#8c5f0e": "#e6b862", "#5e4108": "#f0d39a", "#b3392f": "#f28b80", "#7c241c": "#f5b0a8", "#3f6285": "#9ec0e3", "#2c4866": "#bcd3ea", "#5c5852": "#c9c4ba", "#b0aaa0": "#6c736e", "#3d2b06": "#f0dcb3", "#1f4d35": "#bfe3cc", "#8f2c24": "#f5b0a8", "#6e4a0b": "#e6c27a", "#3f5a72": "#a9c3dc", "#3f5a73": "#a9c3dc", "#8e4529": "#e0a084", "#5a5248": "#cfc8bb", "#b98a2e": "#d9ac57", "#2c4660": "#a9c3dc"} }; }
+themeWatch() {
+if (this.__thw || typeof window === 'undefined') return;
+this.__thw = true;
+const bump = () => this.setState({ __th: Date.now() });
+try { window.addEventListener('storage', (e) => { if (e.key === 'mds-pro-theme') bump(); }); } catch (e) {}
+try { window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', bump); } catch (e) {}
+}
+dmap(v) {
+const T = this.themeMaps();
+const cv = (str) => str.split(';').map((seg) => {
+const i = seg.indexOf(':');
+let M = T.s;
+if (i > -1) { const p = seg.slice(0, i).trim().toLowerCase(); M = /^(color|stroke|fill|caret-color|accent-color|text-decoration-color)$/.test(p) ? T.t : /^(border|outline|box-shadow)/.test(p) ? T.b : T.s; }
+return seg.replace(/#[0-9a-fA-F]{6}/g, (h) => M[h.toLowerCase()] || h);
+}).join(';');
+const go = (x) => (typeof x === 'string' ? cv(x) : Array.isArray(x) ? x.map(go) : x && typeof x === 'object' && Object.prototype.toString.call(x) === '[object Object]' ? Object.keys(x).reduce((o, k) => { o[k] = go(x[k]); return o; }, {}) : x);
+return go(v);
+}
+renderVals() {
+this.themeWatch();
+const dark = this.isDark();
+let v = this.renderValsLight();
+if (dark) v = this.dmap(v);
+const T = this.themeMaps();
+const pal = {};
+['s', 'b', 't'].forEach((k) => { Object.keys(T[k]).forEach((h) => { pal[k + h.slice(1)] = dark ? T[k][h] : h; }); });
+v.pal = pal;
+v.themeDark = dark;
+v.colorScheme = dark ? 'dark' : 'light';
+return v;
+}
+renderValsLight() {
+const s = this.state;
+const SC = { 'Confirmé': ['#2f7350', '#e5f1ea', '✓'], 'À traiter': ['#8c5f0e', '#fbf1dc', '!'], 'Terminé': ['#5c5852', '#eeede8', '●'], 'Planifié': ['#3f6285', '#e8eef5', '○'] };
+const D = [['lun.', '26', 'Lundi 26/10/2026'], ['mar.', '27', 'Mardi 27/10/2026'], ['mer.', '28', 'Mercredi 28/10/2026'], ['jeu.', '29', 'Jeudi 29/10/2026'], ['ven.', '30', 'Vendredi 30/10/2026'], ['sam.', '31', 'Samedi 31/10/2026'], ['dim.', '01', 'Dimanche 01/11/2026']];
+const E = {
+0: [['09:00', '11:00', 'Mme Kouassi Aya', 'Installation, Riviera 3', 'Terminé'], ['13:30', '14:30', 'Mme Diomandé Salimata', 'Service après-vente, Danga', 'Confirmé'], ['16:00', '17:00', 'M. Kacou Hervé', 'Devis sur place, II Plateaux', 'Confirmé']],
+1: [['10:00', '11:30', 'M. Bamba Ibrahim', 'Service après-vente, Marcory', 'Confirmé']],
+2: [['08:30', '12:30', 'Résidence Les Palmiers', 'Installation, Bingerville', 'Planifié']],
+3: [],
+4: [['09:00', '12:00', 'Clinique des Lagunes', 'Installation, Cocody', 'Planifié']],
+5: [['10:00', '11:00', 'Mme Touré Aminata', 'À domicile, Riviera Palmeraie', 'À traiter']],
+6: []
+};
+const list = E[s.d];
+return {
+days: D.map(([dow, n, full], i) => ({ dow, n, aria: full + (E[i].length ? ', ' + E[i].length + ' rendez-vous' : ', aucun rendez-vous'), sel: s.d === i ? 'true' : 'false', pick: () => this.setState({ d: i }),
+style: 'flex:none;width:48px;height:68px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:12px;font:inherit;cursor:pointer;' + (s.d === i ? 'background:#20332c;color:#ffffff;border:1px solid #20332c' : 'background:#ffffff;color:#1c1c1c;border:1px solid #e8e4db'),
+dot: 'width:5px;height:5px;border-radius:50%;background:' + (E[i].length ? '#c09f6a' : 'transparent') })),
+dayTitle: D[s.d][2],
+empty: list.length === 0,
+items: list.map(([h, end, client, kind, st], i) => ({ h, end, client, kind, st, glyph: SC[st][2],
+badge: 'flex:none;display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;font-size:12px;font-weight:600;color:' + SC[st][0] + ';background:' + SC[st][1],
+rail: st === 'Terminé' ? '#c09f6a' : '#e1ddd3',
+ring: 'position:relative;margin-top:16px;width:16px;height:16px;box-sizing:border-box;border-radius:50%;border:2px solid ' + (st === 'Terminé' ? '#c09f6a' : i === 1 && s.d === 0 ? '#c09f6a' : '#cfc8bb') + ';background:' + (st === 'Terminé' ? '#c09f6a' : '#ffffff') }))
+};
+}
+}
+</script>
+</body>
+</html>

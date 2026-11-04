@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Espace Pro — facture MDS-0000088</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="color-scheme: {{colorScheme}}; font-family: Inter, system-ui, sans-serif; color: {{pal.t353535}}; background: {{pal.sf4f4f1}}; min-height: 100vh; display: flex; position: relative">
+<dc-import name="ProSidebar" active="factures" hint-size="240px,100%"></dc-import>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+<dc-import name="ProTopbar" role="admin" hint-size="100%,64px"></dc-import>
+<main id="contenu" style="padding: 24px 32px 48px; display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+
+<section aria-labelledby="f-list" style="flex: 1 1 300px; min-width: 0; background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 10px; overflow: hidden">
+<div style="padding: 16px 16px 12px; display: flex; flex-direction: column; gap: 12px; border-bottom: 1px solid {{pal.be8e4db}}">
+<h1 id="f-list" style="margin: 0; font-family: 'Cormorant Garamond', serif; font-size: 30px; font-weight: 500; color: {{pal.t1c1c1c}}">Factures</h1>
+<div role="group" aria-label="Filtrer par état" style="display: flex; gap: 6px; flex-wrap: wrap">
+<button type="button" aria-pressed="true" style="height: 32px; padding: 0 10px; border-radius: 999px; border: 1px solid {{pal.b20332c}}; background: {{pal.s20332c}}; color: #ffffff; font: inherit; font-size: 13px">Toutes</button>
+<button type="button" aria-pressed="false" style="height: 32px; padding: 0 10px; border-radius: 999px; border: 1px solid {{pal.bdcd6cb}}; background: {{pal.sffffff}}; font: inherit; font-size: 13px">Brouillon</button>
+<button type="button" aria-pressed="false" style="height: 32px; padding: 0 10px; border-radius: 999px; border: 1px solid {{pal.bdcd6cb}}; background: {{pal.sffffff}}; font: inherit; font-size: 13px">Émise</button>
+<button type="button" aria-pressed="false" style="height: 32px; padding: 0 10px; border-radius: 999px; border: 1px solid {{pal.bdcd6cb}}; background: {{pal.sffffff}}; font: inherit; font-size: 13px">Payée</button>
+</div>
+</div>
+<ul style="list-style: none; margin: 0; padding: 0">
+<sc-for list="{{list}}" as="f" hint-placeholder-count="5">
+<li><a href="#f" aria-current="{{f.current}}" style="{{f.row}}">
+<span style="display: flex; justify-content: space-between; gap: 8px"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: {{pal.t20332c}}">{{f.ref}}</span><span style="{{f.badge}}"><span aria-hidden="true">{{f.glyph}}</span>{{f.st}}</span></span>
+<span style="display: flex; justify-content: space-between; gap: 8px"><span style="font-size: 14px; font-weight: 600; color: {{pal.t1c1c1c}}">{{f.client}}</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: {{pal.t1c1c1c}}">{{f.amount}}</span></span>
+</a></li>
+</sc-for>
+</ul>
+</section>
+
+<section aria-label="Facture sélectionnée" style="flex: 999 1 640px; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px">
+<div style="display: flex; align-items: center; gap: 12px"><h2 style="margin: 0; font-family: 'IBM Plex Mono', monospace; font-size: 22px; font-weight: 500; color: {{pal.t1c1c1c}}">MDS-0000088</h2><span style="{{stBadge}}"><span aria-hidden="true">{{stGlyph}}</span>{{stLabel}}</span></div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<button type="button" style="height: 40px; padding: 0 14px; background: {{pal.sffffff}}; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600">Imprimer</button>
+<button type="button" style="height: 40px; padding: 0 14px; background: {{pal.sffffff}}; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600">Télécharger le PDF</button>
+<sc-if value="{{isDraft}}" hint-placeholder-val="{{ true }}"><button type="button" onClick="{{openEmit}}" style="height: 40px; padding: 0 16px; background: #c09f6a; border: 0; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; color: #161616; cursor: pointer">Émettre la facture</button></sc-if>
+<sc-if value="{{isEmitted}}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{pay}}" style="height: 40px; padding: 0 16px; background: #c09f6a; border: 0; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; color: #161616; cursor: pointer">Enregistrer le paiement intégral</button></sc-if>
+</div>
+</div>
+<p role="status" style="margin: 0; font-size: 14px; color: {{pal.t6b665e}}">{{statusText}}</p>
+
+<article aria-label="Aperçu du PDF" style="background: {{pal.se9e8e2}}; border-radius: 10px; padding: 28px; display: flex; justify-content: center">
+<div style="width: 100%; max-width: 640px; aspect-ratio: 210 / 297; box-sizing: border-box; background: {{pal.sffffff}}; box-shadow: 0 10px 30px -14px rgba(0,0,0,0.35); padding: 44px 46px; display: flex; flex-direction: column; gap: 22px; font-size: 12px; color: {{pal.t353535}}; position: relative">
+<sc-if value="{{isDraft}}" hint-placeholder-val="{{ true }}"><span aria-hidden="true" style="position: absolute; top: 46%; left: 50%; transform: translate(-50%, -50%) rotate(-24deg); font-family: 'Cormorant Garamond', serif; font-size: 92px; font-weight: 600; color: rgba(140,95,14,0.09); letter-spacing: 0.04em; pointer-events: none">Brouillon</span></sc-if>
+<div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px">
+<div style="display: flex; align-items: center; gap: 10px"><img src="assets/logo-maison-du-store-am.jpg" alt="" style="width: 44px; height: 44px; object-fit: contain"><span style="display: flex; flex-direction: column"><span style="font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 600; color: {{pal.t1c1c1c}}">Maison du Store AM</span><span style="font-size: 10.5px; color: {{pal.t6b665e}}">Cocody — Marché Saint Jean, Abidjan</span></span></div>
+<div style="text-align: right; display: flex; flex-direction: column; gap: 2px"><span style="font-family: 'Cormorant Garamond', serif; font-size: 24px; color: {{pal.t1c1c1c}}">Facture</span><span style="font-family: 'IBM Plex Mono', monospace">MDS-0000088</span><span>Date : <span style="font-family: 'IBM Plex Mono', monospace">{{issueDate}}</span></span></div>
+</div>
+<div style="height: 2px; background: #c09f6a"></div>
+<div style="display: flex; justify-content: space-between; gap: 20px; line-height: 1.6">
+<div><strong style="color: {{pal.t1c1c1c}}">Facturé à</strong><br>M. Bamba Ibrahim<br>Rue des Jardins, lot 45, Marcory Zone 4<br>01 02 55 87 64</div>
+<div style="text-align: right"><strong style="color: {{pal.t1c1c1c}}">Référence</strong><br>Devis <span style="font-family: 'IBM Plex Mono', monospace">D-2026-0138</span><br>accepté le <span style="font-family: 'IBM Plex Mono', monospace">23/10/2026</span></div>
+</div>
+<table style="width: 100%; border-collapse: collapse; font-size: 11.5px">
+<thead><tr style="border-bottom: 1px solid {{pal.b1c1c1c}}; text-align: left"><th style="padding: 6px 0">Désignation</th><th style="padding: 6px 0; text-align: right">Qté</th><th style="padding: 6px 0; text-align: right">P.U.</th><th style="padding: 6px 0; text-align: right">Total</th></tr></thead>
+<tbody>
+<tr style="border-bottom: 1px solid {{pal.bece9e2}}"><td style="padding: 6px 0">Store enrouleur screen 5 %, Anthracite</td><td style="text-align: right; font-family: 'IBM Plex Mono', monospace">3</td><td style="text-align: right; font-family: 'IBM Plex Mono', monospace">62 000</td><td style="text-align: right; font-family: 'IBM Plex Mono', monospace">186 000</td></tr>
+<tr style="border-bottom: 1px solid {{pal.bece9e2}}"><td style="padding: 6px 0">Remplacement moteur radio</td><td style="text-align: right; font-family: 'IBM Plex Mono', monospace">1</td><td style="text-align: right; font-family: 'IBM Plex Mono', monospace">70 000</td><td style="text-align: right; font-family: 'IBM Plex Mono', monospace">70 000</td></tr>
+<tr style="border-bottom: 1px solid {{pal.bece9e2}}"><td style="padding: 6px 0">Pose et réglages</td><td style="text-align: right; font-family: 'IBM Plex Mono', monospace">1</td><td style="text-align: right; font-family: 'IBM Plex Mono', monospace">24 000</td><td style="text-align: right; font-family: 'IBM Plex Mono', monospace">24 000</td></tr>
+</tbody>
+</table>
+<div style="margin-left: auto; width: 240px; display: flex; flex-direction: column; gap: 4px">
+<div style="display: flex; justify-content: space-between"><span>Total HT</span><span style="font-family: 'IBM Plex Mono', monospace">280 000 FCFA</span></div>
+<div style="display: flex; justify-content: space-between"><span>TVA 18 %</span><span style="font-family: 'IBM Plex Mono', monospace">50 400 FCFA</span></div>
+<div style="display: flex; justify-content: space-between; padding-top: 6px; border-top: 1px solid {{pal.b1c1c1c}}; font-weight: 600; color: {{pal.t1c1c1c}}"><span>Total TTC</span><span style="font-family: 'IBM Plex Mono', monospace">330 400 FCFA</span></div>
+<div style="display: flex; justify-content: space-between; color: {{pal.t6b665e}}"><span>Avance reçue</span><span style="font-family: 'IBM Plex Mono', monospace">− 165 200 FCFA</span></div>
+<div style="display: flex; justify-content: space-between; font-weight: 600; color: {{pal.t1c1c1c}}"><span>Reste à payer</span><span style="font-family: 'IBM Plex Mono', monospace">{{rest}}</span></div>
+</div>
+<div style="margin-top: auto; padding-top: 12px; border-top: 1px solid {{pal.bece9e2}}; font-size: 10px; line-height: 1.6; color: {{pal.t6b665e}}">Maison du Store AM, Cocody — Marché Saint Jean, Abidjan. 07 12 44 93 19, contact@maisondustoream.com. [Mentions légales et coordonnées bancaires à compléter dans Documents et automatisations.]</div>
+</div>
+</article>
+</section>
+</main>
+</div>
+
+<sc-if value="{{emitOpen}}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; inset: 0; z-index: 20; background: rgba(28,28,28,0.45); display: flex; align-items: flex-start; justify-content: center; padding: 140px 16px">
+<div role="dialog" aria-modal="true" aria-labelledby="em-t" style="width: 100%; max-width: 520px; background: {{pal.sffffff}}; border-radius: 12px; box-shadow: 0 24px 60px -20px rgba(0,0,0,0.4); padding: 24px; display: flex; flex-direction: column; gap: 16px">
+<h2 id="em-t" style="margin: 0; font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 500; color: {{pal.t1c1c1c}}">Émettre la facture MDS-0000088 ?</h2>
+<p style="margin: 0; font-size: 14px; line-height: 1.55">Après émission, la facture ne peut plus être modifiée : le numéro, les coordonnées du client et les montants sont figés. Pour corriger une erreur, il faudra émettre un avoir.</p>
+<dl style="margin: 0; padding: 12px 14px; border-radius: 6px; background: {{pal.sf9f8f4}}; display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; font-size: 14px">
+<dt style="color: {{pal.t6b665e}}">Client</dt><dd style="margin: 0">M. Bamba Ibrahim, Marcory Zone 4</dd>
+<dt style="color: {{pal.t6b665e}}">Total TTC</dt><dd style="margin: 0; font-family: 'IBM Plex Mono', monospace">330 400 FCFA</dd>
+<dt style="color: {{pal.t6b665e}}">Reste à payer</dt><dd style="margin: 0; font-family: 'IBM Plex Mono', monospace">165 200 FCFA</dd>
+</dl>
+<label style="display: flex; align-items: flex-start; gap: 10px; font-size: 14px; line-height: 1.5"><input type="checkbox" checked="{{ack}}" onChange="{{toggleAck}}" style="width: 20px; height: 20px; margin: 1px 0 0; accent-color: {{pal.t20332c}}">J’ai vérifié les coordonnées du client et les montants.</label>
+<div style="display: flex; justify-content: flex-end; gap: 8px">
+<button type="button" onClick="{{closeEmit}}" style="height: 44px; padding: 0 16px; background: {{pal.sffffff}}; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600">Revenir au brouillon</button>
+<button type="button" onClick="{{emit}}" disabled="{{notAck}}" style="{{emitStyle}}">Émettre la facture</button>
+</div>
+</div>
+</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1500}}'>
+class Component extends DCLogic {
+constructor(props) {
+super(props);
+this.state = { st: 'Brouillon', open: false, ack: false };
+}
+isDark() {
+const t = this.props.theme;
+if (t === 'dark') return true;
+if (t === 'light') return false;
+let v = 'light';
+try { v = window.localStorage.getItem('mds-pro-theme') || 'light'; } catch (e) {}
+if (v === 'dark') return true;
+if (v === 'auto') { try { return window.matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) {} }
+return false;
+}
+themeMaps() { return { s: {"#ffffff": "#1b2220", "#f4f4f1": "#121816", "#f9f8f4": "#202825", "#fbfaf7": "#1e2623", "#fdfbf6": "#222a27", "#fcfbf8": "#1e2623", "#faf9f7": "#1e2623", "#fffcf5": "#2b2618", "#f1f0ec": "#262e2b", "#ece9e2": "#2a322f", "#e9e8e2": "#2a302d", "#e9e6df": "#0f1412", "#eef0ec": "#232b28", "#eef1ef": "#202826", "#edf1f4": "#1d2530", "#e8e4db": "#313a36", "#dcd6cb": "#3b4540", "#f1eee8": "#29312e", "#efece5": "#29312e", "#cfc9bd": "#4c5751", "#cfc8bb": "#4c5751", "#e1ddd3": "#3b4540", "#b9b4aa": "#5a645e", "#20332c": "#2b4a3e", "#2b4239": "#34574a", "#e5f1ea": "#1d3a2b", "#b7d6c3": "#2f5a43", "#fdf8ec": "#2d2717", "#ecd7a8": "#5b4a25", "#fbf1dc": "#382d15", "#e3c2bd": "#5e302b", "#e3c3bf": "#5e302b", "#fbeceb": "#3a1f1c", "#e8eef5": "#1d2a38", "#eeede8": "#2a302d", "#f6f0e4": "#2f2a1f", "#f3f3f3": "#262e2b", "#cccccc": "#46504b", "#fdf6f5": "#33201e", "#f8e6e4": "#3a2220", "#fbf6ea": "#2d2717", "#ecdcb9": "#5b4a25", "#f6ece5": "#33241d", "#efe9dd": "#2a2620", "#d9b26a": "#8a6a2c", "#b98a2e": "#8a6a2c"}, b: {"#ffffff": "#1b2220", "#f4f4f1": "#121816", "#f9f8f4": "#202825", "#fbfaf7": "#1e2623", "#fdfbf6": "#222a27", "#fcfbf8": "#1e2623", "#faf9f7": "#1e2623", "#fffcf5": "#2b2618", "#f1f0ec": "#262e2b", "#ece9e2": "#2a322f", "#e9e8e2": "#2a302d", "#e9e6df": "#0f1412", "#eef0ec": "#232b28", "#eef1ef": "#202826", "#edf1f4": "#1d2530", "#e8e4db": "#313a36", "#dcd6cb": "#3b4540", "#f1eee8": "#29312e", "#efece5": "#29312e", "#cfc9bd": "#4c5751", "#cfc8bb": "#4c5751", "#e1ddd3": "#3b4540", "#b9b4aa": "#5a645e", "#20332c": "#5d8a76", "#2b4239": "#34574a", "#e5f1ea": "#1d3a2b", "#b7d6c3": "#2f5a43", "#fdf8ec": "#2d2717", "#ecd7a8": "#5b4a25", "#fbf1dc": "#382d15", "#e3c2bd": "#5e302b", "#e3c3bf": "#5e302b", "#fbeceb": "#3a1f1c", "#e8eef5": "#1d2a38", "#eeede8": "#2a302d", "#f6f0e4": "#2f2a1f", "#f3f3f3": "#262e2b", "#cccccc": "#46504b", "#fdf6f5": "#33201e", "#f8e6e4": "#3a2220", "#fbf6ea": "#2d2717", "#ecdcb9": "#5b4a25", "#f6ece5": "#33241d", "#efe9dd": "#2a2620", "#d9b26a": "#8a6a2c", "#b98a2e": "#8a6a2c", "#1c1c1c": "#d6d2c9", "#b3392f": "#f28b80"}, t: {"#1c1c1c": "#f1eee8", "#353535": "#d6d2c9", "#6b665e": "#a8a296", "#20332c": "#bfd8cb", "#84642f": "#d8b47a", "#2f7350": "#86cfa3", "#8c5f0e": "#e6b862", "#5e4108": "#f0d39a", "#b3392f": "#f28b80", "#7c241c": "#f5b0a8", "#3f6285": "#9ec0e3", "#2c4866": "#bcd3ea", "#5c5852": "#c9c4ba", "#b0aaa0": "#6c736e", "#3d2b06": "#f0dcb3", "#1f4d35": "#bfe3cc", "#8f2c24": "#f5b0a8", "#6e4a0b": "#e6c27a", "#3f5a72": "#a9c3dc", "#3f5a73": "#a9c3dc", "#8e4529": "#e0a084", "#5a5248": "#cfc8bb", "#b98a2e": "#d9ac57", "#2c4660": "#a9c3dc"} }; }
+themeWatch() {
+if (this.__thw || typeof window === 'undefined') return;
+this.__thw = true;
+const bump = () => this.setState({ __th: Date.now() });
+try { window.addEventListener('storage', (e) => { if (e.key === 'mds-pro-theme') bump(); }); } catch (e) {}
+try { window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', bump); } catch (e) {}
+}
+dmap(v) {
+const T = this.themeMaps();
+const cv = (str) => str.split(';').map((seg) => {
+const i = seg.indexOf(':');
+let M = T.s;
+if (i > -1) { const p = seg.slice(0, i).trim().toLowerCase(); M = /^(color|stroke|fill|caret-color|accent-color|text-decoration-color)$/.test(p) ? T.t : /^(border|outline|box-shadow)/.test(p) ? T.b : T.s; }
+return seg.replace(/#[0-9a-fA-F]{6}/g, (h) => M[h.toLowerCase()] || h);
+}).join(';');
+const go = (x) => (typeof x === 'string' ? cv(x) : Array.isArray(x) ? x.map(go) : x && typeof x === 'object' && Object.prototype.toString.call(x) === '[object Object]' ? Object.keys(x).reduce((o, k) => { o[k] = go(x[k]); return o; }, {}) : x);
+return go(v);
+}
+renderVals() {
+this.themeWatch();
+const dark = this.isDark();
+let v = this.renderValsLight();
+if (dark) v = this.dmap(v);
+const T = this.themeMaps();
+const pal = {};
+['s', 'b', 't'].forEach((k) => { Object.keys(T[k]).forEach((h) => { pal[k + h.slice(1)] = dark ? T[k][h] : h; }); });
+v.pal = pal;
+v.themeDark = dark;
+v.colorScheme = dark ? 'dark' : 'light';
+return v;
+}
+renderValsLight() {
+const s = this.state;
+const SC = { 'Brouillon': ['#5c5852', '#f1f0ec', '○'], 'Émise': ['#3f6285', '#e8eef5', '◆'], 'Payée': ['#2f7350', '#e5f1ea', '✓'] };
+const b = (x, big) => 'display:inline-flex;align-items:center;gap:6px;padding:' + (big ? '4px 10px' : '2px 8px') + ';border-radius:999px;font-size:' + (big ? '13px' : '12px') + ';font-weight:600;white-space:nowrap;color:' + SC[x][0] + ';background:' + SC[x][1] + (x === 'Brouillon' ? ';box-shadow:inset 0 0 0 1px #b9b4aa' : '');
+const L = [['MDS-0000088', 'M. Bamba Ibrahim', '330 400 FCFA', s.st], ['MDS-0000087', 'Cabinet Traoré & Associés', '1 120 000 FCFA', 'Émise'], ['MDS-0000086', 'Clinique des Lagunes', '2 450 000 FCFA', 'Payée'], ['MDS-0000085', 'Mme Kouassi Aya', '425 000 FCFA', 'Émise'], ['MDS-0000084', 'M. Kacou Hervé', '198 000 FCFA', 'Payée']];
+return {
+list: L.map(([ref, client, amount, st], i) => ({ ref, client, amount, st, glyph: SC[st][2], badge: b(st, false), current: i === 0 ? 'page' : undefined,
+row: 'display:flex;flex-direction:column;gap:4px;padding:12px 16px;border-bottom:1px solid #efece5;text-decoration:none;color:#353535;' + (i === 0 ? 'background:#f9f8f4;box-shadow:inset 3px 0 0 #c09f6a' : '') })),
+stBadge: b(s.st, true), stGlyph: SC[s.st][2], stLabel: s.st,
+isDraft: s.st === 'Brouillon', isEmitted: s.st === 'Émise',
+statusText: s.st === 'Brouillon' ? 'Brouillon créé depuis le devis D-2026-0138. Les montants peuvent encore changer.' : s.st === 'Émise' ? 'Émise le 26/10/2026. Coordonnées et montants figés.' : 'Payée intégralement le 26/10/2026.',
+issueDate: s.st === 'Brouillon' ? 'à l’émission' : '26/10/2026',
+rest: s.st === 'Payée' ? '0 FCFA' : '165 200 FCFA',
+emitOpen: s.open, ack: s.ack, notAck: !s.ack,
+openEmit: () => this.setState({ open: true, ack: false }),
+closeEmit: () => this.setState({ open: false }),
+toggleAck: () => this.setState({ ack: !s.ack }),
+emit: () => { if (s.ack) this.setState({ st: 'Émise', open: false }); },
+emitStyle: 'height:44px;padding:0 16px;border:0;border-radius:6px;font:inherit;font-size:14px;font-weight:600;' + (s.ack ? 'background:#20332c;color:#ffffff;cursor:pointer' : 'background:#e8e4db;color:#6b665e;cursor:not-allowed'),
+pay: () => this.setState({ st: 'Payée' })
+};
+}
+}
+</script>
+</body>
+</html>

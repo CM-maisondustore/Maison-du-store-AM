@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Espace Pro — devis sur place (mobile)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="color-scheme: {{colorScheme}}; width: 100%; box-sizing: border-box; min-height: 100vh; font-family: Inter, system-ui, sans-serif; color: {{pal.t353535}}; background: {{pal.sf4f4f1}}; display: flex; flex-direction: column">
+<header style="position: sticky; top: 0; z-index: 4; background: {{pal.sffffff}}; border-bottom: 1px solid {{pal.be8e4db}}; padding: 4px 8px 8px; display: flex; flex-direction: column">
+<div style="height: 52px; display: flex; align-items: center; gap: 4px">
+<a href="ProPrestation.dc.html" aria-label="Retour à la prestation" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; color: {{pal.t1c1c1c}}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></a>
+<h1 style="margin: 0; flex: 1; font-size: 17px; font-weight: 600; color: {{pal.t1c1c1c}}">Devis sur place</h1>
+</div>
+<span role="status" style="padding: 0 12px; display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: {{pal.t84642f}}"><span aria-hidden="true">◐</span>Pas de réseau : brouillon gardé sur le téléphone, envoi au retour du réseau</span>
+</header>
+
+<main id="contenu" style="flex: 1; padding: 14px 16px 24px; display: flex; flex-direction: column; gap: 12px">
+
+<sc-for list="{{sections}}" as="sec" hint-placeholder-count="4">
+<section style="background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 12px; overflow: hidden">
+<h2 style="margin: 0"><button type="button" onClick="{{sec.toggle}}" aria-expanded="{{sec.expanded}}" style="width: 100%; min-height: 60px; display: flex; align-items: center; gap: 12px; padding: 0 16px; background: transparent; border: 0; font: inherit; text-align: left; cursor: pointer">
+<span style="width: 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: {{pal.s20332c}}; color: #ffffff; font-family: 'IBM Plex Mono', monospace; font-size: 13px">{{sec.n}}</span>
+<span style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 16px; font-weight: 600; color: {{pal.t1c1c1c}}">{{sec.title}}</span><span style="font-size: 13px; color: {{pal.t6b665e}}">{{sec.summary}}</span></span>
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{pal.t6b665e}}" stroke-width="1.8" aria-hidden="true"><path d="{{sec.chev}}"></path></svg>
+</button></h2>
+
+<sc-if value="{{sec.isClient}}" hint-placeholder-val="{{ false }}"><sc-if value="{{sec.open}}" hint-placeholder-val="{{ false }}">
+<div style="padding: 0 16px 16px; display: flex; flex-direction: column; gap: 12px">
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 500; color: {{pal.t1c1c1c}}">Nom ou raison sociale<input type="text" placeholder="Kacou" style="height: 52px; box-sizing: border-box; padding: 0 14px; border: 1px solid {{pal.bcfc9bd}}; border-radius: 10px; font: inherit; font-size: 17px"></label>
+<div style="padding: 10px 12px; border-radius: 10px; background: {{pal.sf9f8f4}}; border: 1px solid {{pal.be8e4db}}; display: flex; justify-content: space-between; align-items: center; gap: 10px"><span style="font-size: 14px; line-height: 1.4"><strong style="color: {{pal.t1c1c1c}}">M. Kacou Hervé</strong><br><span style="color: {{pal.t6b665e}}">05 44 18 72 03, II Plateaux Vallons</span></span><button type="button" style="height: 44px; padding: 0 12px; border: 1px solid {{pal.b20332c}}; border-radius: 8px; background: {{pal.sffffff}}; font: inherit; font-size: 14px; font-weight: 600; color: {{pal.t20332c}}">Utiliser</button></div>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 500; color: {{pal.t1c1c1c}}">Téléphone<input type="tel" inputmode="tel" placeholder="07 00 00 00 00" style="height: 52px; box-sizing: border-box; padding: 0 14px; border: 1px solid {{pal.bcfc9bd}}; border-radius: 10px; font-family: 'IBM Plex Mono', monospace; font-size: 17px"></label>
+</div>
+</sc-if></sc-if>
+
+<sc-if value="{{sec.isChoices}}" hint-placeholder-val="{{ false }}"><sc-if value="{{sec.open}}" hint-placeholder-val="{{ false }}">
+<div style="padding: 0 16px 16px; display: flex; flex-direction: column; gap: 14px">
+<sc-for list="{{choiceGroups}}" as="g" hint-placeholder-count="3">
+<div role="radiogroup" aria-label="{{g.label}}" style="display: flex; flex-direction: column; gap: 8px"><span style="font-size: 14px; font-weight: 500; color: {{pal.t1c1c1c}}">{{g.label}}</span>
+<div style="display: flex; flex-wrap: wrap; gap: 8px"><sc-for list="{{g.opts}}" as="o" hint-placeholder-count="3"><button type="button" role="radio" aria-checked="{{o.checked}}" onClick="{{o.pick}}" style="{{o.style}}">{{o.label}}</button></sc-for></div></div>
+</sc-for>
+</div>
+</sc-if></sc-if>
+
+<sc-if value="{{sec.isWins}}" hint-placeholder-val="{{ true }}"><sc-if value="{{sec.open}}" hint-placeholder-val="{{ true }}">
+<div style="padding: 0 12px 14px; display: flex; flex-direction: column; gap: 10px">
+<sc-for list="{{wins}}" as="w" hint-placeholder-count="2">
+<div style="border: 1px solid {{w.border}}; border-radius: 10px; overflow: hidden">
+<button type="button" onClick="{{w.toggle}}" aria-expanded="{{w.expanded}}" style="width: 100%; min-height: 56px; display: flex; align-items: center; gap: 10px; padding: 0 12px; background: {{w.headBg}}; border: 0; font: inherit; text-align: left; cursor: pointer">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: {{pal.t6b665e}}">{{w.n}}</span>
+<span style="flex: 1; font-size: 15px; font-weight: 600; color: {{pal.t1c1c1c}}">{{w.title}}</span>
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: {{pal.t1c1c1c}}">{{w.dims}}</span>
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="{{pal.t6b665e}}" stroke-width="1.8" aria-hidden="true"><path d="{{w.chev}}"></path></svg>
+</button>
+<sc-if value="{{w.open}}" hint-placeholder-val="{{ true }}">
+<div style="padding: 12px; display: flex; flex-direction: column; gap: 12px; border-top: 1px solid {{pal.befece5}}">
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 500; color: {{pal.t1c1c1c}}">Largeur<span style="display: flex; align-items: center; border: 1px solid {{pal.bcfc9bd}}; border-radius: 10px; overflow: hidden"><input type="text" inputmode="numeric" pattern="[0-9]*" value="{{w.w}}" onChange="{{w.setW}}" style="width: 100%; min-width: 0; height: 60px; box-sizing: border-box; padding: 0 10px; border: 0; font-family: 'IBM Plex Mono', monospace; font-size: 24px; text-align: right"><span style="padding: 0 10px; height: 60px; display: inline-flex; align-items: center; background: {{pal.sf4f4f1}}; font-size: 14px; color: {{pal.t6b665e}}">cm</span></span></label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 500; color: {{pal.t1c1c1c}}">Hauteur<span style="display: flex; align-items: center; border: 1px solid {{pal.bcfc9bd}}; border-radius: 10px; overflow: hidden"><input type="text" inputmode="numeric" pattern="[0-9]*" value="{{w.h}}" onChange="{{w.setH}}" style="width: 100%; min-width: 0; height: 60px; box-sizing: border-box; padding: 0 10px; border: 0; font-family: 'IBM Plex Mono', monospace; font-size: 24px; text-align: right"><span style="padding: 0 10px; height: 60px; display: inline-flex; align-items: center; background: {{pal.sf4f4f1}}; font-size: 14px; color: {{pal.t6b665e}}">cm</span></span></label>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 10px"><span style="font-size: 14px; font-weight: 500; color: {{pal.t1c1c1c}}">Fenêtres identiques</span>
+<span style="display: inline-flex; align-items: center; border: 1px solid {{pal.bcfc9bd}}; border-radius: 10px; overflow: hidden"><button type="button" onClick="{{w.minus}}" aria-label="Une fenêtre de moins" style="width: 52px; height: 52px; border: 0; background: {{pal.sf4f4f1}}; font-size: 22px; color: {{pal.t1c1c1c}}">−</button><span aria-live="polite" style="width: 52px; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 20px; color: {{pal.t1c1c1c}}">{{w.q}}</span><button type="button" onClick="{{w.plus}}" aria-label="Une fenêtre de plus" style="width: 52px; height: 52px; border: 0; background: {{pal.sf4f4f1}}; font-size: 22px; color: {{pal.t1c1c1c}}">+</button></span></div>
+<label style="display: flex; align-items: center; gap: 12px; min-height: 48px; font-size: 15px; color: {{pal.t1c1c1c}}"><input type="checkbox" checked="{{w.common}}" onChange="{{w.toggleCommon}}" style="width: 24px; height: 24px; margin: 0; accent-color: {{pal.t20332c}}">Utiliser les choix communs</label>
+<sc-if value="{{w.custom}}" hint-placeholder-val="{{ false }}"><span style="font-size: 13.5px; color: {{pal.t84642f}}">Fenêtre personnalisée : précisez le tissu ou le matériau dans les notes.</span></sc-if>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 500; color: {{pal.t1c1c1c}}">Notes<textarea rows="2" placeholder="Pièce, type de pose, obstacle…" style="box-sizing: border-box; padding: 10px 12px; border: 1px solid {{pal.bcfc9bd}}; border-radius: 10px; font: inherit; font-size: 16px"></textarea></label>
+<button type="button" onClick="{{w.remove}}" style="align-self: flex-start; height: 44px; padding: 0 8px; background: transparent; border: 0; font: inherit; font-size: 14px; color: {{pal.tb3392f}}">Retirer cette fenêtre</button>
+</div>
+</sc-if>
+</div>
+</sc-for>
+<button type="button" onClick="{{addWin}}" style="height: 52px; display: flex; align-items: center; justify-content: center; gap: 8px; border: 1px dashed {{pal.b20332c}}; border-radius: 10px; background: {{pal.sffffff}}; font: inherit; font-size: 15px; font-weight: 600; color: {{pal.t20332c}}; cursor: pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>Ajouter une fenêtre</button>
+</div>
+</sc-if></sc-if>
+
+<sc-if value="{{sec.isDates}}" hint-placeholder-val="{{ false }}"><sc-if value="{{sec.open}}" hint-placeholder-val="{{ false }}">
+<div style="padding: 0 16px 16px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 500; color: {{pal.t1c1c1c}}">Date du devis<input type="text" value="26/10/2026" style="height: 52px; box-sizing: border-box; padding: 0 12px; border: 1px solid {{pal.bcfc9bd}}; border-radius: 10px; font-family: 'IBM Plex Mono', monospace; font-size: 16px"></label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 500; color: {{pal.t1c1c1c}}">Pose souhaitée<input type="text" placeholder="JJ/MM/AAAA" style="height: 52px; box-sizing: border-box; padding: 0 12px; border: 1px solid {{pal.bcfc9bd}}; border-radius: 10px; font-family: 'IBM Plex Mono', monospace; font-size: 16px"></label>
+</div>
+</sc-if></sc-if>
+</section>
+</sc-for>
+<p style="margin: 4px 4px 0; font-size: 13px; line-height: 1.5; color: {{pal.t6b665e}}">Le chiffrage est fait au bureau. Vous recevrez une notification quand le devis sera validé.</p>
+</main>
+
+<div style="position: sticky; bottom: 0; z-index: 5; background: {{pal.sffffff}}; border-top: 1px solid {{pal.be8e4db}}; padding: 10px 16px 22px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<button type="button" onClick="{{saveDraft}}" style="height: 54px; border: 1px solid {{pal.b1c1c1c}}; border-radius: 12px; background: {{pal.sffffff}}; font: inherit; font-size: 15px; font-weight: 600; color: {{pal.t1c1c1c}}">Brouillon</button>
+<button type="button" onClick="{{save}}" style="height: 54px; border: 0; border-radius: 12px; background: #c09f6a; font: inherit; font-size: 15px; font-weight: 600; color: #161616">Enregistrer le devis</button>
+<span role="status" style="grid-column: 1 / -1; font-size: 13px; text-align: center; color: {{pal.t6b665e}}">{{status}}</span>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":2100}}'>
+class Component extends DCLogic {
+constructor(props) {
+super(props);
+this.state = { open: { 0: false, 1: false, 2: true, 3: false }, wins: [{ w: '180', h: '220', q: 2, common: true }, { w: '120', h: '', q: 1, common: false }], wOpen: 1, ch: { cat: 'Store enrouleur', mat: 'Occultant Lin', mot: 'Radio' }, status: 'Brouillon gardé sur le téléphone à 16:12.' };
+}
+isDark() {
+const t = this.props.theme;
+if (t === 'dark') return true;
+if (t === 'light') return false;
+let v = 'light';
+try { v = window.localStorage.getItem('mds-pro-theme') || 'light'; } catch (e) {}
+if (v === 'dark') return true;
+if (v === 'auto') { try { return window.matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) {} }
+return false;
+}
+themeMaps() { return { s: {"#ffffff": "#1b2220", "#f4f4f1": "#121816", "#f9f8f4": "#202825", "#fbfaf7": "#1e2623", "#fdfbf6": "#222a27", "#fcfbf8": "#1e2623", "#faf9f7": "#1e2623", "#fffcf5": "#2b2618", "#f1f0ec": "#262e2b", "#ece9e2": "#2a322f", "#e9e8e2": "#2a302d", "#e9e6df": "#0f1412", "#eef0ec": "#232b28", "#eef1ef": "#202826", "#edf1f4": "#1d2530", "#e8e4db": "#313a36", "#dcd6cb": "#3b4540", "#f1eee8": "#29312e", "#efece5": "#29312e", "#cfc9bd": "#4c5751", "#cfc8bb": "#4c5751", "#e1ddd3": "#3b4540", "#b9b4aa": "#5a645e", "#20332c": "#2b4a3e", "#2b4239": "#34574a", "#e5f1ea": "#1d3a2b", "#b7d6c3": "#2f5a43", "#fdf8ec": "#2d2717", "#ecd7a8": "#5b4a25", "#fbf1dc": "#382d15", "#e3c2bd": "#5e302b", "#e3c3bf": "#5e302b", "#fbeceb": "#3a1f1c", "#e8eef5": "#1d2a38", "#eeede8": "#2a302d", "#f6f0e4": "#2f2a1f", "#f3f3f3": "#262e2b", "#cccccc": "#46504b", "#fdf6f5": "#33201e", "#f8e6e4": "#3a2220", "#fbf6ea": "#2d2717", "#ecdcb9": "#5b4a25", "#f6ece5": "#33241d", "#efe9dd": "#2a2620", "#d9b26a": "#8a6a2c", "#b98a2e": "#8a6a2c"}, b: {"#ffffff": "#1b2220", "#f4f4f1": "#121816", "#f9f8f4": "#202825", "#fbfaf7": "#1e2623", "#fdfbf6": "#222a27", "#fcfbf8": "#1e2623", "#faf9f7": "#1e2623", "#fffcf5": "#2b2618", "#f1f0ec": "#262e2b", "#ece9e2": "#2a322f", "#e9e8e2": "#2a302d", "#e9e6df": "#0f1412", "#eef0ec": "#232b28", "#eef1ef": "#202826", "#edf1f4": "#1d2530", "#e8e4db": "#313a36", "#dcd6cb": "#3b4540", "#f1eee8": "#29312e", "#efece5": "#29312e", "#cfc9bd": "#4c5751", "#cfc8bb": "#4c5751", "#e1ddd3": "#3b4540", "#b9b4aa": "#5a645e", "#20332c": "#5d8a76", "#2b4239": "#34574a", "#e5f1ea": "#1d3a2b", "#b7d6c3": "#2f5a43", "#fdf8ec": "#2d2717", "#ecd7a8": "#5b4a25", "#fbf1dc": "#382d15", "#e3c2bd": "#5e302b", "#e3c3bf": "#5e302b", "#fbeceb": "#3a1f1c", "#e8eef5": "#1d2a38", "#eeede8": "#2a302d", "#f6f0e4": "#2f2a1f", "#f3f3f3": "#262e2b", "#cccccc": "#46504b", "#fdf6f5": "#33201e", "#f8e6e4": "#3a2220", "#fbf6ea": "#2d2717", "#ecdcb9": "#5b4a25", "#f6ece5": "#33241d", "#efe9dd": "#2a2620", "#d9b26a": "#8a6a2c", "#b98a2e": "#8a6a2c", "#1c1c1c": "#d6d2c9", "#b3392f": "#f28b80"}, t: {"#1c1c1c": "#f1eee8", "#353535": "#d6d2c9", "#6b665e": "#a8a296", "#20332c": "#bfd8cb", "#84642f": "#d8b47a", "#2f7350": "#86cfa3", "#8c5f0e": "#e6b862", "#5e4108": "#f0d39a", "#b3392f": "#f28b80", "#7c241c": "#f5b0a8", "#3f6285": "#9ec0e3", "#2c4866": "#bcd3ea", "#5c5852": "#c9c4ba", "#b0aaa0": "#6c736e", "#3d2b06": "#f0dcb3", "#1f4d35": "#bfe3cc", "#8f2c24": "#f5b0a8", "#6e4a0b": "#e6c27a", "#3f5a72": "#a9c3dc", "#3f5a73": "#a9c3dc", "#8e4529": "#e0a084", "#5a5248": "#cfc8bb", "#b98a2e": "#d9ac57", "#2c4660": "#a9c3dc"} }; }
+themeWatch() {
+if (this.__thw || typeof window === 'undefined') return;
+this.__thw = true;
+const bump = () => this.setState({ __th: Date.now() });
+try { window.addEventListener('storage', (e) => { if (e.key === 'mds-pro-theme') bump(); }); } catch (e) {}
+try { window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', bump); } catch (e) {}
+}
+dmap(v) {
+const T = this.themeMaps();
+const cv = (str) => str.split(';').map((seg) => {
+const i = seg.indexOf(':');
+let M = T.s;
+if (i > -1) { const p = seg.slice(0, i).trim().toLowerCase(); M = /^(color|stroke|fill|caret-color|accent-color|text-decoration-color)$/.test(p) ? T.t : /^(border|outline|box-shadow)/.test(p) ? T.b : T.s; }
+return seg.replace(/#[0-9a-fA-F]{6}/g, (h) => M[h.toLowerCase()] || h);
+}).join(';');
+const go = (x) => (typeof x === 'string' ? cv(x) : Array.isArray(x) ? x.map(go) : x && typeof x === 'object' && Object.prototype.toString.call(x) === '[object Object]' ? Object.keys(x).reduce((o, k) => { o[k] = go(x[k]); return o; }, {}) : x);
+return go(v);
+}
+renderVals() {
+this.themeWatch();
+const dark = this.isDark();
+let v = this.renderValsLight();
+if (dark) v = this.dmap(v);
+const T = this.themeMaps();
+const pal = {};
+['s', 'b', 't'].forEach((k) => { Object.keys(T[k]).forEach((h) => { pal[k + h.slice(1)] = dark ? T[k][h] : h; }); });
+v.pal = pal;
+v.themeDark = dark;
+v.colorScheme = dark ? 'dark' : 'light';
+return v;
+}
+renderValsLight() {
+const s = this.state;
+const set = (p) => this.setState(p);
+const W = s.wins;
+const units = W.reduce((t, w) => t + w.q, 0);
+const SEC = [['Client', 'M. Kacou Hervé, II Plateaux'], ['Choix communs', s.ch.cat + ', ' + s.ch.mat + ', moteur ' + s.ch.mot.toLowerCase()], ['Fenêtres', W.length + ' fenêtres, ' + units + ' unités'], ['Dates', 'Devis du 26/10/2026']];
+const chip = (on) => 'min-height:48px;padding:0 16px;border-radius:999px;font:inherit;font-size:15px;font-weight:500;cursor:pointer;' + (on ? 'background:#20332c;color:#ffffff;border:1px solid #20332c' : 'background:#ffffff;color:#353535;border:1px solid #cfc9bd');
+const G = [['cat', 'Catégorie', ['Store enrouleur', 'Store vénitien', 'Rideau']], ['mat', 'Matériau', ['Occultant Lin', 'Tamisant Gris perle', 'Screen 5 %']], ['mot', 'Motorisation', ['Aucune', 'Filaire', 'Radio']]];
+const updW = (i, patch) => { const a = W.slice(); a[i] = { ...a[i], ...patch }; set({ wins: a }); };
+return {
+sections: SEC.map(([title, summary], i) => ({
+n: i + 1, title, summary,
+open: !!s.open[i], expanded: s.open[i] ? 'true' : 'false',
+chev: s.open[i] ? 'M6 15l6-6 6 6' : 'M6 9l6 6 6-6',
+toggle: () => set({ open: { ...s.open, [i]: !s.open[i] } }),
+isClient: i === 0, isChoices: i === 1, isWins: i === 2, isDates: i === 3
+})),
+choiceGroups: G.map(([k, label, opts]) => ({ label, opts: opts.map((o) => ({ label: o, checked: s.ch[k] === o ? 'true' : 'false', pick: () => set({ ch: { ...s.ch, [k]: o } }), style: chip(s.ch[k] === o) })) })),
+wins: W.map((w, i) => {
+const open = s.wOpen === i;
+const missing = !w.w || !w.h;
+return {
+n: String(i + 1).padStart(2, '0'),
+title: 'Fenêtre ' + (i + 1) + (w.q > 1 ? ' ×' + w.q : ''),
+dims: missing ? 'à mesurer' : w.w + ' × ' + w.h,
+border: missing ? '#d9b26a' : '#e8e4db',
+headBg: missing ? '#fdf8ec' : '#ffffff',
+open, expanded: open ? 'true' : 'false', chev: open ? 'M6 15l6-6 6 6' : 'M6 9l6 6 6-6',
+toggle: () => set({ wOpen: open ? -1 : i }),
+w: w.w, h: w.h, q: w.q, common: w.common, custom: !w.common,
+setW: (e) => updW(i, { w: e.target.value.replace(/[^0-9]/g, '') }),
+setH: (e) => updW(i, { h: e.target.value.replace(/[^0-9]/g, '') }),
+minus: () => updW(i, { q: Math.max(1, w.q - 1) }),
+plus: () => updW(i, { q: w.q + 1 }),
+toggleCommon: () => updW(i, { common: !w.common }),
+remove: () => set({ wins: W.filter((_, j) => j !== i), wOpen: -1 })
+};
+}),
+addWin: () => { if (W.length < 30) set({ wins: W.concat([{ w: '', h: '', q: 1, common: true }]), wOpen: W.length }); },
+saveDraft: () => set({ status: 'Brouillon gardé sur le téléphone.' }),
+save: () => set({ status: W.some((w) => !w.w || !w.h) ? 'Une fenêtre n’a pas ses mesures : complétez-la ou enregistrez en brouillon.' : 'Devis enregistré : il sera envoyé au bureau dès le retour du réseau.' }),
+status: s.status
+};
+}
+}
+</script>
+</body>
+</html>

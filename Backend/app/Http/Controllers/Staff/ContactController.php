@@ -10,7 +10,12 @@ class ContactController
     {
         $query = Contact::query();
         if ($q = $r->string('q')->toString()) $query->where(fn ($b) => $b->where('name', 'like', '%'.$q.'%')->orWhere('email', 'like', '%'.$q.'%')->orWhere('phone', 'like', '%'.$q.'%'));
-        return view('staff.contacts', ['contacts' => $query->orderBy('name')->paginate(25)->withQueryString()]);
+        $type = $r->string('type')->toString();
+        if ($type === 'archive') $query->whereNotNull('archived_at');
+        elseif (in_array($type, ['client', 'fournisseur', 'partenaire'], true)) $query->where('kind', $type)->whereNull('archived_at');
+        $stats = Contact::whereNull('archived_at')->selectRaw('kind, COUNT(*) as total')->groupBy('kind')->pluck('total', 'kind')->all();
+        $stats['archive'] = Contact::whereNotNull('archived_at')->count();
+        return view('staff.contacts', ['contacts' => $query->orderBy('name')->paginate(25)->withQueryString(), 'stats' => $stats, 'total' => Contact::count()]);
     }
     public function show(Contact $contact) { return view('staff.contact', compact('contact')); }
     public function store(Request $r) { $contact = Contact::create($this->data($r)); Audit::record('contact_cree', $contact); return redirect()->route('staff.contacts.show', $contact); }

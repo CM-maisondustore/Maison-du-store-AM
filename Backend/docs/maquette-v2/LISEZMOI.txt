@@ -1,0 +1,29 @@
+ESPACE PRO, MAISON DU STORE AM : MAQUETTE V2 DES ÉCRANS DE CRÉATION
+
+Ce dossier contient la maquette v2 : 12 écrans et 3 éléments partagés.
+- Nouveau devis en quatre étapes (client et ouvertures, matériaux et finitions,
+  affectation et chiffrage, paiement), devis par articles, relevé de l'agent.
+- Créer un client et nouvelle prestation en formulaire flottant, ajouter un matériau.
+- Ajouter une réalisation, ajouter un produit, éditeur libre de mise en page des PDF.
+
+POUR L'OUVRIR
+Les fichiers doivent passer par un petit serveur local. Un double-clic ne suffit pas.
+1. Ouvrez un terminal dans ce dossier.
+2. Lancez :   python -m http.server 8766
+3. Ouvrez :   http://localhost:8766
+
+Une connexion Internet est utile pour charger les polices.
+
+CONTENU
+index.html            sommaire des écrans
+*.dc.html             écrans et composants (même format que docs/maquette)
+canvas-v2.json        titres, tailles et position des planches sur le canevas
+assets/espace-pro.css feuille de style réelle de l'application (public/admin.css
+                      et public/document-layout.css), sans les polices locales
+support.js            moteur de rendu, copié de docs/maquette, pour la consultation seulement
+
+À SAVOIR
+Tous les noms, téléphones, adresses et montants sont des données de démonstration.
+Les montants des écrans de devis suivent le catalogue de démonstration ; ceux de
+l'éditeur de mise en page suivent la grille du 30/10/2026. Ils ne valent pas tarif.
+L'original modifiable se trouve sur le canevas Design « Espace Pro, écrans de création ».

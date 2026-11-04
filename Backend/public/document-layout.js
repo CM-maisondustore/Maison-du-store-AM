@@ -26,16 +26,18 @@
       const blob = await response.blob();
       if (current !== sequence) return;
       if (url) URL.revokeObjectURL(url);
-      url = URL.createObjectURL(blob); frame.src = url; download.href = url; download.hidden = false;
+      url = URL.createObjectURL(blob); frame.src = url + '#view=FitH'; download.href = url; download.hidden = false;
       status.textContent = 'Aperçu à jour · données fictives · modifications non publiées';
     } catch (error) {
       if (error.name !== 'AbortError' && current === sequence) status.textContent = error.message;
     }
   }
-  const schedule = () => { clearTimeout(timer); timer = setTimeout(preview, 1000); };
+  // Dans l'éditeur de blocs, l'aperçu PDF se génère seulement quand son onglet est affiché.
+  const pane = document.getElementById('apercu-a4'), shown = () => !pane?.hidden;
+  const schedule = () => { clearTimeout(timer); if (shown()) timer = setTimeout(preview, 1000); };
   form.addEventListener('input', schedule);
   form.addEventListener('change', schedule);
   document.getElementById('refresh-preview').addEventListener('click', () => { clearTimeout(timer); preview(); });
   window.addEventListener('pagehide', () => {controller?.abort(); if (url) URL.revokeObjectURL(url);});
-  preview();
+  if (!pane?.hasAttribute('data-on-demand')) preview();
 })();

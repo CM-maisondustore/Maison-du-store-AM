@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Nouvelle prestation</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./assets/espace-pro.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.float-veil{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(20,28,25,.5)}
+.float-form{display:flex;flex-direction:column;width:min(940px,100%);max-height:calc(100vh - 48px);background:var(--pro-panel);border-radius:14px;box-shadow:var(--sh-modal);overflow:hidden}
+.float-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:20px 24px 16px;border-bottom:1px solid var(--pro-line)}
+.float-head h2{font:500 30px/1.1 var(--font-title)}
+.float-head p{margin:4px 0 0}
+.float-body{flex:1;min-height:0;overflow:auto;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 32px;padding:8px 24px 22px}
+.float-foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:10px;padding:14px 24px;border-top:1px solid var(--pro-line);background:var(--pro-panel-alt)}
+.float-foot .status{margin-right:auto;font-size:13px;color:var(--pro-text-2)}
+.float-col{min-width:0}
+.float-col>.fgroup:first-child{margin-top:14px}
+.kind-tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.kind-tiles .tile span{padding:10px 12px}
+.slot{position:relative;height:44px;margin-top:8px;border-radius:8px;background:var(--pro-panel-alt);border:1px solid var(--pro-line)}
+.slot-busy,.slot-new{position:absolute;top:5px;bottom:5px;display:flex;align-items:center;padding:0 8px;border-radius:6px;font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden}
+.slot-busy{left:5%;width:15%;background:var(--st-info-tint);color:var(--st-info);border:1px solid var(--st-info)}
+.slot-new{left:15%;width:10%;background:var(--st-error-tint);color:var(--st-error);border:1px dashed var(--st-error)}
+.slot-hours{display:flex;justify-content:space-between;margin-top:4px;font:400 12px var(--font-data);color:var(--pro-text-2)}
+@media (max-width:767px){.float-veil{padding:0;align-items:stretch}.float-form{width:100%;max-height:none;border-radius:0}.float-body{grid-template-columns:minmax(0,1fr)}.kind-tiles{grid-template-columns:minmax(0,1fr)}.float-foot .button,.float-foot button{flex:1 1 40%}}
+</style>
+</helmet>
+<div class="shell">
+<dc-import name="Navigation" active="prestations" hint-size="240px,900px"></dc-import>
+<div class="workspace">
+<dc-import name="Haut" hint-size="100%,64px"></dc-import>
+<main class="main" id="contenu" aria-hidden="true">
+<div class="page-head"><div><h1>Prestations des agents</h1><p class="sub">Installations, services après-vente et devis sur place confiés aux agents.</p></div><div class="page-actions"><a class="button" href="#planifier">Nouvelle prestation</a></div></div>
+<nav class="chips" aria-label="Filtrer par statut"><a class="chip" href="#contenu" aria-current="true">Toutes<b>3</b></a><a class="chip" href="#contenu">Planifié<b>2</b></a><a class="chip" href="#contenu">En cours<b>1</b></a></nav>
+<section class="panel flush" aria-label="Liste des prestations">
+<div class="table-wrap"><table>
+<thead><tr><th scope="col">Date et heure</th><th scope="col">Type</th><th scope="col">Client</th><th scope="col">Agent</th><th scope="col">État</th></tr></thead>
+<tbody>
+<tr><td class="mono">04/11/2026 08:30</td><td>Installation</td><td>M. Bamba Ibrahim</td><td>Koffi Brou</td><td><span class="badge st-info"><span aria-hidden="true">○</span>Planifié</span></td></tr>
+<tr><td class="mono">05/11/2026 14:00</td><td>Devis sur place</td><td>Mme Ouattara Fatou</td><td>Yao Serge</td><td><span class="badge st-info"><span aria-hidden="true">○</span>Planifié</span></td></tr>
+</tbody>
+</table></div>
+</section>
+</main>
+</div>
+</div>
+
+<div class="float-veil">
+<section class="float-form" role="dialog" aria-modal="true" aria-labelledby="h-planifier" id="planifier">
+<div class="float-head">
+<div><h2 id="h-planifier">Nouvelle prestation</h2><p class="muted">L’agent choisi est prévenu sur son compte. Le client ne reçoit aucun message.</p></div>
+<a class="button quiet icon-btn" href="#contenu" aria-label="Fermer sans planifier"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></a>
+</div>
+<div class="float-body">
+<div class="float-col">
+<section class="fgroup">
+<h3 class="section-title"><span class="step" aria-hidden="true">1</span>Client</h3>
+<label>Client<select><option>Mme Kouassi Aya</option><option>M. Bamba Ibrahim</option><option>Mme Ouattara Fatou</option></select></label>
+<p class="hint">Villa 12, Cocody Angré · 07 00 00 00 01 · <a class="link" href="#planifier">Créer un client</a> (nouvel onglet, votre saisie reste ici)</p>
+</section>
+<section class="fgroup">
+<fieldset class="bare"><legend class="section-title"><span class="step" aria-hidden="true">2</span>Type de prestation</legend>
+<div class="kind-tiles mt-8">
+<label class="tile"><input type="radio" name="kind"><span><strong>Devis sur place</strong><small>Relevé et mesures</small></span></label>
+<label class="tile"><input type="radio" name="kind" checked><span><strong>Installation</strong><small>Pose chez le client</small></span></label>
+<label class="tile"><input type="radio" name="kind"><span><strong>Après-vente</strong><small>Réglage, réparation</small></span></label>
+</div>
+</fieldset>
+</section>
+<section class="fgroup">
+<h3 class="section-title"><span class="step" aria-hidden="true">4</span>Adresse et consignes</h3>
+<label>Adresse d’intervention<textarea rows="2">Villa 12, Cocody Angré</textarea><span class="hint">Reprise du dossier client ; modifiable.</span></label>
+<label>Consignes pour l’agent<textarea rows="3" placeholder="Code d’accès, matériel à prévoir…"></textarea></label>
+</section>
+</div>
+<div class="float-col">
+<section class="fgroup">
+<h3 class="section-title"><span class="step" aria-hidden="true">3</span>Agent et créneau</h3>
+<label>Agent<select><option>Koffi Brou</option><option>Yao Serge</option></select></label>
+<label>Date et heure (Abidjan)<input type="datetime-local" value="2026-11-04T09:30" aria-invalid="true"><span class="field-error">Koffi Brou a déjà une prestation sur ce créneau.</span></label>
+<fieldset class="bare mt-12"><legend>Durée</legend>
+<div class="segmented">
+<label><input type="radio" name="duree"><span>30 min</span></label>
+<label><input type="radio" name="duree" checked><span>1 h</span></label>
+<label><input type="radio" name="duree"><span>2 h</span></label>
+<label><input type="radio" name="duree"><span>4 h</span></label>
+</div>
+</fieldset>
+<div class="mt-12">
+<p class="legend mb-0">Planning de Koffi Brou, mercredi 4 novembre</p>
+<div class="slot" role="img" aria-label="Occupé de 8 h 30 à 10 h ; le créneau proposé, de 9 h 30 à 10 h 30, le chevauche.">
+<span class="slot-busy">Installation</span>
+<span class="slot-new">Proposé</span>
+</div>
+<div class="slot-hours" aria-hidden="true"><span>08:00</span><span>10:00</span><span>12:00</span><span>14:00</span><span>16:00</span><span>18:00</span></div>
+<p class="hint">Libre à partir de 10:00 : <a class="link" href="#planifier">choisir 10:00</a></p>
+</div>
+</section>
+<details class="fold"><summary>Liens optionnels<small>Devis et rendez-vous de ce client uniquement</small></summary>
+<label class="mt-0">Devis lié<select><option>Aucun devis lié</option><option>Mme Kouassi Aya · devis du 03/11</option></select></label>
+<label>Rendez-vous lié<select><option>Aucun rendez-vous lié</option></select></label>
+</details>
+</div>
+</div>
+<div class="float-foot">
+<span class="status">La fiche de la prestation s’ouvre après l’enregistrement.</span>
+<a class="button quiet" href="#contenu">Annuler</a>
+<button type="button">Planifier la prestation</button>
+</div>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

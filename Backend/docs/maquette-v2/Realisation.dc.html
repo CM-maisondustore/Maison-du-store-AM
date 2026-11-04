@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Ajouter une réalisation</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./assets/espace-pro.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="shell">
+<dc-import name="Navigation" active="images" hint-size="240px,900px"></dc-import>
+<div class="workspace">
+<dc-import name="Haut" hint-size="100%,64px"></dc-import>
+<main class="main" id="contenu">
+<div class="page-head"><div><nav class="crumbs" aria-label="Fil d’Ariane"><a href="#contenu">Images &amp; portfolio</a></nav><h1>Nouvelle réalisation</h1></div></div>
+<div class="form-narrow">
+<section class="panel portfolio-card" aria-label="Fiche de la réalisation">
+<div class="portfolio-media">
+<div class="drop">
+<span class="drop-empty" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V5M7 9l5-5 5 5M5 20h14"></path></svg><span><strong>Choisir un fichier</strong> ou le déposer ici</span><small>JPG, PNG ou WebP, 2 Mo et 6000 pixels maximum par côté</small></span>
+<label class="drop-input"><span class="sr-only">Importer ou remplacer l’image</span><input type="file" accept="image/jpeg,image/png,image/webp"></label>
+</div>
+<div class="alt-block">
+<label>Texte alternatif de l’image<span class="hint">Décrit la photo pour les lecteurs d’écran et le référencement.</span><input placeholder="Décrivez brièvement ce que montre l’image"></label>
+<p class="alt-warning"><span aria-hidden="true">! </span>Texte alternatif manquant</p>
+</div>
+</div>
+<div class="portfolio-body">
+<p class="badge mt-12">Portfolio</p>
+<label>Titre<input value="Villa à Cocody, séjour"></label>
+<label>Description<textarea rows="4">Trois stores enrouleurs posés devant une baie vitrée.</textarea></label>
+<label>Ordre d’affichage<span class="hint">Les plus petits nombres en premier.</span><input type="number" value="0"></label>
+<label class="toggle-row"><span>Visible sur le site<small>Masquée, la fiche reste enregistrée ici.</small></span><input class="switch" type="checkbox"></label>
+</div>
+</section>
+</div>
+<div class="action-bar"><a class="button quiet" href="#contenu">Retour à la liste</a><button type="button">Enregistrer la réalisation</button></div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1300}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

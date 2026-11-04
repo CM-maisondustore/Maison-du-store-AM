@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Espace Pro — documents et automatisations</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="color-scheme: {{colorScheme}}; font-family: Inter, system-ui, sans-serif; color: {{pal.t353535}}; background: {{pal.sf4f4f1}}; min-height: 100vh; display: flex">
+<dc-import name="ProSidebar" active="documents" hint-size="240px,100%"></dc-import>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+<dc-import name="ProTopbar" role="admin" hint-size="100%,64px"></dc-import>
+<main id="contenu" style="padding: 24px 32px 48px; display: flex; flex-direction: column; gap: 22px">
+<h1 style="margin: 0; font-family: 'Cormorant Garamond', serif; font-size: 34px; font-weight: 500; color: {{pal.t1c1c1c}}">Documents et automatisations</h1>
+
+<section aria-label="État des envois" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px">
+<div style="background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 10px; padding: 16px 20px; display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 10px"><h2 style="margin: 0; font-size: 16px; font-weight: 600; color: {{pal.t1c1c1c}}">Connexion SMTP</h2><span style="{{smtpBadge}}"><span aria-hidden="true">{{smtpGlyph}}</span>{{smtpLabel}}</span></div>
+<p style="margin: 0; font-size: 14px; line-height: 1.55">Envoi depuis <strong>contact@maisondustoream.com</strong> via <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px">smtp.hostinger.com:465</span>.</p>
+<button type="button" onClick="{{testSmtp}}" style="align-self: flex-start; height: 38px; padding: 0 12px; background: {{pal.sffffff}}; border: 1px solid {{pal.b20332c}}; border-radius: 6px; font: inherit; font-size: 13px; font-weight: 600; color: {{pal.t20332c}}; cursor: pointer">Tester la connexion</button>
+</div>
+<div style="background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 10px; padding: 16px 20px; display: flex; flex-direction: column; gap: 8px">
+<h2 style="margin: 0; font-size: 16px; font-weight: 600; color: {{pal.t1c1c1c}}">Traitement automatique</h2>
+<p style="margin: 0; font-size: 14px; line-height: 1.55">Dernier passage le <span style="font-family: 'IBM Plex Mono', monospace">{{lastRun}}</span> : {{lastRunResult}}. Le traitement repasse toutes les heures.</p>
+<button type="button" onClick="{{runNow}}" style="align-self: flex-start; height: 38px; padding: 0 12px; background: #c09f6a; border: 0; border-radius: 6px; font: inherit; font-size: 13px; font-weight: 600; color: #161616; cursor: pointer">Exécuter maintenant</button>
+</div>
+</section>
+
+<section aria-labelledby="h-rules" style="background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 10px; overflow: hidden">
+<div style="padding: 16px 20px; border-bottom: 1px solid {{pal.be8e4db}}; display: flex; flex-direction: column; gap: 4px"><h2 id="h-rules" style="margin: 0; font-size: 16px; font-weight: 600; color: {{pal.t1c1c1c}}">Règles d’envoi par e-mail</h2><p style="margin: 0; font-size: 13.5px; color: {{pal.t6b665e}}">« Brouillon à valider » prépare le message dans la messagerie sans l’envoyer.</p></div>
+<ul style="list-style: none; margin: 0; padding: 0">
+<sc-for list="{{rules}}" as="r" hint-placeholder-count="5">
+<li style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; padding: 14px 20px; border-bottom: 1px solid {{pal.befece5}}">
+<span style="flex: 1 1 280px; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 14.5px; font-weight: 600; color: {{pal.t1c1c1c}}">{{r.name}}</span><span style="font-size: 13px; color: {{pal.t6b665e}}">{{r.desc}}</span></span>
+<sc-if value="{{r.hasDelay}}" hint-placeholder-val="{{ false }}"><label style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: {{pal.t6b665e}}">Envoyer<span style="display: inline-flex; align-items: center; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; overflow: hidden"><input type="number" min="1" max="168" value="{{r.delay}}" onChange="{{r.setDelay}}" aria-label="Délai du rappel en heures" style="width: 60px; height: 36px; box-sizing: border-box; padding: 0 8px; border: 0; font-family: 'IBM Plex Mono', monospace; font-size: 13px; text-align: right"><span style="padding: 0 8px; height: 36px; display: inline-flex; align-items: center; background: {{pal.sf4f4f1}}; font-size: 12px">h avant</span></span></label></sc-if>
+<div role="radiogroup" aria-label="{{r.aria}}" style="display: inline-flex; padding: 3px; border-radius: 999px; background: {{pal.sf4f4f1}}; gap: 2px">
+<sc-for list="{{r.modes}}" as="m" hint-placeholder-count="3"><button type="button" role="radio" aria-checked="{{m.checked}}" onClick="{{m.pick}}" style="{{m.style}}">{{m.label}}</button></sc-for>
+</div>
+</li>
+</sc-for>
+</ul>
+</section>
+
+<section aria-labelledby="h-tpl" style="background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 10px; overflow: hidden">
+<div style="padding: 0 20px; border-bottom: 1px solid {{pal.be8e4db}}; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px">
+<h2 id="h-tpl" style="margin: 0; padding: 16px 0; font-size: 16px; font-weight: 600; color: {{pal.t1c1c1c}}">Modèles</h2>
+<div role="tablist" aria-label="Modèle à modifier" style="display: flex; gap: 2px">
+<sc-for list="{{tpls}}" as="t" hint-placeholder-count="4"><button type="button" role="tab" aria-selected="{{t.sel}}" onClick="{{t.pick}}" style="{{t.style}}">{{t.label}}</button></sc-for>
+</div>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 24px; padding: 20px">
+<form onSubmit="{{noSubmit}}" style="flex: 1 1 380px; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 8px"><span style="font-size: 14px; font-weight: 500; color: {{pal.t1c1c1c}}">Couleur d’accent</span>
+<div role="radiogroup" aria-label="Couleur d’accent" style="display: flex; gap: 8px"><sc-for list="{{colors}}" as="c" hint-placeholder-count="4"><button type="button" role="radio" aria-checked="{{c.checked}}" aria-label="{{c.label}}" onClick="{{c.pick}}" style="{{c.style}}"></button></sc-for></div></div>
+<div style="display: flex; align-items: center; gap: 12px"><span style="width: 52px; height: 52px; border: 1px solid {{pal.be8e4db}}; border-radius: 6px; display: flex; align-items: center; justify-content: center"><img src="assets/logo-maison-du-store-am.jpg" alt="Logo actuel" style="width: 44px; height: 44px; object-fit: contain"></span><span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 14px; font-weight: 500; color: {{pal.t1c1c1c}}">Logo</span><button type="button" style="align-self: flex-start; padding: 0; background: transparent; border: 0; font: inherit; font-size: 13px; font-weight: 600; color: {{pal.t20332c}}; text-decoration: underline">Remplacer le logo</button></span></div>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 500; color: {{pal.t1c1c1c}}">Introduction<textarea rows="3" style="box-sizing: border-box; padding: 10px 12px; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font: inherit; font-weight: 400; font-size: 14px">Suite à notre visite, nous avons le plaisir de vous adresser notre proposition pour l’habillage de vos fenêtres.</textarea></label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 500; color: {{pal.t1c1c1c}}">Signature<input type="text" value="Aïcha Diabaté, Maison du Store AM" style="height: 42px; box-sizing: border-box; padding: 0 12px; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font: inherit; font-weight: 400; font-size: 14px"></label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 500; color: {{pal.t1c1c1c}}">Pied de page<input type="text" value="Cocody — Marché Saint Jean, Abidjan. 07 12 44 93 19" style="height: 42px; box-sizing: border-box; padding: 0 12px; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font: inherit; font-weight: 400; font-size: 14px"></label>
+<fieldset style="margin: 0; padding: 12px 14px 14px; border: 1px solid {{pal.be8e4db}}; border-radius: 6px; display: flex; flex-direction: column; gap: 14px">
+<legend style="padding: 0 6px; font-size: 14px; font-weight: 600; color: {{pal.t1c1c1c}}">Fond de page et filigrane</legend>
+<div style="display: flex; align-items: center; gap: 10px; font-size: 14px"><span style="flex: 1">Logo AM en filigrane</span><button type="button" style="height: 34px; padding: 0 10px; background: {{pal.sffffff}}; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font: inherit; font-size: 13px">Remplacer</button><button type="button" style="height: 34px; padding: 0 10px; background: transparent; border: 0; font: inherit; font-size: 13px; color: {{pal.tb3392f}}">Retirer</button></div>
+<div style="display: grid; grid-template-columns: 60px 120px 60px; grid-template-rows: auto 150px auto; gap: 6px; align-items: center; justify-items: center; align-self: center" aria-label="Marges du filigrane en millimètres" role="group">
+<span></span><label style="display: flex; flex-direction: column; align-items: center; font-size: 11px; color: {{pal.t6b665e}}">Haut<input type="number" value="{{mt}}" onChange="{{setMt}}" style="{{mInput}}"></label><span></span>
+<label style="display: flex; flex-direction: column; align-items: center; font-size: 11px; color: {{pal.t6b665e}}">Gauche<input type="number" value="{{ml}}" onChange="{{setMl}}" style="{{mInput}}"></label>
+<span aria-hidden="true" style="position: relative; width: 106px; height: 150px; background: {{pal.sffffff}}; border: 1px solid {{pal.bb9b4aa}}; box-shadow: 0 2px 6px rgba(0,0,0,0.08)"><span style="{{marginBox}}"></span></span>
+<label style="display: flex; flex-direction: column; align-items: center; font-size: 11px; color: {{pal.t6b665e}}">Droite<input type="number" value="{{mr}}" onChange="{{setMr}}" style="{{mInput}}"></label>
+<span></span><label style="display: flex; flex-direction: column; align-items: center; font-size: 11px; color: {{pal.t6b665e}}">Bas<input type="number" value="{{mb}}" onChange="{{setMb}}" style="{{mInput}}"></label><span></span>
+</div>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 500; color: {{pal.t1c1c1c}}">Opacité : <span style="font-family: 'IBM Plex Mono', monospace">{{opacity}} %</span><input type="range" min="10" max="100" step="5" value="{{opacity}}" onChange="{{setOpacity}}" style="width: 100%; accent-color: {{pal.t20332c}}"></label>
+</fieldset>
+<button type="button" style="align-self: flex-start; height: 44px; padding: 0 18px; background: #c09f6a; border: 0; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; color: #161616">Enregistrer le modèle</button>
+</form>
+
+<div style="flex: 1 1 380px; min-width: 0; display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 13px; color: {{pal.t6b665e}}">Aperçu, mis à jour pendant la saisie</span>
+<div style="background: {{pal.se9e8e2}}; border-radius: 10px; padding: 20px; display: flex; justify-content: center">
+<div style="position: relative; width: 100%; max-width: 420px; aspect-ratio: 210 / 297; background: {{pal.sffffff}}; box-shadow: 0 10px 26px -12px rgba(0,0,0,0.35); padding: 30px 32px; box-sizing: border-box; display: flex; flex-direction: column; gap: 14px; font-size: 10px; overflow: hidden">
+<span aria-hidden="true" style="{{wmArea}}"><img src="assets/logo-maison-du-store-am.jpg" alt="" style="{{wmImg}}"></span>
+<div style="position: relative; display: flex; justify-content: space-between; align-items: flex-start"><span style="display: flex; align-items: center; gap: 6px"><img src="assets/logo-maison-du-store-am.jpg" alt="" style="width: 30px; height: 30px; object-fit: contain"><span style="font-family: 'Cormorant Garamond', serif; font-size: 15px; font-weight: 600; color: {{pal.t1c1c1c}}">Maison du Store AM</span></span><span style="font-family: 'Cormorant Garamond', serif; font-size: 18px; color: {{pal.t1c1c1c}}">{{tplTitle}}</span></div>
+<div style="{{accentRule}}"></div>
+<p style="position: relative; margin: 0; line-height: 1.6">Suite à notre visite, nous avons le plaisir de vous adresser notre proposition pour l’habillage de vos fenêtres.</p>
+<div style="position: relative; display: flex; flex-direction: column; gap: 6px"><span style="height: 8px; background: {{pal.sefece5}}; border-radius: 2px"></span><span style="height: 8px; width: 90%; background: {{pal.sefece5}}; border-radius: 2px"></span><span style="height: 8px; width: 70%; background: {{pal.sefece5}}; border-radius: 2px"></span><span style="height: 8px; width: 80%; background: {{pal.sefece5}}; border-radius: 2px"></span></div>
+<div style="position: relative; margin-left: auto; width: 46%; display: flex; flex-direction: column; gap: 4px"><span style="display: flex; justify-content: space-between"><span>Total TTC</span><span style="font-family: 'IBM Plex Mono', monospace">486 160 FCFA</span></span></div>
+<p style="position: relative; margin: 0">Aïcha Diabaté, Maison du Store AM</p>
+<p style="position: relative; margin: auto 0 0; padding-top: 8px; border-top: 1px solid {{pal.bece9e2}}; color: {{pal.t6b665e}}">Cocody — Marché Saint Jean, Abidjan. 07 12 44 93 19</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1800}}'>
+class Component extends DCLogic {
+constructor(props) {
+super(props);
+this.state = { modes: [2, 1, 1, 2, 2], delay: '24', ran: false, smtp: true, tpl: 'devis', color: 0, op: 20, m: { t: '40', r: '30', b: '60', l: '30' } };
+}
+isDark() {
+const t = this.props.theme;
+if (t === 'dark') return true;
+if (t === 'light') return false;
+let v = 'light';
+try { v = window.localStorage.getItem('mds-pro-theme') || 'light'; } catch (e) {}
+if (v === 'dark') return true;
+if (v === 'auto') { try { return window.matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) {} }
+return false;
+}
+themeMaps() { return { s: {"#ffffff": "#1b2220", "#f4f4f1": "#121816", "#f9f8f4": "#202825", "#fbfaf7": "#1e2623", "#fdfbf6": "#222a27", "#fcfbf8": "#1e2623", "#faf9f7": "#1e2623", "#fffcf5": "#2b2618", "#f1f0ec": "#262e2b", "#ece9e2": "#2a322f", "#e9e8e2": "#2a302d", "#e9e6df": "#0f1412", "#eef0ec": "#232b28", "#eef1ef": "#202826", "#edf1f4": "#1d2530", "#e8e4db": "#313a36", "#dcd6cb": "#3b4540", "#f1eee8": "#29312e", "#efece5": "#29312e", "#cfc9bd": "#4c5751", "#cfc8bb": "#4c5751", "#e1ddd3": "#3b4540", "#b9b4aa": "#5a645e", "#20332c": "#2b4a3e", "#2b4239": "#34574a", "#e5f1ea": "#1d3a2b", "#b7d6c3": "#2f5a43", "#fdf8ec": "#2d2717", "#ecd7a8": "#5b4a25", "#fbf1dc": "#382d15", "#e3c2bd": "#5e302b", "#e3c3bf": "#5e302b", "#fbeceb": "#3a1f1c", "#e8eef5": "#1d2a38", "#eeede8": "#2a302d", "#f6f0e4": "#2f2a1f", "#f3f3f3": "#262e2b", "#cccccc": "#46504b", "#fdf6f5": "#33201e", "#f8e6e4": "#3a2220", "#fbf6ea": "#2d2717", "#ecdcb9": "#5b4a25", "#f6ece5": "#33241d", "#efe9dd": "#2a2620", "#d9b26a": "#8a6a2c", "#b98a2e": "#8a6a2c"}, b: {"#ffffff": "#1b2220", "#f4f4f1": "#121816", "#f9f8f4": "#202825", "#fbfaf7": "#1e2623", "#fdfbf6": "#222a27", "#fcfbf8": "#1e2623", "#faf9f7": "#1e2623", "#fffcf5": "#2b2618", "#f1f0ec": "#262e2b", "#ece9e2": "#2a322f", "#e9e8e2": "#2a302d", "#e9e6df": "#0f1412", "#eef0ec": "#232b28", "#eef1ef": "#202826", "#edf1f4": "#1d2530", "#e8e4db": "#313a36", "#dcd6cb": "#3b4540", "#f1eee8": "#29312e", "#efece5": "#29312e", "#cfc9bd": "#4c5751", "#cfc8bb": "#4c5751", "#e1ddd3": "#3b4540", "#b9b4aa": "#5a645e", "#20332c": "#5d8a76", "#2b4239": "#34574a", "#e5f1ea": "#1d3a2b", "#b7d6c3": "#2f5a43", "#fdf8ec": "#2d2717", "#ecd7a8": "#5b4a25", "#fbf1dc": "#382d15", "#e3c2bd": "#5e302b", "#e3c3bf": "#5e302b", "#fbeceb": "#3a1f1c", "#e8eef5": "#1d2a38", "#eeede8": "#2a302d", "#f6f0e4": "#2f2a1f", "#f3f3f3": "#262e2b", "#cccccc": "#46504b", "#fdf6f5": "#33201e", "#f8e6e4": "#3a2220", "#fbf6ea": "#2d2717", "#ecdcb9": "#5b4a25", "#f6ece5": "#33241d", "#efe9dd": "#2a2620", "#d9b26a": "#8a6a2c", "#b98a2e": "#8a6a2c", "#1c1c1c": "#d6d2c9", "#b3392f": "#f28b80"}, t: {"#1c1c1c": "#f1eee8", "#353535": "#d6d2c9", "#6b665e": "#a8a296", "#20332c": "#bfd8cb", "#84642f": "#d8b47a", "#2f7350": "#86cfa3", "#8c5f0e": "#e6b862", "#5e4108": "#f0d39a", "#b3392f": "#f28b80", "#7c241c": "#f5b0a8", "#3f6285": "#9ec0e3", "#2c4866": "#bcd3ea", "#5c5852": "#c9c4ba", "#b0aaa0": "#6c736e", "#3d2b06": "#f0dcb3", "#1f4d35": "#bfe3cc", "#8f2c24": "#f5b0a8", "#6e4a0b": "#e6c27a", "#3f5a72": "#a9c3dc", "#3f5a73": "#a9c3dc", "#8e4529": "#e0a084", "#5a5248": "#cfc8bb", "#b98a2e": "#d9ac57", "#2c4660": "#a9c3dc"} }; }
+themeWatch() {
+if (this.__thw || typeof window === 'undefined') return;
+this.__thw = true;
+const bump = () => this.setState({ __th: Date.now() });
+try { window.addEventListener('storage', (e) => { if (e.key === 'mds-pro-theme') bump(); }); } catch (e) {}
+try { window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', bump); } catch (e) {}
+}
+dmap(v) {
+const T = this.themeMaps();
+const cv = (str) => str.split(';').map((seg) => {
+const i = seg.indexOf(':');
+let M = T.s;
+if (i > -1) { const p = seg.slice(0, i).trim().toLowerCase(); M = /^(color|stroke|fill|caret-color|accent-color|text-decoration-color)$/.test(p) ? T.t : /^(border|outline|box-shadow)/.test(p) ? T.b : T.s; }
+return seg.replace(/#[0-9a-fA-F]{6}/g, (h) => M[h.toLowerCase()] || h);
+}).join(';');
+const go = (x) => (typeof x === 'string' ? cv(x) : Array.isArray(x) ? x.map(go) : x && typeof x === 'object' && Object.prototype.toString.call(x) === '[object Object]' ? Object.keys(x).reduce((o, k) => { o[k] = go(x[k]); return o; }, {}) : x);
+return go(v);
+}
+renderVals() {
+this.themeWatch();
+const dark = this.isDark();
+let v = this.renderValsLight();
+if (dark) v = this.dmap(v);
+const T = this.themeMaps();
+const pal = {};
+['s', 'b', 't'].forEach((k) => { Object.keys(T[k]).forEach((h) => { pal[k + h.slice(1)] = dark ? T[k][h] : h; }); });
+v.pal = pal;
+v.themeDark = dark;
+v.colorScheme = dark ? 'dark' : 'light';
+return v;
+}
+renderValsLight() {
+const s = this.state;
+const R = [['Accusé de réception', 'Envoyé quand une demande arrive du site.'], ['Devis validé', 'Envoie le devis en PDF au client après validation.'], ['Facture émise', 'Envoie la facture en PDF dès son émission.'], ['RDV confirmé', 'Prévient le client quand un rendez-vous est confirmé.'], ['Rappel de RDV', 'Rappelle le rendez-vous au client avant l’heure prévue.']];
+const M = ['Désactivée', 'Brouillon à valider', 'Envoi automatique'];
+const COLS = [['Or', '#c09f6a'], ['Sapin', '#20332c'], ['Encre', '#1c1c1c'], ['Bleu ardoise', '#3f6285']];
+const accent = COLS[s.color][1];
+const mm = (k) => parseFloat(s.m[k] || 0);
+const setM = (k) => (e) => this.setState({ m: { ...s.m, [k]: e.target.value } });
+const scale = 106 / 210;
+return {
+smtpBadge: 'display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:999px;font-size:12.5px;font-weight:600;color:' + (s.smtp ? '#2f7350;background:#e5f1ea' : '#8c5f0e;background:#fbf1dc'),
+smtpGlyph: s.smtp ? '✓' : '!',
+smtpLabel: s.smtp ? 'Vérifiée' : 'À vérifier',
+testSmtp: () => this.setState({ smtp: true }),
+lastRun: s.ran ? '26/10/2026 à 10:52' : '26/10/2026 à 08:00',
+lastRunResult: s.ran ? 'aucun envoi en attente' : '4 e-mails envoyés, 1 brouillon à valider',
+runNow: () => this.setState({ ran: true }),
+rules: R.map(([name, desc], i) => ({
+name, desc, aria: 'Mode de la règle ' + name,
+hasDelay: i === 4, delay: s.delay,
+setDelay: (e) => this.setState({ delay: e.target.value }),
+modes: M.map((label, k) => ({ label, checked: s.modes[i] === k ? 'true' : 'false',
+pick: () => { const a = s.modes.slice(); a[i] = k; this.setState({ modes: a }); },
+style: 'height:34px;padding:0 12px;border-radius:999px;border:0;font:inherit;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;' + (s.modes[i] === k ? (k === 0 ? 'background:#ffffff;color:#5c5852;box-shadow:0 1px 3px rgba(32,51,44,0.2)' : k === 1 ? 'background:#ffffff;color:#8c5f0e;box-shadow:0 1px 3px rgba(32,51,44,0.2)' : 'background:#20332c;color:#ffffff') : 'background:transparent;color:#6b665e') }))
+})),
+tpls: [['devis', 'PDF devis'], ['facture', 'PDF facture'], ['email', 'E-mail'], ['wa', 'WhatsApp']].map(([k, label]) => ({ label, sel: s.tpl === k ? 'true' : 'false', pick: () => this.setState({ tpl: k }),
+style: 'height:52px;padding:0 12px;background:transparent;border:0;border-bottom:2px solid ' + (s.tpl === k ? '#c09f6a' : 'transparent') + ';font:inherit;font-size:14px;font-weight:' + (s.tpl === k ? '600' : '500') + ';color:' + (s.tpl === k ? '#1c1c1c' : '#6b665e') + ';cursor:pointer' })),
+tplTitle: { devis: 'Devis', facture: 'Facture', email: 'E-mail', wa: 'WhatsApp' }[s.tpl],
+noSubmit: (e) => e.preventDefault(),
+colors: COLS.map(([label, hex], i) => ({ label, checked: s.color === i ? 'true' : 'false', pick: () => this.setState({ color: i }),
+style: 'width:36px;height:36px;border-radius:50%;cursor:pointer;background:' + hex + ';border:0;box-shadow:' + (s.color === i ? '0 0 0 2px #ffffff,0 0 0 4px #1c1c1c' : 'inset 0 0 0 1px rgba(0,0,0,0.15)') })),
+accentRule: 'position:relative;height:2px;background:' + accent,
+mt: s.m.t, mr: s.m.r, mb: s.m.b, ml: s.m.l,
+setMt: setM('t'), setMr: setM('r'), setMb: setM('b'), setMl: setM('l'),
+mInput: "width:52px;height:30px;box-sizing:border-box;padding:0 4px;border:1px solid #dcd6cb;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:12px;text-align:center",
+marginBox: 'position:absolute;box-sizing:border-box;border:1px dashed #c09f6a;background:rgba(192,159,106,0.12);top:' + (mm('t') * scale) + 'px;right:' + (mm('r') * scale) + 'px;bottom:' + (mm('b') * scale) + 'px;left:' + (mm('l') * scale) + 'px',
+opacity: s.op,
+setOpacity: (e) => this.setState({ op: e.target.value }),
+wmArea: 'position:absolute;display:flex;align-items:center;justify-content:center;top:' + (mm('t') / 297 * 100) + '%;right:' + (mm('r') / 210 * 100) + '%;bottom:' + (mm('b') / 297 * 100) + '%;left:' + (mm('l') / 210 * 100) + '%',
+wmImg: 'width:80%;max-height:80%;object-fit:contain;opacity:' + (s.op / 100)
+};
+}
+}
+</script>
+</body>
+</html>

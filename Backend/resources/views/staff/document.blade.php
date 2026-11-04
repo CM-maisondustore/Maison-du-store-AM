@@ -53,6 +53,7 @@
 </p>
 @endif
 @if(!empty($payment_plan['mode']))<p>Conditions : {{ $payment_plan['mode']==='full' ? 'Paiement intégral' : 'Avance de '.number_format($payment_plan['deposit'],0,',',' ').' F CFA puis solde' }}.<br>Versements reçus enregistrés à l’édition : {{ number_format($payment_plan['received'],0,',',' ') }} F CFA · Reste à recevoir : {{ number_format($remaining_amount,0,',',' ') }} F CFA.</p>@endif
+@if($title==='Devis' && !empty($totals['schedule']))<p><strong>Notre engagement.</strong> {{ ($presentation['commitment_text'] ?? '') ?: \App\Services\DocumentLayout::COMMITMENT }}</p>@endif
 <div class="footer">{{ $issuer['tax_note'] }}<br>{{ $issuer['payment_terms'] }}<br>Pour toute question : {{ $issuer['email'] }}</div>
 @if(!empty($presentation['footer']))<p class="footer">{{ $presentation['footer'] }}</p>@endif
 @if(!empty($presentation['signature']))<p class="footer">{{ $presentation['signature'] }}</p>@endif

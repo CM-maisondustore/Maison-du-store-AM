@@ -16,7 +16,7 @@ final class PricingConfig
         $request->merge(['pricing'=>$raw]);
         $rules = ['pricing'=>'required|array','pricing.engine'=>'required|in:2', 'pricing.display_mode'=>'required|in:grouped,individual',
             'pricing.discount_type'=>'required|in:none,percentage,fixed,target_total', 'pricing.discount_value'=>'nullable|numeric|min:0|max:1000000000000',
-            'pricing.deposit_percent'=>'required|numeric|min:0|max:100', 'tax_rate'=>'nullable|numeric|min:0|max:100|decimal:0,2'];
+            'pricing.deposit_percent'=>'required|numeric|min:0|max:100', 'pricing.schedule'=>'sometimes|nullable|in:auto,two,three', 'tax_rate'=>'nullable|numeric|min:0|max:100|decimal:0,2'];
         foreach (self::FEES as $key=>$label) {
             $rules['pricing.fees.'.$key.'.enabled']='sometimes|boolean';
             $rules['pricing.fees.'.$key.'.option_id']='nullable|integer';
@@ -26,7 +26,7 @@ final class PricingConfig
         }
         $request->validate($rules);
         $result = ['engine'=>2,'display_mode'=>$raw['display_mode'], 'discount_type'=>$raw['discount_type'],
-            'discount_value'=>(string)($raw['discount_value'] ?? 0), 'deposit_percent'=>(string)$raw['deposit_percent'],
+            'discount_value'=>(string)($raw['discount_value'] ?? 0), 'deposit_percent'=>(string)$raw['deposit_percent'], 'schedule'=>$raw['schedule'] ?? null,
             'tax_basis_points'=>QuoteValidator::money(QuoteValidator::decimal($request->input('tax_rate',0),'taxe')->multipliedBy(100)->__toString(),'taxe'), 'fees'=>[]];
         foreach (self::FEES as $key=>$label) {
             $fee=$raw['fees'][$key];

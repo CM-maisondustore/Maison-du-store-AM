@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Espace Pro — catalogue</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="color-scheme: {{colorScheme}}; font-family: Inter, system-ui, sans-serif; color: {{pal.t353535}}; background: {{pal.sf4f4f1}}; min-height: 100vh; display: flex">
+<dc-import name="ProSidebar" active="catalogue" hint-size="240px,100%"></dc-import>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+<dc-import name="ProTopbar" role="admin" hint-size="100%,64px"></dc-import>
+<main id="contenu" style="flex: 1; padding: 24px 32px 32px; display: flex; flex-direction: column; gap: 18px">
+
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px">
+<h1 style="margin: 0; font-family: 'Cormorant Garamond', serif; font-size: 34px; font-weight: 500; color: {{pal.t1c1c1c}}">Catalogue</h1>
+<div style="{{globalBox}}">
+<span style="display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 600; color: {{pal.t1c1c1c}}">{{globalTitle}}</span><span style="font-size: 13px; color: {{pal.t6b665e}}">{{globalSub}}</span></span>
+<button type="button" role="switch" aria-checked="{{globalChecked}}" aria-label="Afficher le catalogue sur le site" onClick="{{askGlobal}}" style="{{globalSwitch}}"><span style="{{globalKnob}}"></span></button>
+</div>
+</div>
+
+<sc-if value="{{confirmGlobal}}" hint-placeholder-val="{{ false }}">
+<div role="alertdialog" aria-labelledby="g-t" style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; padding: 14px 16px; border-radius: 10px; background: {{pal.sfbf1dc}}; border: 1px solid {{pal.becd7a8}}; color: {{pal.t5e4108}}">
+<p id="g-t" style="margin: 0; flex: 1 1 420px; font-size: 14px; line-height: 1.5">{{confirmText}}</p>
+<span style="display: flex; gap: 8px"><button type="button" onClick="{{cancelGlobal}}" style="height: 40px; padding: 0 14px; background: {{pal.sffffff}}; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font: inherit; font-size: 14px">Annuler</button><button type="button" onClick="{{doGlobal}}" style="height: 40px; padding: 0 14px; background: {{pal.s20332c}}; border: 0; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; color: #ffffff">{{confirmBtn}}</button></span>
+</div>
+</sc-if>
+
+<div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+<section aria-label="Produits" style="flex: 999 1 640px; min-width: 0; background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 10px; overflow: hidden">
+<div style="display: flex; flex-wrap: wrap; gap: 10px; padding: 12px 16px; border-bottom: 1px solid {{pal.be8e4db}}">
+<label style="flex: 1 1 220px; position: relative; display: flex; align-items: center"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Rechercher un produit</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="{{pal.t6b665e}}" stroke-width="1.6" aria-hidden="true" style="position: absolute; left: 10px"><path d="M4 11a7 7 0 1 0 14 0a7 7 0 1 0-14 0M20 20l-3.5-3.5"></path></svg><input type="search" placeholder="Nom ou référence" style="width: 100%; height: 36px; box-sizing: border-box; padding: 0 10px 0 34px; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font: inherit; font-size: 14px"></label>
+<label style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: {{pal.t6b665e}}">Univers<select onChange="{{setUni}}" style="height: 36px; padding: 0 8px; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font: inherit; font-size: 14px; color: {{pal.t1c1c1c}}; background: {{pal.sffffff}}"><option value="all">Tous</option><option value="Stores &amp; Rideaux">Stores &amp; Rideaux</option><option value="Électroménager">Électroménager</option><option value="Meubles Bureau">Meubles Bureau</option><option value="Meubles Domicile">Meubles Domicile</option></select></label>
+<label style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: {{pal.t6b665e}}">Visibilité<select style="height: 36px; padding: 0 8px; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font: inherit; font-size: 14px; color: {{pal.t1c1c1c}}; background: {{pal.sffffff}}"><option>Toutes</option><option>Visible</option><option>Masqué</option></select></label>
+<label style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: {{pal.t6b665e}}">Disponibilité<select style="height: 36px; padding: 0 8px; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font: inherit; font-size: 14px; color: {{pal.t1c1c1c}}; background: {{pal.sffffff}}"><option>Toutes</option><option>Disponible</option><option>Indisponible</option></select></label>
+</div>
+<div style="overflow-x: auto">
+<table style="width: 100%; border-collapse: collapse; font-size: 14px">
+<thead><tr style="text-align: left; background: {{pal.sf9f8f4}}">
+<th scope="col" style="padding: 10px 16px; font-size: 13px; font-weight: 600; color: {{pal.t6b665e}}">Produit</th>
+<th scope="col" style="padding: 10px 12px; font-size: 13px; font-weight: 600; color: {{pal.t6b665e}}">Univers et type</th>
+<th scope="col" style="padding: 10px 12px; font-size: 13px; font-weight: 600; color: {{pal.t6b665e}}">Visible</th>
+<th scope="col" style="padding: 10px 16px 10px 12px; font-size: 13px; font-weight: 600; color: {{pal.t6b665e}}">Disponible</th>
+</tr></thead>
+<tbody>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="9">
+<tr style="{{r.rowStyle}}">
+<td style="padding: 8px 16px"><button type="button" onClick="{{r.pick}}" style="display: flex; align-items: center; gap: 12px; padding: 0; background: transparent; border: 0; font: inherit; text-align: left; cursor: pointer">
+<span aria-hidden="true" style="flex: none; width: 44px; height: 44px; border-radius: 4px; background: {{pal.sf3f3f3}}; border: 1px solid {{pal.bcccccc}}; display: flex; align-items: center; justify-content: center; color: {{pal.t6b665e}}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 5h18v14H3zM7 10a1.5 1.5 0 1 0 3 0a1.5 1.5 0 1 0-3 0M21 16l-5-5-8 8"></path></svg></span>
+<span style="display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 600; color: {{pal.t1c1c1c}}">{{r.name}}</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: {{pal.t6b665e}}">{{r.ref}}</span></span>
+</button></td>
+<td style="padding: 8px 12px"><span style="display: flex; flex-direction: column"><span>{{r.uni}}</span><span style="font-size: 13px; color: {{pal.t6b665e}}">{{r.type}}</span></span></td>
+<td style="padding: 8px 12px"><label style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px"><button type="button" role="switch" aria-checked="{{r.visChecked}}" aria-label="{{r.visAria}}" onClick="{{r.toggleVis}}" style="{{r.visSwitch}}"><span style="{{r.visKnob}}"></span></button>{{r.visLabel}}</label></td>
+<td style="padding: 8px 16px 8px 12px"><label style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px"><button type="button" role="switch" aria-checked="{{r.disChecked}}" aria-label="{{r.disAria}}" onClick="{{r.toggleDis}}" style="{{r.disSwitch}}"><span style="{{r.disKnob}}"></span></button>{{r.disLabel}}</label></td>
+</tr>
+</sc-for>
+</tbody>
+</table>
+</div>
+<div style="position: sticky; bottom: 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; border-top: 1px solid {{pal.be8e4db}}; background: {{barBg}}">
+<span role="status" style="font-size: 14px; color: {{pal.t1c1c1c}}">{{dirtyLabel}}</span>
+<span style="display: flex; gap: 8px"><button type="button" onClick="{{reset}}" disabled="{{clean}}" style="height: 40px; padding: 0 14px; background: transparent; border: 0; font: inherit; font-size: 14px; color: {{pal.t6b665e}}">Annuler les modifications</button><button type="button" onClick="{{save}}" disabled="{{clean}}" style="{{saveStyle}}">Enregistrer les statuts</button></span>
+</div>
+</section>
+
+<aside aria-labelledby="p-title" style="flex: 1 1 340px; min-width: 0; background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 10px; padding: 18px 20px; display: flex; flex-direction: column; gap: 16px">
+<div style="aspect-ratio: 4 / 3; max-height: 220px; width: 100%; background: {{pal.sf3f3f3}}; border: 1px solid {{pal.bcccccc}}; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; color: {{pal.t6b665e}}"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M3 5h18v14H3zM7 10a1.5 1.5 0 1 0 3 0a1.5 1.5 0 1 0-3 0M21 16l-5-5-8 8"></path></svg><span style="font-size: 13px">Remplacer l’image</span></div>
+<div style="display: flex; flex-direction: column; gap: 2px"><h2 id="p-title" style="margin: 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 500; color: {{pal.t1c1c1c}}">{{sel.name}}</h2><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: {{pal.t6b665e}}">{{sel.ref}}</span></div>
+<div style="display: flex; flex-direction: column; gap: 8px"><span style="font-size: 14px; font-weight: 600; color: {{pal.t1c1c1c}}">Caractéristiques</span><span style="display: flex; flex-wrap: wrap; gap: 6px"><span style="padding: 4px 10px; border: 1px solid {{pal.be8e4db}}; border-radius: 999px; font-size: 13px">Occultant</span><span style="padding: 4px 10px; border: 1px solid {{pal.be8e4db}}; border-radius: 999px; font-size: 13px">Tamisant</span><span style="padding: 4px 10px; border: 1px solid {{pal.be8e4db}}; border-radius: 999px; font-size: 13px">Motorisable</span></span></div>
+<div style="display: flex; flex-direction: column; gap: 8px"><span style="font-size: 14px; font-weight: 600; color: {{pal.t1c1c1c}}">Couleurs</span><span style="display: flex; gap: 8px"><span title="Lin" style="width: 26px; height: 26px; border-radius: 50%; background: #e8dcc6; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.15)"></span><span title="Gris perle" style="width: 26px; height: 26px; border-radius: 50%; background: #c9c9c4; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.15)"></span><span title="Anthracite" style="width: 26px; height: 26px; border-radius: 50%; background: #3a3a3a"></span><button type="button" aria-label="Ajouter une couleur" style="width: 26px; height: 26px; border-radius: 50%; border: 1px dashed {{pal.bb9b4aa}}; background: {{pal.sffffff}}; color: {{pal.t6b665e}}">+</button></span></div>
+<fieldset style="margin: 0; padding: 12px 14px 4px; border: 1px solid {{pal.be8e4db}}; border-radius: 6px">
+<legend style="padding: 0 6px; font-size: 14px; font-weight: 600; color: {{pal.t1c1c1c}}">Coûts internes</legend>
+<p style="margin: 0 0 8px; font-size: 12.5px; color: {{pal.t6b665e}}">Laisser vide = non renseigné. Saisir 0 = coût nul.</p>
+<sc-for list="{{costs}}" as="c" hint-placeholder-count="4">
+<div style="display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; align-items: center; padding: 8px 0; border-top: 1px solid {{pal.bf1eee8}}">
+<label for="{{c.id}}" style="font-size: 14px; color: {{pal.t1c1c1c}}">{{c.label}}</label>
+<span style="{{c.box}}"><input id="{{c.id}}" type="number" placeholder="—" value="{{c.v}}" onChange="{{c.set}}" style="width: 96px; height: 34px; box-sizing: border-box; padding: 0 8px; border: 0; background: transparent; font-family: 'IBM Plex Mono', monospace; font-size: 13px; text-align: right"><span style="padding: 0 8px; height: 34px; display: inline-flex; align-items: center; background: {{pal.sf4f4f1}}; font-size: 12px; color: {{pal.t6b665e}}; white-space: nowrap">{{c.unit}}</span></span>
+<span style="{{c.noteStyle}}">{{c.note}}</span>
+</div>
+</sc-for>
+</fieldset>
+</aside>
+</div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1350}}'>
+class Component extends DCLogic {
+constructor(props) {
+super(props);
+this.state = { on: true, confirm: false, uni: 'all', sel: 0, edits: {}, saved: false, costs: { mat: '14500', conf: '6000', liv: '', pose: '0' } };
+}
+isDark() {
+const t = this.props.theme;
+if (t === 'dark') return true;
+if (t === 'light') return false;
+let v = 'light';
+try { v = window.localStorage.getItem('mds-pro-theme') || 'light'; } catch (e) {}
+if (v === 'dark') return true;
+if (v === 'auto') { try { return window.matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) {} }
+return false;
+}
+themeMaps() { return { s: {"#ffffff": "#1b2220", "#f4f4f1": "#121816", "#f9f8f4": "#202825", "#fbfaf7": "#1e2623", "#fdfbf6": "#222a27", "#fcfbf8": "#1e2623", "#faf9f7": "#1e2623", "#fffcf5": "#2b2618", "#f1f0ec": "#262e2b", "#ece9e2": "#2a322f", "#e9e8e2": "#2a302d", "#e9e6df": "#0f1412", "#eef0ec": "#232b28", "#eef1ef": "#202826", "#edf1f4": "#1d2530", "#e8e4db": "#313a36", "#dcd6cb": "#3b4540", "#f1eee8": "#29312e", "#efece5": "#29312e", "#cfc9bd": "#4c5751", "#cfc8bb": "#4c5751", "#e1ddd3": "#3b4540", "#b9b4aa": "#5a645e", "#20332c": "#2b4a3e", "#2b4239": "#34574a", "#e5f1ea": "#1d3a2b", "#b7d6c3": "#2f5a43", "#fdf8ec": "#2d2717", "#ecd7a8": "#5b4a25", "#fbf1dc": "#382d15", "#e3c2bd": "#5e302b", "#e3c3bf": "#5e302b", "#fbeceb": "#3a1f1c", "#e8eef5": "#1d2a38", "#eeede8": "#2a302d", "#f6f0e4": "#2f2a1f", "#f3f3f3": "#262e2b", "#cccccc": "#46504b", "#fdf6f5": "#33201e", "#f8e6e4": "#3a2220", "#fbf6ea": "#2d2717", "#ecdcb9": "#5b4a25", "#f6ece5": "#33241d", "#efe9dd": "#2a2620", "#d9b26a": "#8a6a2c", "#b98a2e": "#8a6a2c"}, b: {"#ffffff": "#1b2220", "#f4f4f1": "#121816", "#f9f8f4": "#202825", "#fbfaf7": "#1e2623", "#fdfbf6": "#222a27", "#fcfbf8": "#1e2623", "#faf9f7": "#1e2623", "#fffcf5": "#2b2618", "#f1f0ec": "#262e2b", "#ece9e2": "#2a322f", "#e9e8e2": "#2a302d", "#e9e6df": "#0f1412", "#eef0ec": "#232b28", "#eef1ef": "#202826", "#edf1f4": "#1d2530", "#e8e4db": "#313a36", "#dcd6cb": "#3b4540", "#f1eee8": "#29312e", "#efece5": "#29312e", "#cfc9bd": "#4c5751", "#cfc8bb": "#4c5751", "#e1ddd3": "#3b4540", "#b9b4aa": "#5a645e", "#20332c": "#5d8a76", "#2b4239": "#34574a", "#e5f1ea": "#1d3a2b", "#b7d6c3": "#2f5a43", "#fdf8ec": "#2d2717", "#ecd7a8": "#5b4a25", "#fbf1dc": "#382d15", "#e3c2bd": "#5e302b", "#e3c3bf": "#5e302b", "#fbeceb": "#3a1f1c", "#e8eef5": "#1d2a38", "#eeede8": "#2a302d", "#f6f0e4": "#2f2a1f", "#f3f3f3": "#262e2b", "#cccccc": "#46504b", "#fdf6f5": "#33201e", "#f8e6e4": "#3a2220", "#fbf6ea": "#2d2717", "#ecdcb9": "#5b4a25", "#f6ece5": "#33241d", "#efe9dd": "#2a2620", "#d9b26a": "#8a6a2c", "#b98a2e": "#8a6a2c", "#1c1c1c": "#d6d2c9", "#b3392f": "#f28b80"}, t: {"#1c1c1c": "#f1eee8", "#353535": "#d6d2c9", "#6b665e": "#a8a296", "#20332c": "#bfd8cb", "#84642f": "#d8b47a", "#2f7350": "#86cfa3", "#8c5f0e": "#e6b862", "#5e4108": "#f0d39a", "#b3392f": "#f28b80", "#7c241c": "#f5b0a8", "#3f6285": "#9ec0e3", "#2c4866": "#bcd3ea", "#5c5852": "#c9c4ba", "#b0aaa0": "#6c736e", "#3d2b06": "#f0dcb3", "#1f4d35": "#bfe3cc", "#8f2c24": "#f5b0a8", "#6e4a0b": "#e6c27a", "#3f5a72": "#a9c3dc", "#3f5a73": "#a9c3dc", "#8e4529": "#e0a084", "#5a5248": "#cfc8bb", "#b98a2e": "#d9ac57", "#2c4660": "#a9c3dc"} }; }
+themeWatch() {
+if (this.__thw || typeof window === 'undefined') return;
+this.__thw = true;
+const bump = () => this.setState({ __th: Date.now() });
+try { window.addEventListener('storage', (e) => { if (e.key === 'mds-pro-theme') bump(); }); } catch (e) {}
+try { window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', bump); } catch (e) {}
+}
+dmap(v) {
+const T = this.themeMaps();
+const cv = (str) => str.split(';').map((seg) => {
+const i = seg.indexOf(':');
+let M = T.s;
+if (i > -1) { const p = seg.slice(0, i).trim().toLowerCase(); M = /^(color|stroke|fill|caret-color|accent-color|text-decoration-color)$/.test(p) ? T.t : /^(border|outline|box-shadow)/.test(p) ? T.b : T.s; }
+return seg.replace(/#[0-9a-fA-F]{6}/g, (h) => M[h.toLowerCase()] || h);
+}).join(';');
+const go = (x) => (typeof x === 'string' ? cv(x) : Array.isArray(x) ? x.map(go) : x && typeof x === 'object' && Object.prototype.toString.call(x) === '[object Object]' ? Object.keys(x).reduce((o, k) => { o[k] = go(x[k]); return o; }, {}) : x);
+return go(v);
+}
+renderVals() {
+this.themeWatch();
+const dark = this.isDark();
+let v = this.renderValsLight();
+if (dark) v = this.dmap(v);
+const T = this.themeMaps();
+const pal = {};
+['s', 'b', 't'].forEach((k) => { Object.keys(T[k]).forEach((h) => { pal[k + h.slice(1)] = dark ? T[k][h] : h; }); });
+v.pal = pal;
+v.themeDark = dark;
+v.colorScheme = dark ? 'dark' : 'light';
+return v;
+}
+renderValsLight() {
+const s = this.state;
+const P = [
+['ST-A001', 'Store Zebra', 'Stores & Rideaux', 'Store intérieur', true, true],
+['ST-A002', 'Store californien', 'Stores & Rideaux', 'Store intérieur', true, true],
+['ST-A003', 'Store vénitien bois', 'Stores & Rideaux', 'Store intérieur', true, false],
+['ST-E001', 'Store screen', 'Stores & Rideaux', 'Store extérieur', true, true],
+['RD-W001', 'Rideau Wave', 'Stores & Rideaux', 'Rideau', true, true],
+['RD-O002', 'Rideau à œillets', 'Stores & Rideaux', 'Rideau', false, true],
+['VL-L001', 'Voilage lin', 'Stores & Rideaux', 'Voilage', true, true],
+['EM-F001', 'Réfrigérateur combiné', 'Électroménager', 'Froid', false, false],
+['MB-B001', 'Bureau de direction', 'Meubles Bureau', 'Bureaux', false, false]
+];
+const sw = (on, small) => ({
+sw: 'position:relative;flex:none;width:' + (small ? '36px' : '44px') + ';height:' + (small ? '22px' : '26px') + ';border-radius:999px;border:0;padding:0;cursor:pointer;background:' + (on ? '#20332c' : '#cfc9bd'),
+kn: 'position:absolute;top:3px;left:' + (on ? (small ? '17px' : '21px') : '3px') + ';width:' + (small ? '16px' : '20px') + ';height:' + (small ? '16px' : '20px') + ';border-radius:50%;background:#ffffff;transition:left 150ms ease'
+});
+let dirty = 0;
+const rows = P.map((p, i) => ({ p, i })).filter(({ p }) => s.uni === 'all' || p[2] === s.uni).map(({ p, i }) => {
+const e = s.edits[i] || {};
+const base = (s.base || {})[i] || {};
+const v0 = base.vis !== undefined ? base.vis : p[4];
+const d0 = base.dis !== undefined ? base.dis : p[5];
+const vis = e.vis !== undefined ? e.vis : v0;
+const dis = e.dis !== undefined ? e.dis : d0;
+const changed = vis !== v0 || dis !== d0;
+if (changed) dirty += 1;
+const a = sw(vis, true);
+const b = sw(dis, true);
+return {
+ref: p[0], name: p[1], uni: p[2], type: p[3],
+pick: () => this.setState({ sel: i }),
+rowStyle: 'border-top:1px solid #efece5;' + (changed ? 'background:#fdf8ec;' : '') + (s.sel === i ? 'box-shadow:inset 3px 0 0 #c09f6a' : ''),
+visChecked: vis ? 'true' : 'false', visLabel: vis ? 'Visible' : 'Masqué', visAria: 'Visible sur le site : ' + p[1], visSwitch: a.sw, visKnob: a.kn,
+toggleVis: () => this.setState({ edits: { ...s.edits, [i]: { ...e, vis: !vis } }, saved: false }),
+disChecked: dis ? 'true' : 'false', disLabel: dis ? 'Disponible' : 'Indisponible', disAria: 'Disponible : ' + p[1], disSwitch: b.sw, disKnob: b.kn,
+toggleDis: () => this.setState({ edits: { ...s.edits, [i]: { ...e, dis: !dis } }, saved: false })
+};
+});
+const g = sw(s.on, false);
+const C = s.costs;
+const cost = (key, label, unit) => {
+const v = C[key];
+const empty = v === '' || v === undefined;
+const zero = v === '0';
+return {
+id: 'cost-' + key, label, unit, v,
+set: (ev) => this.setState({ costs: { ...C, [key]: ev.target.value } }),
+box: 'display:inline-flex;align-items:center;border-radius:6px;overflow:hidden;' + (empty ? 'border:1px dashed #b98a2e;background:#fdf8ec' : 'border:1px solid #dcd6cb'),
+note: empty ? '! Non renseigné' : zero ? 'Coût nul' : '',
+noteStyle: 'grid-column:1 / -1;font-size:12.5px;' + (empty ? 'color:#8c5f0e;font-weight:600' : 'color:#6b665e')
+};
+};
+const sel = P[s.sel];
+return {
+globalBox: 'display:flex;align-items:center;gap:14px;padding:10px 14px;border-radius:10px;border:1px solid ' + (s.on ? '#b7d6c3' : '#dcd6cb') + ';background:' + (s.on ? '#e5f1ea' : '#ffffff'),
+globalTitle: s.on ? 'Catalogue affiché sur le site' : 'Catalogue masqué sur le site',
+globalSub: s.on ? 'Les visiteurs voient les produits visibles.' : 'Seules les pages de demande restent accessibles.',
+globalChecked: s.on ? 'true' : 'false', globalSwitch: g.sw, globalKnob: g.kn,
+askGlobal: () => this.setState({ confirm: true }),
+confirmGlobal: s.confirm,
+confirmText: s.on ? 'Masquer tout le catalogue du site ? Les pages boutique n’afficheront plus aucun produit, mais les visiteurs pourront toujours demander un devis ou un prix.' : 'Afficher de nouveau le catalogue sur le site ? Seuls les produits marqués « Visible » apparaîtront.',
+confirmBtn: s.on ? 'Masquer le catalogue' : 'Afficher le catalogue',
+cancelGlobal: () => this.setState({ confirm: false }),
+doGlobal: () => this.setState({ confirm: false, on: !s.on }),
+setUni: (e) => this.setState({ uni: e.target.value }),
+rows,
+clean: dirty === 0,
+barBg: dirty ? '#fdf8ec' : '#ffffff',
+dirtyLabel: s.saved ? 'Statuts enregistrés.' : dirty ? dirty + (dirty > 1 ? ' statuts modifiés, non enregistrés.' : ' statut modifié, non enregistré.') : 'Aucune modification en attente.',
+saveStyle: 'height:40px;padding:0 16px;border:0;border-radius:6px;font:inherit;font-size:14px;font-weight:600;' + (dirty ? 'background:#c09f6a;color:#161616;cursor:pointer' : 'background:#e8e4db;color:#6b665e'),
+reset: () => this.setState({ edits: {} }),
+save: () => { const b = { ...(s.base || {}) }; Object.keys(s.edits).forEach((k) => { b[k] = { ...(b[k] || {}), ...s.edits[k] }; }); this.setState({ base: b, edits: {}, saved: true }); },
+sel: { name: sel[1], ref: sel[0] + ', ' + sel[2] },
+costs: [cost('mat', 'Matériel', 'FCFA / m²'), cost('conf', 'Confection', 'FCFA / pièce'), cost('liv', 'Livraison', 'FCFA / lot'), cost('pose', 'Pose', 'FCFA / pièce')]
+};
+}
+}
+</script>
+</body>
+</html>

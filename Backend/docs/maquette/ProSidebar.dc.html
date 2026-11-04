@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Espace Pro — barre latérale</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<sc-if value="{{narrow}}" hint-placeholder-val="{{ false }}">
+<div style="position: fixed; left: 0; right: 0; bottom: 0; z-index: 30"><dc-import name="ProTabbar" role="{{role}}" active="{{tabActive}}" theme="{{theme}}" hint-size="100%,84px"></dc-import></div>
+</sc-if>
+<sc-if value="{{wide}}" hint-placeholder-val="{{ true }}">
+<nav aria-label="Modules de l’Espace Pro" style="{{rootStyle}}">
+<div style="{{brandStyle}}">
+<span style="flex: none; width: 38px; height: 38px; border-radius: 50%; background: #ffffff; display: flex; align-items: center; justify-content: center; overflow: hidden"><img src="assets/logo-maison-du-store-am.jpg" alt="" style="width: 34px; height: 34px; object-fit: contain"></span>
+<sc-if value="{{open}}" hint-placeholder-val="{{ true }}">
+<span style="display: flex; flex-direction: column; gap: 1px; min-width: 0">
+<span style="font-family: 'Cormorant Garamond', serif; font-size: 19px; font-weight: 600; line-height: 1.1; color: #ffffff; white-space: nowrap">Maison du Store AM</span>
+<span style="font-size: 12px; color: #a9bab2">Espace professionnel</span>
+</span>
+</sc-if>
+</div>
+
+<div style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 18px; padding: 8px 10px 16px">
+<sc-for list="{{sections}}" as="sec" hint-placeholder-count="3">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<sc-if value="{{sec.showTitle}}" hint-placeholder-val="{{ true }}">
+<span style="padding: 6px 10px; font-size: 12px; font-weight: 600; color: #8fa49b">{{sec.title}}</span>
+</sc-if>
+<sc-for list="{{sec.items}}" as="it" hint-placeholder-count="4">
+<a href="{{it.href}}" aria-current="{{it.current}}" title="{{it.label}}" style="{{it.style}}">
+<span aria-hidden="true" style="{{it.ring}}"></span>
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="{{it.d}}"></path></svg>
+<sc-if value="{{open}}" hint-placeholder-val="{{ true }}"><span style="flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{it.label}}</span></sc-if>
+<sc-if value="{{it.hasCount}}" hint-placeholder-val="{{ false }}"><span aria-label="{{it.countLabel}}" style="{{it.countStyle}}">{{it.count}}</span></sc-if>
+</a>
+</sc-for>
+</div>
+</sc-for>
+</div>
+
+<div style="border-top: 1px solid rgba(255,255,255,0.1); padding: 10px; display: flex; flex-direction: column; gap: 2px">
+<a href="index.html" title="Voir le site" style="{{footLink}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="M14 4h6v6M20 4l-9 9M18 14v6H4V6h6"></path></svg><sc-if value="{{open}}" hint-placeholder-val="{{ true }}"><span>Voir le site</span></sc-if></a>
+<button type="button" onClick="{{toggle}}" aria-expanded="{{expanded}}" aria-label="{{toggleLabel}}" style="{{footBtn}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="{{toggleIcon}}"></path></svg><sc-if value="{{open}}" hint-placeholder-val="{{ true }}"><span>Réduire le menu</span></sc-if></button>
+</div>
+</nav>
+</sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"active":{"editor":"enum","options":["overview","devis","materiaux","rdv","prestations","clients","catalogue","factures","messagerie","documents","images","equipe","today"],"default":"overview"},"role":{"editor":"enum","options":["admin","agent"],"default":"admin"},"collapsed":{"editor":"boolean","default":false},"$preview":{"width":240,"height":900}}'>
+class Component extends DCLogic {
+constructor(props) {
+super(props);
+this.state = { collapsed: null, vw: typeof window !== 'undefined' ? window.innerWidth : 1440 };
+}
+componentDidMount() {
+this.onR = () => { const w = document.documentElement.clientWidth || window.innerWidth; if (w && w !== this.state.vw) this.setState({ vw: w }); };
+window.addEventListener('resize', this.onR);
+if (typeof ResizeObserver !== 'undefined') { this.ro = new ResizeObserver(this.onR); this.ro.observe(document.documentElement); }
+this.t1 = setTimeout(this.onR, 300);
+this.t2 = setTimeout(this.onR, 1200);
+this.onR();
+}
+componentWillUnmount() { window.removeEventListener('resize', this.onR); if (this.ro) this.ro.disconnect(); clearTimeout(this.t1); clearTimeout(this.t2); }
+renderVals() {
+const p = this.props;
+const vw = this.state.vw || 1440;
+const auto = p.collapsed === undefined || p.collapsed === null ? vw < 1200 : !!p.collapsed;
+const collapsed = this.state.collapsed === null ? auto : this.state.collapsed;
+const narrow = vw < 768 && !p.embedded;
+const open = !collapsed;
+const active = p.active ?? 'overview';
+const I = {
+overview: 'M3 13h8V3H3zM13 21h8V11h-8zM13 3v6h8V3zM3 21h8v-6H3z',
+today: 'M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4M8 12a4 4 0 1 0 8 0a4 4 0 1 0-8 0',
+devis: 'M6 3h9l4 4v14H6zM14 3v5h5M9 13h7M9 17h7',
+materiaux: 'M4 7h10M18 7h2M4 17h4M12 17h8M14 5v4M8 15v4',
+rdv: 'M4 5h16v16H4zM4 9h16M8 3v4M16 3v4',
+prestations: 'M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.5-.5-.5-2.5z',
+clients: 'M9 11a4 4 0 1 0 0-8a4 4 0 1 0 0 8zM2 21v-1a7 7 0 0 1 14 0v1M17 3.5a4 4 0 0 1 0 7M22 21v-1a6 6 0 0 0-4-5.6',
+catalogue: 'M4 3h16v18H4zM4 7h16M4 11h16M4 15h16',
+factures: 'M6 2h12v20l-3-2-3 2-3-2-3 2zM9 7h6M9 11h6M9 15h4',
+messagerie: 'M3 5h18v14H3zM3 6l9 7 9-7',
+documents: 'M6 3h9l4 4v14H6zM14 3v5h5M9.5 14l2 2 3.5-4',
+images: 'M3 5h18v14H3zM7 10a1.5 1.5 0 1 0 3 0a1.5 1.5 0 1 0-3 0M21 16l-5-5-8 8',
+equipe: 'M12 12a4 4 0 1 0 0-8a4 4 0 1 0 0 8zM4 21v-1a8 8 0 0 1 16 0v1'
+};
+const H = { overview: 'ProDashboard.dc.html', today: 'ProAgentToday.dc.html', devis: 'ProDevisList.dc.html', rdv: 'ProRdv.dc.html', clients: 'ProClients.dc.html', catalogue: 'ProCatalogue.dc.html', factures: 'ProFacture.dc.html', messagerie: 'ProMessagerie.dc.html', documents: 'ProAutomatisations.dc.html', materiaux: 'ProMateriaux.dc.html', prestations: (p.role === 'agent' ? 'ProPrestation.dc.html' : 'ProPrestations.dc.html'), images: 'ProImages.dc.html', equipe: 'ProEquipe.dc.html' };
+const admin = [
+{ title: '', items: [['overview', 'Vue d’ensemble']] },
+{ title: 'Activité', items: [['devis', 'Devis', 12, 'devis à traiter'], ['materiaux', 'Matériaux et finitions'], ['rdv', 'Rendez-vous', 3, 'rendez-vous à confirmer'], ['prestations', 'Prestations']] },
+{ title: 'Gestion', items: [['clients', 'Clients et contacts'], ['factures', 'Factures'], ['messagerie', 'Messagerie', 5, 'messages non lus']] },
+{ title: 'Site et réglages', items: [['catalogue', 'Catalogue'], ['images', 'Images et portfolio'], ['documents', 'Documents et automatisations'], ['equipe', 'Équipe']] }
+];
+const agent = [
+{ title: '', items: [['today', 'Aujourd’hui']] },
+{ title: 'Mon activité', items: [['prestations', 'Mes prestations'], ['rdv', 'Mes rendez-vous'], ['devis', 'Mes devis']] }
+];
+const src = (p.role ?? 'admin') === 'agent' ? agent : admin;
+const sections = src.map((s) => ({
+title: s.title,
+showTitle: open && !!s.title,
+items: s.items.map(([k, label, count, what]) => {
+const on = k === active;
+return {
+label, d: I[k], href: H[k] || '#',
+current: on ? 'page' : undefined,
+hasCount: !!count,
+count: count || '',
+countLabel: count ? count + ' ' + what : '',
+countStyle: open
+? "margin-left:auto;min-width:22px;height:20px;padding:0 6px;box-sizing:border-box;border-radius:999px;background:#c09f6a;color:#1c1c1c;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:500;display:inline-flex;align-items:center;justify-content:center"
+: "position:absolute;top:4px;right:6px;min-width:18px;height:18px;padding:0 4px;box-sizing:border-box;border-radius:999px;background:#c09f6a;color:#1c1c1c;font-family:'IBM Plex Mono',monospace;font-size:11px;display:inline-flex;align-items:center;justify-content:center",
+ring: 'position:absolute;left:' + (open ? '4px' : '3px') + ';top:50%;margin-top:-4px;width:8px;height:8px;box-sizing:border-box;border-radius:50%;border:2px solid #c09f6a;background:' + (on ? '#c09f6a' : 'transparent') + ';opacity:' + (on ? '1' : '0'),
+style: 'position:relative;display:flex;align-items:center;gap:12px;min-height:40px;padding:0 ' + (open ? '10px 0 20px' : '0') + ';' + (open ? '' : 'justify-content:center;') + 'border-radius:6px;text-decoration:none;font-size:14px;font-weight:' + (on ? '600' : '500') + ';color:' + (on ? '#ffffff' : '#d3dcd7') + ';background:' + (on ? 'rgba(255,255,255,0.09)' : 'transparent')
+};
+})
+}));
+const btnBase = 'display:flex;align-items:center;gap:12px;min-height:40px;border-radius:6px;font:inherit;font-size:14px;color:#c4d0ca;text-decoration:none;background:transparent;border:0;cursor:pointer;' + (open ? 'padding:0 10px 0 20px' : 'justify-content:center;padding:0');
+const roleKey = (p.role ?? 'admin') === 'agent' ? 'agent' : 'admin';
+const tabMap = roleKey === 'agent'
+? { today: 'today', prestations: 'prestations', devis: 'devis', rdv: 'rdv' }
+: { overview: 'home', devis: 'devis', rdv: 'rdv', clients: 'clients' };
+return {
+narrow, wide: !narrow, theme: p.theme || '',
+role: roleKey,
+tabActive: tabMap[active] || (roleKey === 'agent' ? 'profil' : 'plus'),
+open,
+sections,
+rootStyle: "font-family:Inter,system-ui,sans-serif;color:#ffffff;background:#20332c;display:flex;flex-direction:column;box-sizing:border-box;position:sticky;top:0;align-self:flex-start;height:100vh;width:" + (open ? '240px' : '68px') + ';transition:width 180ms ease',
+brandStyle: 'display:flex;align-items:center;gap:10px;height:64px;box-sizing:border-box;border-bottom:1px solid rgba(255,255,255,0.1);' + (open ? 'padding:0 16px' : 'padding:0;justify-content:center'),
+footLink: btnBase,
+footBtn: btnBase,
+expanded: open ? 'true' : 'false',
+toggleLabel: open ? 'Réduire le menu' : 'Déplier le menu',
+toggleIcon: open ? 'M15 6l-6 6 6 6' : 'M9 6l6 6-6 6',
+toggle: () => this.setState({ collapsed: open })
+};
+}
+}
+</script>
+</body>
+</html>
