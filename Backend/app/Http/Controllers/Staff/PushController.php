@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Staff;
 
 use App\Models\PushSubscription;
+use App\Services\StaffInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -13,6 +14,16 @@ class PushController
         $notifications = $request->user()->notifications()->latest()->paginate(30);
         $request->user()->unreadNotifications()->update(['read_at' => now()]);
         return view('staff.notifications', compact('notifications'));
+    }
+
+    /** Bulles et cloche : lecture seule, limitée à la personne connectée, sans marquer les alertes comme lues. */
+    public function recent(Request $request)
+    {
+        $user = $request->user();
+        return response()->json([
+            'count' => $user->unreadNotifications()->count(),
+            'items' => $user->notifications()->latest()->limit(6)->get()->map(fn ($notification) => StaffInterface::notification($notification))->values(),
+        ]);
     }
 
     public function publicKey()

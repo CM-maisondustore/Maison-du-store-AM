@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Barre latérale</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./assets/espace-pro.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<nav class="sidebar" aria-label="Modules de l’Espace Pro">
+<a class="brand" href="#menu">
+<span class="brand-logo"><img src="./assets/logo-maison-du-store-am.jpg" alt=""></span>
+<span class="brand-text"><strong>Maison du Store AM</strong><span>Espace professionnel</span></span>
+</a>
+<div class="nav-scroll" id="menu">
+<sc-for list="{{sections}}" as="section" hint-placeholder-count="3">
+<div class="nav-section">
+<sc-if value="{{section.title}}" hint-placeholder-val="{{ true }}"><span class="nav-title">{{section.title}}</span></sc-if>
+<sc-for list="{{section.items}}" as="item" hint-placeholder-count="4">
+<a class="nav-link" href="#menu" title="{{item.label}}" aria-current="{{item.current}}">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{item.d}}"></path></svg>
+<span class="nav-label">{{item.label}}</span>
+<sc-if value="{{item.count}}" hint-placeholder-val="{{ false }}"><span class="nav-count">{{item.count}}</span></sc-if>
+</a>
+</sc-for>
+</div>
+</sc-for>
+</div>
+<div class="nav-foot">
+<a class="nav-link" href="#menu"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v6H4V6h6"></path></svg><span class="nav-label">Voir le site</span></a>
+<button type="button" class="nav-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg><span class="nav-label">Réduire le menu</span></button>
+</div>
+</nav>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"active":{"editor":null,"default":"devis"},"$preview":{"width":240,"height":900}}'>
+class Component extends DCLogic {
+renderVals() {
+const active = this.props.active ?? 'devis';
+const item = (key, label, d, count) => ({ label, d, count, current: key === active ? 'page' : undefined });
+return { sections: [
+{ title: '', items: [item('overview', 'Vue d’ensemble', 'M3 13h8V3H3zM13 21h8V11h-8zM13 3v6h8V3zM3 21h8v-6H3z')] },
+{ title: 'Activité', items: [
+item('devis', 'Devis', 'M6 3h9l4 4v14H6zM14 3v5h5M9 13h7M9 17h7', 4),
+item('materiaux', 'Matériaux et finitions', 'M4 7h10M18 7h2M4 17h4M12 17h8M14 5v4M8 15v4'),
+item('rdv', 'Rendez-vous', 'M4 5h16v16H4zM4 9h16M8 3v4M16 3v4', 1),
+item('prestations', 'Prestations', 'M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.5-.5-.5-2.5z')] },
+{ title: 'Gestion', items: [
+item('clients', 'Clients et contacts', 'M9 11a4 4 0 1 0 0-8a4 4 0 1 0 0 8zM2 21v-1a7 7 0 0 1 14 0v1M17 3.5a4 4 0 0 1 0 7M22 21v-1a6 6 0 0 0-4-5.6'),
+item('factures', 'Factures', 'M6 2h12v20l-3-2-3 2-3-2-3 2zM9 7h6M9 11h6M9 15h4'),
+item('messagerie', 'Messagerie', 'M3 5h18v14H3zM3 6l9 7 9-7')] },
+{ title: 'Site et réglages', items: [
+item('catalogue', 'Catalogue', 'M4 3h16v18H4zM4 7h16M4 11h16M4 15h16'),
+item('images', 'Images et portfolio', 'M3 5h18v14H3zM7 10a1.5 1.5 0 1 0 3 0a1.5 1.5 0 1 0-3 0M21 16l-5-5-8 8'),
+item('documents', 'Documents et automatisations', 'M6 3h9l4 4v14H6zM14 3v5h5M9.5 14l2 2 3.5-4'),
+item('layout', 'Mise en page', 'M4 3h16v18H4zM4 8h16M9 8v13'),
+item('equipe', 'Équipe', 'M12 12a4 4 0 1 0 0-8a4 4 0 1 0 0 8zM4 21v-1a8 8 0 0 1 16 0v1')] },
+] };
+}
+}
+</script>
+</body>
+</html>

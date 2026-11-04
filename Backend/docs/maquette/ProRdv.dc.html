@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Espace Pro — rendez-vous</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="color-scheme: {{colorScheme}}; font-family: Inter, system-ui, sans-serif; color: {{pal.t353535}}; background: {{pal.sf4f4f1}}; min-height: 100vh; display: flex">
+<dc-import name="ProSidebar" active="rdv" hint-size="240px,100%"></dc-import>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+<dc-import name="ProTopbar" role="admin" hint-size="100%,64px"></dc-import>
+<main id="contenu" style="padding: 24px 32px 48px; display: flex; flex-direction: column; gap: 18px">
+
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px">
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 16px">
+<h1 style="margin: 0; font-family: 'Cormorant Garamond', serif; font-size: 34px; font-weight: 500; color: {{pal.t1c1c1c}}">Rendez-vous</h1>
+<span style="font-size: 14px; color: {{pal.t6b665e}}">Semaine du <span style="font-family: 'IBM Plex Mono', monospace">26/10</span> au <span style="font-family: 'IBM Plex Mono', monospace">31/10/2026</span></span>
+</div>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px">
+<button type="button" aria-label="Semaine précédente" style="width: 40px; height: 40px; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; background: {{pal.sffffff}}; color: {{pal.t1c1c1c}}">‹</button>
+<button type="button" style="height: 40px; padding: 0 12px; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; background: {{pal.sffffff}}; font: inherit; font-size: 14px; color: {{pal.t1c1c1c}}">Aujourd’hui</button>
+<button type="button" aria-label="Semaine suivante" style="width: 40px; height: 40px; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; background: {{pal.sffffff}}; color: {{pal.t1c1c1c}}">›</button>
+<div role="tablist" aria-label="Affichage" style="display: inline-flex; padding: 3px; border-radius: 999px; background: {{pal.se9e8e2}}; gap: 2px; margin-left: 8px">
+<sc-for list="{{views}}" as="v" hint-placeholder-count="3"><button type="button" role="tab" aria-selected="{{v.sel}}" onClick="{{v.pick}}" style="{{v.style}}">{{v.label}}</button></sc-for>
+</div>
+</div>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 13px; color: {{pal.t353535}}" aria-label="Légende des états">
+<sc-for list="{{legend}}" as="g" hint-placeholder-count="4"><span style="{{g.style}}"><span aria-hidden="true">{{g.glyph}}</span>{{g.label}}</span></sc-for>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+<section aria-label="Calendrier" style="flex: 999 1 720px; min-width: 0; background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 10px; overflow: hidden">
+<sc-if value="{{isWeek}}" hint-placeholder-val="{{ true }}">
+<div style="overflow-x: auto">
+<div style="min-width: 760px">
+<div style="display: grid; grid-template-columns: 64px repeat(6, minmax(0, 1fr)); border-bottom: 1px solid {{pal.be8e4db}}; background: {{pal.sf9f8f4}}">
+<span></span>
+<sc-for list="{{days}}" as="d" hint-placeholder-count="6"><span style="{{d.head}}"><span aria-hidden="true" style="{{d.ring}}"></span>{{d.label}}</span></sc-for>
+</div>
+<div style="display: grid; grid-template-columns: 64px repeat(6, minmax(0, 1fr))">
+<div style="display: flex; flex-direction: column">
+<sc-for list="{{hours}}" as="h" hint-placeholder-count="10"><span style="height: 56px; box-sizing: border-box; padding: 4px 8px 0 0; text-align: right; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: {{pal.t6b665e}}; border-top: 1px solid {{pal.bf1eee8}}">{{h}}</span></sc-for>
+</div>
+<sc-for list="{{days}}" as="d" hint-placeholder-count="6">
+<div style="{{d.col}}">
+<sc-for list="{{hours}}" as="h" hint-placeholder-count="10"><span aria-hidden="true" style="display: block; height: 56px; box-sizing: border-box; border-top: 1px solid {{pal.bf1eee8}}"></span></sc-for>
+<sc-for list="{{d.ev}}" as="e" hint-placeholder-count="2">
+<button type="button" onClick="{{e.pick}}" aria-pressed="{{e.pressed}}" aria-label="{{e.aria}}" style="{{e.style}}">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px">{{e.time}}</span>
+<span style="{{e.titleStyle}}">{{e.client}}</span>
+<span style="font-size: 11.5px; opacity: 0.85">{{e.kind}}</span>
+</button>
+</sc-for>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+</sc-if>
+<sc-if value="{{isList}}" hint-placeholder-val="{{ false }}">
+<table style="width: 100%; border-collapse: collapse; font-size: 14px">
+<thead><tr style="text-align: left; background: {{pal.sf9f8f4}}"><th scope="col" style="padding: 10px 16px; font-size: 13px; font-weight: 600; color: {{pal.t6b665e}}">Date et heure</th><th scope="col" style="padding: 10px 12px; font-size: 13px; font-weight: 600; color: {{pal.t6b665e}}">Client</th><th scope="col" style="padding: 10px 12px; font-size: 13px; font-weight: 600; color: {{pal.t6b665e}}">Lieu</th><th scope="col" style="padding: 10px 12px; font-size: 13px; font-weight: 600; color: {{pal.t6b665e}}">Agent</th><th scope="col" style="padding: 10px 16px 10px 12px; font-size: 13px; font-weight: 600; color: {{pal.t6b665e}}">État</th></tr></thead>
+<tbody>
+<sc-for list="{{all}}" as="e" hint-placeholder-count="8">
+<tr style="border-top: 1px solid {{pal.befece5}}"><td style="padding: 10px 16px; font-family: 'IBM Plex Mono', monospace; font-size: 13px">{{e.full}}</td><td style="padding: 10px 12px; color: {{pal.t1c1c1c}}; font-weight: 500">{{e.client}}</td><td style="padding: 10px 12px">{{e.kind}}</td><td style="padding: 10px 12px">{{e.agent}}</td><td style="padding: 10px 16px 10px 12px"><span style="{{e.badge}}"><span aria-hidden="true">{{e.glyph}}</span>{{e.st}}</span></td></tr>
+</sc-for>
+</tbody>
+</table>
+</sc-if>
+<sc-if value="{{isDay}}" hint-placeholder-val="{{ false }}">
+<div style="padding: 20px; display: flex; flex-direction: column; gap: 10px">
+<h2 style="margin: 0; font-size: 16px; font-weight: 600; color: {{pal.t1c1c1c}}">Lundi 26/10/2026</h2>
+<sc-for list="{{today}}" as="e" hint-placeholder-count="3">
+<button type="button" onClick="{{e.pick}}" style="display: grid; grid-template-columns: 110px 1fr auto; gap: 16px; align-items: center; padding: 12px 14px; border: 1px solid {{pal.be8e4db}}; border-radius: 6px; background: {{pal.sffffff}}; font: inherit; text-align: left; cursor: pointer"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px">{{e.time}}</span><span style="display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 600; color: {{pal.t1c1c1c}}">{{e.client}}</span><span style="font-size: 13px; color: {{pal.t6b665e}}">{{e.kind}}, {{e.agent}}</span></span><span style="{{e.badge}}"><span aria-hidden="true">{{e.glyph}}</span>{{e.st}}</span></button>
+</sc-for>
+</div>
+</sc-if>
+</section>
+
+<aside aria-labelledby="sel-title" style="flex: 1 1 300px; min-width: 0; background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 10px; padding: 18px 20px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px">
+<h2 id="sel-title" style="margin: 0; font-size: 17px; font-weight: 600; color: {{pal.t1c1c1c}}">{{sel.client}}</h2>
+<span style="{{sel.badge}}"><span aria-hidden="true">{{sel.glyph}}</span>{{sel.st}}</span>
+</div>
+<dl style="margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 8px 14px; font-size: 14px">
+<dt style="color: {{pal.t6b665e}}">Quand</dt><dd style="margin: 0; font-family: 'IBM Plex Mono', monospace">{{sel.full}}</dd>
+<dt style="color: {{pal.t6b665e}}">Lieu</dt><dd style="margin: 0">{{sel.kind}}</dd>
+<dt style="color: {{pal.t6b665e}}">Téléphone</dt><dd style="margin: 0; font-family: 'IBM Plex Mono', monospace">{{sel.tel}}</dd>
+<dt style="color: {{pal.t6b665e}}">Projet</dt><dd style="margin: 0">{{sel.projet}}</dd>
+</dl>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 500; color: {{pal.t1c1c1c}}">Agent affecté
+<select style="height: 42px; padding: 0 10px; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font: inherit; font-weight: 400; font-size: 14px"><option>{{sel.agent}}</option><option>Koffi Brou</option><option>Yao Serge</option><option>Aïcha Diabaté</option></select></label>
+<sc-if value="{{sel.canConfirm}}" hint-placeholder-val="{{ true }}"><button type="button" onClick="{{confirm}}" style="height: 44px; border: 0; border-radius: 6px; background: #c09f6a; font: inherit; font-size: 14px; font-weight: 600; color: #161616; cursor: pointer">Confirmer le rendez-vous</button></sc-if>
+<div style="display: flex; gap: 8px">
+<button type="button" style="flex: 1; height: 44px; border: 1px solid {{pal.b20332c}}; border-radius: 6px; background: {{pal.sffffff}}; font: inherit; font-size: 14px; font-weight: 600; color: {{pal.t20332c}}">Déplacer</button>
+<button type="button" onClick="{{cancel}}" style="flex: 1; height: 44px; border: 1px solid {{pal.be3c3bf}}; border-radius: 6px; background: {{pal.sffffff}}; font: inherit; font-size: 14px; font-weight: 600; color: {{pal.tb3392f}}">Annuler</button>
+</div>
+<p style="margin: 0; font-size: 13px; line-height: 1.5; color: {{pal.t6b665e}}">Annuler libère le créneau et prévient le client si la règle « RDV confirmé » est active.</p>
+</aside>
+</div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1150}}'>
+class Component extends DCLogic {
+constructor(props) {
+super(props);
+this.state = { view: 'week', sel: 'e2', over: {} };
+}
+isDark() {
+const t = this.props.theme;
+if (t === 'dark') return true;
+if (t === 'light') return false;
+let v = 'light';
+try { v = window.localStorage.getItem('mds-pro-theme') || 'light'; } catch (e) {}
+if (v === 'dark') return true;
+if (v === 'auto') { try { return window.matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) {} }
+return false;
+}
+themeMaps() { return { s: {"#ffffff": "#1b2220", "#f4f4f1": "#121816", "#f9f8f4": "#202825", "#fbfaf7": "#1e2623", "#fdfbf6": "#222a27", "#fcfbf8": "#1e2623", "#faf9f7": "#1e2623", "#fffcf5": "#2b2618", "#f1f0ec": "#262e2b", "#ece9e2": "#2a322f", "#e9e8e2": "#2a302d", "#e9e6df": "#0f1412", "#eef0ec": "#232b28", "#eef1ef": "#202826", "#edf1f4": "#1d2530", "#e8e4db": "#313a36", "#dcd6cb": "#3b4540", "#f1eee8": "#29312e", "#efece5": "#29312e", "#cfc9bd": "#4c5751", "#cfc8bb": "#4c5751", "#e1ddd3": "#3b4540", "#b9b4aa": "#5a645e", "#20332c": "#2b4a3e", "#2b4239": "#34574a", "#e5f1ea": "#1d3a2b", "#b7d6c3": "#2f5a43", "#fdf8ec": "#2d2717", "#ecd7a8": "#5b4a25", "#fbf1dc": "#382d15", "#e3c2bd": "#5e302b", "#e3c3bf": "#5e302b", "#fbeceb": "#3a1f1c", "#e8eef5": "#1d2a38", "#eeede8": "#2a302d", "#f6f0e4": "#2f2a1f", "#f3f3f3": "#262e2b", "#cccccc": "#46504b", "#fdf6f5": "#33201e", "#f8e6e4": "#3a2220", "#fbf6ea": "#2d2717", "#ecdcb9": "#5b4a25", "#f6ece5": "#33241d", "#efe9dd": "#2a2620", "#d9b26a": "#8a6a2c", "#b98a2e": "#8a6a2c"}, b: {"#ffffff": "#1b2220", "#f4f4f1": "#121816", "#f9f8f4": "#202825", "#fbfaf7": "#1e2623", "#fdfbf6": "#222a27", "#fcfbf8": "#1e2623", "#faf9f7": "#1e2623", "#fffcf5": "#2b2618", "#f1f0ec": "#262e2b", "#ece9e2": "#2a322f", "#e9e8e2": "#2a302d", "#e9e6df": "#0f1412", "#eef0ec": "#232b28", "#eef1ef": "#202826", "#edf1f4": "#1d2530", "#e8e4db": "#313a36", "#dcd6cb": "#3b4540", "#f1eee8": "#29312e", "#efece5": "#29312e", "#cfc9bd": "#4c5751", "#cfc8bb": "#4c5751", "#e1ddd3": "#3b4540", "#b9b4aa": "#5a645e", "#20332c": "#5d8a76", "#2b4239": "#34574a", "#e5f1ea": "#1d3a2b", "#b7d6c3": "#2f5a43", "#fdf8ec": "#2d2717", "#ecd7a8": "#5b4a25", "#fbf1dc": "#382d15", "#e3c2bd": "#5e302b", "#e3c3bf": "#5e302b", "#fbeceb": "#3a1f1c", "#e8eef5": "#1d2a38", "#eeede8": "#2a302d", "#f6f0e4": "#2f2a1f", "#f3f3f3": "#262e2b", "#cccccc": "#46504b", "#fdf6f5": "#33201e", "#f8e6e4": "#3a2220", "#fbf6ea": "#2d2717", "#ecdcb9": "#5b4a25", "#f6ece5": "#33241d", "#efe9dd": "#2a2620", "#d9b26a": "#8a6a2c", "#b98a2e": "#8a6a2c", "#1c1c1c": "#d6d2c9", "#b3392f": "#f28b80"}, t: {"#1c1c1c": "#f1eee8", "#353535": "#d6d2c9", "#6b665e": "#a8a296", "#20332c": "#bfd8cb", "#84642f": "#d8b47a", "#2f7350": "#86cfa3", "#8c5f0e": "#e6b862", "#5e4108": "#f0d39a", "#b3392f": "#f28b80", "#7c241c": "#f5b0a8", "#3f6285": "#9ec0e3", "#2c4866": "#bcd3ea", "#5c5852": "#c9c4ba", "#b0aaa0": "#6c736e", "#3d2b06": "#f0dcb3", "#1f4d35": "#bfe3cc", "#8f2c24": "#f5b0a8", "#6e4a0b": "#e6c27a", "#3f5a72": "#a9c3dc", "#3f5a73": "#a9c3dc", "#8e4529": "#e0a084", "#5a5248": "#cfc8bb", "#b98a2e": "#d9ac57", "#2c4660": "#a9c3dc"} }; }
+themeWatch() {
+if (this.__thw || typeof window === 'undefined') return;
+this.__thw = true;
+const bump = () => this.setState({ __th: Date.now() });
+try { window.addEventListener('storage', (e) => { if (e.key === 'mds-pro-theme') bump(); }); } catch (e) {}
+try { window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', bump); } catch (e) {}
+}
+dmap(v) {
+const T = this.themeMaps();
+const cv = (str) => str.split(';').map((seg) => {
+const i = seg.indexOf(':');
+let M = T.s;
+if (i > -1) { const p = seg.slice(0, i).trim().toLowerCase(); M = /^(color|stroke|fill|caret-color|accent-color|text-decoration-color)$/.test(p) ? T.t : /^(border|outline|box-shadow)/.test(p) ? T.b : T.s; }
+return seg.replace(/#[0-9a-fA-F]{6}/g, (h) => M[h.toLowerCase()] || h);
+}).join(';');
+const go = (x) => (typeof x === 'string' ? cv(x) : Array.isArray(x) ? x.map(go) : x && typeof x === 'object' && Object.prototype.toString.call(x) === '[object Object]' ? Object.keys(x).reduce((o, k) => { o[k] = go(x[k]); return o; }, {}) : x);
+return go(v);
+}
+renderVals() {
+this.themeWatch();
+const dark = this.isDark();
+let v = this.renderValsLight();
+if (dark) v = this.dmap(v);
+const T = this.themeMaps();
+const pal = {};
+['s', 'b', 't'].forEach((k) => { Object.keys(T[k]).forEach((h) => { pal[k + h.slice(1)] = dark ? T[k][h] : h; }); });
+v.pal = pal;
+v.themeDark = dark;
+v.colorScheme = dark ? 'dark' : 'light';
+return v;
+}
+renderValsLight() {
+const s = this.state;
+const SC = { 'À traiter': ['#8c5f0e', '#fbf1dc', '!', '1px dashed #b98a2e'], 'Confirmé': ['#2f7350', '#e5f1ea', '✓', '1px solid #b7d6c3'], 'Annulé': ['#5c5852', '#f1f0ec', '–', '1px solid #dcd6cb'], 'Terminé': ['#5c5852', '#eeede8', '●', '1px solid #dcd6cb'] };
+const DAYS = ['lun. 26/10', 'mar. 27/10', 'mer. 28/10', 'jeu. 29/10', 'ven. 30/10', 'sam. 31/10'];
+const E = [
+['e0', 0, 8, 0.75, 'M. Assi Jean-Marc', 'Téléphone', 'Aïcha Diabaté', 'Terminé', '07 07 22 41 90', 'Rideaux salon'],
+['e1', 0, 10, 1, 'M. Kacou Hervé', 'Au showroom', 'Aïcha Diabaté', 'Confirmé', '05 44 18 72 03', 'Stores bureau'],
+['e2', 0, 15, 1, 'Mme Koné Mariam', 'À domicile, Angré 8e tranche', 'Non affecté', 'À traiter', '07 49 30 11 58', 'Rideaux et voilages, 3 pièces'],
+['e3', 1, 10, 1.5, 'M. Bamba Ibrahim', 'À domicile, Marcory Zone 4', 'Koffi Brou', 'Confirmé', '01 02 55 87 64', 'SAV moteur store'],
+['e4', 1, 15, 0.5, 'M. Yao Patrick', 'Téléphone', 'Aïcha Diabaté', 'À traiter', '07 77 40 12 95', 'Stores vénitiens'],
+['e5', 2, 9, 1, 'Mme Yapi Christelle', 'Au showroom', 'Aïcha Diabaté', 'Annulé', '05 05 61 28 47', 'Store enrouleur'],
+['e6', 3, 11, 1, 'Résidence Les Palmiers', 'À domicile, Bingerville', 'Yao Serge', 'Confirmé', '27 22 41 08 66', '12 appartements'],
+['e7', 3, 16, 1, 'M. Gnagne Rodrigue', 'Visio', 'Non affecté', 'À traiter', '07 89 14 03 22', 'Rideaux villa'],
+['e8', 4, 9.5, 1, 'Mme Ouattara Fatou', 'Au showroom', 'Aïcha Diabaté', 'Confirmé', '07 58 44 21 09', 'Choix des tissus'],
+['e9', 5, 10, 1, 'Mme Touré Aminata', 'À domicile, Riviera Palmeraie', 'Koffi Brou', 'Confirmé', '07 12 90 33 48', 'Stores chambre']
+].map((e) => ({ id: e[0], d: e[1], h: e[2], dur: e[3], client: e[4], kind: e[5], agent: e[6], st: s.over[e[0]] || e[7], tel: e[8], projet: e[9] }));
+const hh = (x) => String(Math.floor(x)).padStart(2, '0') + ':' + (x % 1 ? String(Math.round((x % 1) * 60)).padStart(2, '0') : '00');
+const deco = (e) => {
+const c = SC[e.st];
+return {
+...e,
+time: hh(e.h) + '–' + hh(e.h + e.dur),
+full: DAYS[e.d] + '/2026, ' + hh(e.h) + '–' + hh(e.h + e.dur),
+badge: 'display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:999px;font-size:12.5px;font-weight:600;white-space:nowrap;color:' + c[0] + ';background:' + c[1],
+glyph: c[2],
+pick: () => this.setState({ sel: e.id }),
+pressed: s.sel === e.id ? 'true' : 'false',
+aria: e.client + ', ' + DAYS[e.d] + ' ' + hh(e.h) + ', ' + e.st,
+style: 'position:absolute;left:4px;right:4px;top:' + ((e.h - 8) * 56 + 2) + 'px;height:' + (e.dur * 56 - 4) + 'px;box-sizing:border-box;padding:4px 6px;border-radius:6px;display:flex;flex-direction:column;gap:1px;overflow:hidden;text-align:left;font:inherit;cursor:pointer;color:' + c[0] + ';background:' + c[1] + ';border:' + c[3] + ';' + (s.sel === e.id ? 'outline:2px solid #20332c;outline-offset:1px;' : ''),
+titleStyle: 'font-size:12.5px;font-weight:600;line-height:1.2;' + (e.st === 'Annulé' ? 'text-decoration:line-through' : '')
+};
+};
+const all = E.map(deco);
+const sel = all.find((e) => e.id === s.sel) || all[0];
+return {
+views: [['week', 'Semaine'], ['day', 'Jour'], ['list', 'Liste']].map(([k, label]) => ({ label, sel: s.view === k ? 'true' : 'false', pick: () => this.setState({ view: k }),
+style: 'height:34px;padding:0 14px;border-radius:999px;border:0;font:inherit;font-size:13px;font-weight:600;cursor:pointer;' + (s.view === k ? 'background:#ffffff;color:#1c1c1c;box-shadow:0 1px 3px rgba(32,51,44,0.2)' : 'background:transparent;color:#6b665e') })),
+isWeek: s.view === 'week', isDay: s.view === 'day', isList: s.view === 'list',
+legend: ['À traiter', 'Confirmé', 'Terminé', 'Annulé'].map((k) => ({ label: k, glyph: SC[k][2], style: 'display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:999px;font-weight:600;color:' + SC[k][0] + ';background:' + SC[k][1] })),
+hours: ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'],
+days: DAYS.map((label, i) => ({
+label,
+head: 'display:flex;align-items:center;gap:6px;padding:10px;font-size:13px;font-weight:600;border-left:1px solid #e8e4db;color:' + (i === 0 ? '#1c1c1c' : '#6b665e'),
+ring: 'width:8px;height:8px;box-sizing:border-box;border-radius:50%;border:2px solid #c09f6a;background:#c09f6a;opacity:' + (i === 0 ? '1' : '0'),
+col: 'position:relative;border-left:1px solid #e8e4db;' + (i === 0 ? 'background:#fcfbf8' : ''),
+ev: all.filter((e) => e.d === i)
+})),
+all,
+today: all.filter((e) => e.d === 0),
+sel: { ...sel, canConfirm: sel.st === 'À traiter' },
+confirm: () => this.setState({ over: { ...s.over, [sel.id]: 'Confirmé' } }),
+cancel: () => this.setState({ over: { ...s.over, [sel.id]: 'Annulé' } })
+};
+}
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Espace Pro — devis D-2026-0140</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="color-scheme: {{colorScheme}}; font-family: Inter, system-ui, sans-serif; color: {{pal.t353535}}; background: {{pal.sf4f4f1}}; min-height: 100vh; display: flex">
+<dc-import name="ProSidebar" active="devis" hint-size="240px,100%"></dc-import>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+<dc-import name="ProTopbar" role="admin" hint-size="100%,64px"></dc-import>
+<main id="contenu" style="flex: 1; padding: 24px 32px 0; display: flex; flex-direction: column; gap: 20px">
+
+<div style="display: flex; flex-direction: column; gap: 6px">
+<nav aria-label="Fil d’Ariane" style="font-size: 13px; color: {{pal.t6b665e}}"><a href="ProDevisList.dc.html" style="color: {{pal.t6b665e}}">Devis</a> / <span aria-current="page" style="font-family: 'IBM Plex Mono', monospace">D-2026-0140</span></nav>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px">
+<h1 style="margin: 0; font-family: 'Cormorant Garamond', serif; font-size: 34px; font-weight: 500; color: {{pal.t1c1c1c}}">Cabinet Traoré &amp; Associés</h1>
+<span style="{{stateBadge}}"><span aria-hidden="true">{{stateGlyph}}</span>{{stateLabel}}</span>
+</div>
+<p style="margin: 0; font-size: 14px; color: {{pal.t6b665e}}">Devis <span style="font-family: 'IBM Plex Mono', monospace">D-2026-0140</span>, créé sur place le 24/10/2026 par Yao Serge.</p>
+</div>
+
+<sc-if value="{{isConcurrent}}" hint-placeholder-val="{{ false }}">
+<div role="alert" style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; padding: 14px 16px; border-radius: 10px; background: {{pal.sfbf1dc}}; border: 1px solid {{pal.becd7a8}}; color: {{pal.t5e4108}}">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3l10 18H2zM12 10v5M12 18h.01"></path></svg>
+<p style="margin: 0; flex: 1 1 400px; font-size: 14px; line-height: 1.5"><strong>Koffi Brou a enregistré ce devis à 10:47</strong> pendant que vous le modifiiez. Vos changements ne sont pas encore enregistrés : comparez avant d’écraser sa version.</p>
+<span style="display: flex; gap: 8px"><button type="button" style="height: 40px; padding: 0 14px; background: {{pal.sffffff}}; border: 1px solid #8c5f0e; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; color: {{pal.t5e4108}}">Comparer les versions</button><button type="button" style="height: 40px; padding: 0 14px; background: transparent; border: 0; font: inherit; font-size: 14px; font-weight: 600; color: {{pal.t5e4108}}; text-decoration: underline">Recharger sa version</button></span>
+</div>
+</sc-if>
+<sc-if value="{{isLocked}}" hint-placeholder-val="{{ false }}">
+<div role="status" style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; padding: 14px 16px; border-radius: 10px; background: {{pal.se8eef5}}; border: 1px solid #c9d6e5; color: {{pal.t2c4660}}">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 11h12v10H6zM8 11V7a4 4 0 0 1 8 0v4"></path></svg>
+<p style="margin: 0; flex: 1 1 400px; font-size: 14px; line-height: 1.5"><strong>Devis verrouillé.</strong> Le client l’a accepté le 25/10/2026 : les montants et les fenêtres ne peuvent plus changer. Pour le modifier, créez une nouvelle version.</p>
+<button type="button" style="height: 40px; padding: 0 14px; background: {{pal.sffffff}}; border: 1px solid #3f6285; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; color: {{pal.t2c4660}}">Créer une nouvelle version</button>
+</div>
+</sc-if>
+
+<div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+<form onSubmit="{{noSubmit}}" style="flex: 999 1 720px; min-width: 0; display: flex; flex-direction: column; gap: 20px; padding-bottom: 24px">
+<fieldset disabled="{{isLocked}}" style="border: 0; margin: 0; padding: 0; min-width: 0; display: flex; flex-direction: column; gap: 20px">
+
+<section id="s-client" aria-labelledby="h-client" style="{{panel}}">
+<h2 id="h-client" style="{{h2}}"><span style="{{num}}">1</span>Client</h2>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px 16px">
+<label style="{{label}}">Nom ou raison sociale<input type="text" value="Cabinet Traoré &amp; Associés" style="{{input}}">
+<span style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 400; color: {{pal.t2f7350}}"><span aria-hidden="true">✓</span>Client existant : 3 devis, dernier en 2025</span></label>
+<label style="{{label}}">Prénom <span style="font-weight: 400; color: {{pal.t6b665e}}">(facultatif)</span><input type="text" placeholder="Pour un particulier" style="{{input}}"></label>
+<label style="{{label}}">Téléphone<input type="tel" value="07 08 12 34 56" style="{{input}}"></label>
+<label style="{{label}}">E-mail <span style="font-weight: 400; color: {{pal.t6b665e}}">(facultatif)</span><input type="email" value="secretariat@traore-associes.ci" style="{{input}}"></label>
+<label style="{{labelWide}}">Adresse<input type="text" value="Immeuble Alpha 2000, 6e étage, avenue Chardy, Plateau, Abidjan" style="{{input}}"></label>
+</div>
+</section>
+
+<section id="s-choix" aria-labelledby="h-choix" style="{{panel}}">
+<h2 id="h-choix" style="{{h2}}"><span style="{{num}}">2</span>Choix communs</h2>
+<p style="margin: -6px 0 0; font-size: 14px; color: {{pal.t6b665e}}">Appliqués à toutes les fenêtres, sauf celles marquées « personnalisée ».</p>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px 16px">
+<label style="{{label}}">Catégorie<select style="{{input}}"><option>Store enrouleur</option><option>Store vénitien</option><option>Rideau</option><option>Rideau et voilage</option></select></label>
+<label style="{{label}}">Matériau du store<select style="{{input}}"><option>Toile occultante polyester, Lin</option><option>Toile tamisante, Gris perle</option><option>Screen 5 %, Anthracite</option></select></label>
+<label style="{{label}}">Motorisation<select style="{{input}}"><option>Moteur radio et télécommande</option><option>Moteur filaire</option><option>Aucune (chaînette)</option></select></label>
+<label style="{{label}}">Finition<select style="{{input}}"><option>Barre de charge alu laquée</option><option>Barre de charge plate</option></select></label>
+</div>
+<fieldset style="border: 1px solid {{pal.be8e4db}}; border-radius: 6px; margin: 0; padding: 10px 14px 6px">
+<legend style="padding: 0 6px; font-size: 14px; font-weight: 600; color: {{pal.t1c1c1c}}">Fournitures compatibles</legend>
+<sc-for list="{{supplies}}" as="f" hint-placeholder-count="4">
+<div style="display: flex; align-items: center; gap: 12px; min-height: 44px; border-bottom: 1px solid {{pal.bf1eee8}}">
+<label style="flex: 1; display: flex; align-items: center; gap: 10px; font-size: 14px; color: {{pal.t1c1c1c}}"><input type="checkbox" checked="{{f.on}}" onChange="{{f.toggle}}" style="width: 18px; height: 18px; margin: 0; accent-color: {{pal.t20332c}}">{{f.label}}</label>
+<label style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: {{pal.t6b665e}}">Quantité<span style="display: inline-flex; align-items: center; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; overflow: hidden"><input type="number" value="{{f.q}}" disabled="{{f.off}}" style="width: 64px; height: 34px; box-sizing: border-box; padding: 0 8px; border: 0; font-family: 'IBM Plex Mono', monospace; font-size: 13px; text-align: right"><span style="padding: 0 8px; height: 34px; display: inline-flex; align-items: center; background: {{pal.sf4f4f1}}; font-size: 12px">{{f.u}}</span></span></label>
+</div>
+</sc-for>
+</fieldset>
+</section>
+
+<section id="s-fen" aria-labelledby="h-fen" style="{{panel}}">
+<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px"><h2 id="h-fen" style="{{h2}}"><span style="{{num}}">3</span>Fenêtres</h2><span style="font-size: 13px; color: {{pal.t6b665e}}">{{winCount}}</span></div>
+<div style="overflow-x: auto">
+<table style="width: 100%; border-collapse: collapse; font-size: 14px">
+<thead><tr style="text-align: left; background: {{pal.sf9f8f4}}">
+<th scope="col" style="padding: 8px 10px; font-size: 13px; font-weight: 600; color: {{pal.t6b665e}}">N°</th>
+<th scope="col" style="padding: 8px 10px; font-size: 13px; font-weight: 600; color: {{pal.t6b665e}}">Largeur</th>
+<th scope="col" style="padding: 8px 10px; font-size: 13px; font-weight: 600; color: {{pal.t6b665e}}">Hauteur</th>
+<th scope="col" style="padding: 8px 10px; font-size: 13px; font-weight: 600; color: {{pal.t6b665e}}">Identiques</th>
+<th scope="col" style="padding: 8px 10px; font-size: 13px; font-weight: 600; color: {{pal.t6b665e}}">Notes</th>
+<th scope="col" style="padding: 8px 10px; font-size: 13px; font-weight: 600; color: {{pal.t6b665e}}">Choix communs</th>
+</tr></thead>
+<tbody>
+<sc-for list="{{wins}}" as="w" hint-placeholder-count="2">
+<tr style="border-top: 1px solid {{pal.befece5}}; vertical-align: top">
+<td style="padding: 12px 10px; font-family: 'IBM Plex Mono', monospace; color: {{pal.t6b665e}}">{{w.n}}</td>
+<td style="padding: 8px 10px"><span style="{{unitBox}}"><input type="number" aria-label="{{w.lw}}" value="{{w.w}}" style="{{unitInput}}"><span style="{{unitTag}}">cm</span></span></td>
+<td style="padding: 8px 10px"><span style="{{unitBox}}"><input type="number" aria-label="{{w.lh}}" value="{{w.h}}" style="{{unitInput}}"><span style="{{unitTag}}">cm</span></span></td>
+<td style="padding: 8px 10px"><input type="number" aria-label="{{w.lq}}" value="{{w.q}}" style="width: 64px; height: 38px; box-sizing: border-box; padding: 0 8px; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font-family: 'IBM Plex Mono', monospace; font-size: 14px; text-align: right"></td>
+<td style="padding: 8px 10px; min-width: 200px"><input type="text" aria-label="{{w.ln}}" value="{{w.note}}" style="width: 100%; height: 38px; box-sizing: border-box; padding: 0 10px; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font: inherit; font-size: 14px"><sc-if value="{{w.custom}}" hint-placeholder-val="{{ false }}"><span style="display: block; margin-top: 6px; font-size: 13px; color: {{pal.t84642f}}">Personnalisée : toile tamisante, Gris perle, sans moteur</span></sc-if></td>
+<td style="padding: 8px 10px"><label style="display: inline-flex; align-items: center; gap: 8px; min-height: 38px; font-size: 14px; white-space: nowrap"><input type="checkbox" checked="{{w.common}}" onChange="{{w.toggle}}" style="width: 18px; height: 18px; margin: 0; accent-color: {{pal.t20332c}}">{{w.commonLabel}}</label></td>
+</tr>
+</sc-for>
+</tbody>
+</table>
+</div>
+<button type="button" onClick="{{addWin}}" style="align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px; background: {{pal.sffffff}}; border: 1px dashed {{pal.b20332c}}; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; color: {{pal.t20332c}}; cursor: pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>Ajouter une fenêtre</button>
+</section>
+
+<section id="s-dates" aria-labelledby="h-dates" style="{{panel}}">
+<h2 id="h-dates" style="{{h2}}"><span style="{{num}}">4</span>Dates</h2>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px 16px">
+<label style="{{label}}">Date du devis<input type="text" value="24/10/2026" style="{{inputMono}}"></label>
+<label style="{{label}}">Valable jusqu’au<input type="text" value="23/11/2026" style="{{inputMono}}"></label>
+<label style="{{label}}">Livraison prévue<input type="text" value="09/11/2026" style="{{inputMono}}"></label>
+<label style="{{label}}">Pose prévue<input type="text" value="10/11/2026" style="{{inputMono}}"></label>
+</div>
+</section>
+
+<section id="s-prix" aria-labelledby="h-prix" style="{{panel}}">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px">
+<h2 id="h-prix" style="{{h2}}"><span style="{{num}}">5</span>Chiffrage</h2>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px">
+<label style="display: inline-flex; align-items: center; gap: 8px; font-size: 14px"><button type="button" role="switch" aria-checked="{{manualChecked}}" onClick="{{toggleManual}}" style="{{switchStyle}}"><span style="{{knobStyle}}"></span></button>Saisie entièrement manuelle</label>
+<button type="button" onClick="{{askCalc}}" disabled="{{manual}}" style="{{calcStyle}}">Calculer depuis le catalogue</button>
+</div>
+</div>
+<sc-if value="{{confirmCalc}}" hint-placeholder-val="{{ false }}">
+<div role="alertdialog" aria-labelledby="calc-title" style="padding: 14px 16px; border-radius: 10px; background: {{pal.sf9f8f4}}; border: 1px solid {{pal.bdcd6cb}}; display: flex; flex-wrap: wrap; align-items: center; gap: 12px">
+<p id="calc-title" style="margin: 0; flex: 1 1 360px; font-size: 14px; line-height: 1.5"><strong>Remplacer les 5 lignes actuelles ?</strong> Le calcul reprend les tarifs du catalogue pour les 2 fenêtres. Les prix saisis à la main seront perdus.</p>
+<span style="display: flex; gap: 8px"><button type="button" onClick="{{cancelCalc}}" style="height: 40px; padding: 0 14px; background: {{pal.sffffff}}; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font: inherit; font-size: 14px">Garder mes lignes</button><button type="button" onClick="{{cancelCalc}}" style="height: 40px; padding: 0 14px; background: {{pal.s20332c}}; border: 0; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; color: #ffffff">Remplacer les lignes</button></span>
+</div>
+</sc-if>
+<div style="overflow-x: auto">
+<table style="width: 100%; border-collapse: collapse; font-size: 14px">
+<thead><tr style="text-align: left; background: {{pal.sf9f8f4}}">
+<th scope="col" style="padding: 8px 10px; font-size: 13px; font-weight: 600; color: {{pal.t6b665e}}">Désignation</th>
+<th scope="col" style="padding: 8px 10px; font-size: 13px; font-weight: 600; color: {{pal.t6b665e}}; text-align: right">Quantité</th>
+<th scope="col" style="padding: 8px 10px; font-size: 13px; font-weight: 600; color: {{pal.t6b665e}}; text-align: right">Prix unitaire</th>
+<th scope="col" style="padding: 8px 10px; font-size: 13px; font-weight: 600; color: {{pal.t6b665e}}; text-align: right">Total</th>
+<th scope="col" style="padding: 8px 4px; width: 44px"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Actions</span></th>
+</tr></thead>
+<tbody>
+<sc-for list="{{lines}}" as="l" hint-placeholder-count="5">
+<tr style="border-top: 1px solid {{pal.befece5}}">
+<td style="padding: 6px 10px"><input type="text" aria-label="Désignation" value="{{l.label}}" style="width: 100%; min-width: 220px; height: 38px; box-sizing: border-box; padding: 0 10px; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font: inherit; font-size: 14px"></td>
+<td style="padding: 6px 10px; text-align: right; white-space: nowrap"><input type="number" aria-label="Quantité" value="{{l.q}}" onChange="{{l.setQ}}" style="width: 72px; height: 38px; box-sizing: border-box; padding: 0 8px; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; text-align: right"> <span style="font-size: 12px; color: {{pal.t6b665e}}">{{l.u}}</span></td>
+<td style="padding: 6px 10px; text-align: right"><span style="{{l.priceBox}}"><input type="number" aria-label="Prix unitaire en FCFA" placeholder="À définir" value="{{l.p}}" onChange="{{l.setP}}" style="{{l.priceInput}}"><span style="{{unitTag}}">FCFA</span></span></td>
+<td style="{{l.totalStyle}}">{{l.total}}</td>
+<td style="padding: 6px 4px"><button type="button" onClick="{{l.remove}}" aria-label="{{l.removeLabel}}" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: transparent; border: 0; border-radius: 6px; color: {{pal.t6b665e}}; cursor: pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"></path></svg></button></td>
+</tr>
+</sc-for>
+</tbody>
+</table>
+</div>
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; align-items: flex-start">
+<button type="button" onClick="{{addLine}}" style="display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px; background: {{pal.sffffff}}; border: 1px dashed {{pal.b20332c}}; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; color: {{pal.t20332c}}; cursor: pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>Ajouter une ligne</button>
+<dl style="margin: 0; min-width: 320px; display: flex; flex-direction: column; font-size: 14px">
+<div style="display: flex; justify-content: space-between; padding: 6px 0"><dt>Sous-total HT</dt><dd style="margin: 0; font-family: 'IBM Plex Mono', monospace">{{ht}}</dd></div>
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 0"><dt style="display: flex; align-items: center; gap: 8px">TVA<select aria-label="Taux de TVA" style="height: 30px; padding: 0 6px; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font-family: 'IBM Plex Mono', monospace; font-size: 12px"><option>18 %</option><option>0 %</option></select></dt><dd style="margin: 0; font-family: 'IBM Plex Mono', monospace">{{tva}}</dd></div>
+<div style="display: flex; justify-content: space-between; padding: 10px 0 4px; border-top: 2px solid {{pal.b1c1c1c}}; margin-top: 4px"><dt style="font-weight: 600; color: {{pal.t1c1c1c}}">{{ttcLabel}}</dt><dd style="margin: 0; font-family: 'IBM Plex Mono', monospace; font-size: 18px; font-weight: 500; color: {{pal.t1c1c1c}}">{{ttc}}</dd></div>
+<sc-if value="{{hasUndefined}}" hint-placeholder-val="{{ true }}"><div role="status" style="display: flex; gap: 6px; padding-top: 6px; font-size: 13px; color: {{pal.t8c5f0e}}"><span aria-hidden="true">!</span>{{undefinedLabel}}</div></sc-if>
+</dl>
+</div>
+</section>
+
+<section id="s-pay" aria-labelledby="h-pay" style="{{panel}}">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px">
+<h2 id="h-pay" style="{{h2}}"><span style="{{num}}">6</span>Paiements</h2>
+<div role="radiogroup" aria-label="Mode de paiement" style="display: inline-flex; padding: 3px; border-radius: 999px; background: {{pal.sf4f4f1}}; gap: 2px">
+<sc-for list="{{payModes}}" as="m" hint-placeholder-count="2"><button type="button" role="radio" aria-checked="{{m.checked}}" onClick="{{m.pick}}" style="{{m.style}}">{{m.label}}</button></sc-for>
+</div>
+</div>
+<ol style="list-style: none; margin: 0; padding: 0; border: 1px solid {{pal.be8e4db}}; border-radius: 6px">
+<sc-for list="{{payments}}" as="p" hint-placeholder-count="3">
+<li style="{{p.row}}">
+<span style="display: flex; flex-direction: column; gap: 2px; min-width: 0">
+<span style="{{p.titleStyle}}">{{p.title}}</span>
+<span style="font-size: 13px; color: {{pal.t6b665e}}">{{p.meta}}</span>
+<sc-if value="{{p.hasReason}}" hint-placeholder-val="{{ false }}"><span style="font-size: 13px; color: {{pal.tb3392f}}">{{p.reason}}</span></sc-if>
+</span>
+<span style="{{p.amountStyle}}">{{p.amount}}</span>
+<span style="{{p.st.style}}"><span aria-hidden="true">{{p.st.glyph}}</span>{{p.st.label}}</span>
+</li>
+</sc-for>
+</ol>
+<div style="display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: center; justify-content: space-between">
+<button type="button" style="display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px; background: {{pal.sffffff}}; border: 1px solid {{pal.b20332c}}; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; color: {{pal.t20332c}}">Enregistrer un versement</button>
+<span style="font-size: 14px">Reste à percevoir : <span style="font-family: 'IBM Plex Mono', monospace; font-weight: 500; color: {{pal.t1c1c1c}}">{{rest}}</span></span>
+</div>
+</section>
+</fieldset>
+</form>
+
+<aside aria-label="Sommaire du devis" style="flex: 1 1 260px; position: sticky; top: 20px; display: flex; flex-direction: column; gap: 16px">
+<nav aria-label="Sections" style="background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 10px; padding: 8px">
+<ol style="list-style: none; margin: 0; padding: 0">
+<sc-for list="{{toc}}" as="t" hint-placeholder-count="6">
+<li><a href="{{t.href}}" style="display: flex; align-items: center; gap: 10px; min-height: 40px; padding: 0 10px; border-radius: 6px; text-decoration: none; color: {{pal.t1c1c1c}}; font-size: 14px"><span style="{{t.glyphStyle}}" aria-hidden="true">{{t.glyph}}</span><span style="flex: 1">{{t.label}}</span><span style="font-size: 12px; color: {{t.noteColor}}">{{t.note}}</span></a></li>
+</sc-for>
+</ol>
+</nav>
+<div style="background: {{pal.s20332c}}; color: #ffffff; border-radius: 10px; padding: 16px 18px; display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 13px; color: #b9c8c1">{{ttcLabel}}</span>
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 24px; font-weight: 500">{{ttc}}</span>
+<span style="font-size: 13px; color: #d9c39b">{{asideNote}}</span>
+</div>
+</aside>
+</div>
+</main>
+
+<div style="position: sticky; bottom: 0; z-index: 4; background: {{pal.sffffff}}; border-top: 1px solid {{pal.be8e4db}}; box-shadow: 0 -8px 20px -14px rgba(32,51,44,0.3); padding: 12px 32px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px">
+<span role="status" style="flex: 1; font-size: 13px; color: {{pal.t6b665e}}">{{saveStatus}}</span>
+<sc-if value="{{notLocked}}" hint-placeholder-val="{{ true }}">
+<button type="button" onClick="{{saveDraft}}" style="height: 44px; padding: 0 18px; background: {{pal.sffffff}}; border: 1px solid {{pal.b1c1c1c}}; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; color: {{pal.t1c1c1c}}; cursor: pointer">Enregistrer le brouillon</button>
+<button type="button" onClick="{{saveQuote}}" style="height: 44px; padding: 0 20px; background: #c09f6a; border: 0; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; color: #161616; cursor: pointer">Enregistrer le devis</button>
+</sc-if>
+<sc-if value="{{isLocked}}" hint-placeholder-val="{{ false }}">
+<a href="ProDevisFiche.dc.html" style="display: inline-flex; align-items: center; height: 44px; padding: 0 18px; background: {{pal.s20332c}}; border-radius: 6px; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 600">Retour à la fiche</a>
+</sc-if>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"state":{"editor":"enum","options":["normal","concurrent","locked"],"default":"normal"},"$preview":{"width":1440,"height":2900}}'>
+class Component extends DCLogic {
+constructor(props) {
+super(props);
+this.state = {
+lines: [
+{ label: 'Toile occultante polyester, coloris Lin', q: '9.6', u: 'm²', p: '18500' },
+{ label: 'Mécanisme enrouleur aluminium Ø 40 mm', q: '4', u: 'pièce', p: '32000' },
+{ label: 'Moteur radio et télécommande', q: '2', u: 'pièce', p: '95000' },
+{ label: 'Confection atelier', q: '4', u: 'pièce', p: '8000' },
+{ label: 'Pose au Plateau, 6e étage', q: '4', u: 'pièce', p: '' }
+],
+wins: [
+{ w: '180', h: '220', q: '2', note: 'Bureau de direction, baie sud', common: true },
+{ w: '120', h: '160', q: '2', note: 'Salle de réunion', common: false }
+],
+supplies: [true, true, false, true],
+manual: false, confirmCalc: false, pay: 'split', saved: ''
+};
+}
+isDark() {
+const t = this.props.theme;
+if (t === 'dark') return true;
+if (t === 'light') return false;
+let v = 'light';
+try { v = window.localStorage.getItem('mds-pro-theme') || 'light'; } catch (e) {}
+if (v === 'dark') return true;
+if (v === 'auto') { try { return window.matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) {} }
+return false;
+}
+themeMaps() { return { s: {"#ffffff": "#1b2220", "#f4f4f1": "#121816", "#f9f8f4": "#202825", "#fbfaf7": "#1e2623", "#fdfbf6": "#222a27", "#fcfbf8": "#1e2623", "#faf9f7": "#1e2623", "#fffcf5": "#2b2618", "#f1f0ec": "#262e2b", "#ece9e2": "#2a322f", "#e9e8e2": "#2a302d", "#e9e6df": "#0f1412", "#eef0ec": "#232b28", "#eef1ef": "#202826", "#edf1f4": "#1d2530", "#e8e4db": "#313a36", "#dcd6cb": "#3b4540", "#f1eee8": "#29312e", "#efece5": "#29312e", "#cfc9bd": "#4c5751", "#cfc8bb": "#4c5751", "#e1ddd3": "#3b4540", "#b9b4aa": "#5a645e", "#20332c": "#2b4a3e", "#2b4239": "#34574a", "#e5f1ea": "#1d3a2b", "#b7d6c3": "#2f5a43", "#fdf8ec": "#2d2717", "#ecd7a8": "#5b4a25", "#fbf1dc": "#382d15", "#e3c2bd": "#5e302b", "#e3c3bf": "#5e302b", "#fbeceb": "#3a1f1c", "#e8eef5": "#1d2a38", "#eeede8": "#2a302d", "#f6f0e4": "#2f2a1f", "#f3f3f3": "#262e2b", "#cccccc": "#46504b", "#fdf6f5": "#33201e", "#f8e6e4": "#3a2220", "#fbf6ea": "#2d2717", "#ecdcb9": "#5b4a25", "#f6ece5": "#33241d", "#efe9dd": "#2a2620", "#d9b26a": "#8a6a2c", "#b98a2e": "#8a6a2c"}, b: {"#ffffff": "#1b2220", "#f4f4f1": "#121816", "#f9f8f4": "#202825", "#fbfaf7": "#1e2623", "#fdfbf6": "#222a27", "#fcfbf8": "#1e2623", "#faf9f7": "#1e2623", "#fffcf5": "#2b2618", "#f1f0ec": "#262e2b", "#ece9e2": "#2a322f", "#e9e8e2": "#2a302d", "#e9e6df": "#0f1412", "#eef0ec": "#232b28", "#eef1ef": "#202826", "#edf1f4": "#1d2530", "#e8e4db": "#313a36", "#dcd6cb": "#3b4540", "#f1eee8": "#29312e", "#efece5": "#29312e", "#cfc9bd": "#4c5751", "#cfc8bb": "#4c5751", "#e1ddd3": "#3b4540", "#b9b4aa": "#5a645e", "#20332c": "#5d8a76", "#2b4239": "#34574a", "#e5f1ea": "#1d3a2b", "#b7d6c3": "#2f5a43", "#fdf8ec": "#2d2717", "#ecd7a8": "#5b4a25", "#fbf1dc": "#382d15", "#e3c2bd": "#5e302b", "#e3c3bf": "#5e302b", "#fbeceb": "#3a1f1c", "#e8eef5": "#1d2a38", "#eeede8": "#2a302d", "#f6f0e4": "#2f2a1f", "#f3f3f3": "#262e2b", "#cccccc": "#46504b", "#fdf6f5": "#33201e", "#f8e6e4": "#3a2220", "#fbf6ea": "#2d2717", "#ecdcb9": "#5b4a25", "#f6ece5": "#33241d", "#efe9dd": "#2a2620", "#d9b26a": "#8a6a2c", "#b98a2e": "#8a6a2c", "#1c1c1c": "#d6d2c9", "#b3392f": "#f28b80"}, t: {"#1c1c1c": "#f1eee8", "#353535": "#d6d2c9", "#6b665e": "#a8a296", "#20332c": "#bfd8cb", "#84642f": "#d8b47a", "#2f7350": "#86cfa3", "#8c5f0e": "#e6b862", "#5e4108": "#f0d39a", "#b3392f": "#f28b80", "#7c241c": "#f5b0a8", "#3f6285": "#9ec0e3", "#2c4866": "#bcd3ea", "#5c5852": "#c9c4ba", "#b0aaa0": "#6c736e", "#3d2b06": "#f0dcb3", "#1f4d35": "#bfe3cc", "#8f2c24": "#f5b0a8", "#6e4a0b": "#e6c27a", "#3f5a72": "#a9c3dc", "#3f5a73": "#a9c3dc", "#8e4529": "#e0a084", "#5a5248": "#cfc8bb", "#b98a2e": "#d9ac57", "#2c4660": "#a9c3dc"} }; }
+themeWatch() {
+if (this.__thw || typeof window === 'undefined') return;
+this.__thw = true;
+const bump = () => this.setState({ __th: Date.now() });
+try { window.addEventListener('storage', (e) => { if (e.key === 'mds-pro-theme') bump(); }); } catch (e) {}
+try { window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', bump); } catch (e) {}
+}
+dmap(v) {
+const T = this.themeMaps();
+const cv = (str) => str.split(';').map((seg) => {
+const i = seg.indexOf(':');
+let M = T.s;
+if (i > -1) { const p = seg.slice(0, i).trim().toLowerCase(); M = /^(color|stroke|fill|caret-color|accent-color|text-decoration-color)$/.test(p) ? T.t : /^(border|outline|box-shadow)/.test(p) ? T.b : T.s; }
+return seg.replace(/#[0-9a-fA-F]{6}/g, (h) => M[h.toLowerCase()] || h);
+}).join(';');
+const go = (x) => (typeof x === 'string' ? cv(x) : Array.isArray(x) ? x.map(go) : x && typeof x === 'object' && Object.prototype.toString.call(x) === '[object Object]' ? Object.keys(x).reduce((o, k) => { o[k] = go(x[k]); return o; }, {}) : x);
+return go(v);
+}
+renderVals() {
+this.themeWatch();
+const dark = this.isDark();
+let v = this.renderValsLight();
+if (dark) v = this.dmap(v);
+const T = this.themeMaps();
+const pal = {};
+['s', 'b', 't'].forEach((k) => { Object.keys(T[k]).forEach((h) => { pal[k + h.slice(1)] = dark ? T[k][h] : h; }); });
+v.pal = pal;
+v.themeDark = dark;
+v.colorScheme = dark ? 'dark' : 'light';
+return v;
+}
+renderValsLight() {
+const s = this.state;
+const st = this.props.state ?? 'normal';
+const locked = st === 'locked';
+const fmt = (n) => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' FCFA';
+const set = (patch) => this.setState(patch);
+const upd = (i, k, v) => { const lines = s.lines.slice(); lines[i] = { ...lines[i], [k]: v }; set({ lines }); };
+let ht = 0;
+let undef = 0;
+const lines = s.lines.map((l, i) => {
+const has = l.p !== '' && l.p !== null;
+const tot = has ? parseFloat(l.q || 0) * parseFloat(l.p) : null;
+if (has) ht += tot; else undef += 1;
+return {
+label: l.label, q: l.q, u: l.u, p: l.p,
+setQ: (e) => upd(i, 'q', e.target.value),
+setP: (e) => upd(i, 'p', e.target.value),
+remove: () => set({ lines: s.lines.filter((_, j) => j !== i) }),
+removeLabel: 'Supprimer la ligne ' + l.label,
+total: has ? fmt(tot) : 'À définir',
+totalStyle: 'padding:6px 10px;text-align:right;white-space:nowrap;' + (has ? "font-family:'IBM Plex Mono',monospace;font-size:13px;color:#1c1c1c" : 'font-size:13px;font-style:italic;color:#8c5f0e'),
+priceBox: 'display:inline-flex;align-items:center;border-radius:6px;overflow:hidden;' + (has ? 'border:1px solid #dcd6cb' : 'border:1px dashed #b98a2e;background:#fdf8ec'),
+priceInput: "width:104px;height:36px;box-sizing:border-box;padding:0 8px;border:0;background:transparent;font-family:'IBM Plex Mono',monospace;font-size:13px;text-align:right"
+};
+});
+const tva = ht * 0.18;
+const ttc = ht + tva;
+const paid = 300000;
+const SC = { 'Confirmé': ['#2f7350', '#e5f1ea', '✓'], 'Annulé': ['#5c5852', '#f1f0ec', '–'], 'À traiter': ['#8c5f0e', '#fbf1dc', '!'], 'Brouillon': ['#5c5852', '#f1f0ec', '○'], 'Accepté': ['#2f7350', '#e5f1ea', '✓'] };
+const badge = (x) => ({ label: x, glyph: SC[x][2], style: 'display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:999px;font-size:12.5px;font-weight:600;white-space:nowrap;color:' + SC[x][0] + ';background:' + SC[x][1] + (x === 'Brouillon' ? ';box-shadow:inset 0 0 0 1px #b9b4aa' : '') });
+const stBadge = badge(locked ? 'Accepté' : 'Brouillon');
+const payments = [
+['Avance de 50 %', '24/10/2026, Orange Money, réf. OM-58213, confirmée par Aïcha Diabaté', fmt(300000), 'Confirmé', false, ''],
+['Avance', '20/10/2026, espèces, réf. —', fmt(30000), 'Annulé', true, 'Annulé le 21/10/2026 : montant saisi en double.'],
+['Solde', 'À la pose, prévue le 10/11/2026', s.pay === 'split' ? fmt(Math.max(ttc - paid, 0)) : '—', 'À traiter', false, '']
+].filter((x, i) => s.pay === 'split' || i < 2).map(([title, meta, amount, x, cancelled, reason]) => ({
+title, meta, amount, st: badge(x), hasReason: !!reason, reason,
+row: 'display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:16px;align-items:center;padding:12px 14px;border-bottom:1px solid #efece5;' + (cancelled ? 'background:#faf9f7' : ''),
+titleStyle: 'font-size:14px;font-weight:600;color:' + (cancelled ? '#6b665e;text-decoration:line-through' : '#1c1c1c'),
+amountStyle: "font-family:'IBM Plex Mono',monospace;font-size:14px;color:" + (cancelled ? '#6b665e;text-decoration:line-through' : '#1c1c1c')
+}));
+const panel = 'background:#ffffff;border:1px solid #e8e4db;border-radius:10px;padding:20px 22px;display:flex;flex-direction:column;gap:16px';
+const W = s.wins;
+return {
+noSubmit: (e) => e.preventDefault(),
+isConcurrent: st === 'concurrent',
+isLocked: locked,
+notLocked: !locked,
+stateBadge: stBadge.style, stateGlyph: stBadge.glyph, stateLabel: stBadge.label,
+panel,
+h2: 'margin:0;display:flex;align-items:center;gap:12px;font-size:17px;font-weight:600;color:#1c1c1c',
+num: "width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:#20332c;color:#ffffff;font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:500",
+label: 'display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:500;color:#1c1c1c',
+labelWide: 'grid-column:1 / -1;display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:500;color:#1c1c1c',
+input: 'height:42px;box-sizing:border-box;padding:0 12px;background:#ffffff;border:1px solid #dcd6cb;border-radius:6px;font:inherit;font-weight:400;font-size:14px;color:#1c1c1c',
+inputMono: "height:42px;box-sizing:border-box;padding:0 12px;background:#ffffff;border:1px solid #dcd6cb;border-radius:6px;font-family:'IBM Plex Mono',monospace;font-size:14px;color:#1c1c1c",
+unitBox: 'display:inline-flex;align-items:center;border:1px solid #dcd6cb;border-radius:6px;overflow:hidden',
+unitInput: "width:76px;height:36px;box-sizing:border-box;padding:0 8px;border:0;font-family:'IBM Plex Mono',monospace;font-size:14px;text-align:right",
+unitTag: 'padding:0 8px;height:36px;display:inline-flex;align-items:center;background:#f4f4f1;font-size:12px;color:#6b665e',
+supplies: [['Rail aluminium', '6.4', 'm'], ['Supports muraux', '8', 'pièce'], ['Crochets', '1', 'lot de 100'], ['Embouts de finition', '8', 'pièce']].map(([label, q, u], i) => ({
+label, q, u, on: s.supplies[i], off: !s.supplies[i],
+toggle: () => { const a = s.supplies.slice(); a[i] = !a[i]; set({ supplies: a }); }
+})),
+winCount: W.length + ' fenêtres sur 30 au maximum, ' + W.reduce((t, w) => t + parseInt(w.q || 0, 10), 0) + ' unités',
+wins: W.map((w, i) => ({
+n: String(i + 1).padStart(2, '0'), w: w.w, h: w.h, q: w.q, note: w.note, common: w.common, custom: !w.common,
+commonLabel: w.common ? 'Oui' : 'Non, personnalisée',
+lw: 'Largeur fenêtre ' + (i + 1), lh: 'Hauteur fenêtre ' + (i + 1), lq: 'Fenêtres identiques ' + (i + 1), ln: 'Notes fenêtre ' + (i + 1),
+toggle: () => { const a = W.slice(); a[i] = { ...a[i], common: !a[i].common }; set({ wins: a }); }
+})),
+addWin: () => { if (W.length < 30) set({ wins: W.concat([{ w: '', h: '', q: '1', note: '', common: true }]) }); },
+manual: s.manual,
+manualChecked: s.manual ? 'true' : 'false',
+toggleManual: () => set({ manual: !s.manual, confirmCalc: false }),
+switchStyle: 'position:relative;width:40px;height:24px;border-radius:999px;border:0;padding:0;cursor:pointer;background:' + (s.manual ? '#20332c' : '#cfc9bd'),
+knobStyle: 'position:absolute;top:3px;left:' + (s.manual ? '19px' : '3px') + ';width:18px;height:18px;border-radius:50%;background:#ffffff;transition:left 150ms ease',
+askCalc: () => set({ confirmCalc: true }),
+cancelCalc: () => set({ confirmCalc: false }),
+confirmCalc: s.confirmCalc,
+calcStyle: 'height:40px;padding:0 14px;border-radius:6px;font:inherit;font-size:14px;font-weight:600;cursor:pointer;' + (s.manual ? 'background:#f4f4f1;border:1px solid #e8e4db;color:#6b665e;cursor:not-allowed' : 'background:#ffffff;border:1px solid #20332c;color:#20332c'),
+lines,
+addLine: () => set({ lines: s.lines.concat([{ label: '', q: '1', u: 'pièce', p: '' }]) }),
+ht: fmt(ht), tva: fmt(tva), ttc: fmt(ttc),
+ttcLabel: undef ? 'Total TTC provisoire' : 'Total TTC',
+hasUndefined: undef > 0,
+undefinedLabel: undef + (undef > 1 ? ' lignes sans prix : le total est incomplet.' : ' ligne sans prix : le total est incomplet.'),
+asideNote: undef ? undef + ' prix à définir avant validation' : 'Prêt à être validé',
+payModes: [['split', 'Avance puis solde'], ['full', 'Paiement intégral']].map(([k, label]) => ({ label, checked: s.pay === k ? 'true' : 'false', pick: () => set({ pay: k }),
+style: 'height:34px;padding:0 14px;border-radius:999px;border:0;font:inherit;font-size:13px;font-weight:600;cursor:pointer;' + (s.pay === k ? 'background:#ffffff;color:#1c1c1c;box-shadow:0 1px 3px rgba(32,51,44,0.2)' : 'background:transparent;color:#6b665e') })),
+payments,
+rest: fmt(Math.max(ttc - paid, 0)),
+toc: [
+['#s-client', 'Client', '✓', ''], ['#s-choix', 'Choix communs', '✓', ''], ['#s-fen', 'Fenêtres', '✓', W.length + ' / 30'], ['#s-dates', 'Dates', '✓', ''],
+['#s-prix', 'Chiffrage', undef ? '!' : '✓', undef ? undef + ' à définir' : ''], ['#s-pay', 'Paiements', '◐', 'avance reçue']
+].map(([href, label, glyph, note]) => ({ href, label, glyph, note, noteColor: glyph === '!' ? '#8c5f0e' : '#6b665e',
+glyphStyle: 'width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;' + (glyph === '✓' ? 'background:#e5f1ea;color:#2f7350' : glyph === '!' ? 'background:#fbf1dc;color:#8c5f0e' : 'background:#f6f0e4;color:#84642f') })),
+saveStatus: s.saved || (locked ? 'Lecture seule.' : 'Brouillon enregistré automatiquement à 10:42.'),
+saveDraft: () => set({ saved: 'Brouillon enregistré à 10:45.' }),
+saveQuote: () => set({ saved: undef ? 'Devis enregistré. ' + undef + ' prix reste à définir avant la validation.' : 'Devis enregistré.' })
+};
+}
+}
+</script>
+</body>
+</html>

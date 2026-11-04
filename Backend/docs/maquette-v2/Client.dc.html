@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Créer un client</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./assets/espace-pro.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.float-veil{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(20,28,25,.5)}
+.float-form{display:flex;flex-direction:column;width:min(860px,100%);max-height:calc(100vh - 48px);background:var(--pro-panel);border-radius:14px;box-shadow:var(--sh-modal);overflow:hidden}
+.float-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:20px 24px 16px;border-bottom:1px solid var(--pro-line)}
+.float-head h2{font:500 30px/1.1 var(--font-title)}
+.float-head p{margin:4px 0 0}
+.float-body{flex:1;min-height:0;overflow:auto;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 32px;padding:8px 24px 22px}
+.float-foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:10px;padding:14px 24px;border-top:1px solid var(--pro-line);background:var(--pro-panel-alt)}
+.float-foot .status{margin-right:auto;font-size:13px;color:var(--pro-text-2)}
+.float-col{min-width:0}
+.float-col>.fgroup:first-child{margin-top:14px}
+.kind-tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.kind-tiles .tile span{padding:10px 12px}
+@media (max-width:767px){.float-veil{padding:0;align-items:stretch}.float-form{width:100%;max-height:none;border-radius:0}.float-body{grid-template-columns:minmax(0,1fr)}.kind-tiles{grid-template-columns:minmax(0,1fr)}.float-foot .button,.float-foot button{flex:1 1 40%}}
+</style>
+</helmet>
+<div class="shell">
+<dc-import name="Navigation" active="clients" hint-size="240px,900px"></dc-import>
+<div class="workspace">
+<dc-import name="Haut" hint-size="100%,64px"></dc-import>
+<main class="main" id="contenu" aria-hidden="true">
+<div class="page-head"><div><h1>Clients &amp; contacts</h1><p class="sub">4 client(s), 1 fournisseur(s), 0 partenaire(s).</p></div><div class="page-actions"><a class="button" href="#nouveau-contact">Créer un client</a></div></div>
+<nav class="chips" aria-label="Type de contact"><a class="chip" href="#contenu" aria-current="true">Tous<b>5</b></a><a class="chip" href="#contenu">Clients<b>4</b></a><a class="chip" href="#contenu">Fournisseurs<b>1</b></a><a class="chip" href="#contenu">Archivés<b>0</b></a></nav>
+<section class="panel flush" aria-label="Contacts">
+<div class="table-wrap"><table>
+<thead><tr><th scope="col">Contact</th><th scope="col">Coordonnées</th><th scope="col">Catégorie</th><th scope="col">État</th></tr></thead>
+<tbody>
+<tr><td><span class="title-row nowrap"><span class="avatar" aria-hidden="true">BI</span><a class="row-link" href="#contenu">M. Bamba Ibrahim</a></span></td><td>bamba@exemple.invalid<small class="mono">07 00 00 00 02</small></td><td>Client</td><td>Actif</td></tr>
+<tr><td><span class="title-row nowrap"><span class="avatar" aria-hidden="true">KA</span><a class="row-link" href="#contenu">Mme Kouassi Aya</a></span></td><td>kouassi@exemple.invalid<small class="mono">07 00 00 00 01</small></td><td>Client</td><td>Actif</td></tr>
+<tr><td><span class="title-row nowrap"><span class="avatar" aria-hidden="true">OF</span><a class="row-link" href="#contenu">Mme Ouattara Fatou</a></span></td><td>ouattara@exemple.invalid<small class="mono">07 00 00 00 03</small></td><td>Client</td><td>Actif</td></tr>
+</tbody>
+</table></div>
+</section>
+</main>
+</div>
+</div>
+
+<div class="float-veil">
+<section class="float-form" role="dialog" aria-modal="true" aria-labelledby="h-nouveau-contact" id="nouveau-contact">
+<div class="float-head">
+<div><h2 id="h-nouveau-contact">Créer un client</h2><p class="muted">Les champs obligatoires sont le nom et la catégorie. Aucun message n’est envoyé.</p></div>
+<a class="button quiet icon-btn" href="#contenu" aria-label="Fermer sans créer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></a>
+</div>
+<div class="float-body">
+<div class="float-col">
+<section class="fgroup">
+<fieldset class="bare"><legend class="section-title"><span class="step" aria-hidden="true">1</span>Catégorie</legend>
+<div class="kind-tiles mt-8">
+<label class="tile"><input type="radio" name="kind" checked><span><strong>Client</strong><small>Particulier ou entreprise</small></span></label>
+<label class="tile"><input type="radio" name="kind"><span><strong>Fournisseur</strong><small>Tissus, rails, moteurs</small></span></label>
+<label class="tile"><input type="radio" name="kind"><span><strong>Partenaire</strong><small>Architecte, décorateur</small></span></label>
+</div>
+</fieldset>
+</section>
+<section class="fgroup">
+<h3 class="section-title"><span class="step" aria-hidden="true">2</span>Coordonnées</h3>
+<label>Nom / raison sociale<input value="Mme Touré Aminata"></label>
+<label>Téléphone<span class="field-unit"><span class="unit">+225</span><input type="tel" value="07 00 00 00 04" style="text-align: left"></span></label>
+<label>E-mail<input type="email" value="deja-utilise@exemple.invalid" aria-invalid="true"><span class="field-error">Cette adresse e-mail est déjà utilisée par un autre dossier. Recherchez ce dossier ou indiquez une autre adresse.</span><a class="hint link" href="#contenu">Ouvrir le dossier qui utilise cette adresse</a></label>
+<label>Adresse<textarea rows="2">Riviera Palmeraie, Abidjan</textarea></label>
+</section>
+</div>
+<div class="float-col">
+<section class="fgroup" data-consent="">
+<h3 class="section-title"><span class="step" aria-hidden="true">3</span>Promotions</h3>
+<label class="toggle-row"><span>Consentement aux offres et promotions<small>À cocher seulement si le client l’a donné.</small></span><input class="switch" type="checkbox" name="marketing" checked></label>
+<label class="consent-source">Origine du consentement<input placeholder="Ex. accord écrit du 24/09/2026"><span class="hint">Obligatoire dès que le consentement est coché.</span></label>
+</section>
+<div class="internal-block">
+<p class="internal-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 11h12v10H6zM8 11V7a4 4 0 0 1 8 0v4"></path></svg>Réservé à l’équipe</p>
+<label>Notes internes<textarea rows="5" placeholder="Préférences, historique, points d’attention…"></textarea><span class="hint">Jamais transmises au client.</span></label>
+</div>
+</div>
+</div>
+<div class="float-foot">
+<span class="status">Le dossier s’ouvre après la création.</span>
+<a class="button quiet" href="#contenu">Annuler</a>
+<button type="button">Créer un client</button>
+</div>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Espace Pro — clients et contacts</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="color-scheme: {{colorScheme}}; font-family: Inter, system-ui, sans-serif; color: {{pal.t353535}}; background: {{pal.sf4f4f1}}; min-height: 100vh; display: flex">
+<dc-import name="ProSidebar" active="clients" hint-size="240px,100%"></dc-import>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+<dc-import name="ProTopbar" role="admin" hint-size="100%,64px"></dc-import>
+<main id="contenu" style="flex: 1; padding: 24px clamp(16px, 3vw, 32px) 96px; display: flex; flex-direction: column; gap: 18px">
+
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 16px">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<h1 style="margin: 0; font-family: 'Cormorant Garamond', serif; font-size: 34px; font-weight: 500; color: {{pal.t1c1c1c}}">Clients et contacts</h1>
+<span style="font-size: 14px; color: {{pal.t6b665e}}">318 clients, 4 contacts à qualifier.</span>
+</div>
+<button type="button" style="display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 16px 0 14px; background: #c09f6a; border: 0; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; color: #161616; cursor: pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>Nouveau contact</button>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 12px">
+<sc-for list="{{kpis}}" as="k" hint-placeholder-count="4">
+<div style="background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 13px; color: {{pal.t6b665e}}">{{k.label}}</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 20px; font-weight: 500; color: {{pal.t1c1c1c}}; white-space: nowrap">{{k.v}}</span><span style="font-size: 12.5px; color: {{pal.t6b665e}}">{{k.sub}}</span></div>
+</sc-for>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+<section aria-label="Clients" style="flex: 999 1 600px; min-width: 0; background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 10px; overflow: hidden">
+<div style="display: flex; flex-wrap: wrap; gap: 10px; padding: 12px 16px; border-bottom: 1px solid {{pal.be8e4db}}">
+<label style="flex: 1 1 240px; position: relative; display: flex; align-items: center"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Rechercher un client</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="{{pal.t6b665e}}" stroke-width="1.6" aria-hidden="true" style="position: absolute; left: 10px"><path d="M4 11a7 7 0 1 0 14 0a7 7 0 1 0-14 0M20 20l-3.5-3.5"></path></svg><input type="search" value="{{q}}" onChange="{{setQ}}" placeholder="Nom, téléphone ou commune" style="width: 100%; height: 36px; box-sizing: border-box; padding: 0 10px 0 34px; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font: inherit; font-size: 14px"></label>
+<span role="group" aria-label="Type de client" style="display: inline-flex; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; overflow: hidden">
+<sc-for list="{{types}}" as="t" hint-placeholder-count="3"><button type="button" aria-pressed="{{t.on}}" onClick="{{t.pick}}" style="{{t.style}}">{{t.label}}</button></sc-for>
+</span>
+</div>
+<ul style="list-style: none; margin: 0; padding: 0">
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="8">
+<li style="border-top: 1px solid {{pal.befece5}}">
+<a href="ProClient.dc.html" style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding: 12px 16px; text-decoration: none; color: {{pal.t353535}}">
+<span aria-hidden="true" style="{{r.avatar}}">{{r.ini}}</span>
+<span style="flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px; font-weight: 600; color: {{pal.t1c1c1c}}">{{r.name}}</span><span style="font-size: 13px; color: {{pal.t6b665e}}">{{r.meta}}</span></span>
+<span style="flex: 0 0 132px; font-family: 'IBM Plex Mono', monospace; font-size: 13.5px; color: {{pal.t1c1c1c}}; white-space: nowrap">{{r.tel}}</span>
+<span style="flex: 0 0 96px; display: flex; flex-direction: column"><span style="font-size: 12px; color: {{pal.t6b665e}}">Devis</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: {{pal.t1c1c1c}}">{{r.devis}}</span></span>
+<span style="flex: 0 0 150px; display: flex; flex-direction: column; text-align: right"><span style="font-size: 12px; color: {{pal.t6b665e}}">Facturé</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: {{pal.t1c1c1c}}; white-space: nowrap">{{r.ca}}</span></span>
+<span style="flex: 0 0 104px; display: flex; flex-direction: column; text-align: right"><span style="font-size: 12px; color: {{pal.t6b665e}}">Dernier contact</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: {{pal.t1c1c1c}}">{{r.last}}</span></span>
+</a>
+</li>
+</sc-for>
+</ul>
+<sc-if value="{{empty}}" hint-placeholder-val="{{ false }}"><p style="margin: 0; padding: 28px 16px; text-align: center; font-size: 14px; color: {{pal.t6b665e}}">Aucun client ne correspond à cette recherche.</p></sc-if>
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 16px; border-top: 1px solid {{pal.be8e4db}}; font-size: 13px; color: {{pal.t6b665e}}"><span>{{countLabel}}</span><span style="display: flex; gap: 6px"><button type="button" disabled style="height: 34px; padding: 0 12px; border: 1px solid {{pal.be8e4db}}; border-radius: 6px; background: {{pal.sffffff}}; font: inherit; font-size: 13px; color: {{pal.tb0aaa0}}">Précédent</button><button type="button" style="height: 34px; padding: 0 12px; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; background: {{pal.sffffff}}; font: inherit; font-size: 13px; color: {{pal.t1c1c1c}}">Suivant</button></span></div>
+</section>
+
+<aside aria-labelledby="q-t" style="flex: 1 1 340px; min-width: 0; background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 10px; overflow: hidden">
+<div style="padding: 16px 18px 10px; display: flex; flex-direction: column; gap: 2px"><h2 id="q-t" style="margin: 0; font-size: 17px; font-weight: 600; color: {{pal.t1c1c1c}}">Contacts à qualifier</h2><span style="font-size: 13px; color: {{pal.t6b665e}}">Demandes du site et messages qui ne sont pas encore rattachés à un client.</span></div>
+<ul style="list-style: none; margin: 0; padding: 0">
+<sc-for list="{{leads}}" as="l" hint-placeholder-count="4">
+<li style="border-top: 1px solid {{pal.befece5}}; padding: 12px 18px; display: flex; flex-direction: column; gap: 8px">
+<span style="display: flex; justify-content: space-between; gap: 10px"><span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 14.5px; font-weight: 600; color: {{pal.t1c1c1c}}">{{l.name}}</span><span style="font-size: 13px; color: {{pal.t6b665e}}">{{l.what}}</span></span><span style="{{l.chip}}">{{l.src}}</span></span>
+<sc-if value="{{l.dup}}" hint-placeholder-val="{{ false }}"><span style="font-size: 12.5px; color: {{pal.t84642f}}">Même téléphone que M. Kacou Hervé : rattacher plutôt que créer ?</span></sc-if>
+<span style="display: flex; flex-wrap: wrap; gap: 6px"><button type="button" onClick="{{l.create}}" style="height: 34px; padding: 0 12px; border: 0; border-radius: 6px; background: {{pal.s20332c}}; font: inherit; font-size: 13px; font-weight: 600; color: #ffffff">{{l.mainLabel}}</button><button type="button" onClick="{{l.drop}}" style="height: 34px; padding: 0 10px; border: 0; background: transparent; font: inherit; font-size: 13px; color: {{pal.t6b665e}}">Ignorer</button></span>
+</li>
+</sc-for>
+</ul>
+<sc-if value="{{noLeads}}" hint-placeholder-val="{{ false }}"><p style="margin: 0; padding: 20px 18px; font-size: 14px; color: {{pal.t2f7350}}">● Tous les contacts sont qualifiés.</p></sc-if>
+</aside>
+</div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1150}}'>
+class Component extends DCLogic {
+constructor(props) {
+super(props);
+this.state = { q: '', type: 'all', done: {} };
+}
+isDark() {
+const t = this.props.theme;
+if (t === 'dark') return true;
+if (t === 'light') return false;
+let v = 'light';
+try { v = window.localStorage.getItem('mds-pro-theme') || 'light'; } catch (e) {}
+if (v === 'dark') return true;
+if (v === 'auto') { try { return window.matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) {} }
+return false;
+}
+themeMaps() { return { s: {"#ffffff": "#1b2220", "#f4f4f1": "#121816", "#f9f8f4": "#202825", "#fbfaf7": "#1e2623", "#fdfbf6": "#222a27", "#fcfbf8": "#1e2623", "#faf9f7": "#1e2623", "#fffcf5": "#2b2618", "#f1f0ec": "#262e2b", "#ece9e2": "#2a322f", "#e9e8e2": "#2a302d", "#e9e6df": "#0f1412", "#eef0ec": "#232b28", "#eef1ef": "#202826", "#edf1f4": "#1d2530", "#e8e4db": "#313a36", "#dcd6cb": "#3b4540", "#f1eee8": "#29312e", "#efece5": "#29312e", "#cfc9bd": "#4c5751", "#cfc8bb": "#4c5751", "#e1ddd3": "#3b4540", "#b9b4aa": "#5a645e", "#20332c": "#2b4a3e", "#2b4239": "#34574a", "#e5f1ea": "#1d3a2b", "#b7d6c3": "#2f5a43", "#fdf8ec": "#2d2717", "#ecd7a8": "#5b4a25", "#fbf1dc": "#382d15", "#e3c2bd": "#5e302b", "#e3c3bf": "#5e302b", "#fbeceb": "#3a1f1c", "#e8eef5": "#1d2a38", "#eeede8": "#2a302d", "#f6f0e4": "#2f2a1f", "#f3f3f3": "#262e2b", "#cccccc": "#46504b", "#fdf6f5": "#33201e", "#f8e6e4": "#3a2220", "#fbf6ea": "#2d2717", "#ecdcb9": "#5b4a25", "#f6ece5": "#33241d", "#efe9dd": "#2a2620", "#d9b26a": "#8a6a2c", "#b98a2e": "#8a6a2c"}, b: {"#ffffff": "#1b2220", "#f4f4f1": "#121816", "#f9f8f4": "#202825", "#fbfaf7": "#1e2623", "#fdfbf6": "#222a27", "#fcfbf8": "#1e2623", "#faf9f7": "#1e2623", "#fffcf5": "#2b2618", "#f1f0ec": "#262e2b", "#ece9e2": "#2a322f", "#e9e8e2": "#2a302d", "#e9e6df": "#0f1412", "#eef0ec": "#232b28", "#eef1ef": "#202826", "#edf1f4": "#1d2530", "#e8e4db": "#313a36", "#dcd6cb": "#3b4540", "#f1eee8": "#29312e", "#efece5": "#29312e", "#cfc9bd": "#4c5751", "#cfc8bb": "#4c5751", "#e1ddd3": "#3b4540", "#b9b4aa": "#5a645e", "#20332c": "#5d8a76", "#2b4239": "#34574a", "#e5f1ea": "#1d3a2b", "#b7d6c3": "#2f5a43", "#fdf8ec": "#2d2717", "#ecd7a8": "#5b4a25", "#fbf1dc": "#382d15", "#e3c2bd": "#5e302b", "#e3c3bf": "#5e302b", "#fbeceb": "#3a1f1c", "#e8eef5": "#1d2a38", "#eeede8": "#2a302d", "#f6f0e4": "#2f2a1f", "#f3f3f3": "#262e2b", "#cccccc": "#46504b", "#fdf6f5": "#33201e", "#f8e6e4": "#3a2220", "#fbf6ea": "#2d2717", "#ecdcb9": "#5b4a25", "#f6ece5": "#33241d", "#efe9dd": "#2a2620", "#d9b26a": "#8a6a2c", "#b98a2e": "#8a6a2c", "#1c1c1c": "#d6d2c9", "#b3392f": "#f28b80"}, t: {"#1c1c1c": "#f1eee8", "#353535": "#d6d2c9", "#6b665e": "#a8a296", "#20332c": "#bfd8cb", "#84642f": "#d8b47a", "#2f7350": "#86cfa3", "#8c5f0e": "#e6b862", "#5e4108": "#f0d39a", "#b3392f": "#f28b80", "#7c241c": "#f5b0a8", "#3f6285": "#9ec0e3", "#2c4866": "#bcd3ea", "#5c5852": "#c9c4ba", "#b0aaa0": "#6c736e", "#3d2b06": "#f0dcb3", "#1f4d35": "#bfe3cc", "#8f2c24": "#f5b0a8", "#6e4a0b": "#e6c27a", "#3f5a72": "#a9c3dc", "#3f5a73": "#a9c3dc", "#8e4529": "#e0a084", "#5a5248": "#cfc8bb", "#b98a2e": "#d9ac57", "#2c4660": "#a9c3dc"} }; }
+themeWatch() {
+if (this.__thw || typeof window === 'undefined') return;
+this.__thw = true;
+const bump = () => this.setState({ __th: Date.now() });
+try { window.addEventListener('storage', (e) => { if (e.key === 'mds-pro-theme') bump(); }); } catch (e) {}
+try { window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', bump); } catch (e) {}
+}
+dmap(v) {
+const T = this.themeMaps();
+const cv = (str) => str.split(';').map((seg) => {
+const i = seg.indexOf(':');
+let M = T.s;
+if (i > -1) { const p = seg.slice(0, i).trim().toLowerCase(); M = /^(color|stroke|fill|caret-color|accent-color|text-decoration-color)$/.test(p) ? T.t : /^(border|outline|box-shadow)/.test(p) ? T.b : T.s; }
+return seg.replace(/#[0-9a-fA-F]{6}/g, (h) => M[h.toLowerCase()] || h);
+}).join(';');
+const go = (x) => (typeof x === 'string' ? cv(x) : Array.isArray(x) ? x.map(go) : x && typeof x === 'object' && Object.prototype.toString.call(x) === '[object Object]' ? Object.keys(x).reduce((o, k) => { o[k] = go(x[k]); return o; }, {}) : x);
+return go(v);
+}
+renderVals() {
+this.themeWatch();
+const dark = this.isDark();
+let v = this.renderValsLight();
+if (dark) v = this.dmap(v);
+const T = this.themeMaps();
+const pal = {};
+['s', 'b', 't'].forEach((k) => { Object.keys(T[k]).forEach((h) => { pal[k + h.slice(1)] = dark ? T[k][h] : h; }); });
+v.pal = pal;
+v.themeDark = dark;
+v.colorScheme = dark ? 'dark' : 'light';
+return v;
+}
+renderValsLight() {
+const s = this.state;
+const fmt = (v) => String(v).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+const C = [
+['Mme Ouattara Fatou', 'part', 'Cocody Angré', '07 08 12 34 56', 3, 1450600, '24/10/2026'],
+['Cabinet Traoré & Associés', 'pro', 'Plateau', '27 20 21 98 74', 4, 3870000, '24/10/2026'],
+['M. Kacou Hervé', 'part', 'II Plateaux Vallons', '05 44 18 72 03', 1, 0, '23/10/2026'],
+['Mme Kouassi Aya', 'part', 'Cité Riviera 3, Cocody', '07 42 18 66 05', 2, 330400, '26/10/2026'],
+['Clinique des Lagunes', 'pro', 'Cocody', '27 22 44 10 20', 2, 2450000, '21/10/2026'],
+['Résidence Les Palmiers', 'pro', 'Bingerville', '07 58 44 21 09', 1, 1120000, '19/10/2026'],
+['M. Bamba Ibrahim', 'part', 'Marcory Zone 4', '01 02 33 45 67', 2, 330400, '18/10/2026'],
+['Mme Touré Aminata', 'part', 'Riviera Palmeraie', '07 49 30 11 58', 1, 0, '16/10/2026']
+];
+const q = s.q.trim().toLowerCase();
+const rows = C.filter((c) => (s.type === 'all' || c[1] === s.type) && (!q || (c[0] + ' ' + c[2] + ' ' + c[3].replace(/ /g, '')).toLowerCase().includes(q.replace(/ /g, '')) || (c[0] + ' ' + c[2]).toLowerCase().includes(q))).map((c) => ({
+name: c[0], tel: c[3], devis: String(c[4]), ca: c[5] ? fmt(c[5]) + ' FCFA' : '—', last: c[6],
+meta: (c[1] === 'pro' ? 'Entreprise' : 'Particulier') + ', ' + c[2],
+ini: c[0].replace(/^(M\.|Mme)\s/, '').split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase(),
+avatar: 'flex:none;width:36px;height:36px;border-radius:' + (c[1] === 'pro' ? '8px' : '50%') + ';display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;' + (c[1] === 'pro' ? 'background:#f6f0e4;color:#84642f' : 'background:#20332c;color:#ffffff')
+}));
+const T = [['all', 'Tous'], ['part', 'Particuliers'], ['pro', 'Entreprises']];
+const LEADS = [
+['Mme N’Guessan Rose', 'Demande de devis stores, 3 fenêtres', 'Site', false],
+['Hervé K.', 'Message WhatsApp : « prix moteur radio ? »', 'WhatsApp', true],
+['SCI Les Flamboyants', 'Demande de prix, 12 bureaux', 'Site', false],
+['M. Coulibaly Seydou', 'Appel manqué, rappel souhaité', 'Téléphone', false]
+];
+const leads = LEADS.map((l, i) => ({ l, i })).filter(({ i }) => !s.done[i]).map(({ l, i }) => ({
+name: l[0], what: l[1], src: l[2], dup: l[3], mainLabel: l[3] ? 'Rattacher au client' : 'Créer le client',
+chip: 'flex:none;align-self:flex-start;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:600;background:#f4f4f1;color:#5c5852',
+create: () => this.setState({ done: { ...s.done, [i]: true } }),
+drop: () => this.setState({ done: { ...s.done, [i]: true } })
+}));
+return {
+kpis: [['Clients', '318', '+14 ce mois-ci'], ['Entreprises', '42', '13 % des clients'], ['Facturé en 2026', fmt(48920000) + ' FCFA', 'factures émises et payées'], ['Sans contact depuis 6 mois', '57', 'à relancer']].map(([label, v, sub]) => ({ label, v, sub })),
+q: s.q, setQ: (e) => this.setState({ q: e.target.value }),
+types: T.map(([k, label]) => ({ label, on: s.type === k ? 'true' : 'false', pick: () => this.setState({ type: k }),
+style: 'height:34px;padding:0 12px;border:0;font:inherit;font-size:13px;cursor:pointer;' + (s.type === k ? 'background:#20332c;color:#ffffff;font-weight:600' : 'background:#ffffff;color:#353535') })),
+rows, empty: rows.length === 0,
+countLabel: rows.length + ' affichés sur 318',
+leads, noLeads: leads.length === 0
+};
+}
+}
+</script>
+</body>
+</html>

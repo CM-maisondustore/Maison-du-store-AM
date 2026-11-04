@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Nouveau devis, matériaux et finitions</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./assets/espace-pro.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="shell">
+<dc-import name="Navigation" active="devis" hint-size="240px,900px"></dc-import>
+<div class="workspace">
+<dc-import name="Haut" hint-size="100%,64px"></dc-import>
+<main class="main" id="contenu">
+<div class="page-head"><div>
+<nav class="crumbs" aria-label="Fil d’Ariane"><a href="#contenu">Devis</a></nav>
+<h1>Nouveau devis</h1>
+<p class="sub">Mme Kouassi Aya · Villa 12, Cocody Angré</p>
+</div></div>
+<div style="margin-bottom: 20px"><dc-import name="EtapesDevis" step="2" hint-size="100%,96px"></dc-import></div>
+
+<section class="panel" aria-labelledby="h-communs">
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px">
+<h2 id="h-communs" class="section-title"><span class="step" aria-hidden="true">3</span>Choix communs</h2>
+<p class="muted" style="margin: 0">Appliqués à toutes les ouvertures, sauf celles que vous personnalisez ci-dessous.</p>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 4px 16px">
+<label>Type de projet<select><option>Rideaux et voilages</option><option>Rideaux seuls</option><option>Voilages seuls</option><option>Store</option></select></label>
+<label>Tissu rideau<select><option>Tissu occultant 100 % — 12 000 F/m</option><option>Tissu occultant 80 % — 9 000 F/m</option><option>Tissu occultant 60 % — 7 000 F/m</option></select></label>
+<label>Voilage<select><option>Voilage lourd — 11 000 F/m</option><option>Voilage luxe — 14 000 F/m</option><option>Voilage transparent — 4 000 F/m</option><option>Sans voilage</option></select></label>
+<label>Finition<select><option>Wave</option><option>Wavy simple</option><option>Plis flamands</option><option>Œillets</option></select></label>
+<label>Rail / support<select><option>Rail Wave manuel — 7 000 F/m</option><option>Rail Wave électrique — 22 000 F/m</option><option>Rail double — 10 000 F/m</option></select></label>
+<label>Coefficient de tissu<select><option>× 2,5</option><option>× 2</option><option>× 3</option></select></label>
+</div>
+</section>
+
+<section class="panel flush" aria-labelledby="h-par-ouverture">
+<div class="panel-head"><div><h2 id="h-par-ouverture">Par ouverture</h2><p class="muted" style="margin: 2px 0 0">Changez un menu pour personnaliser une seule ouverture. Les quantités se calculent à l’étape suivante.</p></div></div>
+<div class="table-wrap">
+<table>
+<thead><tr><th scope="col">Ouverture</th><th scope="col">Tissu</th><th scope="col">Voilage</th><th scope="col">Finition</th><th scope="col">Rail / support</th><th scope="col">Coefficient</th><th scope="col">Choix</th></tr></thead>
+<tbody>
+<tr>
+<td style="min-width: 190px"><strong style="display: block; color: var(--pro-ink)">Salon — baie vitrée</strong><small class="mono">380 × 270 cm</small></td>
+<td><select aria-label="Tissu du salon" style="min-width: 190px; margin: 0"><option>Comme les choix communs</option><option>Tissu occultant 80 % — 9 000 F/m</option></select></td>
+<td><select aria-label="Voilage du salon" style="min-width: 170px; margin: 0"><option>Comme les choix communs</option></select></td>
+<td><select aria-label="Finition du salon" style="min-width: 150px; margin: 0"><option>Comme les choix communs</option></select></td>
+<td><select aria-label="Rail du salon" style="min-width: 200px; margin: 0"><option>Rail Wave électrique — 22 000 F/m</option><option>Comme les choix communs</option></select></td>
+<td><select aria-label="Coefficient du salon" style="min-width: 110px; margin: 0"><option>× 2,5</option></select></td>
+<td class="state"><span class="badge st-progress"><span aria-hidden="true">◐</span>Personnalisée</span></td>
+</tr>
+<tr>
+<td><strong style="display: block; color: var(--pro-ink)">Chambre — fenêtres côté jardin</strong><small class="mono">180 × 220 cm ×2</small></td>
+<td><select aria-label="Tissu de la chambre" style="min-width: 190px; margin: 0"><option>Comme les choix communs</option></select></td>
+<td><select aria-label="Voilage de la chambre" style="min-width: 170px; margin: 0"><option>Comme les choix communs</option></select></td>
+<td><select aria-label="Finition de la chambre" style="min-width: 150px; margin: 0"><option>Comme les choix communs</option></select></td>
+<td><select aria-label="Rail de la chambre" style="min-width: 200px; margin: 0"><option>Comme les choix communs</option></select></td>
+<td><select aria-label="Coefficient de la chambre" style="min-width: 110px; margin: 0"><option>× 2,5</option></select></td>
+<td class="state"><span class="badge st-neutral"><span aria-hidden="true">○</span>Choix communs</span></td>
+</tr>
+<tr>
+<td><strong style="display: block; color: var(--pro-ink)">Bureau</strong><small class="mono">140 × 160 cm</small></td>
+<td><select aria-label="Matériau du bureau" style="min-width: 190px; margin: 0"><option>Store léger — 18 000 F/m²</option></select></td>
+<td><select aria-label="Voilage du bureau" disabled style="min-width: 170px; margin: 0"><option>Sans objet pour un store</option></select></td>
+<td><select aria-label="Finition du bureau" style="min-width: 150px; margin: 0"><option>Finition standard</option></select></td>
+<td><select aria-label="Support du bureau" disabled style="min-width: 200px; margin: 0"><option>Inclus dans le store</option></select></td>
+<td><select aria-label="Coefficient du bureau" disabled style="min-width: 110px; margin: 0"><option>Surface</option></select></td>
+<td class="state"><span class="badge st-progress"><span aria-hidden="true">◐</span>Personnalisée</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="panel-foot muted" style="margin: 0">Motorisation, poses supplémentaires et quantités manuelles : dans « Ajuster » à l’étape suivante.</p>
+</section>
+
+<div class="action-bar"><span class="status">Enregistré en brouillon, jamais envoyé sans action de votre part.</span><a class="button quiet" href="Main.dc.html">Précédent</a><button type="button" class="secondary">Enregistrer le devis</button><a class="button" href="DevisChiffrage.dc.html">Suivant : affectation et chiffrage</a></div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1100}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

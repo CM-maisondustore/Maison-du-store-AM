@@ -1,0 +1,186 @@
+{
+  "v": 3,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-11-02T23:30:00Z"
+  },
+  "title": "Espace Pro, écrans de création",
+  "launch": {
+    "view": "canvas"
+  },
+  "pages": [],
+  "boards": {
+    "Main.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 1400,
+      "title": "Nouveau devis · 1. Client et ouvertures",
+      "expand": "fill"
+    },
+    "DevisMateriaux.dc.html": {
+      "x": 1520,
+      "y": 0,
+      "w": 1440,
+      "h": 1100,
+      "title": "Nouveau devis · 2. Matériaux et finitions",
+      "expand": "fill"
+    },
+    "DevisChiffrage.dc.html": {
+      "x": 3040,
+      "y": 0,
+      "w": 1440,
+      "h": 1900,
+      "title": "Nouveau devis · 3. Affectation et chiffrage",
+      "expand": "fill"
+    },
+    "DevisPaiement.dc.html": {
+      "x": 4560,
+      "y": 0,
+      "w": 1440,
+      "h": 1250,
+      "title": "Nouveau devis · 4. Paiement",
+      "expand": "fill"
+    },
+    "DevisArticles.dc.html": {
+      "x": 0,
+      "y": 2320,
+      "w": 1440,
+      "h": 2200,
+      "title": "Nouveau devis, électroménager, admin",
+      "expand": "fill"
+    },
+    "DevisAgent.dc.html": {
+      "x": 1520,
+      "y": 2320,
+      "w": 390,
+      "h": 2300,
+      "title": "Nouveau devis, relevé de l’agent, 390 px"
+    },
+    "Client.dc.html": {
+      "x": 0,
+      "y": 5020,
+      "w": 1440,
+      "h": 1000,
+      "title": "Créer un client, formulaire flottant",
+      "expand": "fill"
+    },
+    "Prestation.dc.html": {
+      "x": 1520,
+      "y": 5020,
+      "w": 1440,
+      "h": 1000,
+      "title": "Nouvelle prestation, formulaire flottant",
+      "expand": "fill"
+    },
+    "Materiau.dc.html": {
+      "x": 3040,
+      "y": 5020,
+      "w": 1440,
+      "h": 1000,
+      "title": "Ajouter un matériau",
+      "expand": "fill"
+    },
+    "Realisation.dc.html": {
+      "x": 0,
+      "y": 6420,
+      "w": 1440,
+      "h": 1300,
+      "title": "Ajouter une réalisation",
+      "expand": "fill"
+    },
+    "Produit.dc.html": {
+      "x": 1520,
+      "y": 6420,
+      "w": 1440,
+      "h": 2700,
+      "title": "Ajouter un produit",
+      "expand": "fill"
+    },
+    "MiseEnPage.dc.html": {
+      "x": 3040,
+      "y": 6420,
+      "w": 1440,
+      "h": 1000,
+      "title": "Éditeur libre de mise en page des PDF",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Navigation.dc.html": {
+      "x": 0,
+      "y": 9520,
+      "w": 240,
+      "h": 900,
+      "title": "Barre latérale"
+    },
+    "Haut.dc.html": {
+      "x": 320,
+      "y": 9520,
+      "w": 1200,
+      "h": 64,
+      "title": "Barre du haut"
+    },
+    "EtapesDevis.dc.html": {
+      "x": 320,
+      "y": 9664,
+      "w": 1200,
+      "h": 96,
+      "title": "Étapes du nouveau devis"
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "DevisMateriaux.dc.html",
+    "DevisChiffrage.dc.html",
+    "DevisPaiement.dc.html",
+    "DevisArticles.dc.html",
+    "DevisAgent.dc.html",
+    "Client.dc.html",
+    "Prestation.dc.html",
+    "Materiau.dc.html",
+    "Realisation.dc.html",
+    "Produit.dc.html",
+    "MiseEnPage.dc.html",
+    "Navigation.dc.html",
+    "Haut.dc.html",
+    "EtapesDevis.dc.html"
+  ],
+  "notes": {
+    "rangee-devis": {
+      "x": 0,
+      "y": -300,
+      "text": "Nouveau devis en quatre étapes",
+      "kind": "title1",
+      "maxW": 6000
+    },
+    "rangee-autres-devis": {
+      "x": 0,
+      "y": 2020,
+      "text": "Nouveau devis : articles et relevé de l’agent",
+      "kind": "title1",
+      "maxW": 1910
+    },
+    "rangee-panneaux": {
+      "x": 0,
+      "y": 4720,
+      "text": "Créer sans quitter la liste",
+      "kind": "title1",
+      "maxW": 4480
+    },
+    "rangee-fiches": {
+      "x": 0,
+      "y": 6120,
+      "text": "Fiches, réglages et éditeur",
+      "kind": "title1",
+      "maxW": 4480
+    },
+    "rangee-partages": {
+      "x": 0,
+      "y": 9220,
+      "text": "Éléments partagés",
+      "kind": "title1",
+      "maxW": 1520
+    }
+  },
+  "designSystems": []
+}

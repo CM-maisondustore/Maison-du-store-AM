@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Espace Pro — tokens admin.css</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 1440px; box-sizing: border-box; padding: 56px 64px 72px; font-family: Inter, system-ui, sans-serif; color: #353535; background: #ffffff; display: flex; flex-direction: column; gap: 44px">
+<header style="display: flex; flex-direction: column; gap: 6px"><h1 style="margin: 0; font-family: 'Cormorant Garamond', serif; font-size: 48px; font-weight: 500; color: #1c1c1c">Espace Pro, tokens</h1><p style="margin: 0; font-size: 15px; color: #6b665e; max-width: 72ch">La charte du site, resserrée pour un usage dense. Le vert sapin reste la couleur des coulisses : la barre latérale, les boutons secondaires et les sélections.</p></header>
+
+<section style="display: flex; flex-direction: column; gap: 16px">
+<h2 style="{{h2}}">Couleurs de base</h2>
+<div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px">
+<sc-for list="{{base}}" as="c" hint-placeholder-count="10">
+<div style="display: flex; flex-direction: column; gap: 8px"><span style="{{c.chip}}"></span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #1c1c1c">{{c.token}}</span><span style="font-size: 13px; color: #6b665e">{{c.hex}}, {{c.use}}</span></div>
+</sc-for>
+</div>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 16px">
+<h2 style="{{h2}}">Couleurs d’état</h2>
+<div style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 16px">
+<sc-for list="{{states}}" as="c" hint-placeholder-count="6">
+<div style="display: flex; flex-direction: column; gap: 8px; padding: 14px; border-radius: 10px; background: {{c.tint}}"><span style="font-size: 15px; font-weight: 600; color: {{c.fg}}">{{c.name}}</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: {{c.fg}}">{{c.fgHex}} sur {{c.tintHex}}</span><span style="font-size: 12.5px; color: {{c.fg}}">{{c.ratio}}</span></div>
+</sc-for>
+</div>
+</section>
+
+<section style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px">
+<div style="display: flex; flex-direction: column; gap: 14px">
+<h2 style="{{h2}}">Typographie</h2>
+<sc-for list="{{type}}" as="t" hint-placeholder-count="7">
+<div style="display: flex; align-items: baseline; gap: 18px; padding: 6px 0; border-bottom: 1px solid #f1eee8"><span style="width: 150px; flex: none; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b665e">{{t.token}}</span><span style="{{t.style}}">{{t.sample}}</span></div>
+</sc-for>
+</div>
+<div style="display: flex; flex-direction: column; gap: 14px">
+<h2 style="{{h2}}">Espacements, rayons, ombres</h2>
+<div style="display: flex; align-items: flex-end; gap: 14px">
+<sc-for list="{{space}}" as="s" hint-placeholder-count="8"><span style="display: flex; flex-direction: column; align-items: center; gap: 6px"><span style="{{s.box}}"></span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b665e">{{s.v}}</span></span></sc-for>
+</div>
+<div style="display: flex; gap: 16px; padding-top: 8px">
+<sc-for list="{{radii}}" as="r" hint-placeholder-count="5"><span style="display: flex; flex-direction: column; align-items: center; gap: 6px"><span style="{{r.box}}"></span><span style="font-size: 12px; color: #6b665e">{{r.use}}</span></span></sc-for>
+</div>
+<div style="display: flex; gap: 20px; padding-top: 8px">
+<span style="width: 150px; height: 70px; border-radius: 10px; background: #ffffff; border: 1px solid #e8e4db; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #6b665e">Panneau : filet seul</span>
+<span style="width: 150px; height: 70px; border-radius: 10px; background: #ffffff; box-shadow: 0 12px 28px -12px rgba(32,51,44,0.28); display: flex; align-items: center; justify-content: center; font-size: 12px; color: #6b665e">Menu, feuille</span>
+<span style="width: 150px; height: 70px; border-radius: 12px; background: #ffffff; box-shadow: 0 24px 60px -20px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; font-size: 12px; color: #6b665e">Modale</span>
+</div>
+</div>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 14px">
+<h2 style="{{h2}}">admin.css</h2>
+<pre style="margin: 0; padding: 26px 30px; background: #20332c; color: #e6ece9; border-radius: 12px; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; line-height: 1.7; white-space: pre; overflow-x: auto">:root {
+  /* Base : charte du site + vert sapin des coulisses */
+  --pro-sapin:        #20332c;  /* barre latérale, sélection, boutons secondaires (13,4:1 avec le blanc) */
+  --pro-sapin-text:   #d3dcd7;  /* libellés du menu */
+  --pro-bg:           #f4f4f1;  /* fond de travail, gris chaud neutre */
+  --pro-panel:        #ffffff;
+  --pro-panel-alt:    #f9f8f4;  /* en-têtes de tableaux, zones secondaires */
+  --pro-line:         #e8e4db;
+  --pro-line-strong:  #dcd6cb;  /* bordure des champs */
+  --pro-ink:          #1c1c1c;
+  --pro-text:         #353535;
+  --pro-text-2:       #6b665e;  /* 5,1:1 sur --pro-bg */
+  --pro-gold:         #c09f6a;  /* action principale, tringle */
+  --pro-gold-text:    #84642f;
+  --pro-gold-tint:    #f6f0e4;
+
+  /* États : couleur + teinte, toujours avec symbole et libellé */
+  --st-warn: #8c5f0e;    --st-warn-tint: #fbf1dc;     /* À traiter, Envoi à vérifier */
+  --st-progress: #84642f; --st-progress-tint: #f6f0e4; /* En cours */
+  --st-info: #3f6285;    --st-info-tint: #e8eef5;     /* Validé, Planifié, Émise, Reçu, Envoi en cours */
+  --st-ok: #2f7350;      --st-ok-tint: #e5f1ea;       /* Accepté, Confirmé, Terminé, Payée, Envoyé, Partagé */
+  --st-error: #b3392f;   --st-error-tint: #f8e6e4;    /* Refusé, erreurs */
+  --st-neutral: #5c5852; --st-neutral-tint: #f1f0ec;  /* Brouillon, Annulé */
+  --st-undefined-line: #b98a2e;                       /* prix « à définir », coût « non renseigné » */
+
+  /* Typographie */
+  --font-ui: "Inter", system-ui, sans-serif;
+  --font-title: "Cormorant Garamond", Georgia, serif;
+  --font-data: "IBM Plex Mono", ui-monospace, monospace;  /* références, montants, dates */
+  --fs-12: 12px; --fs-13: 13px; --fs-14: 14px; --fs-16: 16px;
+  --fs-18: 18px; --fs-24: 24px; --fs-34: 34px; --fs-48: 48px;
+
+  /* Espacements (échelle de 4 px), rayons, ombres */
+  --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px;
+  --sp-5: 20px; --sp-6: 24px; --sp-8: 32px; --sp-12: 48px;
+  --r-4: 4px; --r-6: 6px; --r-10: 10px; --r-12: 12px; --r-pill: 999px;
+  --sh-menu: 0 12px 28px -12px rgba(32, 51, 44, .28);
+  --sh-modal: 0 24px 60px -20px rgba(0, 0, 0, .40);
+
+  /* Dimensions */
+  --sidebar-w: 240px; --sidebar-w-collapsed: 68px;
+  --topbar-h: 64px; --tabbar-h: 84px;
+  --row-h: 44px;       /* lignes de tableau desktop */
+  --control-h: 40px;   /* desktop */
+  --touch: 48px;       /* cible tactile mobile (≥ 44 px) */
+  --dur: 180ms; --ease: cubic-bezier(.2, .7, .2, 1);
+}
+
+/* Points de rupture */
+@media (max-width: 1199px) { /* barre latérale repliée en icônes */ }
+@media (max-width: 767px)  { /* onglets en bas, tableaux en cartes */ }
+
+@media (prefers-reduced-motion: reduce) { :root { --dur: 0ms; } }
+
+/* Impression des devis et factures */
+@media print {
+  .pro-sidebar, .pro-topbar, .pro-tabbar, .pro-actions { display: none !important; }
+  body { background: #fff; }
+  .pro-document { box-shadow: none; margin: 0; width: auto; }
+}</pre>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":2000}}'>
+class Component extends DCLogic {
+renderVals() {
+return {
+h2: "margin:0;padding-bottom:10px;border-bottom:1px solid #dcd6cb;font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:500;color:#1c1c1c",
+base: [
+['--pro-sapin', '#20332c', 'barre latérale'], ['--pro-bg', '#f4f4f1', 'fond de travail'], ['--pro-panel', '#ffffff', 'panneaux'], ['--pro-panel-alt', '#f9f8f4', 'en-têtes'], ['--pro-line', '#e8e4db', 'filets'],
+['--pro-ink', '#1c1c1c', 'titres'], ['--pro-text', '#353535', 'texte'], ['--pro-text-2', '#6b665e', 'secondaire'], ['--pro-gold', '#c09f6a', 'action principale'], ['--pro-gold-text', '#84642f', 'or lisible']
+].map(([token, hex, use]) => ({ token, hex, use, chip: 'height:64px;border-radius:10px;background:' + hex + ';box-shadow:inset 0 0 0 1px rgba(0,0,0,0.08)' })),
+states: [
+['Attention', '#8c5f0e', '#fbf1dc', '5,0:1'], ['En cours', '#84642f', '#f6f0e4', '4,8:1'], ['Information', '#3f6285', '#e8eef5', '5,4:1'],
+['Succès', '#2f7350', '#e5f1ea', '4,9:1'], ['Erreur', '#b3392f', '#f8e6e4', '4,9:1'], ['Neutre', '#5c5852', '#f1f0ec', '6,2:1']
+].map(([name, fg, tint, ratio]) => ({ name, fg, tint, fgHex: fg, tintHex: tint, ratio: 'Contraste ' + ratio + ', AA' })),
+type: [
+['--fs-48 titre login', "font-family:'Cormorant Garamond',serif;font-size:44px;font-weight:500;color:#1c1c1c;line-height:1", 'Espace Pro'],
+['--fs-34 titre de page', "font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:500;color:#1c1c1c", 'Rendez-vous'],
+['--fs-18 titre mobile', 'font-size:18px;font-weight:600;color:#1c1c1c', 'Mes devis'],
+['--fs-16 titre de panneau', 'font-size:16px;font-weight:600;color:#1c1c1c', 'Prestations à venir'],
+['--fs-14 interface', 'font-size:14px;color:#353535', 'Mme Koné Mariam, Angré 8e tranche'],
+['--fs-13 aide', 'font-size:13px;color:#6b665e', 'Le plus ancien attend depuis 3 jours.'],
+['--font-data montants', "font-family:'IBM Plex Mono',monospace;font-size:14px;color:#1c1c1c", 'D-2026-0140, 622 568 FCFA, 26/10/2026']
+].map(([token, style, sample]) => ({ token, style, sample })),
+space: [4, 8, 12, 16, 20, 24, 32, 48].map((v) => ({ v, box: 'width:' + v + 'px;height:' + v + 'px;background:#c09f6a;border-radius:2px' })),
+radii: [[4, 'image'], [6, 'champ'], [10, 'panneau'], [12, 'modale'], [999, 'pastille']].map(([r, use]) => ({ use, box: 'width:56px;height:40px;border:2px solid #20332c;border-radius:' + Math.min(r, 20) + 'px' }))
+};
+}
+}
+</script>
+</body>
+</html>

@@ -1,24 +1,21 @@
 <div class="table-wrap">
-<table>
+<table class="cards">
 <thead>
 <tr>
-<th>Date / heure</th>
-<th>Prestation</th>
-<th>Client</th>
-<th>Agent</th>
-<th>État</th>
+<th scope="col">Date et heure</th>
+<th scope="col">Type</th>
+<th scope="col">Client</th>
+<th scope="col">Agent</th>
+<th scope="col">État</th>
 </tr>
 </thead>
 <tbody>
 @forelse($jobs as $job)<tr>
-<td>{{ $job->scheduled_at->format('d/m/Y H:i') }}</td>
-<td>
-<a href="{{ route('staff.interventions.show',$job) }}">{{ ['devis_sur_place'=>'Devis sur place','installation'=>'Installation','sav'=>'Service après-vente'][$job->kind] }}</a>
-</td>
-<td>{{ $job->contact->name }}</td>
-<td>{{ $job->agent->name }}</td>
-<td>
-@include('staff.status',['status'=>$job->status])</td>
+<td class="primary mono"><a class="row-link" href="{{ route('staff.interventions.show',$job) }}">{{ $job->scheduled_at->format('d/m/Y H:i') }}</a></td>
+<td data-label="Type">{{ \App\Services\StaffInterface::JOB_KINDS[$job->kind] ?? $job->kind }}</td>
+<td data-label="Client">{{ $job->contact->name }}</td>
+<td data-label="Agent">{{ $job->agent->name }}</td>
+<td class="state">@include('staff.status',['status'=>$job->status])</td>
 </tr>
 @empty<tr>
 <td colspan="5" class="empty">Aucune prestation à afficher.</td>

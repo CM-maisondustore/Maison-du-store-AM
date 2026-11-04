@@ -16,6 +16,7 @@ class ProductController
         $filters = $request->validate([
             'q' => 'nullable|string|max:150', 'published' => 'nullable|in:0,1',
             'available' => 'nullable|in:0,1', 'type' => 'nullable|in:store,rideau',
+            'universe' => 'nullable|in:stores_rideaux,electromenager,meubles_bureau,meubles_domicile',
         ]);
         $query = Product::query();
         if (!empty($filters['q'])) {
@@ -25,6 +26,8 @@ class ProductController
         if ($request->filled('published')) $query->where('published', $request->boolean('published'));
         if ($request->filled('available')) $query->where('details->available', $request->boolean('available'));
         if ($request->filled('type')) $query->where('details->type', $filters['type']);
+        // Les produits créés avant les univers n'ont pas ce champ : ce sont des stores et des rideaux.
+        if ($request->filled('universe')) $filters['universe'] === 'stores_rideaux' ? $query->whereIn('details->type', ['store', 'rideau']) : $query->where('details->universe', $filters['universe']);
         $catalogueVisible = SiteSetting::catalogueVisible();
         return view('staff.products', [
             'catalogueVisible' => $catalogueVisible,

@@ -1,3 +1,27 @@
+# Espace Pro : refonte de l'interface
+
+Cette version reprend `Backend-main.zip` et ajoute l'interface de la maquette `MDS-espace-pro.zip`.
+Voir [l'audit et la correspondance des routes](docs/AUDIT_ET_CORRESPONDANCE.md) et [les écarts à trancher](docs/ECARTS.md).
+
+## Essayer en local
+
+```powershell
+composer install --ignore-platform-req=php   # l'option n'est utile qu'avec PHP 8.4.0
+Copy-Item .env.example .env
+php artisan key:generate
+New-Item -ItemType File database\database.sqlite
+php artisan migrate --force
+php artisan db:seed --class=DemoSeeder       # données fictives, refusé hors environnement local
+php artisan catalogue:import                 # facultatif, aucun produit n'est publié
+php artisan serve
+```
+
+Ouvrir http://127.0.0.1:8000/admin. Comptes de démonstration : `demo-admin` et `demo-agent`, mot de passe `Demo-Maison-2026`.
+
+Tests : `composer test` et `npm test`.
+
+---
+
 # Backend — Maison du Store AM
 
 Application Laravel 12 autonome, avec les vues Blade existantes et Vite. Les demandes sont réellement enregistrées en base. Ouvrir `index.html` à la racine continue de lancer la maquette statique : utiliser le serveur Laravel pour le backend.

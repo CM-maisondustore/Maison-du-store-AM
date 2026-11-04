@@ -1,0 +1,5 @@
+@extends('errors.layout')
+@section('code','419')
+@section('tone','gold')
+@section('heading','Session expirée')
+@section('message','La page est restée ouverte trop longtemps. Revenez en arrière, rechargez puis renvoyez le formulaire.')

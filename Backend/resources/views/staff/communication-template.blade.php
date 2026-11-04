@@ -1,5 +1,6 @@
 @extends('staff.layout')
 @section('title',$template->name.' · '.strtoupper($template->channel))
+@section('back',route('staff.communications.index'))
 @section('content')
 @if($template->channel==='pdf')<p><a class="button" href="{{ route('staff.layouts.edit',$template->key) }}">Ouvrir l’éditeur Mise en page : aperçu A4, brouillons et versions publiées</a></p>@endif
 <div class="actions"><a href="{{ route('staff.communications.index') }}">← Documents & automatisations</a></div>
@@ -12,7 +13,7 @@
 <label>Couleur principale<input name="accent" type="color" value="{{ old('accent',$options['accent'] ?? '#243831') }}" required></label>
 <label>Logo PNG ou JPEG (512 Ko maximum)<input type="file" name="logo" accept="image/png,image/jpeg"></label>
 </div>
-@if(!empty($options['logo']))<img src="{{ $options['logo'] }}" alt="Logo actuel" style="max-width:180px;max-height:90px"><label class="check"><input type="checkbox" name="remove_logo" value="1">Retirer le logo</label>@endif
+@if(!empty($options['logo']))<img src="{{ $options['logo'] }}" alt="Logo actuel" class="asset-preview"><label class="check"><input type="checkbox" name="remove_logo" value="1">Retirer le logo</label>@endif
 <label>Texte d’introduction<textarea name="body" maxlength="10000" rows="4">{{ old('body',$template->body) }}</textarea></label>
 <label>Pied de page<textarea name="footer" maxlength="2000" rows="3">{{ old('footer',$options['footer'] ?? '') }}</textarea></label>
 <label>Signature / mention de signature<textarea name="signature" maxlength="1000" rows="2">{{ old('signature',$options['signature'] ?? '') }}</textarea></label></section>

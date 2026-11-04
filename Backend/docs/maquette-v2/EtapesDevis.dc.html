@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Étapes du nouveau devis</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./assets/espace-pro.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<nav aria-label="Étapes du nouveau devis" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); padding: 14px 20px 12px; background: var(--pro-panel); border: 1px solid var(--pro-line); border-radius: 12px; font-family: var(--font-ui); color: var(--pro-text); overflow-x: auto">
+<sc-for list="{{steps}}" as="s" hint-placeholder-count="4">
+<a href="{{s.href}}" aria-current="{{s.current}}" style="display: flex; flex-direction: column; gap: 1px; min-width: 150px; min-height: 44px; padding-right: 14px; color: inherit; text-decoration: none">
+<span aria-hidden="true" style="{{s.rail}}"><span style="{{s.ring}}"></span></span>
+<span style="font-size: 12.5px; color: var(--pro-text-2)">Étape {{s.n}}</span>
+<strong style="{{s.title}}">{{s.label}}</strong>
+<small style="{{s.noteStyle}}">{{s.note}}</small>
+</a>
+</sc-for>
+</nav>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"step":{"editor":"enum","options":["1","2","3","4"],"default":"1"},"$preview":{"width":1200,"height":96}}'>
+class Component extends DCLogic {
+renderVals() {
+const step = Number(this.props.step ?? 1);
+const list = [
+['Main.dc.html', 'Client et ouvertures'],
+['DevisMateriaux.dc.html', 'Matériaux et finitions'],
+['DevisChiffrage.dc.html', 'Affectation et chiffrage'],
+['DevisPaiement.dc.html', 'Paiement'],
+];
+return { steps: list.map(([href, label], index) => {
+const n = index + 1, done = n < step, current = n === step;
+return {
+n, href, label,
+current: current ? 'step' : undefined,
+note: done ? 'Complet' : current ? 'En cours' : 'À venir',
+rail: 'position: relative; display: block; height: 2px; margin: 8px 0 14px; background: ' + (done ? 'var(--pro-gold)' : 'var(--pro-line-strong)'),
+ring: 'position: absolute; left: 0; top: -7px; width: 16px; height: 16px; box-sizing: border-box; border-radius: 50%; border: 2px solid ' + (done ? 'var(--pro-gold)' : current ? 'var(--pro-gold-text)' : 'var(--pro-line-strong)') + '; background: ' + (done ? 'var(--pro-gold)' : 'var(--pro-panel)') + (current ? '; box-shadow: 0 0 0 4px var(--pro-gold-tint)' : ''),
+title: 'font-size: 14px; color: var(--pro-ink); font-weight: ' + (current ? '600' : '500'),
+noteStyle: 'font-size: 12.5px; color: ' + (current ? 'var(--pro-gold-text)' : 'var(--pro-text-2)'),
+};
+}) };
+}
+}
+</script>
+</body>
+</html>

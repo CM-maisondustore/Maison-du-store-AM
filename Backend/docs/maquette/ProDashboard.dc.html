@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Espace Pro — vue d’ensemble</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="color-scheme: {{colorScheme}}; font-family: Inter, system-ui, sans-serif; color: {{pal.t353535}}; background: {{pal.sf4f4f1}}; min-height: 100vh; display: flex">
+<dc-import name="ProSidebar" active="overview" hint-size="240px,100%"></dc-import>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+<dc-import name="ProTopbar" role="admin" hint-size="100%,64px"></dc-import>
+<main id="contenu" style="padding: 28px 32px 56px; display: flex; flex-direction: column; gap: 24px">
+
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 24px">
+<h1 style="margin: 0; font-family: 'Cormorant Garamond', serif; font-size: 34px; font-weight: 500; color: {{pal.t1c1c1c}}">Vue d’ensemble</h1>
+<span style="font-size: 14px; color: {{pal.t6b665e}}">Lundi 26/10/2026</span>
+</div>
+
+<nav aria-label="Files d’attente" style="background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 10px; overflow: hidden; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr))">
+<sc-for list="{{queues}}" as="q" hint-placeholder-count="4">
+<a href="{{q.href}}" style="{{q.style}}">
+<span style="display: flex; align-items: baseline; gap: 10px">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 30px; font-weight: 500; line-height: 1; color: {{pal.t1c1c1c}}">{{q.n}}</span>
+<span style="font-size: 15px; font-weight: 600; color: {{pal.t1c1c1c}}">{{q.label}}</span>
+</span>
+<span style="font-size: 13px; color: {{pal.t6b665e}}">{{q.detail}}</span>
+<span style="margin-top: auto; font-size: 13px; font-weight: 600; color: {{pal.t20332c}}; text-decoration: underline; text-decoration-color: #c09f6a; text-underline-offset: 4px">{{q.cta}}</span>
+</a>
+</sc-for>
+</nav>
+
+<div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+<div style="flex: 2 1 640px; min-width: 0; display: flex; flex-direction: column; gap: 24px">
+
+<section aria-labelledby="planning-title" style="background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 10px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px; border-bottom: 1px solid {{pal.be8e4db}}">
+<h2 id="planning-title" style="margin: 0; font-size: 16px; font-weight: 600; color: {{pal.t1c1c1c}}">Planning de la semaine <span style="font-weight: 400; color: {{pal.t6b665e}}">du 26/10 au 31/10/2026</span></h2>
+<a href="ProRdv.dc.html" style="font-size: 14px; font-weight: 600; color: {{pal.t20332c}}">Ouvrir le calendrier</a>
+</div>
+<div style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); overflow-x: auto">
+<sc-for list="{{week}}" as="d" hint-placeholder-count="6">
+<div style="{{d.col}}">
+<div style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: {{d.headColor}}; font-weight: 600"><span aria-hidden="true" style="{{d.ring}}"></span>{{d.label}}</div>
+<sc-for list="{{d.ev}}" as="e" hint-placeholder-count="1">
+<div style="{{e.style}}">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: {{pal.t6b665e}}">{{e.h}}</span>
+<span style="font-size: 13px; font-weight: 600; color: {{pal.t1c1c1c}}">{{e.type}}</span>
+<span style="font-size: 12.5px; color: {{pal.t353535}}; line-height: 1.35">{{e.client}}</span>
+<span style="font-size: 12px; color: {{pal.t6b665e}}">{{e.agent}}</span>
+</div>
+</sc-for>
+<sc-if value="{{d.empty}}" hint-placeholder-val="{{ false }}"><span style="font-size: 12.5px; color: {{pal.t6b665e}}">Aucune intervention</span></sc-if>
+</div>
+</sc-for>
+</div>
+</section>
+
+<section aria-labelledby="presta-title" style="background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 10px; overflow: hidden">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px; border-bottom: 1px solid {{pal.be8e4db}}">
+<h2 id="presta-title" style="margin: 0; font-size: 16px; font-weight: 600; color: {{pal.t1c1c1c}}">Prestations à venir</h2>
+<a href="ProPrestation.dc.html" style="font-size: 14px; font-weight: 600; color: {{pal.t20332c}}">Toutes les prestations</a>
+</div>
+<div style="overflow-x: auto">
+<table style="width: 100%; border-collapse: collapse; font-size: 14px">
+<thead><tr style="background: {{pal.sf9f8f4}}; text-align: left">
+<th scope="col" style="padding: 10px 20px; font-size: 13px; font-weight: 600; color: {{pal.t6b665e}}">Date et heure</th>
+<th scope="col" style="padding: 10px 12px; font-size: 13px; font-weight: 600; color: {{pal.t6b665e}}">Type</th>
+<th scope="col" style="padding: 10px 12px; font-size: 13px; font-weight: 600; color: {{pal.t6b665e}}">Client</th>
+<th scope="col" style="padding: 10px 12px; font-size: 13px; font-weight: 600; color: {{pal.t6b665e}}">Agent</th>
+<th scope="col" style="padding: 10px 20px 10px 12px; font-size: 13px; font-weight: 600; color: {{pal.t6b665e}}">État</th>
+</tr></thead>
+<tbody>
+<sc-for list="{{presta}}" as="r" hint-placeholder-count="5">
+<tr style="border-top: 1px solid {{pal.befece5}}">
+<td style="padding: 11px 20px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: {{pal.t1c1c1c}}; white-space: nowrap">{{r.dt}}</td>
+<td style="padding: 11px 12px">{{r.type}}</td>
+<td style="padding: 11px 12px; color: {{pal.t1c1c1c}}; font-weight: 500">{{r.client}}<br><span style="font-weight: 400; font-size: 13px; color: {{pal.t6b665e}}">{{r.lieu}}</span></td>
+<td style="padding: 11px 12px">{{r.agent}}</td>
+<td style="padding: 11px 20px 11px 12px"><span style="{{r.st.style}}"><span aria-hidden="true">{{r.st.glyph}}</span>{{r.st.label}}</span></td>
+</tr>
+</sc-for>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+
+<div style="flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 24px">
+<section aria-labelledby="valid-title" style="background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 10px">
+<div style="padding: 16px 20px; border-bottom: 1px solid {{pal.be8e4db}}"><h2 id="valid-title" style="margin: 0; font-size: 16px; font-weight: 600; color: {{pal.t1c1c1c}}">Devis à valider</h2></div>
+<ul style="list-style: none; margin: 0; padding: 0">
+<sc-for list="{{toValidate}}" as="v" hint-placeholder-count="3">
+<li style="border-bottom: 1px solid {{pal.befece5}}"><a href="ProDevisFiche.dc.html" style="display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; padding: 12px 20px; text-decoration: none; color: {{pal.t353535}}">
+<span style="font-size: 14px; font-weight: 600; color: {{pal.t1c1c1c}}">{{v.client}}</span>
+<span style="{{v.amountStyle}}">{{v.amount}}</span>
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: {{pal.t6b665e}}">{{v.ref}}</span>
+<span style="font-size: 12px; color: {{pal.t6b665e}}; text-align: right">{{v.age}}</span>
+</a></li>
+</sc-for>
+</ul>
+<a href="ProDevisList.dc.html" style="display: block; padding: 12px 20px; font-size: 14px; font-weight: 600; color: {{pal.t20332c}}">Voir les 7 devis à valider</a>
+</section>
+
+<section aria-labelledby="fact-title" style="background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 10px">
+<div style="padding: 16px 20px; border-bottom: 1px solid {{pal.be8e4db}}"><h2 id="fact-title" style="margin: 0; font-size: 16px; font-weight: 600; color: {{pal.t1c1c1c}}">Factures émises non payées</h2></div>
+<ul style="list-style: none; margin: 0; padding: 0">
+<sc-for list="{{unpaid}}" as="f" hint-placeholder-count="3">
+<li style="border-bottom: 1px solid {{pal.befece5}}"><a href="ProFacture.dc.html" style="display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; padding: 12px 20px; text-decoration: none; color: {{pal.t353535}}">
+<span style="font-size: 14px; font-weight: 600; color: {{pal.t1c1c1c}}">{{f.client}}</span>
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: {{pal.t1c1c1c}}; text-align: right">{{f.amount}}</span>
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: {{pal.t6b665e}}">{{f.ref}}</span>
+<span style="{{f.dueStyle}}">{{f.due}}</span>
+</a></li>
+</sc-for>
+</ul>
+<div style="display: flex; justify-content: space-between; padding: 12px 20px; background: {{pal.sf9f8f4}}; border-radius: 0 0 10px 10px; font-size: 14px"><span style="font-weight: 600; color: {{pal.t1c1c1c}}">Total dû</span><span style="font-family: 'IBM Plex Mono', monospace; font-weight: 500; color: {{pal.t1c1c1c}}">{{unpaidTotal}}</span></div>
+</section>
+
+<section aria-labelledby="auto-title" style="background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 10px; padding: 16px 20px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+<h2 id="auto-title" style="margin: 0; font-size: 16px; font-weight: 600; color: {{pal.t1c1c1c}}">Automatisations</h2>
+<span style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; border-radius: 999px; background: {{pal.se5f1ea}}; color: {{pal.t2f7350}}; font-size: 12.5px; font-weight: 600"><span aria-hidden="true">✓</span>SMTP vérifié</span>
+</div>
+<p style="margin: 0; font-size: 14px; line-height: 1.55; color: {{pal.t353535}}">Dernier passage le <span style="font-family: 'IBM Plex Mono', monospace">26/10/2026 à 08:00</span> : 4 e-mails envoyés, 1 brouillon à valider.</p>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<button type="button" onClick="{{run}}" style="height: 40px; padding: 0 14px; background: {{pal.sffffff}}; border: 1px solid {{pal.b20332c}}; border-radius: 6px; color: {{pal.t20332c}}; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer">{{runLabel}}</button>
+<a href="ProAutomatisations.dc.html" style="display: inline-flex; align-items: center; height: 40px; padding: 0 6px; font-size: 14px; font-weight: 600; color: {{pal.t20332c}}">Voir les règles</a>
+</div>
+</section>
+</div>
+</div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1400}}'>
+class Component extends DCLogic {
+constructor(props) {
+super(props);
+this.state = { ran: false };
+}
+isDark() {
+const t = this.props.theme;
+if (t === 'dark') return true;
+if (t === 'light') return false;
+let v = 'light';
+try { v = window.localStorage.getItem('mds-pro-theme') || 'light'; } catch (e) {}
+if (v === 'dark') return true;
+if (v === 'auto') { try { return window.matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) {} }
+return false;
+}
+themeMaps() { return { s: {"#ffffff": "#1b2220", "#f4f4f1": "#121816", "#f9f8f4": "#202825", "#fbfaf7": "#1e2623", "#fdfbf6": "#222a27", "#fcfbf8": "#1e2623", "#faf9f7": "#1e2623", "#fffcf5": "#2b2618", "#f1f0ec": "#262e2b", "#ece9e2": "#2a322f", "#e9e8e2": "#2a302d", "#e9e6df": "#0f1412", "#eef0ec": "#232b28", "#eef1ef": "#202826", "#edf1f4": "#1d2530", "#e8e4db": "#313a36", "#dcd6cb": "#3b4540", "#f1eee8": "#29312e", "#efece5": "#29312e", "#cfc9bd": "#4c5751", "#cfc8bb": "#4c5751", "#e1ddd3": "#3b4540", "#b9b4aa": "#5a645e", "#20332c": "#2b4a3e", "#2b4239": "#34574a", "#e5f1ea": "#1d3a2b", "#b7d6c3": "#2f5a43", "#fdf8ec": "#2d2717", "#ecd7a8": "#5b4a25", "#fbf1dc": "#382d15", "#e3c2bd": "#5e302b", "#e3c3bf": "#5e302b", "#fbeceb": "#3a1f1c", "#e8eef5": "#1d2a38", "#eeede8": "#2a302d", "#f6f0e4": "#2f2a1f", "#f3f3f3": "#262e2b", "#cccccc": "#46504b", "#fdf6f5": "#33201e", "#f8e6e4": "#3a2220", "#fbf6ea": "#2d2717", "#ecdcb9": "#5b4a25", "#f6ece5": "#33241d", "#efe9dd": "#2a2620", "#d9b26a": "#8a6a2c", "#b98a2e": "#8a6a2c"}, b: {"#ffffff": "#1b2220", "#f4f4f1": "#121816", "#f9f8f4": "#202825", "#fbfaf7": "#1e2623", "#fdfbf6": "#222a27", "#fcfbf8": "#1e2623", "#faf9f7": "#1e2623", "#fffcf5": "#2b2618", "#f1f0ec": "#262e2b", "#ece9e2": "#2a322f", "#e9e8e2": "#2a302d", "#e9e6df": "#0f1412", "#eef0ec": "#232b28", "#eef1ef": "#202826", "#edf1f4": "#1d2530", "#e8e4db": "#313a36", "#dcd6cb": "#3b4540", "#f1eee8": "#29312e", "#efece5": "#29312e", "#cfc9bd": "#4c5751", "#cfc8bb": "#4c5751", "#e1ddd3": "#3b4540", "#b9b4aa": "#5a645e", "#20332c": "#5d8a76", "#2b4239": "#34574a", "#e5f1ea": "#1d3a2b", "#b7d6c3": "#2f5a43", "#fdf8ec": "#2d2717", "#ecd7a8": "#5b4a25", "#fbf1dc": "#382d15", "#e3c2bd": "#5e302b", "#e3c3bf": "#5e302b", "#fbeceb": "#3a1f1c", "#e8eef5": "#1d2a38", "#eeede8": "#2a302d", "#f6f0e4": "#2f2a1f", "#f3f3f3": "#262e2b", "#cccccc": "#46504b", "#fdf6f5": "#33201e", "#f8e6e4": "#3a2220", "#fbf6ea": "#2d2717", "#ecdcb9": "#5b4a25", "#f6ece5": "#33241d", "#efe9dd": "#2a2620", "#d9b26a": "#8a6a2c", "#b98a2e": "#8a6a2c", "#1c1c1c": "#d6d2c9", "#b3392f": "#f28b80"}, t: {"#1c1c1c": "#f1eee8", "#353535": "#d6d2c9", "#6b665e": "#a8a296", "#20332c": "#bfd8cb", "#84642f": "#d8b47a", "#2f7350": "#86cfa3", "#8c5f0e": "#e6b862", "#5e4108": "#f0d39a", "#b3392f": "#f28b80", "#7c241c": "#f5b0a8", "#3f6285": "#9ec0e3", "#2c4866": "#bcd3ea", "#5c5852": "#c9c4ba", "#b0aaa0": "#6c736e", "#3d2b06": "#f0dcb3", "#1f4d35": "#bfe3cc", "#8f2c24": "#f5b0a8", "#6e4a0b": "#e6c27a", "#3f5a72": "#a9c3dc", "#3f5a73": "#a9c3dc", "#8e4529": "#e0a084", "#5a5248": "#cfc8bb", "#b98a2e": "#d9ac57", "#2c4660": "#a9c3dc"} }; }
+themeWatch() {
+if (this.__thw || typeof window === 'undefined') return;
+this.__thw = true;
+const bump = () => this.setState({ __th: Date.now() });
+try { window.addEventListener('storage', (e) => { if (e.key === 'mds-pro-theme') bump(); }); } catch (e) {}
+try { window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', bump); } catch (e) {}
+}
+dmap(v) {
+const T = this.themeMaps();
+const cv = (str) => str.split(';').map((seg) => {
+const i = seg.indexOf(':');
+let M = T.s;
+if (i > -1) { const p = seg.slice(0, i).trim().toLowerCase(); M = /^(color|stroke|fill|caret-color|accent-color|text-decoration-color)$/.test(p) ? T.t : /^(border|outline|box-shadow)/.test(p) ? T.b : T.s; }
+return seg.replace(/#[0-9a-fA-F]{6}/g, (h) => M[h.toLowerCase()] || h);
+}).join(';');
+const go = (x) => (typeof x === 'string' ? cv(x) : Array.isArray(x) ? x.map(go) : x && typeof x === 'object' && Object.prototype.toString.call(x) === '[object Object]' ? Object.keys(x).reduce((o, k) => { o[k] = go(x[k]); return o; }, {}) : x);
+return go(v);
+}
+renderVals() {
+this.themeWatch();
+const dark = this.isDark();
+let v = this.renderValsLight();
+if (dark) v = this.dmap(v);
+const T = this.themeMaps();
+const pal = {};
+['s', 'b', 't'].forEach((k) => { Object.keys(T[k]).forEach((h) => { pal[k + h.slice(1)] = dark ? T[k][h] : h; }); });
+v.pal = pal;
+v.themeDark = dark;
+v.colorScheme = dark ? 'dark' : 'light';
+return v;
+}
+renderValsLight() {
+const SC = { 'À traiter': ['#8c5f0e', '#fbf1dc', '!'], 'Planifié': ['#3f6285', '#e8eef5', '○'], 'En cours': ['#84642f', '#f6f0e4', '◐'], 'Terminé': ['#2f7350', '#e5f1ea', '●'] };
+const badge = (s) => ({ label: s, glyph: SC[s][2], style: 'display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:999px;font-size:12.5px;font-weight:600;white-space:nowrap;color:' + SC[s][0] + ';background:' + SC[s][1] });
+const fmt = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' FCFA';
+const W = [
+['lun. 26/10', true, [['09:00', 'Installation', 'Mme Kouassi Aya', 'Koffi B.'], ['14:30', 'Devis sur place', 'Cabinet Traoré & Associés', 'Yao S.']]],
+['mar. 27/10', false, [['10:00', 'SAV', 'M. Bamba Ibrahim', 'Koffi B.'], ['15:00', 'RDV showroom', 'M. Yao Patrick', 'Aïcha D.']]],
+['mer. 28/10', false, [['08:30', 'Installation', 'Résidence Les Palmiers', 'Koffi B., Yao S.']]],
+['jeu. 29/10', false, [['15:00', 'Devis sur place', 'Mme Koné Mariam', 'Yao S.']]],
+['ven. 30/10', false, [['09:00', 'Installation', 'Clinique des Lagunes', 'Koffi B.']]],
+['sam. 31/10', false, []]
+];
+const tint = { 'Installation': '#f6f0e4', 'Devis sur place': '#e8eef5', 'SAV': '#f8e6e4', 'RDV showroom': '#eef0ec' };
+return {
+queues: [
+['12', 'devis à traiter', 'Le plus ancien attend depuis 3 jours.', 'Ouvrir la liste filtrée', 'ProDevisList.dc.html'],
+['3', 'rendez-vous à confirmer', 'Le prochain est demain à 10:00.', 'Confirmer les rendez-vous', 'ProRdv.dc.html'],
+['248', 'dossiers clients', '6 nouveaux clients ce mois-ci.', 'Ouvrir les clients', 'ProClient.dc.html'],
+['5', 'messages non lus', 'Dont 2 réponses WhatsApp à traiter.', 'Ouvrir la messagerie', 'ProMessagerie.dc.html']
+].map(([n, label, detail, cta, href], i) => ({ n, label, detail, cta, href, style: 'display:flex;flex-direction:column;gap:8px;min-height:132px;padding:18px 20px;margin:-1px 0 0 -1px;box-sizing:border-box;text-decoration:none;color:#353535;border-left:1px solid #e8e4db;border-top:1px solid #e8e4db' })),
+week: W.map(([label, today, ev], i) => ({
+label,
+headColor: today ? '#1c1c1c' : '#6b665e',
+ring: 'width:8px;height:8px;box-sizing:border-box;border-radius:50%;border:2px solid #c09f6a;background:' + (today ? '#c09f6a' : 'transparent') + ';opacity:' + (today ? '1' : '0'),
+col: 'display:flex;flex-direction:column;gap:8px;padding:14px 12px;min-height:230px;min-width:120px;' + (i ? 'border-left:1px solid #efece5;' : '') + (today ? 'background:#fcfbf8' : ''),
+empty: ev.length === 0,
+ev: ev.map(([h, type, client, agent]) => ({ h, type, client, agent, style: 'display:flex;flex-direction:column;gap:2px;padding:8px 10px;border-radius:6px;background:' + tint[type] }))
+})),
+presta: [
+['26/10/2026 09:00', 'Installation', 'Mme Kouassi Aya', 'Cocody Riviera 3', 'Koffi Brou', 'En cours'],
+['26/10/2026 14:30', 'Devis sur place', 'Cabinet Traoré & Associés', 'Plateau', 'Yao Serge', 'Planifié'],
+['27/10/2026 10:00', 'Service après-vente', 'M. Bamba Ibrahim', 'Marcory Zone 4', 'Koffi Brou', 'Planifié'],
+['28/10/2026 08:30', 'Installation', 'Résidence Les Palmiers', 'Bingerville', 'Koffi Brou, Yao Serge', 'Planifié'],
+['29/10/2026 15:00', 'Devis sur place', 'Mme Koné Mariam', 'Angré 8e tranche', 'Yao Serge', 'À traiter']
+].map(([dt, type, client, lieu, agent, st]) => ({ dt, type, client, lieu, agent, st: badge(st) })),
+toValidate: [
+['Cabinet Traoré & Associés', 'D-2026-0140', 622568, 'depuis 2 jours'],
+['M. Gnagne Rodrigue', 'D-2026-0131', 2340000, 'depuis 4 jours'],
+['M. Diallo Moussa', 'D-2026-0135', null, 'depuis 6 jours']
+].map(([client, ref, n, age]) => ({ client, ref, age, amount: n === null ? 'Prix à définir' : fmt(n), amountStyle: n === null ? 'font-size:13px;font-style:italic;color:#8c5f0e;text-align:right' : "font-family:'IBM Plex Mono',monospace;font-size:13px;color:#1c1c1c;text-align:right" })),
+unpaid: [
+['Cabinet Traoré & Associés', 'MDS-0000087', 1120000, 'Émise le 12/10/2026', false],
+['Mme Kouassi Aya', 'MDS-0000085', 425000, 'Émise le 05/10/2026', false],
+['M. Bamba Ibrahim', 'MDS-0000082', 300000, '! Émise il y a 28 jours', true]
+].map(([client, ref, n, due, late]) => ({ client, ref, amount: fmt(n), due, dueStyle: 'font-size:12px;text-align:right;color:' + (late ? '#8c5f0e;font-weight:600' : '#6b665e') })),
+unpaidTotal: fmt(1845000),
+run: () => this.setState({ ran: true }),
+runLabel: this.state.ran ? 'Traitement lancé' : 'Exécuter maintenant'
+};
+}
+}
+</script>
+</body>
+</html>

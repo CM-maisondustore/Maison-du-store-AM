@@ -8,17 +8,32 @@ use Illuminate\Validation\Rule;
 class QuoteController
 {
     private function access(Request $r, Quote $quote): void { abort_unless($quote->canBeViewedBy($r->user()), 403); }
+    /** Photo d'une ouverture : visible par qui peut voir le devis, et seulement si elle appartient à ce devis. */
+    public function photo(Request $r, Quote $quote, int $media)
+    {
+        $this->access($r, $quote);
+        abort_unless(in_array($media, \App\Services\QuotePhotos::ids($quote), true), 404);
+        $asset = \App\Models\MediaAsset::findOrFail($media);
+        return response(base64_decode($asset->payload), 200, ['Content-Type' => $asset->mime, 'Cache-Control' => 'private, no-store', 'Content-Security-Policy' => "default-src 'none'"]);
+    }
     public function index(Request $r)
     {
-        $query = Quote::with('agent')->visibleTo($r->user())->latest();
+        $filters = $r->validate(['q' => 'nullable|string|max:150', 'type' => 'nullable|in:store,rideau,electromenager,meubles', 'source' => 'nullable|in:site,interne,sur_place', 'agent' => 'nullable|string|max:20', 'sort' => 'nullable|in:asc,desc']);
+        $query = Quote::with('agent')->visibleTo($r->user());
+        $query = ($filters['sort'] ?? 'desc') === 'asc' ? $query->oldest() : $query->latest();
         if ($r->filled('status')) $query->where('status', $r->string('status')->toString());
-        return view('staff.quotes', ['quotes' => $query->paginate(25)->withQueryString()]);
+        if (!empty($filters['q'])) $query->where(fn ($b) => $b->where('reference', 'like', '%'.$filters['q'].'%')->orWhereRaw('LOWER(CAST(contact AS CHAR)) LIKE ?', ['%'.mb_strtolower($filters['q']).'%']));
+        if (!empty($filters['type'])) $query->where('type', $filters['type']);
+        if (!empty($filters['source'])) $query->where('source', $filters['source']);
+        if ($r->user()->isAdmin() && !empty($filters['agent'])) $filters['agent'] === 'none' ? $query->whereNull('agent_id') : $query->where('agent_id', (int) $filters['agent']);
+        $counts = Quote::visibleTo($r->user())->selectRaw('status, COUNT(*) as total')->groupBy('status')->pluck('total', 'status');
+        return view('staff.quotes', ['quotes' => $query->paginate(25)->withQueryString(), 'counts' => $counts, 'agents' => $r->user()->isAdmin() ? User::where('role', 'agent')->where('active', true)->orderBy('name')->get() : collect()]);
     }
     public function show(Request $r, Quote $quote) { $this->access($r, $quote); return view($r->user()->isAdmin() ? 'staff.quote' : 'staff.quote-technical', ['quote' => $quote, 'agents' => User::where('role', 'agent')->where('active', true)->get()]); }
     public function onsite(Request $r, Intervention $intervention)
     {
         abort_unless($r->user()->isAdmin() || $intervention->agent_id === $r->user()->id, 403);
-        $r->validate(['type' => 'required|in:store,rideau']);
+        $r->validate(['type' => 'required|in:store,rideau,electromenager,meubles']);
         $quote = DB::transaction(function () use ($intervention, $r) {
             $job = Intervention::whereKey($intervention->id)->lockForUpdate()->firstOrFail();
             abort_unless($r->user()->isAdmin() || $job->agent_id === $r->user()->id,403);

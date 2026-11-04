@@ -7,7 +7,7 @@ class StaffAccess
 {
     public function handle(Request $request, Closure $next)
     {
-        if (!$request->user()?->active || !in_array($request->user()->role, ['admin', 'agent'], true)) {
+        if (!$request->user()?->active || !array_key_exists((string) $request->user()->role, \App\Models\User::ROLES)) {
             Auth::logout(); $request->session()->invalidate(); $request->session()->regenerateToken();
             return redirect()->route('login');
         }

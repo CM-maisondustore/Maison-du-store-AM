@@ -4,6 +4,7 @@
 <p><strong>{{ $window['label'] ?? 'Ouverture' }}</strong> · {{ $window['width'] ?? '' }} × {{ $window['height'] ?? '' }} cm @if(auth()->user()->isAdmin()) · Qté {{ $window['quantity'] ?? 1 }} @endif<br>
 {{ $window['product_name'] ?? '' }} @if(auth()->user()->isAdmin()) · {{ $window['material_name'] ?? '' }} @endif · {{ $window['finish_name'] ?? '' }} · Motorisé : {{ !empty($window['motorized']) ? 'Oui' : 'Non' }}
 @if(!empty($window['notes']))<br>{{ $window['notes'] }}@endif</p>
+@if(!empty($window['photo_media_id']))<a class="opening-photo-link" href="{{ route('staff.quotes.photo',[$quote,$window['photo_media_id']]) }}" target="_blank" rel="noopener"><img class="opening-photo-img" src="{{ route('staff.quotes.photo',[$quote,$window['photo_media_id']]) }}" alt="Photo de {{ $window['label'] ?? 'l’ouverture' }}" loading="lazy"></a>@endif
 @if(auth()->user()->isAdmin())
 @foreach($window['components'] ?? [] as $component)
 <p>{{ $component['label'] }} · {{ $component['quantity'] ?? 'À mesurer' }} {{ \App\Models\QuoteOption::UNITS[$component['unit']] ?? '' }}</p>

@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Espace Pro — feuille Plus (Admin, mobile)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="color-scheme: {{colorScheme}}; width: 100%; height: 100vh; min-height: 640px; overflow: hidden; position: relative; font-family: Inter, system-ui, sans-serif; color: {{pal.t353535}}; background: {{pal.sf4f4f1}}; display: flex; flex-direction: column">
+<header style="background: {{pal.sffffff}}; border-bottom: 1px solid {{pal.be8e4db}}; padding: 10px 16px 12px"><h1 style="margin: 0; font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 500; color: {{pal.t1c1c1c}}">Accueil</h1><span style="font-size: 14px; color: {{pal.t6b665e}}">Lundi 26/10/2026, Aïcha Diabaté, Admin-CM</span></header>
+<div aria-hidden="true" style="flex: 1; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+<div style="height: 84px; background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 12px"></div>
+<div style="height: 84px; background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 12px"></div>
+<div style="height: 160px; background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 12px"></div>
+</div>
+<div style="position: absolute; left: 0; right: 0; bottom: 0"><dc-import name="ProTabbar" role="admin" active="plus" hint-size="390px,84px"></dc-import></div>
+
+<sc-if value="{{open}}" hint-placeholder-val="{{ true }}">
+<div style="position: absolute; inset: 0; z-index: 10; background: rgba(28,28,28,0.45); display: flex; flex-direction: column; justify-content: flex-end">
+<button type="button" onClick="{{close}}" aria-label="Fermer la feuille" style="flex: 1; background: transparent; border: 0; cursor: pointer"></button>
+<div role="dialog" aria-modal="true" aria-labelledby="plus-t" style="background: {{pal.sffffff}}; border-radius: 18px 18px 0 0; padding: 8px 0 28px; max-height: 78%; overflow-y: auto; display: flex; flex-direction: column">
+<span aria-hidden="true" style="align-self: center; width: 40px; height: 4px; border-radius: 2px; background: {{pal.scfc9bd}}; margin: 4px 0 8px"></span>
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 0 8px 4px 20px"><h2 id="plus-t" style="margin: 0; font-size: 18px; font-weight: 600; color: {{pal.t1c1c1c}}">Autres modules</h2><button type="button" onClick="{{close}}" aria-label="Fermer" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; background: transparent; border: 0; color: {{pal.t1c1c1c}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<sc-for list="{{groups}}" as="g" hint-placeholder-count="2">
+<span style="padding: 12px 20px 4px; font-size: 13px; font-weight: 600; color: {{pal.t6b665e}}">{{g.title}}</span>
+<ul style="list-style: none; margin: 0; padding: 0 8px">
+<sc-for list="{{g.items}}" as="it" hint-placeholder-count="4">
+<li><a href="{{it.href}}" style="display: flex; align-items: center; gap: 14px; min-height: 52px; padding: 0 12px; border-radius: 10px; text-decoration: none; color: {{pal.t1c1c1c}}; font-size: 16px">
+<span aria-hidden="true" style="width: 36px; height: 36px; border-radius: 10px; background: {{pal.seef1ef}}; color: {{pal.t20332c}}; display: flex; align-items: center; justify-content: center"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="{{it.d}}"></path></svg></span>
+<span style="flex: 1">{{it.label}}</span>
+<sc-if value="{{it.hasCount}}" hint-placeholder-val="{{ false }}"><span aria-label="{{it.countLabel}}" style="min-width: 22px; height: 22px; padding: 0 6px; box-sizing: border-box; border-radius: 999px; background: #c09f6a; color: #161616; font-family: 'IBM Plex Mono', monospace; font-size: 12px; display: inline-flex; align-items: center; justify-content: center">{{it.count}}</span></sc-if>
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="{{pal.t6b665e}}" stroke-width="1.8" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
+</a></li>
+</sc-for>
+</ul>
+</sc-for>
+<div style="margin: 12px 20px 0; padding-top: 12px; border-top: 1px solid {{pal.be8e4db}}; display: flex; flex-direction: column">
+<a href="ProProfilEditMobileAdmin.dc.html" style="min-height: 48px; display: flex; align-items: center; color: {{pal.t1c1c1c}}; text-decoration: none; font-size: 15px">Modifier mon profil</a>
+<a href="ProParametresMobileAdmin.dc.html" style="min-height: 48px; display: flex; align-items: center; color: {{pal.t1c1c1c}}; text-decoration: none; font-size: 15px">Paramètres</a>
+<a href="ProPassword.dc.html" style="min-height: 48px; display: flex; align-items: center; color: {{pal.t1c1c1c}}; text-decoration: none; font-size: 15px">Changer le mot de passe</a>
+<a href="index.html" style="min-height: 48px; display: flex; align-items: center; color: {{pal.t1c1c1c}}; text-decoration: none; font-size: 15px">Voir le site</a>
+<a href="ProLoginMobile.dc.html" style="min-height: 48px; display: flex; align-items: center; color: {{pal.tb3392f}}; text-decoration: none; font-size: 15px">Se déconnecter</a>
+</div>
+</div>
+</div>
+</sc-if>
+<sc-if value="{{closed}}" hint-placeholder-val="{{ false }}">
+<button type="button" onClick="{{reopen}}" style="position: absolute; left: 16px; right: 16px; bottom: 100px; height: 48px; border: 1px dashed {{pal.b20332c}}; border-radius: 10px; background: {{pal.sffffff}}; font: inherit; font-size: 14px; color: {{pal.t20332c}}">Rouvrir la feuille « Plus »</button>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+constructor(props) {
+super(props);
+this.state = { open: true };
+}
+isDark() {
+const t = this.props.theme;
+if (t === 'dark') return true;
+if (t === 'light') return false;
+let v = 'light';
+try { v = window.localStorage.getItem('mds-pro-theme') || 'light'; } catch (e) {}
+if (v === 'dark') return true;
+if (v === 'auto') { try { return window.matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) {} }
+return false;
+}
+themeMaps() { return { s: {"#ffffff": "#1b2220", "#f4f4f1": "#121816", "#f9f8f4": "#202825", "#fbfaf7": "#1e2623", "#fdfbf6": "#222a27", "#fcfbf8": "#1e2623", "#faf9f7": "#1e2623", "#fffcf5": "#2b2618", "#f1f0ec": "#262e2b", "#ece9e2": "#2a322f", "#e9e8e2": "#2a302d", "#e9e6df": "#0f1412", "#eef0ec": "#232b28", "#eef1ef": "#202826", "#edf1f4": "#1d2530", "#e8e4db": "#313a36", "#dcd6cb": "#3b4540", "#f1eee8": "#29312e", "#efece5": "#29312e", "#cfc9bd": "#4c5751", "#cfc8bb": "#4c5751", "#e1ddd3": "#3b4540", "#b9b4aa": "#5a645e", "#20332c": "#2b4a3e", "#2b4239": "#34574a", "#e5f1ea": "#1d3a2b", "#b7d6c3": "#2f5a43", "#fdf8ec": "#2d2717", "#ecd7a8": "#5b4a25", "#fbf1dc": "#382d15", "#e3c2bd": "#5e302b", "#e3c3bf": "#5e302b", "#fbeceb": "#3a1f1c", "#e8eef5": "#1d2a38", "#eeede8": "#2a302d", "#f6f0e4": "#2f2a1f", "#f3f3f3": "#262e2b", "#cccccc": "#46504b", "#fdf6f5": "#33201e", "#f8e6e4": "#3a2220", "#fbf6ea": "#2d2717", "#ecdcb9": "#5b4a25", "#f6ece5": "#33241d", "#efe9dd": "#2a2620", "#d9b26a": "#8a6a2c", "#b98a2e": "#8a6a2c"}, b: {"#ffffff": "#1b2220", "#f4f4f1": "#121816", "#f9f8f4": "#202825", "#fbfaf7": "#1e2623", "#fdfbf6": "#222a27", "#fcfbf8": "#1e2623", "#faf9f7": "#1e2623", "#fffcf5": "#2b2618", "#f1f0ec": "#262e2b", "#ece9e2": "#2a322f", "#e9e8e2": "#2a302d", "#e9e6df": "#0f1412", "#eef0ec": "#232b28", "#eef1ef": "#202826", "#edf1f4": "#1d2530", "#e8e4db": "#313a36", "#dcd6cb": "#3b4540", "#f1eee8": "#29312e", "#efece5": "#29312e", "#cfc9bd": "#4c5751", "#cfc8bb": "#4c5751", "#e1ddd3": "#3b4540", "#b9b4aa": "#5a645e", "#20332c": "#5d8a76", "#2b4239": "#34574a", "#e5f1ea": "#1d3a2b", "#b7d6c3": "#2f5a43", "#fdf8ec": "#2d2717", "#ecd7a8": "#5b4a25", "#fbf1dc": "#382d15", "#e3c2bd": "#5e302b", "#e3c3bf": "#5e302b", "#fbeceb": "#3a1f1c", "#e8eef5": "#1d2a38", "#eeede8": "#2a302d", "#f6f0e4": "#2f2a1f", "#f3f3f3": "#262e2b", "#cccccc": "#46504b", "#fdf6f5": "#33201e", "#f8e6e4": "#3a2220", "#fbf6ea": "#2d2717", "#ecdcb9": "#5b4a25", "#f6ece5": "#33241d", "#efe9dd": "#2a2620", "#d9b26a": "#8a6a2c", "#b98a2e": "#8a6a2c", "#1c1c1c": "#d6d2c9", "#b3392f": "#f28b80"}, t: {"#1c1c1c": "#f1eee8", "#353535": "#d6d2c9", "#6b665e": "#a8a296", "#20332c": "#bfd8cb", "#84642f": "#d8b47a", "#2f7350": "#86cfa3", "#8c5f0e": "#e6b862", "#5e4108": "#f0d39a", "#b3392f": "#f28b80", "#7c241c": "#f5b0a8", "#3f6285": "#9ec0e3", "#2c4866": "#bcd3ea", "#5c5852": "#c9c4ba", "#b0aaa0": "#6c736e", "#3d2b06": "#f0dcb3", "#1f4d35": "#bfe3cc", "#8f2c24": "#f5b0a8", "#6e4a0b": "#e6c27a", "#3f5a72": "#a9c3dc", "#3f5a73": "#a9c3dc", "#8e4529": "#e0a084", "#5a5248": "#cfc8bb", "#b98a2e": "#d9ac57", "#2c4660": "#a9c3dc"} }; }
+themeWatch() {
+if (this.__thw || typeof window === 'undefined') return;
+this.__thw = true;
+const bump = () => this.setState({ __th: Date.now() });
+try { window.addEventListener('storage', (e) => { if (e.key === 'mds-pro-theme') bump(); }); } catch (e) {}
+try { window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', bump); } catch (e) {}
+}
+dmap(v) {
+const T = this.themeMaps();
+const cv = (str) => str.split(';').map((seg) => {
+const i = seg.indexOf(':');
+let M = T.s;
+if (i > -1) { const p = seg.slice(0, i).trim().toLowerCase(); M = /^(color|stroke|fill|caret-color|accent-color|text-decoration-color)$/.test(p) ? T.t : /^(border|outline|box-shadow)/.test(p) ? T.b : T.s; }
+return seg.replace(/#[0-9a-fA-F]{6}/g, (h) => M[h.toLowerCase()] || h);
+}).join(';');
+const go = (x) => (typeof x === 'string' ? cv(x) : Array.isArray(x) ? x.map(go) : x && typeof x === 'object' && Object.prototype.toString.call(x) === '[object Object]' ? Object.keys(x).reduce((o, k) => { o[k] = go(x[k]); return o; }, {}) : x);
+return go(v);
+}
+renderVals() {
+this.themeWatch();
+const dark = this.isDark();
+let v = this.renderValsLight();
+if (dark) v = this.dmap(v);
+const T = this.themeMaps();
+const pal = {};
+['s', 'b', 't'].forEach((k) => { Object.keys(T[k]).forEach((h) => { pal[k + h.slice(1)] = dark ? T[k][h] : h; }); });
+v.pal = pal;
+v.themeDark = dark;
+v.colorScheme = dark ? 'dark' : 'light';
+return v;
+}
+renderValsLight() {
+const I = {
+presta: 'M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.5-.5-.5-2.5z',
+mat: 'M4 7h10M18 7h2M4 17h4M12 17h8M14 5v4M8 15v4',
+fact: 'M6 2h12v20l-3-2-3 2-3-2-3 2zM9 7h6M9 11h6M9 15h4',
+msg: 'M3 5h18v14H3zM3 6l9 7 9-7',
+cat: 'M4 3h16v18H4zM4 7h16M4 11h16M4 15h16',
+img: 'M3 5h18v14H3zM7 10a1.5 1.5 0 1 0 3 0a1.5 1.5 0 1 0-3 0M21 16l-5-5-8 8',
+doc: 'M6 3h9l4 4v14H6zM14 3v5h5M9.5 14l2 2 3.5-4',
+team: 'M12 12a4 4 0 1 0 0-8a4 4 0 1 0 0 8zM4 21v-1a8 8 0 0 1 16 0v1'
+};
+const G = [
+['Activité et gestion', [['presta', 'Prestations', 'ProPrestations.dc.html'], ['mat', 'Matériaux et finitions', 'ProMateriaux.dc.html'], ['fact', 'Factures', 'ProFacture.dc.html'], ['msg', 'Messagerie', 'ProMessagerie.dc.html', 5, 'messages non lus']]],
+['Site et réglages', [['cat', 'Catalogue', 'ProCatalogue.dc.html'], ['img', 'Images et portfolio', 'ProImages.dc.html'], ['doc', 'Documents et automatisations', 'ProAutomatisations.dc.html'], ['team', 'Équipe', 'ProEquipe.dc.html']]]
+];
+return {
+open: this.state.open, closed: !this.state.open,
+close: () => this.setState({ open: false }),
+reopen: () => this.setState({ open: true }),
+groups: G.map(([title, items]) => ({ title, items: items.map(([k, label, href, count, what]) => ({ label, href, d: I[k], hasCount: !!count, count: count || '', countLabel: count ? count + ' ' + what : '' })) }))
+};
+}
+}
+</script>
+</body>
+</html>

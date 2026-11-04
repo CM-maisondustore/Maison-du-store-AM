@@ -1,6 +1,7 @@
 
 @extends('staff.layout')
 @section('title','Préparer un message')
+@section('back',route('staff.messages.index'))
 @section('content')
 @php
  $draft['channel']=in_array(old('channel'),['email','whatsapp'],true) ? old('channel') : $draft['channel'];

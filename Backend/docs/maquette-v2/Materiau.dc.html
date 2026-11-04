@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Ajouter un matériau</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./assets/espace-pro.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="shell">
+<dc-import name="Navigation" active="materiaux" hint-size="240px,900px"></dc-import>
+<div class="workspace">
+<dc-import name="Haut" hint-size="100%,64px"></dc-import>
+<main class="main" id="contenu">
+<div class="page-head"><div><nav class="crumbs" aria-label="Fil d’Ariane"><a href="#contenu">Catalogue</a></nav><h1>Catalogue : tarifs, matériaux &amp; finitions</h1><p class="sub">Tarifs utilisés par « Calculer depuis le catalogue » dans le chiffrage des devis.</p></div><div class="page-actions"><a class="button" href="#ajouter-option"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>Ajouter un matériau</a></div></div>
+<div class="notice" role="status"><strong>2 option(s) active(s) sans prix.</strong> Les lignes de devis qui les utilisent restent « À définir » jusqu’à ce qu’un prix soit saisi.</div>
+<div class="create-layout always">
+<div class="create-list">
+<div class="chips">
+<button type="button" class="chip" aria-pressed="true">Tous<b>6</b></button>
+<button type="button" class="chip" aria-pressed="false">Tissu / matériau<b>3</b></button>
+<button type="button" class="chip" aria-pressed="false">Finition<b>2</b></button>
+<button type="button" class="chip" aria-pressed="false">Rail / barre<b>1</b></button>
+</div>
+<div class="option-list">
+<sc-for list="{{options}}" as="o" hint-placeholder-count="6">
+<details class="option"><summary>
+<span class="option-name"><strong>{{o.label}}</strong><small>{{o.meta}}</small></span>
+<sc-if value="{{o.price}}" hint-placeholder-val="{{ true }}"><span class="amount option-price">{{o.price}}</span></sc-if>
+<sc-if value="{{o.undefinedPrice}}" hint-placeholder-val="{{ false }}"><span class="undefined option-price">À définir</span></sc-if>
+<span class="badge st-ok"><span aria-hidden="true">✓</span>Actif</span>
+</summary><div class="option-body"><p class="muted">Le formulaire de modification s’ouvre ici, avec sa route d’origine.</p></div></details>
+</sc-for>
+</div>
+</div>
+<section class="panel create-panel" id="ajouter-option" aria-labelledby="h-ajouter-option">
+<div class="create-head"><div><h2 id="h-ajouter-option">Ajouter un matériau</h2><p class="muted">La nature décide des champs utiles.</p></div></div>
+<div class="grid">
+<label>Nature<select><option>Tissu / matériau</option><option>Finition</option><option>Rail / barre</option><option>Reflète</option></select></label>
+<label>Catégorie<select><option>Rideaux</option><option>Stores</option></select></label>
+</div>
+<label>Libellé<input value="Voilage lin"></label>
+<div class="grid">
+<label>Prix unitaire<span class="field-unit is-price"><input type="number" placeholder="À définir"><span class="unit">FCFA</span></span><span class="hint">Vide signifie « à définir », jamais gratuit.</span></label>
+<label>Unité<select><option>Mètre linéaire</option><option>Mètre carré</option><option>Pièce</option></select></label>
+</div>
+<label>Groupe du tissu / matériau<select><option>Voilage</option><option>Tissu rideau</option></select></label>
+<label class="toggle-row"><span>Proposer cette option dans les nouveaux choix<small>Les devis déjà enregistrés conservent leur chiffrage.</small></span><input class="switch" type="checkbox" checked></label>
+<details class="fold"><summary>Réglages rares<small>Motorisation, produits associés, demande publique, image</small></summary><p class="muted mt-0">Motorisation compatible, produits de la même catégorie, choix public sans prix et image d’illustration.</p></details>
+<div class="action-bar"><button type="button">Ajouter le matériau</button></div>
+</section>
+</div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+renderVals() {
+return { options: [
+{ label: 'Tissu occultant 100 %', meta: 'Tissu / matériau, rideau', price: '12 000 FCFA' },
+{ label: 'Voilage lourd', meta: 'Tissu / matériau, rideau', price: '11 000 FCFA' },
+{ label: 'Store léger', meta: 'Tissu / matériau, store', price: '18 000 FCFA' },
+{ label: 'Wave', meta: 'Finition, rideau', undefinedPrice: true },
+{ label: 'Plis flamands', meta: 'Finition, rideau', undefinedPrice: true },
+{ label: 'Rail double', meta: 'Rail / barre, rideau', price: '10 000 FCFA' },
+] };
+}
+}
+</script>
+</body>
+</html>

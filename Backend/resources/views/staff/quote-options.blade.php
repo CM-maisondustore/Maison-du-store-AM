@@ -1,29 +1,40 @@
 @extends('staff.layout')
 @section('title','Catalogue : tarifs, matériaux & finitions')
+@section('crumbs')<a href="{{ route('staff.products.index') }}">Catalogue</a>@endsection
+@section('subtitle','Tarifs utilisés par « Calculer depuis le catalogue » dans le chiffrage des devis.')
+@section('page-actions')<a class="button" href="#ajouter-option">@include('staff.partials.icon',['n'=>'plus','s'=>18])Ajouter un matériau</a>@endsection
 @section('content')
-<p>Définissez les tissus, fournitures et finitions proposés dans le formulaire de devis. <a href="{{ route('staff.products.index') }}">Retour au catalogue</a>.</p>
-<p>Tarifs en FCFA, utilisés pour préparer les devis internes. Un prix vide signifie « à définir », jamais gratuit. Les métrages des rideaux sont saisis manuellement. Les accroches sont facturées par lots de 100. Les devis déjà enregistrés conservent leur chiffrage.</p>
-@foreach(collect([new \App\Models\QuoteOption(['active'=>true,'category'=>'rideau','kind'=>'material','motorization'=>'any'])])->concat($options) as $option)
-<details class="panel" @if(!$option->exists) open @endif><summary>{{ $option->exists ? $option->label.' · '.$option->category.' · '.($option->active ? 'Actif' : 'Inactif') : 'Ajouter un matériau ou une finition' }}</summary>
-<form method="post" enctype="multipart/form-data" action="{{ $option->exists ? route('staff.quote-options.update',$option) : route('staff.quote-options.store') }}">@csrf @if($option->exists) @method('PUT') @endif
-<input type="hidden" name="tariff_form" value="1">
-<label>Produits associés (même catégorie ; aucun = toute la catégorie)<select name="product_ids[]" multiple>@foreach($products as $product)<option value="{{ $product->id }}" @selected(in_array($product->id,$option->product_ids ?? [],true))>{{ ($product->details['type'] ?? '')==='store' ? 'Store' : 'Rideau' }} — {{ $product->details['name'] ?? $product->reference }}</option>@endforeach</select></label>
-<div class="grid">
-<label>Libellé<input required name="label" maxlength="150" value="{{ $option->label }}"></label>
-<label>Nature<select name="kind">@foreach(\App\Models\QuoteOption::KINDS as $key=>$label)<option value="{{ $key }}" @selected($option->kind===$key)>{{ $label }}</option>@endforeach</select></label>
-<label>Catégorie<select name="category">@foreach(['rideau'=>'Rideaux','store'=>'Stores'] as $key=>$label)<option value="{{ $key }}" @selected($option->category===$key)>{{ $label }}</option>@endforeach</select></label>
-<label>Groupe du tissu / matériau<select name="fabric_group">@foreach([''=>'Sans objet (fourniture ou finition)','rideau'=>'Tissu rideau','voilage'=>'Voilage','store'=>'Matériau de store'] as $key=>$label)<option value="{{ $key }}" @selected(($option->fabric_group ?? '')===$key)>{{ $label }}</option>@endforeach</select></label>
-<label>Motorisation compatible<select name="motorization">@foreach(['any'=>'Oui et non','yes'=>'Motorisé uniquement','no'=>'Manuel uniquement'] as $key=>$label)<option value="{{ $key }}" @selected($option->motorization===$key)>{{ $label }}</option>@endforeach</select></label>
+@php
+ $missing=$options->where('active',true)->whereNull('unit_price')->count();
+ $usedKinds=$options->pluck('kind')->unique();
+ $failedForm=$errors->any() ? (string)old('open_form','new') : null;
+ $blank=new \App\Models\QuoteOption(['active'=>true,'category'=>'rideau','kind'=>'material','motorization'=>'any']);
+@endphp
+@if($missing)<div class="notice" role="status"><strong>{{ $missing }} option(s) active(s) sans prix.</strong> Les lignes de devis qui les utilisent restent « À définir » jusqu’à ce qu’un prix soit saisi.</div>@endif
+<div class="create-layout always">
+<div class="create-list">
+<p class="muted mt-0">Tarifs en FCFA, utilisés pour préparer les devis internes. Un prix vide signifie « à définir », jamais gratuit. Les métrages des rideaux sont saisis manuellement. Les accroches sont facturées par lots de 100. Les devis déjà enregistrés conservent leur chiffrage.</p>
+<div class="chips" data-chip-filter="option-list">
+<button type="button" class="chip" data-chip="all" aria-pressed="true">Tous<b>{{ $options->count() }}</b></button>
+@foreach(\App\Models\QuoteOption::KINDS as $key=>$label)@if($usedKinds->contains($key))<button type="button" class="chip" data-chip="{{ $key }}" aria-pressed="false">{{ $label }}<b>{{ $options->where('kind',$key)->count() }}</b></button>@endif @endforeach
 </div>
-<div class="grid">
-<label>Prix unitaire (FCFA)<input name="unit_price" type="number" min="0" max="100000000" step="1" value="{{ $option->unit_price }}" placeholder="À définir"></label>
-<label>Unité<select name="unit">@foreach(\App\Models\QuoteOption::UNITS as $key=>$label)<option value="{{ $key }}" @selected(($option->unit ?? 'm')===$key)>{{ $label }}</option>@endforeach</select></label>
+<div class="option-list" id="option-list">
+@forelse($options as $option)
+<details class="option {{ !$option->active ? 'is-off' : '' }}" data-chip-item="{{ $option->kind }}" @if($failedForm===(string)$option->id) open @endif><summary>
+<span class="option-name"><strong>{{ $option->label }}</strong><small>{{ \App\Models\QuoteOption::KINDS[$option->kind] ?? $option->kind }}, {{ $option->category }}</small></span>
+@if($option->unit_price===null)<span class="undefined option-price">À définir</span>@else<span class="amount option-price">{{ number_format($option->unit_price,0,',',' ') }} FCFA</span>@endif
+<span class="badge {{ $option->active ? 'st-ok' : 'st-neutral' }}"><span aria-hidden="true">{{ $option->active ? '✓' : '○' }}</span>{{ $option->active ? 'Actif' : 'Inactif' }}</span>
+</summary>
+<div class="option-body">@include('staff.quote-option-form',['failed'=>$failedForm===(string)$option->id])</div>
+</details>
+@empty
+<p class="empty">Aucun matériau pour le moment. Ajoutez le premier avec le panneau de création.</p>
+@endforelse
 </div>
-<p class="muted">Pour un rail, une barre ou un accessoire : finitions compatibles. Ne rien cocher pour toutes les finitions de la catégorie.</p>
-<div class="grid">@foreach($options->where('kind','finish')->where('category',$option->category) as $finish)<label class="check"><input type="checkbox" name="finish_codes[]" value="{{ $finish->code }}" @checked(in_array($finish->code,$option->finish_codes ?? [],true))>{{ $finish->label }}</label>@endforeach</div>
-<input name="active" type="hidden" value="0"><label class="check"><input name="active" type="checkbox" value="1" @checked($option->active)>Proposer cette option dans les nouveaux choix</label>
-<input name="public_choice" type="hidden" value="0"><label class="check"><input name="public_choice" type="checkbox" value="1" @checked($option->public_choice)>Proposer aussi dans la demande de devis publique (tissus, finitions et supports, sans prix)</label>
-@include('staff.image-fields',['owner'=>$option])
-<button>Enregistrer l’option</button></form></details>
-@endforeach
+</div>
+<section class="panel create-panel" id="ajouter-option" aria-labelledby="h-ajouter-option" @if($failedForm==='new') data-open @endif>
+<div class="create-head"><div><h2 id="h-ajouter-option">Ajouter un matériau</h2><p class="muted">La nature décide des champs utiles.</p></div><a class="button quiet icon-btn" href="{{ route('staff.quote-options.index') }}" data-close-panel aria-label="Fermer sans ajouter">@include('staff.partials.icon',['n'=>'close','s'=>18])</a></div>
+@include('staff.quote-option-form',['option'=>$blank,'failed'=>$failedForm==='new'])
+</section>
+</div>
 @endsection

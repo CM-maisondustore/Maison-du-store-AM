@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Nouveau devis, affectation et chiffrage</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./assets/espace-pro.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="shell">
+<dc-import name="Navigation" active="devis" hint-size="240px,900px"></dc-import>
+<div class="workspace">
+<dc-import name="Haut" hint-size="100%,64px"></dc-import>
+<main class="main" id="contenu">
+<div class="page-head"><div>
+<nav class="crumbs" aria-label="Fil d’Ariane"><a href="#contenu">Devis</a></nav>
+<h1>Nouveau devis</h1>
+<p class="sub">Mme Kouassi Aya · 3 ouvertures · 4 exemplaires</p>
+</div></div>
+<div style="margin-bottom: 20px"><dc-import name="EtapesDevis" step="3" hint-size="100%,96px"></dc-import></div>
+
+<div style="display: flex; flex-wrap: wrap; align-items: flex-start; gap: 20px">
+<section class="panel" aria-labelledby="h-affectation" style="flex: 1 1 300px; max-width: 380px; margin: 0">
+<h2 id="h-affectation" class="section-title"><span class="step" aria-hidden="true">4</span>Affectation</h2>
+<label>Agent chargé du chantier<select><option>Koffi Brou</option><option>Yao Serge</option><option>Non affecté</option></select></label>
+<div class="grid" style="grid-template-columns: repeat(2, minmax(0, 1fr))">
+<label>Date du devis<input type="date" value="2026-11-03"></label>
+<label>Valable jusqu’au<input type="date" value="2026-12-03"></label>
+<label>Livraison prévue<input type="date"></label>
+<label>Pose prévue<input type="date"></label>
+</div>
+<p class="hint">Dates prévisionnelles. La prestation se planifie ensuite dans Prestations.</p>
+<div class="internal-block"><p class="internal-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 11h12v10H6zM8 11V7a4 4 0 0 1 8 0v4"></path></svg>Réservé à l’équipe</p><label>Notes internes<textarea rows="3"></textarea></label></div>
+</section>
+
+<section class="panel" aria-labelledby="h-chiffrage" style="flex: 999 1 560px; min-width: 0; margin: 0">
+<h2 id="h-chiffrage" class="section-title"><span class="step" aria-hidden="true">5</span>Chiffrage</h2>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 4px 16px">
+<label>Présentation<select><option>Ouvertures regroupées</option><option>Détaillées une à une</option></select></label>
+<label>Remise<select><option>Pourcentage</option><option>Aucune</option><option>Montant fixe</option><option>Total négocié</option></select></label>
+<label>Valeur de la remise<span class="field-unit"><input inputmode="decimal" value="5"><span class="unit">%</span></span></label>
+<label>Taux de taxe<span class="field-unit"><input type="number" value="0"><span class="unit">%</span></span></label>
+</div>
+<details class="fold"><summary>Frais du devis<small>Pose, livraison, transport, déplacement : facturés une seule fois</small></summary><p class="muted mt-0">Pour une pose globale, décochez les poses par ouverture. Zéro est accepté pour un poste offert.</p></details>
+<div class="calc-bar"><button type="button">Calculer depuis le catalogue</button><p role="status">Total provisoire : 2 poses de rideaux restent à définir.</p></div>
+<div class="quote-pricing-summary">
+<sc-for list="{{openings}}" as="o" hint-placeholder-count="3">
+<section class="quote-opening">
+<h3>{{o.title}}</h3>
+<div class="table-wrap"><table><thead><tr><th>Désignation</th><th>Quantité</th><th>PU (FCFA)</th><th>Montant (FCFA)</th></tr></thead><tbody>
+<sc-for list="{{o.lines}}" as="l" hint-placeholder-count="4"><tr><td>{{l.d}}</td><td>{{l.q}}</td><td>{{l.pu}}</td><td>{{l.m}}</td></tr></sc-for>
+</tbody></table></div>
+<p style="display: flex; justify-content: space-between; gap: 12px">{{o.note}}<span>Sous-total : <strong class="mono">{{o.sub}}</strong></span></p>
+</section>
+</sc-for>
+</div>
+<dl class="totals">
+<dt>Fournitures, confection et pose</dt><dd>541 120 FCFA</dd>
+<dt>Remise de 5 %</dt><dd>− 27 056 FCFA</dd>
+<dt class="grand">Total provisoire</dt><dd class="grand">514 064 FCFA</dd>
+</dl>
+<p class="hint" style="text-align: right">2 lignes à définir : le devis ne pourra pas être validé tant qu’il en reste.</p>
+</section>
+</div>
+
+<div class="action-bar"><div class="live-total" role="status"><small>Total provisoire</small><strong>514 064 FCFA</strong></div><a class="button quiet" href="DevisMateriaux.dc.html">Précédent</a><button type="button" class="secondary">Enregistrer le devis</button><a class="button" href="DevisPaiement.dc.html">Suivant : paiement</a></div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1900}}'>
+class Component extends DCLogic {
+renderVals() {
+const pending = 'À définir';
+return { openings: [
+{ title: 'Salon — baie vitrée · 380 × 270 cm', note: 'Coefficient × 2,5 · métrage 9,5 m', sub: '254 600 FCFA', lines: [
+{ d: 'Tissu occultant 100 %', q: '9,5 m', pu: '12 000', m: '114 000' },
+{ d: 'Voilage lourd', q: '9,5 m', pu: '11 000', m: '104 500' },
+{ d: 'Confection', q: '9,5 m', pu: '1 000', m: '9 500' },
+{ d: 'Rail Wave manuel', q: '3,8 m', pu: '7 000', m: '26 600' },
+{ d: 'Pose des rideaux', q: '1 ouv.', pu: pending, m: pending },
+] },
+{ title: 'Chambre — fenêtres côté jardin · 180 × 220 cm ×2', note: 'Coefficient × 2,5 · 120 600 FCFA par fenêtre', sub: '241 200 FCFA', lines: [
+{ d: 'Tissu occultant 100 %', q: '9 m', pu: '12 000', m: '108 000' },
+{ d: 'Voilage lourd', q: '9 m', pu: '11 000', m: '99 000' },
+{ d: 'Confection', q: '9 m', pu: '1 000', m: '9 000' },
+{ d: 'Rail Wave manuel', q: '3,6 m', pu: '7 000', m: '25 200' },
+{ d: 'Pose des rideaux', q: '2 ouv.', pu: pending, m: pending },
+] },
+{ title: 'Bureau · 140 × 160 cm', note: 'Surface 2,24 m²', sub: '45 320 FCFA', lines: [
+{ d: 'Store léger', q: '2,24 m²', pu: '18 000', m: '40 320' },
+{ d: 'Installation de store à Abidjan', q: '1 ouv.', pu: '5 000', m: '5 000' },
+] },
+] };
+}
+}
+</script>
+</body>
+</html>

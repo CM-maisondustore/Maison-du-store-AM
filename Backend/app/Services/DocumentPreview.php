@@ -23,7 +23,7 @@ final class DocumentPreview
         }
         if ($scenario==='individual') $openings[0]['quantity']=4;
         $financial=(new QuoteCalculator)->calculate(['openings'=>$openings,'fees'=>[['label'=>'Pose et livraison','scope'=>'global','unitPrice'=>30000]],
-            'displayMode'=>$scenario==='individual'?'individual':'grouped','discount'=>match($scenario){'discount'=>['type'=>'percentage','value'=>10],'negotiated'=>['type'=>'target_total','value'=>150000],default=>['type'=>'none','value'=>0]},'depositPercent'=>70]);
+            'displayMode'=>$scenario==='individual'?'individual':'grouped','discount'=>match($scenario){'discount'=>['type'=>'percentage','value'=>10],'negotiated'=>['type'=>'target_total','value'=>150000],default=>['type'=>'none','value'=>0]},'depositPercent'=>70,'schedule'=>'auto']);
         $reference='AM-2026-09-30-'.($scenario==='store'?'ST':'RV').'-112';
         return ['kind'=>$kind,'title'=>$kind==='invoice'?'Facture':($kind==='receipt'?'Reçu':'Devis'),'number'=>$reference.match($kind){'invoice'=>'-FAC','receipt'=>'-REC-01',default=>''},'draft'=>true,
             'date'=>'30/09/2026','due'=>$kind==='receipt'?'':'30/10/2026','issuer'=>CommunicationTemplates::issuer($presentation),'presentation'=>$presentation,

@@ -7,7 +7,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 class InvoiceController
 {
-    public function index() { return view('staff.invoices', ['invoices' => Invoice::with('contact')->latest()->paginate(25)]); }
+    public function index(Request $r)
+    {
+        $status = $r->validate(['status' => 'nullable|in:draft,issued,paid'])['status'] ?? null;
+        return view('staff.invoices', ['invoices' => Invoice::with('contact')->when($status, fn ($q) => $q->where('status', $status))->latest()->paginate(25)->withQueryString(), 'counts' => Invoice::selectRaw('status, COUNT(*) as total')->groupBy('status')->pluck('total', 'status')]);
+    }
     public function create(Request $r, Quote $quote)
     {
         $data = $r->validate(['due_date' => 'required|date_format:Y-m-d']);

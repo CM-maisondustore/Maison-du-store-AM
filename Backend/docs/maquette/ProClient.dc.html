@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Espace Pro — fiche client</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="color-scheme: {{colorScheme}}; font-family: Inter, system-ui, sans-serif; color: {{pal.t353535}}; background: {{pal.sf4f4f1}}; min-height: 100vh; display: flex">
+<dc-import name="ProSidebar" active="clients" hint-size="240px,100%"></dc-import>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+<dc-import name="ProTopbar" role="admin" hint-size="100%,64px"></dc-import>
+<main id="contenu" style="padding: 24px 32px 48px; display: flex; flex-direction: column; gap: 20px">
+
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<nav aria-label="Fil d’Ariane" style="font-size: 13px; color: {{pal.t6b665e}}"><a href="#clients" style="color: {{pal.t6b665e}}">Clients et contacts</a> / <span aria-current="page">Cabinet Traoré &amp; Associés</span></nav>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px">
+<h1 style="margin: 0; font-family: 'Cormorant Garamond', serif; font-size: 34px; font-weight: 500; color: {{pal.t1c1c1c}}">Cabinet Traoré &amp; Associés</h1>
+<span style="padding: 3px 10px; border-radius: 999px; border: 1px solid {{pal.bdcd6cb}}; font-size: 13px; font-weight: 600; color: {{pal.t353535}}">Client</span>
+<sc-if value="{{archived}}" hint-placeholder-val="{{ false }}"><span style="display: inline-flex; gap: 6px; padding: 3px 10px; border-radius: 999px; background: {{pal.sf1f0ec}}; color: {{pal.t5c5852}}; font-size: 13px; font-weight: 600"><span aria-hidden="true">–</span>Archivé</span></sc-if>
+</div>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<a href="ProDevisNew.dc.html" style="display: inline-flex; align-items: center; height: 40px; padding: 0 14px; background: #c09f6a; border-radius: 6px; font-size: 14px; font-weight: 600; color: #161616; text-decoration: none">Nouveau devis</a>
+<a href="ProMessagerie.dc.html" style="display: inline-flex; align-items: center; height: 40px; padding: 0 14px; background: {{pal.sffffff}}; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font-size: 14px; font-weight: 600; color: {{pal.t1c1c1c}}; text-decoration: none">Écrire au client</a>
+<button type="button" onClick="{{askArchive}}" style="height: 40px; padding: 0 14px; background: {{pal.sffffff}}; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; color: {{pal.t5c5852}}; cursor: pointer">{{archiveLabel}}</button>
+</div>
+</div>
+
+<sc-if value="{{confirmArchive}}" hint-placeholder-val="{{ false }}">
+<div role="alertdialog" aria-labelledby="arch-t" style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; padding: 14px 16px; border-radius: 10px; background: {{pal.sffffff}}; border: 1px solid {{pal.bdcd6cb}}">
+<p id="arch-t" style="margin: 0; flex: 1 1 420px; font-size: 14px; line-height: 1.5"><strong>Archiver ce client ?</strong> Il disparaît des listes et de la recherche, mais ses devis et factures restent consultables. Une facture de 1 120 000 FCFA est encore due.</p>
+<span style="display: flex; gap: 8px"><button type="button" onClick="{{cancelArchive}}" style="height: 40px; padding: 0 14px; background: {{pal.sffffff}}; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font: inherit; font-size: 14px">Garder actif</button><button type="button" onClick="{{doArchive}}" style="height: 40px; padding: 0 14px; background: {{pal.s20332c}}; border: 0; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; color: #ffffff">Archiver le client</button></span>
+</div>
+</sc-if>
+
+<dl style="margin: 0; background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 10px; overflow: hidden; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr))">
+<sc-for list="{{facts}}" as="f" hint-placeholder-count="4">
+<div style="{{f.style}}"><dt style="font-size: 13px; color: {{pal.t6b665e}}">{{f.k}}</dt><dd style="margin: 0; font-family: 'IBM Plex Mono', monospace; font-size: 17px; color: {{pal.t1c1c1c}}">{{f.v}}</dd></div>
+</sc-for>
+</dl>
+
+<div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+<section aria-labelledby="h-coord" style="flex: 1 1 300px; min-width: 0; background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 10px; padding: 18px 20px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; justify-content: space-between; align-items: center"><h2 id="h-coord" style="margin: 0; font-size: 16px; font-weight: 600; color: {{pal.t1c1c1c}}">Coordonnées</h2><button type="button" style="height: 34px; padding: 0 10px; background: transparent; border: 0; font: inherit; font-size: 14px; font-weight: 600; color: {{pal.t20332c}}; text-decoration: underline">Modifier</button></div>
+<dl style="margin: 0; display: flex; flex-direction: column; gap: 12px; font-size: 14px">
+<div><dt style="font-size: 13px; color: {{pal.t6b665e}}">Interlocuteur</dt><dd style="margin: 0">Me Adama Traoré, associé gérant</dd></div>
+<div><dt style="font-size: 13px; color: {{pal.t6b665e}}">Téléphones</dt><dd style="margin: 0; display: flex; flex-direction: column; gap: 2px"><a href="tel:+2250708123456" style="font-family: 'IBM Plex Mono', monospace; color: {{pal.t20332c}}">07 08 12 34 56</a><a href="tel:+2252720219874" style="font-family: 'IBM Plex Mono', monospace; color: {{pal.t20332c}}">27 20 21 98 74</a></dd></div>
+<div><dt style="font-size: 13px; color: {{pal.t6b665e}}">E-mail</dt><dd style="margin: 0">secretariat@traore-associes.ci</dd></div>
+<div><dt style="font-size: 13px; color: {{pal.t6b665e}}">Adresse</dt><dd style="margin: 0; line-height: 1.5">Immeuble Alpha 2000, 6e étage<br>Avenue Chardy, Plateau, Abidjan</dd></div>
+<div><dt style="font-size: 13px; color: {{pal.t6b665e}}">Source</dt><dd style="margin: 0">Demande sur le site, 20/10/2025</dd></div>
+</dl>
+</section>
+
+<section aria-labelledby="h-hist" style="flex: 999 1 640px; min-width: 0; background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 10px; overflow: hidden">
+<h2 id="h-hist" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Historique du client</h2>
+<div role="tablist" aria-label="Historique" style="display: flex; gap: 2px; padding: 0 12px; border-bottom: 1px solid {{pal.be8e4db}}; overflow-x: auto">
+<sc-for list="{{tabs}}" as="t" hint-placeholder-count="6"><button type="button" role="tab" aria-selected="{{t.sel}}" onClick="{{t.pick}}" style="{{t.style}}">{{t.label}}<span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: {{pal.t6b665e}}">{{t.n}}</span></button></sc-for>
+</div>
+<div role="tabpanel" style="padding: 8px 20px 18px">
+<sc-for list="{{groups}}" as="g" hint-placeholder-count="2">
+<h3 style="margin: 14px 0 6px; font-size: 13px; font-weight: 600; color: {{pal.t6b665e}}">{{g.month}}</h3>
+<ol style="list-style: none; margin: 0; padding: 0">
+<sc-for list="{{g.items}}" as="e" hint-placeholder-count="3">
+<li style="display: grid; grid-template-columns: 30px 92px minmax(0, 1fr) auto auto; gap: 14px; align-items: center; min-height: 52px; border-bottom: 1px solid {{pal.bf1eee8}}">
+<span aria-hidden="true" style="width: 30px; height: 30px; border-radius: 50%; background: {{pal.sf4f4f1}}; display: flex; align-items: center; justify-content: center; color: {{pal.t20332c}}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="{{e.d}}"></path></svg></span>
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: {{pal.t6b665e}}">{{e.date}}</span>
+<span style="display: flex; flex-direction: column; min-width: 0"><span style="font-size: 14px; font-weight: 600; color: {{pal.t1c1c1c}}">{{e.title}}</span><span style="font-size: 13px; color: {{pal.t6b665e}}">{{e.sub}}</span></span>
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: {{pal.t1c1c1c}}; text-align: right; white-space: nowrap">{{e.amount}}</span>
+<span style="{{e.badge}}"><span aria-hidden="true">{{e.glyph}}</span>{{e.st}}</span>
+</li>
+</sc-for>
+</ol>
+</sc-for>
+</div>
+</section>
+</div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1300}}'>
+class Component extends DCLogic {
+constructor(props) {
+super(props);
+this.state = { tab: 'all', confirm: false, archived: false };
+}
+isDark() {
+const t = this.props.theme;
+if (t === 'dark') return true;
+if (t === 'light') return false;
+let v = 'light';
+try { v = window.localStorage.getItem('mds-pro-theme') || 'light'; } catch (e) {}
+if (v === 'dark') return true;
+if (v === 'auto') { try { return window.matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) {} }
+return false;
+}
+themeMaps() { return { s: {"#ffffff": "#1b2220", "#f4f4f1": "#121816", "#f9f8f4": "#202825", "#fbfaf7": "#1e2623", "#fdfbf6": "#222a27", "#fcfbf8": "#1e2623", "#faf9f7": "#1e2623", "#fffcf5": "#2b2618", "#f1f0ec": "#262e2b", "#ece9e2": "#2a322f", "#e9e8e2": "#2a302d", "#e9e6df": "#0f1412", "#eef0ec": "#232b28", "#eef1ef": "#202826", "#edf1f4": "#1d2530", "#e8e4db": "#313a36", "#dcd6cb": "#3b4540", "#f1eee8": "#29312e", "#efece5": "#29312e", "#cfc9bd": "#4c5751", "#cfc8bb": "#4c5751", "#e1ddd3": "#3b4540", "#b9b4aa": "#5a645e", "#20332c": "#2b4a3e", "#2b4239": "#34574a", "#e5f1ea": "#1d3a2b", "#b7d6c3": "#2f5a43", "#fdf8ec": "#2d2717", "#ecd7a8": "#5b4a25", "#fbf1dc": "#382d15", "#e3c2bd": "#5e302b", "#e3c3bf": "#5e302b", "#fbeceb": "#3a1f1c", "#e8eef5": "#1d2a38", "#eeede8": "#2a302d", "#f6f0e4": "#2f2a1f", "#f3f3f3": "#262e2b", "#cccccc": "#46504b", "#fdf6f5": "#33201e", "#f8e6e4": "#3a2220", "#fbf6ea": "#2d2717", "#ecdcb9": "#5b4a25", "#f6ece5": "#33241d", "#efe9dd": "#2a2620", "#d9b26a": "#8a6a2c", "#b98a2e": "#8a6a2c"}, b: {"#ffffff": "#1b2220", "#f4f4f1": "#121816", "#f9f8f4": "#202825", "#fbfaf7": "#1e2623", "#fdfbf6": "#222a27", "#fcfbf8": "#1e2623", "#faf9f7": "#1e2623", "#fffcf5": "#2b2618", "#f1f0ec": "#262e2b", "#ece9e2": "#2a322f", "#e9e8e2": "#2a302d", "#e9e6df": "#0f1412", "#eef0ec": "#232b28", "#eef1ef": "#202826", "#edf1f4": "#1d2530", "#e8e4db": "#313a36", "#dcd6cb": "#3b4540", "#f1eee8": "#29312e", "#efece5": "#29312e", "#cfc9bd": "#4c5751", "#cfc8bb": "#4c5751", "#e1ddd3": "#3b4540", "#b9b4aa": "#5a645e", "#20332c": "#5d8a76", "#2b4239": "#34574a", "#e5f1ea": "#1d3a2b", "#b7d6c3": "#2f5a43", "#fdf8ec": "#2d2717", "#ecd7a8": "#5b4a25", "#fbf1dc": "#382d15", "#e3c2bd": "#5e302b", "#e3c3bf": "#5e302b", "#fbeceb": "#3a1f1c", "#e8eef5": "#1d2a38", "#eeede8": "#2a302d", "#f6f0e4": "#2f2a1f", "#f3f3f3": "#262e2b", "#cccccc": "#46504b", "#fdf6f5": "#33201e", "#f8e6e4": "#3a2220", "#fbf6ea": "#2d2717", "#ecdcb9": "#5b4a25", "#f6ece5": "#33241d", "#efe9dd": "#2a2620", "#d9b26a": "#8a6a2c", "#b98a2e": "#8a6a2c", "#1c1c1c": "#d6d2c9", "#b3392f": "#f28b80"}, t: {"#1c1c1c": "#f1eee8", "#353535": "#d6d2c9", "#6b665e": "#a8a296", "#20332c": "#bfd8cb", "#84642f": "#d8b47a", "#2f7350": "#86cfa3", "#8c5f0e": "#e6b862", "#5e4108": "#f0d39a", "#b3392f": "#f28b80", "#7c241c": "#f5b0a8", "#3f6285": "#9ec0e3", "#2c4866": "#bcd3ea", "#5c5852": "#c9c4ba", "#b0aaa0": "#6c736e", "#3d2b06": "#f0dcb3", "#1f4d35": "#bfe3cc", "#8f2c24": "#f5b0a8", "#6e4a0b": "#e6c27a", "#3f5a72": "#a9c3dc", "#3f5a73": "#a9c3dc", "#8e4529": "#e0a084", "#5a5248": "#cfc8bb", "#b98a2e": "#d9ac57", "#2c4660": "#a9c3dc"} }; }
+themeWatch() {
+if (this.__thw || typeof window === 'undefined') return;
+this.__thw = true;
+const bump = () => this.setState({ __th: Date.now() });
+try { window.addEventListener('storage', (e) => { if (e.key === 'mds-pro-theme') bump(); }); } catch (e) {}
+try { window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', bump); } catch (e) {}
+}
+dmap(v) {
+const T = this.themeMaps();
+const cv = (str) => str.split(';').map((seg) => {
+const i = seg.indexOf(':');
+let M = T.s;
+if (i > -1) { const p = seg.slice(0, i).trim().toLowerCase(); M = /^(color|stroke|fill|caret-color|accent-color|text-decoration-color)$/.test(p) ? T.t : /^(border|outline|box-shadow)/.test(p) ? T.b : T.s; }
+return seg.replace(/#[0-9a-fA-F]{6}/g, (h) => M[h.toLowerCase()] || h);
+}).join(';');
+const go = (x) => (typeof x === 'string' ? cv(x) : Array.isArray(x) ? x.map(go) : x && typeof x === 'object' && Object.prototype.toString.call(x) === '[object Object]' ? Object.keys(x).reduce((o, k) => { o[k] = go(x[k]); return o; }, {}) : x);
+return go(v);
+}
+renderVals() {
+this.themeWatch();
+const dark = this.isDark();
+let v = this.renderValsLight();
+if (dark) v = this.dmap(v);
+const T = this.themeMaps();
+const pal = {};
+['s', 'b', 't'].forEach((k) => { Object.keys(T[k]).forEach((h) => { pal[k + h.slice(1)] = dark ? T[k][h] : h; }); });
+v.pal = pal;
+v.themeDark = dark;
+v.colorScheme = dark ? 'dark' : 'light';
+return v;
+}
+renderValsLight() {
+const s = this.state;
+const SC = { 'Planifié': ['#3f6285', '#e8eef5', '○'], 'Brouillon': ['#5c5852', '#f1f0ec', '○'], 'Envoyé': ['#2f7350', '#e5f1ea', '✓'], 'Émise': ['#3f6285', '#e8eef5', '◆'], 'Terminé': ['#2f7350', '#e5f1ea', '●'], 'Accepté': ['#2f7350', '#e5f1ea', '✓'], 'Payée': ['#2f7350', '#e5f1ea', '✓'], 'Reçu': ['#3f6285', '#e8eef5', '●'], 'Confirmé': ['#2f7350', '#e5f1ea', '✓'] };
+const I = { devis: 'M6 3h9l4 4v14H6zM14 3v5h5M9 13h7M9 17h7', rdv: 'M4 5h16v16H4zM4 9h16M8 3v4M16 3v4', presta: 'M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.5-.5-.5-2.5z', fact: 'M6 2h12v20l-3-2-3 2-3-2-3 2zM9 7h6M9 11h6M9 15h4', msg: 'M3 5h18v14H3zM3 6l9 7 9-7' };
+const E = [
+['Octobre 2026', 'presta', '26/10/2026', 'Devis sur place, 14:30', 'Yao Serge, nouveaux bureaux du 7e étage', '', 'Planifié'],
+['Octobre 2026', 'devis', '24/10/2026', 'Devis D-2026-0140', 'Stores enrouleurs, 2 fenêtres, créé sur place', '622 568 FCFA', 'Brouillon'],
+['Octobre 2026', 'msg', '24/10/2026', 'WhatsApp : confirmation de passage', 'Envoyé à Me Traoré', '', 'Envoyé'],
+['Octobre 2026', 'fact', '12/10/2026', 'Facture MDS-0000087', 'Solde du devis D-2026-0098', '1 120 000 FCFA', 'Émise'],
+['Septembre 2026', 'presta', '30/09/2026', 'Installation', 'Koffi Brou, 6 stores vénitiens', '', 'Terminé'],
+['Septembre 2026', 'devis', '18/09/2026', 'Devis D-2026-0098', 'Stores vénitiens bois, 6 fenêtres', '1 120 000 FCFA', 'Accepté'],
+['Septembre 2026', 'rdv', '15/09/2026', 'Rendez-vous au showroom', 'Choix des lames avec Me Traoré', '', 'Terminé'],
+['Septembre 2026', 'msg', '15/09/2026', 'E-mail : demande de rendez-vous', 'Reçu depuis le formulaire du site', '', 'Reçu'],
+['Novembre 2025', 'fact', '04/11/2025', 'Facture MDS-0000031', 'Rideaux salle d’attente', '845 000 FCFA', 'Payée'],
+['Octobre 2025', 'devis', '20/10/2025', 'Devis D-2025-0211', 'Rideaux salle d’attente', '845 000 FCFA', 'Accepté']
+];
+const T = [['all', 'Tout'], ['devis', 'Devis'], ['rdv', 'Rendez-vous'], ['presta', 'Prestations'], ['fact', 'Factures'], ['msg', 'Messages']];
+const items = E.filter((e) => s.tab === 'all' || e[1] === s.tab);
+const months = [];
+items.forEach((e) => { if (!months.includes(e[0])) months.push(e[0]); });
+return {
+archived: s.archived,
+archiveLabel: s.archived ? 'Réactiver' : 'Archiver',
+askArchive: () => s.archived ? this.setState({ archived: false }) : this.setState({ confirm: true }),
+cancelArchive: () => this.setState({ confirm: false }),
+doArchive: () => this.setState({ confirm: false, archived: true }),
+confirmArchive: s.confirm,
+facts: [['Client depuis', '10/2025'], ['Devis acceptés', '3'], ['Total facturé', '1 965 000 FCFA'], ['Reste dû', '1 120 000 FCFA']].map(([k, v], i) => ({ k, v, style: 'display:flex;flex-direction:column;gap:4px;padding:14px 20px;margin:-1px 0 0 -1px;border-left:1px solid #e8e4db;border-top:1px solid #e8e4db' })),
+tabs: T.map(([k, label]) => ({ label, n: k === 'all' ? E.length : E.filter((e) => e[1] === k).length, sel: s.tab === k ? 'true' : 'false', pick: () => this.setState({ tab: k }),
+style: 'display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 12px;background:transparent;border:0;border-bottom:2px solid ' + (s.tab === k ? '#c09f6a' : 'transparent') + ';margin-bottom:-1px;font:inherit;font-size:14px;font-weight:' + (s.tab === k ? '600' : '500') + ';color:' + (s.tab === k ? '#1c1c1c' : '#6b665e') + ';cursor:pointer;white-space:nowrap' })),
+groups: months.map((m) => ({ month: m, items: items.filter((e) => e[0] === m).map((e) => ({ d: I[e[1]], date: e[2], title: e[3], sub: e[4], amount: e[5], st: e[6], glyph: SC[e[6]][2], badge: 'display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:999px;font-size:12.5px;font-weight:600;white-space:nowrap;color:' + SC[e[6]][0] + ';background:' + SC[e[6]][1] + (e[6] === 'Brouillon' ? ';box-shadow:inset 0 0 0 1px #b9b4aa' : '') })) }))
+};
+}
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Espace Pro — prestations</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="color-scheme: {{colorScheme}}; font-family: Inter, system-ui, sans-serif; color: {{pal.t353535}}; background: {{pal.sf4f4f1}}; min-height: 100vh; display: flex">
+<dc-import name="ProSidebar" active="prestations" hint-size="240px,100%"></dc-import>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+<dc-import name="ProTopbar" role="admin" hint-size="100%,64px"></dc-import>
+<main id="contenu" style="flex: 1; padding: 24px clamp(16px, 3vw, 32px) 96px; display: flex; flex-direction: column; gap: 18px">
+
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 16px">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<h1 style="margin: 0; font-family: 'Cormorant Garamond', serif; font-size: 34px; font-weight: 500; color: {{pal.t1c1c1c}}">Prestations</h1>
+<span style="font-size: 14px; color: {{pal.t6b665e}}">Installations, services après-vente et devis sur place confiés aux agents.</span>
+</div>
+<button type="button" style="display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 16px 0 14px; background: #c09f6a; border: 0; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; color: #161616; cursor: pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>Nouvelle prestation</button>
+</div>
+
+<div role="tablist" aria-label="Filtrer par statut" style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 2px">
+<sc-for list="{{filters}}" as="f" hint-placeholder-count="5">
+<button type="button" role="tab" aria-selected="{{f.sel}}" onClick="{{f.pick}}" style="{{f.style}}">{{f.label}}<span style="{{f.countStyle}}">{{f.count}}</span></button>
+</sc-for>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+<section aria-label="Liste des prestations" style="flex: 999 1 600px; min-width: 0; background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 10px; overflow: hidden">
+<div style="display: flex; flex-wrap: wrap; gap: 10px; padding: 12px 16px; border-bottom: 1px solid {{pal.be8e4db}}">
+<label style="flex: 1 1 220px; position: relative; display: flex; align-items: center"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Rechercher une prestation</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="{{pal.t6b665e}}" stroke-width="1.6" aria-hidden="true" style="position: absolute; left: 10px"><path d="M4 11a7 7 0 1 0 14 0a7 7 0 1 0-14 0M20 20l-3.5-3.5"></path></svg><input type="search" placeholder="Client, lieu ou n° de devis" style="width: 100%; height: 36px; box-sizing: border-box; padding: 0 10px 0 34px; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font: inherit; font-size: 14px"></label>
+<label style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: {{pal.t6b665e}}">Agent<select style="height: 36px; padding: 0 8px; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font: inherit; font-size: 14px; color: {{pal.t1c1c1c}}; background: {{pal.sffffff}}"><option>Tous</option><option>Koffi Brou</option><option>Yao Serge</option><option>Non assignée</option></select></label>
+<label style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: {{pal.t6b665e}}">Semaine<select style="height: 36px; padding: 0 8px; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font: inherit; font-size: 14px; color: {{pal.t1c1c1c}}; background: {{pal.sffffff}}"><option>26/10 – 01/11/2026</option><option>02/11 – 08/11/2026</option></select></label>
+</div>
+<ul style="list-style: none; margin: 0; padding: 0">
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="8">
+<li style="{{r.rowStyle}}">
+<button type="button" onClick="{{r.pick}}" aria-current="{{r.current}}" style="width: 100%; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding: 12px 16px; background: transparent; border: 0; font: inherit; text-align: left; color: {{pal.t353535}}; cursor: pointer">
+<span style="flex: 0 0 92px; display: flex; flex-direction: column"><span style="font-size: 13px; color: {{pal.t6b665e}}">{{r.day}}</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 500; color: {{pal.t1c1c1c}}">{{r.h}}</span></span>
+<span style="flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px; font-weight: 600; color: {{pal.t1c1c1c}}">{{r.client}}</span><span style="font-size: 13px; color: {{pal.t6b665e}}">{{r.kind}}, {{r.lieu}}</span></span>
+<span style="flex: 0 1 150px; display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px"><span aria-hidden="true" style="{{r.avatar}}">{{r.ini}}</span><span style="{{r.agentStyle}}">{{r.agent}}</span></span>
+<span style="flex: 0 0 104px; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: {{pal.t6b665e}}">{{r.ref}}</span>
+<span style="{{r.badge}}"><span aria-hidden="true">{{r.glyph}}</span>{{r.st}}</span>
+</button>
+</li>
+</sc-for>
+</ul>
+<sc-if value="{{empty}}" hint-placeholder-val="{{ false }}"><p style="margin: 0; padding: 28px 16px; text-align: center; font-size: 14px; color: {{pal.t6b665e}}">Aucune prestation avec ce statut cette semaine.</p></sc-if>
+</section>
+
+<aside aria-labelledby="pr-t" style="flex: 1 1 340px; min-width: 0; background: {{pal.sffffff}}; border: 1px solid {{pal.be8e4db}}; border-radius: 10px; padding: 18px 20px; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px">
+<div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 13px; color: {{pal.t6b665e}}">{{sel.kind}}</span><h2 id="pr-t" style="margin: 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 500; color: {{pal.t1c1c1c}}">{{sel.client}}</h2></div>
+<span style="{{sel.badge}}"><span aria-hidden="true">{{sel.glyph}}</span>{{sel.st}}</span>
+</div>
+<ol aria-label="Avancement" style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr))">
+<sc-for list="{{steps}}" as="st" hint-placeholder-count="3">
+<li aria-current="{{st.current}}" style="display: flex; flex-direction: column; gap: 4px; padding-right: 6px"><span aria-hidden="true" style="position: relative; display: block; height: 3px; margin: 7px 0 10px; border-radius: 2px; background: {{st.rail}}"><span style="{{st.ring}}"></span></span><span style="{{st.lbl}}">{{st.label}}</span></li>
+</sc-for>
+</ol>
+<dl style="margin: 0; display: grid; grid-template-columns: 110px 1fr; gap: 10px 12px; font-size: 14px">
+<dt style="color: {{pal.t6b665e}}">Créneau</dt><dd style="margin: 0; color: {{pal.t1c1c1c}}">{{sel.slot}}</dd>
+<dt style="color: {{pal.t6b665e}}">Adresse</dt><dd style="margin: 0; color: {{pal.t1c1c1c}}">{{sel.lieu}}</dd>
+<dt style="color: {{pal.t6b665e}}">Devis lié</dt><dd style="margin: 0"><a href="ProDevisFiche.dc.html" style="font-family: 'IBM Plex Mono', monospace; color: {{pal.t84642f}}">{{sel.ref}}</a></dd>
+<dt style="color: {{pal.t6b665e}}">Client</dt><dd style="margin: 0"><a href="ProClient.dc.html" style="color: {{pal.t84642f}}">Voir la fiche client</a></dd>
+</dl>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 500; color: {{pal.t1c1c1c}}">Agent assigné
+<select value="{{agentVal}}" onChange="{{setAgent}}" style="height: 40px; padding: 0 10px; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font: inherit; font-size: 14px; color: {{pal.t1c1c1c}}; background: {{pal.sffffff}}"><option value="Non assignée">Non assignée</option><option value="Koffi Brou">Koffi Brou</option><option value="Yao Serge">Yao Serge</option></select></label>
+<sc-if value="{{sel.unassigned}}" hint-placeholder-val="{{ false }}"><p role="status" style="margin: -8px 0 0; font-size: 13px; font-weight: 600; color: {{pal.t8c5f0e}}">! Aucun agent : la prestation n’apparaît sur aucun téléphone.</p></sc-if>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 500; color: {{pal.t1c1c1c}}">Consignes pour l’agent<textarea rows="3" value="{{sel.cons}}" onChange="{{setCons}}" placeholder="Code d’accès, matériel à prévoir, contact sur place…" style="box-sizing: border-box; padding: 10px 12px; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; font: inherit; font-size: 14px; line-height: 1.5; resize: vertical"></textarea></label>
+<sc-if value="{{sel.hasReport}}" hint-placeholder-val="{{ false }}">
+<div style="padding: 12px 14px; border-radius: 8px; background: {{pal.sf9f8f4}}; border: 1px solid {{pal.be8e4db}}; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 13px; font-weight: 600; color: {{pal.t1c1c1c}}">{{sel.reportTitle}}</span><p style="margin: 0; font-size: 14px; line-height: 1.55">{{sel.report}}</p></div>
+</sc-if>
+<div style="display: flex; flex-wrap: wrap; gap: 8px; padding-top: 4px; border-top: 1px solid {{pal.bf1eee8}}">
+<sc-if value="{{sel.billable}}" hint-placeholder-val="{{ false }}"><a href="ProFacture.dc.html" style="display: inline-flex; align-items: center; height: 40px; padding: 0 14px; border-radius: 6px; background: {{pal.s20332c}}; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 600">Créer la facture</a></sc-if>
+<button type="button" style="height: 40px; padding: 0 14px; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; background: {{pal.sffffff}}; font: inherit; font-size: 14px; color: {{pal.t1c1c1c}}">Déplacer le créneau</button>
+<button type="button" style="height: 40px; padding: 0 14px; border: 1px solid {{pal.bdcd6cb}}; border-radius: 6px; background: {{pal.sffffff}}; font: inherit; font-size: 14px; color: {{pal.t1c1c1c}}">Prévenir le client</button>
+</div>
+</aside>
+</div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1200}}'>
+class Component extends DCLogic {
+constructor(props) {
+super(props);
+this.state = { f: 'all', sel: 1, agents: {} };
+}
+isDark() {
+const t = this.props.theme;
+if (t === 'dark') return true;
+if (t === 'light') return false;
+let v = 'light';
+try { v = window.localStorage.getItem('mds-pro-theme') || 'light'; } catch (e) {}
+if (v === 'dark') return true;
+if (v === 'auto') { try { return window.matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) {} }
+return false;
+}
+themeMaps() { return { s: {"#ffffff": "#1b2220", "#f4f4f1": "#121816", "#f9f8f4": "#202825", "#fbfaf7": "#1e2623", "#fdfbf6": "#222a27", "#fcfbf8": "#1e2623", "#faf9f7": "#1e2623", "#fffcf5": "#2b2618", "#f1f0ec": "#262e2b", "#ece9e2": "#2a322f", "#e9e8e2": "#2a302d", "#e9e6df": "#0f1412", "#eef0ec": "#232b28", "#eef1ef": "#202826", "#edf1f4": "#1d2530", "#e8e4db": "#313a36", "#dcd6cb": "#3b4540", "#f1eee8": "#29312e", "#efece5": "#29312e", "#cfc9bd": "#4c5751", "#cfc8bb": "#4c5751", "#e1ddd3": "#3b4540", "#b9b4aa": "#5a645e", "#20332c": "#2b4a3e", "#2b4239": "#34574a", "#e5f1ea": "#1d3a2b", "#b7d6c3": "#2f5a43", "#fdf8ec": "#2d2717", "#ecd7a8": "#5b4a25", "#fbf1dc": "#382d15", "#e3c2bd": "#5e302b", "#e3c3bf": "#5e302b", "#fbeceb": "#3a1f1c", "#e8eef5": "#1d2a38", "#eeede8": "#2a302d", "#f6f0e4": "#2f2a1f", "#f3f3f3": "#262e2b", "#cccccc": "#46504b", "#fdf6f5": "#33201e", "#f8e6e4": "#3a2220", "#fbf6ea": "#2d2717", "#ecdcb9": "#5b4a25", "#f6ece5": "#33241d", "#efe9dd": "#2a2620", "#d9b26a": "#8a6a2c", "#b98a2e": "#8a6a2c"}, b: {"#ffffff": "#1b2220", "#f4f4f1": "#121816", "#f9f8f4": "#202825", "#fbfaf7": "#1e2623", "#fdfbf6": "#222a27", "#fcfbf8": "#1e2623", "#faf9f7": "#1e2623", "#fffcf5": "#2b2618", "#f1f0ec": "#262e2b", "#ece9e2": "#2a322f", "#e9e8e2": "#2a302d", "#e9e6df": "#0f1412", "#eef0ec": "#232b28", "#eef1ef": "#202826", "#edf1f4": "#1d2530", "#e8e4db": "#313a36", "#dcd6cb": "#3b4540", "#f1eee8": "#29312e", "#efece5": "#29312e", "#cfc9bd": "#4c5751", "#cfc8bb": "#4c5751", "#e1ddd3": "#3b4540", "#b9b4aa": "#5a645e", "#20332c": "#5d8a76", "#2b4239": "#34574a", "#e5f1ea": "#1d3a2b", "#b7d6c3": "#2f5a43", "#fdf8ec": "#2d2717", "#ecd7a8": "#5b4a25", "#fbf1dc": "#382d15", "#e3c2bd": "#5e302b", "#e3c3bf": "#5e302b", "#fbeceb": "#3a1f1c", "#e8eef5": "#1d2a38", "#eeede8": "#2a302d", "#f6f0e4": "#2f2a1f", "#f3f3f3": "#262e2b", "#cccccc": "#46504b", "#fdf6f5": "#33201e", "#f8e6e4": "#3a2220", "#fbf6ea": "#2d2717", "#ecdcb9": "#5b4a25", "#f6ece5": "#33241d", "#efe9dd": "#2a2620", "#d9b26a": "#8a6a2c", "#b98a2e": "#8a6a2c", "#1c1c1c": "#d6d2c9", "#b3392f": "#f28b80"}, t: {"#1c1c1c": "#f1eee8", "#353535": "#d6d2c9", "#6b665e": "#a8a296", "#20332c": "#bfd8cb", "#84642f": "#d8b47a", "#2f7350": "#86cfa3", "#8c5f0e": "#e6b862", "#5e4108": "#f0d39a", "#b3392f": "#f28b80", "#7c241c": "#f5b0a8", "#3f6285": "#9ec0e3", "#2c4866": "#bcd3ea", "#5c5852": "#c9c4ba", "#b0aaa0": "#6c736e", "#3d2b06": "#f0dcb3", "#1f4d35": "#bfe3cc", "#8f2c24": "#f5b0a8", "#6e4a0b": "#e6c27a", "#3f5a72": "#a9c3dc", "#3f5a73": "#a9c3dc", "#8e4529": "#e0a084", "#5a5248": "#cfc8bb", "#b98a2e": "#d9ac57", "#2c4660": "#a9c3dc"} }; }
+themeWatch() {
+if (this.__thw || typeof window === 'undefined') return;
+this.__thw = true;
+const bump = () => this.setState({ __th: Date.now() });
+try { window.addEventListener('storage', (e) => { if (e.key === 'mds-pro-theme') bump(); }); } catch (e) {}
+try { window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', bump); } catch (e) {}
+}
+dmap(v) {
+const T = this.themeMaps();
+const cv = (str) => str.split(';').map((seg) => {
+const i = seg.indexOf(':');
+let M = T.s;
+if (i > -1) { const p = seg.slice(0, i).trim().toLowerCase(); M = /^(color|stroke|fill|caret-color|accent-color|text-decoration-color)$/.test(p) ? T.t : /^(border|outline|box-shadow)/.test(p) ? T.b : T.s; }
+return seg.replace(/#[0-9a-fA-F]{6}/g, (h) => M[h.toLowerCase()] || h);
+}).join(';');
+const go = (x) => (typeof x === 'string' ? cv(x) : Array.isArray(x) ? x.map(go) : x && typeof x === 'object' && Object.prototype.toString.call(x) === '[object Object]' ? Object.keys(x).reduce((o, k) => { o[k] = go(x[k]); return o; }, {}) : x);
+return go(v);
+}
+renderVals() {
+this.themeWatch();
+const dark = this.isDark();
+let v = this.renderValsLight();
+if (dark) v = this.dmap(v);
+const T = this.themeMaps();
+const pal = {};
+['s', 'b', 't'].forEach((k) => { Object.keys(T[k]).forEach((h) => { pal[k + h.slice(1)] = dark ? T[k][h] : h; }); });
+v.pal = pal;
+v.themeDark = dark;
+v.colorScheme = dark ? 'dark' : 'light';
+return v;
+}
+renderValsLight() {
+const s = this.state;
+const SC = { 'Planifiée': ['#3f6285', '#e8eef5', '○'], 'En cours': ['#84642f', '#f6f0e4', '◐'], 'Terminée': ['#2f7350', '#e5f1ea', '●'], 'À planifier': ['#8c5f0e', '#fbf1dc', '!'] };
+const P = [
+['lun. 26/10', '09:00', '11:00', 'Mme Kouassi Aya', 'Installation', 'Villa 24, Cité Riviera 3, Cocody', 'Koffi Brou', 'D-2026-0118', 'Terminée', 'Code du portail 4521. Escabeau de 3 m.', '3 stores posés et réglés. Moteur du salon appairé à la télécommande. Cliente satisfaite, aucune réserve.'],
+['lun. 26/10', '13:30', '14:30', 'Mme Diomandé Salimata', 'Service après-vente', 'Cocody Danga', 'Koffi Brou', 'D-2026-0097', 'En cours', 'Chaînette du store de la chambre cassée.', ''],
+['lun. 26/10', '16:00', '17:00', 'M. Kacou Hervé', 'Devis sur place', 'II Plateaux Vallons', 'Koffi Brou', 'D-2026-0142', 'Planifiée', 'Prendre les mesures des 4 fenêtres du séjour.', ''],
+['mar. 27/10', '10:00', '11:30', 'M. Bamba Ibrahim', 'Service après-vente', 'Marcory Zone 4', 'Yao Serge', 'D-2026-0102', 'Planifiée', '', ''],
+['mer. 28/10', '08:30', '12:30', 'Résidence Les Palmiers', 'Installation', 'Bingerville', 'Yao Serge', 'D-2026-0131', 'Planifiée', 'Accès par le portail B. Prévoir 2 personnes.', ''],
+['ven. 30/10', '09:00', '12:00', 'Clinique des Lagunes', 'Installation', 'Cocody', '', 'D-2026-0135', 'À planifier', 'Pose hors horaires de consultation.', ''],
+['sam. 31/10', '10:00', '11:00', 'Mme Touré Aminata', 'Rendez-vous à domicile', 'Riviera Palmeraie', '', 'D-2026-0140', 'À planifier', '', ''],
+['ven. 23/10', '14:00', '16:00', 'Cabinet Traoré & Associés', 'Installation', 'Plateau, immeuble Alpha 2000', 'Yao Serge', 'D-2026-0109', 'Terminée', '', 'Stores bureau 1 à 4 posés. Le store de la salle de réunion attend une pièce, repasser la semaine prochaine.']
+];
+const agentOf = (i) => (s.agents[i] !== undefined ? s.agents[i] : P[i][6]);
+const F = [['all', 'Toutes', () => true], ['À planifier', 'À planifier'], ['Planifiée', 'Planifiées'], ['En cours', 'En cours'], ['Terminée', 'Terminées']];
+const match = (key, p) => key === 'all' || p[8] === key;
+const badge = (st) => 'flex:none;display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font-size:12.5px;font-weight:600;white-space:nowrap;color:' + SC[st][0] + ';background:' + SC[st][1];
+const rows = P.map((p, i) => ({ p, i })).filter(({ p }) => match(s.f, p)).map(({ p, i }) => {
+const a = agentOf(i);
+return {
+day: p[0], h: p[1], client: p[3], kind: p[4], lieu: p[5].split(',').pop().trim(), ref: p[7], st: p[8], glyph: SC[p[8]][2], badge: badge(p[8]),
+agent: a || 'Non assignée', ini: a ? a.split(' ').map((w) => w[0]).join('') : '?',
+agentStyle: a ? 'color:#353535' : 'color:#8c5f0e;font-weight:600',
+avatar: 'flex:none;width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;' + (a ? 'background:#20332c;color:#ffffff' : 'background:#fbf1dc;color:#8c5f0e;border:1px dashed #d9b26a;box-sizing:border-box'),
+current: s.sel === i ? 'true' : undefined,
+rowStyle: 'border-top:1px solid #efece5;' + (s.sel === i ? 'box-shadow:inset 3px 0 0 #c09f6a;background:#fdfbf6' : ''),
+pick: () => this.setState({ sel: i })
+};
+});
+const p = P[s.sel];
+const a = agentOf(s.sel);
+const order = ['Planifiée', 'En cours', 'Terminée'];
+const idx = p[8] === 'À planifier' ? -1 : order.indexOf(p[8]);
+return {
+filters: F.map(([k, label]) => {
+const on = s.f === k;
+return { label, sel: on ? 'true' : 'false', count: P.filter((x) => match(k, x)).length, pick: () => this.setState({ f: k }),
+style: 'flex:none;display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 12px;border-radius:999px;font:inherit;font-size:14px;cursor:pointer;' + (on ? 'background:#20332c;color:#ffffff;border:1px solid #20332c;font-weight:600' : 'background:#ffffff;color:#353535;border:1px solid #dcd6cb'),
+countStyle: 'font-family:\'IBM Plex Mono\',monospace;font-size:12px;' + (on ? 'color:#d9c39b' : 'color:#6b665e') };
+}),
+rows, empty: rows.length === 0,
+sel: { client: p[3], kind: p[4], day: p[0], h: p[1], end: p[2], lieu: p[5], ref: p[7], st: p[8], glyph: SC[p[8]][2], badge: badge(p[8]), cons: (s.cons || {})[s.sel] !== undefined ? s.cons[s.sel] : p[9], report: p[10], hasReport: !!p[10], reportTitle: 'Compte rendu de ' + (a || 'l’agent'), slot: p[0] + ', ' + p[1] + '–' + p[2], agent: a, unassigned: !a, billable: p[8] === 'Terminée' },
+steps: order.map((label, i) => ({ label, current: i === idx ? 'step' : undefined,
+rail: i < idx || (i === idx && i === 2) ? '#c09f6a' : '#e1ddd3',
+ring: 'position:absolute;left:0;top:-6px;width:15px;height:15px;box-sizing:border-box;border-radius:50%;border:2px solid ' + (i <= idx ? '#c09f6a' : '#cfc8bb') + ';background:' + (i < idx || (i === idx && i === 2) ? '#c09f6a' : '#ffffff'),
+lbl: 'font-size:13px;font-weight:' + (i === idx ? '600' : '500') + ';color:' + (i <= idx ? '#1c1c1c' : '#6b665e') })),
+agentVal: a || 'Non assignée',
+setCons: (e) => this.setState({ cons: { ...(s.cons || {}), [s.sel]: e.target.value } }),
+setAgent: (e) => this.setState({ agents: { ...s.agents, [s.sel]: e.target.value === 'Non assignée' ? '' : e.target.value } })
+};
+}
+}
+</script>
+</body>
+</html>

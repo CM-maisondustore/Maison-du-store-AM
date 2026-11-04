@@ -1,7 +1,7 @@
 <?php
 namespace App\Http\Controllers\Staff;
 use App\Models\{Quote,Contact,Invoice,User,QuotePayment};
-use App\Services\{StaffQuoteData,QuoteReceipts,Pricing,Audit};
+use App\Services\{StaffQuoteData,QuoteArticles,QuotePhotos,QuoteReceipts,Pricing,Audit,StaffInterface};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -18,10 +18,26 @@ class QuoteFormController
     }
     private function form(Quote $quote)
     {
+        if(StaffInterface::isArticleQuote($quote))return view('staff.quote-articles',['quote'=>$quote,'catalogue'=>QuoteArticles::catalogue($quote->type),'agents'=>User::where('role','agent')->where('active',true)->get()]);
         if(!auth()->user()->isAdmin())return view('staff.agent-quote-form',['quote'=>$quote,'catalogue'=>\App\Services\AgentQuoteData::catalogue()]);
         return view('staff.quote-form',['quote'=>$quote,'catalogue'=>StaffQuoteData::catalogue(auth()->user()->isAdmin()),'agents'=>User::where('role','agent')->where('active',true)->get()]);
     }
-    public function create() { return $this->form(new Quote(['contact'=>[],'dimensions'=>[],'edit_version'=>0,'submission_token'=>(string)Str::uuid()])); }
+    public function create(Request $r)
+    {
+        $type=in_array($r->query('boutique'),['electromenager','meubles'],true) ? $r->query('boutique') : null;
+        // Un agent n'ouvre que ses boutiques : la première autorisée remplace une boutique refusée.
+        if (!$r->user()->canOpenShop($type ?? 'stores')) { $first=$r->user()->shops()[0]; return redirect()->route('staff.quotes.create',$first==='stores' ? [] : ['boutique'=>$first]); }
+        return $this->form(new Quote(['type'=>$type,'contact'=>[],'dimensions'=>[],'edit_version'=>0,'submission_token'=>(string)Str::uuid()]));
+    }
+    /** Devis par ouvertures (stores et rideaux) : seuls ceux-là ont des photos d'ouverture. */
+    private function hasOpenings(array $data): bool { return !empty($data['dimensions']) && !in_array($data['type'] ?? null,['electromenager','meubles'],true); }
+    private function validated(Request $r,?Quote $quote=null): array
+    {
+        QuotePhotos::validate($r);
+        if (!$quote) abort_unless($r->user()->canOpenShop(in_array($r->input('universe'),['electromenager','meubles'],true) ? $r->input('universe') : 'stores'),403);
+        if(StaffInterface::isArticleQuote($quote) || (!$quote && in_array($r->input('universe'),['electromenager','meubles'],true))) return QuoteArticles::validate($r,$quote?->type);
+        return $r->user()->isAdmin() ? StaffQuoteData::validate($r) : \App\Services\AgentQuoteData::validate($r);
+    }
     public function calculate(Request $r) {
         abort_unless($r->user()->isAdmin(),403);
         $data=\App\Services\QuoteCosting::calculate($r);
@@ -41,13 +57,14 @@ class QuoteFormController
     }
     public function store(Request $r)
     {
-        $data=$r->user()->isAdmin() ? StaffQuoteData::validate($r) : \App\Services\AgentQuoteData::validate($r); $payment=$r->user()->isAdmin() ? QuoteReceipts::validate($r) : null;
+        $data=$this->validated($r); $payment=$r->user()->isAdmin() ? QuoteReceipts::validate($r) : null;
         $token=$r->input('submission_token');
         $previous=Quote::where('submission_token',$token)->first();
         if ($previous) { abort_unless($previous->created_by===$r->user()->id,403); return redirect()->route('staff.quotes.show',$previous); }
         try {
             $quote=DB::transaction(function () use ($r,$data,$payment,$token) {
                 $data['dimensions']=array_values($data['dimensions']);
+                if ($this->hasOpenings($data)) [$data['dimensions']]=QuotePhotos::apply($r,$data['dimensions'],null);
                 $quote=Quote::create([...$data,'contact_id'=>$this->contact($data['contact'])->id,'source'=>'interne','status'=>'draft','submission_token'=>$token,'created_by'=>$r->user()->id,'agent_id'=>$r->user()->isAdmin() ? ($data['agent_id'] ?? null) : $r->user()->id]);
                 if ($payment) QuoteReceipts::record($quote,$payment,$r->user()->id); Audit::record('devis_interne_cree',$quote); return $quote;
             });
@@ -58,15 +75,18 @@ class QuoteFormController
     }
     public function update(Request $r,Quote $quote)
     {
-        $this->access($r,$quote,true); $data=$r->user()->isAdmin() ? StaffQuoteData::validate($r) : \App\Services\AgentQuoteData::validate($r); $payment=$r->user()->isAdmin() ? QuoteReceipts::validate($r) : null;
+        $this->access($r,$quote,true); $data=$this->validated($r,$quote); $payment=$r->user()->isAdmin() ? QuoteReceipts::validate($r) : null;
         DB::transaction(function () use ($r,$quote,$data,$payment) {
             $locked=Quote::whereKey($quote->id)->lockForUpdate()->firstOrFail(); $this->access($r,$locked,true);
             if ($locked->edit_version!==(int)$r->input('edit_version')) throw ValidationException::withMessages(['edit_version'=>'Ce devis a été modifié dans une autre fenêtre. Rechargez-le avant de reprendre la saisie.']);
             if ($r->user()->isAdmin() && $locked->receivedAmount()>($data['configuration']['calculation']['financial']['total'] ?? Pricing::totals($data['lines'],$data['tax_basis_points'])['total'])) throw ValidationException::withMessages(['lines'=>'Le total ne peut pas être inférieur aux montants déjà reçus.']);
-            if (!$r->user()->isAdmin()) $data=\App\Services\AgentQuoteData::preserveAdminData($data,$locked);
+            if (StaffInterface::isArticleQuote($locked)) { if (!$r->user()->isAdmin()) $data=QuoteArticles::preserveAdminData($data,$locked); }
+            elseif (!$r->user()->isAdmin()) $data=\App\Services\AgentQuoteData::preserveAdminData($data,$locked);
             elseif (!$r->has('field_notes')) $data['configuration']['field_notes']=$locked->configuration['field_notes'] ?? '';
+            $unused=[];
+            if ($this->hasOpenings($data)) [$data['dimensions'],$unused]=QuotePhotos::apply($r,$data['dimensions'],$locked);
             $locked->fill([...$data,'contact_id'=>$this->contact($data['contact'],$locked)->id,'status'=>'draft','edit_version'=>$locked->edit_version+1]);
-            $locked->save(); if ($payment) QuoteReceipts::record($locked,$payment,$r->user()->id); Audit::record('formulaire_devis_modifie',$locked);
+            $locked->save(); QuotePhotos::forget($unused); if ($payment) QuoteReceipts::record($locked,$payment,$r->user()->id); Audit::record('formulaire_devis_modifie',$locked);
         });
         return redirect()->route('staff.quotes.show',$quote)->with('success','Devis enregistré.');
     }

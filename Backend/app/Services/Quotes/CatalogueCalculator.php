@@ -88,7 +88,7 @@ final class CatalogueCalculator
         foreach ($pricing['fees'] as $key=>$fee) if ($fee['enabled']) $fees[]=['key'=>$key,'description'=>PricingConfig::FEES[$key], 'unitPrice'=>$fee['unit_price'],'priceSource'=>$fee['price_override']!==null?'manual':'default','scope'=>$fee['scope'],'quantity'=>$fee['quantity']];
         try {
             $financial=(new QuoteCalculator)->calculate(['openings'=>$openings,'fees'=>$fees,'displayMode'=>$pricing['display_mode'],
-                'taxBasisPoints'=>$pricing['tax_basis_points'],'discount'=>['type'=>$pricing['discount_type'],'value'=>$pricing['discount_value']],'depositPercent'=>$pricing['deposit_percent']]);
+                'taxBasisPoints'=>$pricing['tax_basis_points'],'discount'=>['type'=>$pricing['discount_type'],'value'=>$pricing['discount_value']],'depositPercent'=>$pricing['deposit_percent'],'schedule'=>$pricing['schedule'] ?? null]);
         } catch (\InvalidArgumentException $e) { throw ValidationException::withMessages(['pricing'=>$e->getMessage()]); }
         $lines=[];
         foreach ($financial['openings'] as $opening) foreach ($opening['lines'] as $line) if (!$line['pending']) $lines[]=['description'=>mb_substr($opening['label'].' — '.$line['description'].' ('.$line['quantity'].' '.$line['unit'].' / ouverture)',0,250),'quantity'=>$opening['quantity'],'unit_price'=>$line['amount']];
