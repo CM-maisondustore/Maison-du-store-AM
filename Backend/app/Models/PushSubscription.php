@@ -6,7 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class PushSubscription extends Model
 {
-    protected $fillable = ['endpoint_hash', 'endpoint', 'public_key', 'auth_token', 'content_encoding', 'label', 'last_used_at'];
+    // user_id vient toujours du compte connecté (PushController), jamais de la requête.
+    protected $fillable = ['user_id', 'endpoint_hash', 'endpoint', 'public_key', 'auth_token', 'content_encoding', 'label', 'last_used_at'];
     protected $hidden = ['endpoint', 'public_key', 'auth_token'];
     protected $casts = [
         'endpoint' => 'encrypted',
