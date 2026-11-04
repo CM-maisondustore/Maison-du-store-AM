@@ -12,5 +12,6 @@
 <dl class="detail-list">
 @foreach(['suppliesAndConfectionTotal'=>'Fournitures et confection','feesTotal'=>'Frais','tax'=>'Taxe','grossTotal'=>'Total avant remise','discountAmount'=>'Remise','finalTotal'=>'Total définitif','deposit'=>'Acompte','balance'=>'Solde après acompte'] as $key=>$label)<dt>{{ $label }}</dt><dd>{{ number_format($financial[$key],0,',',' ') }} F CFA</dd>@endforeach
 </dl>
-<p>Un acompte de {{ str_replace('.',',',$financial['depositPercent']) }} % est obligatoire avant le démarrage des travaux.<br>Le solde de {{ str_replace('.',',',$financial['balancePercent']) }} % est payable à la fin de la prestation.</p>
+@if($scheduleText=\App\Services\Quotes\QuoteFinancials::scheduleText($financial))<p>Échéancier : {{ $scheduleText }}</p>@else<p>Un acompte de {{ str_replace('.',',',$financial['depositPercent']) }} % est obligatoire avant le démarrage des travaux.<br>Le solde de {{ str_replace('.',',',$financial['balancePercent']) }} % est payable à la fin de la prestation.</p>@endif
+
 </div>

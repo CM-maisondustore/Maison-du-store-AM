@@ -7,6 +7,8 @@ use Illuminate\Validation\ValidationException;
 
 final class DocumentLayout
 {
+    /** Mention « Notre engagement », imprimée sous les conditions de paiement des devis à échéancier. Modifiable dans Mise en page. */
+    public const COMMITMENT='La confection est lancée dès réception de l’acompte. Nous nous engageons à mener le chantier jusqu’à la pose finale, avec une finition soignée. L’acompte n’est plus remboursable une fois la confection lancée.';
     public const COLORS=['accent'=>'Or principal','secondary_color'=>'Or clair','text_color'=>'Texte principal','muted_color'=>'Texte secondaire','stripe_color'=>'Lignes alternées'];
     public const TOGGLES=['show_logo'=>'Logo','show_name'=>'Nom de l’entreprise','show_activities'=>'Activités','show_title'=>'Type de document','show_cover'=>'Couverture séparée (devis et factures)','striped_rows'=>'Alternance des lignes','table_borders'=>'Bordures des tableaux','show_conditions'=>'Conditions commerciales','show_client_signature'=>'Signature client','show_company_signature'=>'Signature entreprise','show_company_details'=>'Coordonnées en pied de document','show_page_number'=>'Pagination'];
     public static function defaults(): array
@@ -17,14 +19,16 @@ final class DocumentLayout
             'show_conditions'=>true,'show_client_signature'=>true,'show_company_signature'=>true,'show_company_details'=>true,'show_page_number'=>true,
             'table_header'=>'light','total_style'=>'gold','subtotal_style'=>'light','discount_style'=>'light','deposit_style'=>'light','balance_style'=>'light',
             'margin_top_mm'=>25,'margin_bottom_mm'=>25,'margin_left_mm'=>15,'margin_right_mm'=>15,'letterhead_enabled'=>false,'letterhead_opacity'=>100,
-            'issuer_email'=>config('workspace.issuer.email'),'issuer_phone'=>'','issuer_whatsapp'=>config('workspace.whatsapp_number'),'issuer_rccm'=>'','issuer_ncc'=>'','issuer_website'=>'www.maisondustoream.com'];
+            'issuer_email'=>config('workspace.issuer.email'),'issuer_phone'=>'','issuer_whatsapp'=>config('workspace.whatsapp_number'),'issuer_rccm'=>'','issuer_ncc'=>'','issuer_website'=>'www.maisondustoream.com',
+            'commitment_text'=>self::COMMITMENT];
     }
     public static function validate(Request $r, array $saved): array
     {
         $rules=['version'=>'required|integer|min:1','name'=>'required|string|max:150','body'=>'nullable|string|max:10000','inherit_global'=>'sometimes|boolean',
             'font_family'=>'required|in:DejaVu Sans,DejaVu Serif','font_size'=>'required|integer|min:8|max:12','activities'=>'nullable|string|max:300',
             'footer'=>'nullable|string|max:2000','signature'=>'nullable|string|max:1000','issuer_name'=>'required|string|max:150','issuer_email'=>'sometimes|required|email:rfc|max:254',
-            'issuer_address'=>'nullable|string|max:1000','issuer_registration'=>'nullable|string|max:300','issuer_tax_note'=>'nullable|string|max:1000','issuer_payment_terms'=>'nullable|string|max:2000'];
+            'issuer_address'=>'nullable|string|max:1000','issuer_registration'=>'nullable|string|max:300','issuer_tax_note'=>'nullable|string|max:1000','issuer_payment_terms'=>'nullable|string|max:2000',
+            'blocks'=>'sometimes|nullable|string|max:200000','commitment_text'=>'sometimes|nullable|string|max:1000'];
         foreach (self::COLORS as $key=>$label) $rules[$key]='required|regex:/^#[0-9a-fA-F]{6}$/';
         foreach (self::TOGGLES as $key=>$label) $rules[$key]='required|boolean';
         foreach (['issuer_phone','issuer_whatsapp','issuer_rccm','issuer_ncc','issuer_website'] as $key) $rules[$key]='nullable|string|max:150';
@@ -34,9 +38,11 @@ final class DocumentLayout
             $rules['remove_'.$key]='sometimes|boolean';
         }
         $data=$r->validate($rules); $options=[...self::defaults(),...$saved];
-        foreach ($data as $key=>$value) if (!in_array($key,['version','name','body','logo','signature_image','stamp_image']) && !str_starts_with($key,'remove_')) $options[$key]=$value ?? '';
+        foreach ($data as $key=>$value) if (!in_array($key,['version','name','body','logo','signature_image','stamp_image','blocks']) && !str_starts_with($key,'remove_')) $options[$key]=$value ?? '';
         foreach (self::TOGGLES as $key=>$label) $options[$key]=$r->boolean($key);
         $options['inherit_global']=$r->boolean('inherit_global');
+        // Mise en page libre : absent, on garde les blocs enregistrés ; vide, on revient au rendu actuel.
+        if ($r->has('blocks')) $options['blocks']=DocumentBlocks::normalize($r->input('blocks'));
         foreach (['logo','signature_image','stamp_image'] as $key) {
             if ($r->boolean('remove_'.$key)) $options[$key]=null;
             if ($r->hasFile($key)) {

@@ -34,5 +34,6 @@
  'alert'=>'M12 4 2.5 20h19zM12 10v4M12 17h.01',
  'info'=>'M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18zM12 11v5M12 8h.01',
  'lock'=>'M6 11h12v10H6zM8 11V7a4 4 0 0 1 8 0v4',
+ 'camera'=>'M4 8h3l2-3h6l2 3h3v12H4zM12 17a4 4 0 1 0 0-8a4 4 0 1 0 0 8z',
 ])
 <svg width="{{ $s ?? 20 }}" height="{{ $s ?? 20 }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ $iconPaths[$n] ?? '' }}"/></svg>

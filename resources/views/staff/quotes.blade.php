@@ -5,7 +5,7 @@
 <a class="button desktop-only" href="{{ route('staff.quotes.create') }}">@include('staff.partials.icon',['n'=>'plus','s'=>18])Nouveau devis</a>
 @if(auth()->user()->isAdmin())<a class="button quiet desktop-only" href="{{ route('staff.quote-options.index') }}">Matériaux &amp; finitions</a>@endif
 @endsection
-@section('fab')<a class="button fab" href="{{ route('staff.quotes.create') }}">@include('staff.partials.icon',['n'=>'plus','s'=>18])Nouveau devis</a>@endsection
+@section('fab')<a class="fab fab-round" href="{{ route('staff.quotes.create') }}" aria-label="Nouveau devis" title="Nouveau devis">@include('staff.partials.icon',['n'=>'plus','s'=>26])</a>@endsection
 @section('content')
 @php($keep=request()->except(['status','page']))
 <nav class="chips" aria-label="Filtrer par état">

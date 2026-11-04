@@ -8,6 +8,8 @@ use Illuminate\Validation\{Rule, ValidationException};
 use Carbon\Carbon;
 class InterventionController
 {
+    private const PLANNING_DAYS = 60;
+
     public function index(Request $r)
     {
         $filters = $r->validate(['q' => 'nullable|string|max:150', 'status' => 'nullable|in:planned,in_progress,completed,cancelled', 'agent' => 'nullable|integer']);
@@ -17,7 +19,7 @@ class InterventionController
         if (!empty($filters['q'])) $q->where(fn ($b) => $b->where('address', 'like', '%'.$filters['q'].'%')->orWhereHas('contact', fn ($c) => $c->where('name', 'like', '%'.$filters['q'].'%')));
         $counts = (clone $q)->reorder()->selectRaw('status, COUNT(*) as total')->groupBy('status')->pluck('total', 'status');
         if (!empty($filters['status'])) $q->where('status', $filters['status']);
-        return view('staff.interventions', ['counts' => $counts, 'jobs' => $q->paginate(25)->withQueryString(), 'contacts' => $r->user()->isAdmin() ? Contact::whereNull('archived_at')->orderBy('name')->get() : collect(), 'agents' => $r->user()->isAdmin() ? User::where('role', 'agent')->where('active', true)->get() : collect(), 'quotes' => $r->user()->isAdmin() ? Quote::with('customer')->whereNotNull('contact_id')->latest()->limit(200)->get() : collect(), 'appointments' => $r->user()->isAdmin() ? Appointment::with('customer')->whereNotNull('contact_id')->latest()->limit(200)->get() : collect()]);
+        return view('staff.interventions', ['planning' => $r->user()->isAdmin() ? $this->agentPlanning() : null, 'counts' => $counts, 'jobs' => $q->paginate(25)->withQueryString(), 'contacts' => $r->user()->isAdmin() ? Contact::whereNull('archived_at')->orderBy('name')->get() : collect(), 'agents' => $r->user()->isAdmin() ? User::where('role', 'agent')->where('active', true)->get() : collect(), 'quotes' => $r->user()->isAdmin() ? Quote::with('customer')->whereNotNull('contact_id')->latest()->limit(200)->get() : collect(), 'appointments' => $r->user()->isAdmin() ? Appointment::with('customer')->whereNotNull('contact_id')->latest()->limit(200)->get() : collect()]);
     }
     public function show(Request $r, Intervention $intervention)
     {
@@ -63,6 +65,19 @@ class InterventionController
         // HTML form values remain strings after validation; Carbon requires a number.
         $data['duration_minutes'] = (int) $data['duration_minutes'];
         return $data;
+    }
+    /**
+     * Créneaux occupés des agents actifs, pour le planning du formulaire « Nouvelle prestation » (administrateur seulement).
+     * Mêmes prestations que celles qui bloquent un créneau dans checkSlot ; ni client, ni adresse, ni consignes.
+     */
+    private function agentPlanning(): array
+    {
+        $from = today(); $to = today()->addDays(self::PLANNING_DAYS);
+        $jobs = Intervention::whereNotIn('status', ['cancelled', 'completed'])->whereHas('agent', fn ($q) => $q->where('role', 'agent')->where('active', true))
+            ->where('scheduled_at', '<', $to->copy()->addDay())->where('scheduled_at', '>', $from->copy()->subDay())->orderBy('scheduled_at')->get(['agent_id', 'kind', 'scheduled_at', 'duration_minutes']);
+        return ['from' => $from->format('Y-m-d'), 'to' => $to->format('Y-m-d'), 'jobs' => $jobs->map(fn ($job) => [
+            'agent' => $job->agent_id, 'kind' => $job->kind, 'start' => $job->scheduled_at->format('Y-m-d\TH:i'), 'end' => $job->scheduled_at->copy()->addMinutes($job->duration_minutes)->format('Y-m-d\TH:i'),
+        ])->values()->all()];
     }
     private function checkSlot(array $data, ?int $except = null): void
     {

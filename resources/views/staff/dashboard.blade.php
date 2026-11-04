@@ -1,7 +1,7 @@
 @extends('staff.layout')
 @section('title', auth()->user()->isAdmin() ? 'Vue d’ensemble' : 'Aujourd’hui')
 @if(!auth()->user()->isAdmin())
-@section('fab')<a class="button fab" href="{{ route('staff.quotes.create') }}">@include('staff.partials.icon',['n'=>'plus','s'=>18])Devis sur place</a>@endsection
+@section('fab')<a class="fab fab-round" href="{{ route('staff.quotes.create') }}" aria-label="Nouveau devis sur place" title="Nouveau devis sur place">@include('staff.partials.icon',['n'=>'plus','s'=>26])</a>@endsection
 @section('page-actions')<a class="button desktop-only" href="{{ route('staff.quotes.create') }}">Devis sur place</a>@endsection
 @endif
 @section('subtitle', ucfirst(now()->locale('fr')->isoFormat('dddd')).' '.now()->format('d/m/Y').(auth()->user()->isAdmin() ? '' : ', '.auth()->user()->name))
@@ -52,6 +52,7 @@
 </ul>
 @if($unpaid->isNotEmpty())<div class="panel-foot row d-flex between"><strong>Total dû</strong><span class="amount">{{ \App\Services\StaffInterface::money($unpaid->sum('total')) }}</span></div>@endif
 </section>
+@if(auth()->user()->isOwner())
 <section class="panel" aria-labelledby="auto-title">
 <div class="title-row between"><h2 id="auto-title">Automatisations</h2>
 @if($smtpVerified)<span class="badge st-ok"><span aria-hidden="true">✓</span>SMTP vérifié</span>@else<span class="badge st-warn"><span aria-hidden="true">!</span>SMTP à vérifier</span>@endif</div>
@@ -59,6 +60,7 @@
 @if($lastRun && !$lastRun->successful)<p class="notice">Le dernier traitement a échoué. Vérifiez la planification.</p>@endif
 <div class="actions mb-0"><form method="post" action="{{ route('staff.communications.process') }}" data-confirm="Exécuter les règles actives ? Les règles en mode automatique peuvent envoyer des e-mails aux clients.">@csrf<button class="secondary">Exécuter maintenant</button></form><a class="link" href="{{ route('staff.communications.index') }}">Voir les règles</a></div>
 </section>
+@endif
 </aside>
 </div>
 @else

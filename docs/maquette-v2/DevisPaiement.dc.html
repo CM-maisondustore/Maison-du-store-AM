@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Nouveau devis, paiement</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./assets/espace-pro.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="shell">
+<dc-import name="Navigation" active="devis" hint-size="240px,900px"></dc-import>
+<div class="workspace">
+<dc-import name="Haut" hint-size="100%,64px"></dc-import>
+<main class="main" id="contenu">
+<div class="page-head"><div>
+<nav class="crumbs" aria-label="Fil d’Ariane"><a href="#contenu">Devis</a></nav>
+<h1>Nouveau devis</h1>
+<p class="sub">Mme Kouassi Aya · 3 ouvertures · 4 exemplaires</p>
+</div></div>
+<div style="margin-bottom: 20px"><dc-import name="EtapesDevis" step="4" hint-size="100%,96px"></dc-import></div>
+
+<div style="display: flex; flex-wrap: wrap; align-items: flex-start; gap: 20px">
+<div style="flex: 999 1 560px; min-width: 0">
+<section class="panel" aria-labelledby="h-conditions">
+<h2 id="h-conditions" class="section-title"><span class="step" aria-hidden="true">6</span>Conditions de paiement</h2>
+<fieldset class="bare mt-12"><legend>Échéancier</legend>
+<div class="segmented">
+<label><input type="radio" name="echeancier"><span>2 échéances · 70 / 30</span></label>
+<label><input type="radio" name="echeancier" checked><span>3 échéances · 50 / 30 / 20</span></label>
+</div>
+<p class="hint">Choisi selon le total : 70 / 30 jusqu’à 500 000 F, 50 / 30 / 20 au-delà.</p>
+</fieldset>
+<ol style="list-style: none; margin: 14px 0 0; padding: 0; border: 1px solid var(--pro-line); border-radius: 10px; overflow: hidden">
+<li style="display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--pro-line)"><span class="mono" style="font-size: 18px; color: var(--pro-ink)">50 %</span><span><strong style="display: block; color: var(--pro-ink)">Acompte à la validation du chantier</strong><small class="muted">Lance la confection</small></span><span class="amount" style="color: var(--pro-ink)">257 032 FCFA</span></li>
+<li style="display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--pro-line)"><span class="mono" style="font-size: 18px; color: var(--pro-ink)">30 %</span><span><strong style="display: block; color: var(--pro-ink)">Après installation des rails</strong></span><span class="amount" style="color: var(--pro-ink)">154 219 FCFA</span></li>
+<li style="display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 12px 16px"><span class="mono" style="font-size: 18px; color: var(--pro-ink)">20 %</span><span><strong style="display: block; color: var(--pro-ink)">Après livraison et pose</strong></span><span class="amount" style="color: var(--pro-ink)">102 813 FCFA</span></li>
+</ol>
+<div style="margin-top: 14px; padding: 12px 14px; border-radius: 10px; background: var(--pro-gold-tint)">
+<strong style="display: block; color: var(--pro-ink)">Notre engagement</strong>
+<p style="margin: 4px 0 0">La confection est lancée dès réception de l’acompte. Nous nous engageons à mener le chantier jusqu’à la pose finale, avec une finition soignée. L’acompte n’est plus remboursable une fois la confection lancée.</p>
+</div>
+<p class="hint">Cette mention s’imprime sous les conditions de paiement du devis.</p>
+</section>
+
+<section class="panel" aria-labelledby="h-recu">
+<h2 id="h-recu" class="section-title"><span class="step" aria-hidden="true">7</span>Paiement déjà reçu</h2>
+<p class="muted">Déjà reçu : <span class="amount">0 FCFA</span> · reste à payer : <span class="amount">514 064 FCFA</span></p>
+<details class="fold" open="{{ true }}"><summary>Enregistrer un versement reçu<small>Seulement si un montant vient d’être encaissé</small></summary>
+<div class="grid">
+<label class="mt-0">Montant reçu<span class="field-unit"><input type="number" placeholder="0"><span class="unit">FCFA</span></span></label>
+<label class="mt-0">Date de réception<input type="date"></label>
+<label>Moyen de paiement<select><option>À préciser</option><option>Espèces</option><option>Mobile Money</option><option>Virement</option><option>Chèque</option></select></label>
+<label>Référence du paiement ou du reçu<input></label>
+</div>
+<label class="check"><input type="checkbox">Je confirme que ce montant a effectivement été reçu.</label>
+<p class="hint">La saisie consigne le versement ; elle ne déclenche aucun débit.</p>
+</details>
+</section>
+</div>
+
+<aside class="panel" aria-labelledby="h-recap" style="flex: 1 1 280px; max-width: 360px; margin: 0">
+<h2 id="h-recap">Récapitulatif</h2>
+<dl class="detail-list mt-12">
+<dt>Client</dt><dd>Mme Kouassi Aya · 07 00 00 00 01</dd>
+<dt>Ouvertures</dt><dd>Salon 380 × 270 · Chambre 180 × 220 ×2 · Bureau 140 × 160</dd>
+<dt>Agent</dt><dd>Koffi Brou</dd>
+<dt>Total provisoire</dt><dd class="amount" style="font-size: 22px">514 064 FCFA</dd>
+</dl>
+<p class="notice mt-12" style="margin-bottom: 0"><strong>2 lignes à définir.</strong> Le devis s’enregistre en brouillon, mais il ne pourra être validé qu’une fois les prix de pose saisis.</p>
+</aside>
+</div>
+
+<div class="action-bar"><span class="status">Enregistré en brouillon, jamais envoyé sans action de votre part.</span><a class="button quiet" href="DevisChiffrage.dc.html">Précédent</a><button type="button">Enregistrer le devis</button></div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1250}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

@@ -6,7 +6,6 @@
 <label>Présentation des ouvertures<select name="pricing[display_mode]"><option value="grouped" @selected(($pricing['display_mode'] ?? 'grouped')==='grouped')>Regroupées avec nombre d’exemplaires</option><option value="individual" @selected(($pricing['display_mode'] ?? '')==='individual')>Détaillées individuellement</option></select></label>
 <label>Remise<select name="pricing[discount_type]">@foreach(['none'=>'Aucune','percentage'=>'Pourcentage','fixed'=>'Montant fixe','target_total'=>'Total négocié'] as $key=>$label)<option value="{{ $key }}" @selected(($pricing['discount_type'] ?? 'none')===$key)>{{ $label }}</option>@endforeach</select></label>
 <label>Valeur de remise / total négocié<input name="pricing[discount_value]" inputmode="decimal" value="{{ $pricing['discount_value'] ?? 0 }}"></label>
-<label>Acompte<span class="field-unit"><input name="pricing[deposit_percent]" type="number" min="0" max="100" step="0.01" required value="{{ $pricing['deposit_percent'] ?? 70 }}"><span class="unit">%</span></span></label>
 </div>
 <details class="fold" @if($feesInUse || $errors->has('pricing.fees')) open @endif>
 <summary>Frais du devis<small>Pose, livraison, transport, déplacement : facturés une seule fois par défaut</small></summary>

@@ -41,6 +41,6 @@ class StaffPushNotifications
 
     public function admins(string $title, string $message, string $url): void
     {
-        $this->send(User::where('role', 'admin')->where('active', true)->get(), $title, $message, $url);
+        $this->send(User::whereIn('role', ['admin', 'manager'])->where('active', true)->get(), $title, $message, $url);
     }
 }

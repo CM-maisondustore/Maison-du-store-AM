@@ -8,6 +8,14 @@ use Illuminate\Validation\Rule;
 class QuoteController
 {
     private function access(Request $r, Quote $quote): void { abort_unless($quote->canBeViewedBy($r->user()), 403); }
+    /** Photo d'une ouverture : visible par qui peut voir le devis, et seulement si elle appartient à ce devis. */
+    public function photo(Request $r, Quote $quote, int $media)
+    {
+        $this->access($r, $quote);
+        abort_unless(in_array($media, \App\Services\QuotePhotos::ids($quote), true), 404);
+        $asset = \App\Models\MediaAsset::findOrFail($media);
+        return response(base64_decode($asset->payload), 200, ['Content-Type' => $asset->mime, 'Cache-Control' => 'private, no-store', 'Content-Security-Policy' => "default-src 'none'"]);
+    }
     public function index(Request $r)
     {
         $filters = $r->validate(['q' => 'nullable|string|max:150', 'type' => 'nullable|in:store,rideau,electromenager,meubles', 'source' => 'nullable|in:site,interne,sur_place', 'agent' => 'nullable|string|max:20', 'sort' => 'nullable|in:asc,desc']);

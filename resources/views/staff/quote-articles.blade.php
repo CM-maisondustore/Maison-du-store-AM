@@ -28,13 +28,14 @@
 <input type="hidden" name="edit_version" value="{{ old('edit_version',$quote->edit_version ?? 0) }}">
 <div class="form-narrow">
 <section class="panel"><h2 class="section-title"><span class="step" aria-hidden="true">1</span>Client</h2><div class="grid client-grid">
-@foreach(['firstName'=>'Prénom','lastName'=>'Nom / raison sociale','phone'=>'Téléphone','email'=>'E-mail (facultatif)','address'=>'Adresse de livraison','city'=>'Ville'] as $key=>$fieldLabel)
+@foreach(['firstName'=>'Prénom','lastName'=>'Nom / raison sociale','phone'=>'Téléphone','email'=>'E-mail (facultatif)'] as $key=>$fieldLabel)
 @if($key==='phone')
 @include('staff.quote-phone')
 @else
-<label>{{ $fieldLabel }}<input name="contact[{{ $key }}]" type="{{ $key==='email' ? 'email' : 'text' }}" @required(in_array($key,['lastName','address'])) maxlength="{{ $key==='address' ? 1000 : ($key==='email' ? 255 : 100) }}" value="{{ old('contact.'.$key,$quote->contact[$key] ?? '') }}"></label>
+<label>{{ $fieldLabel }}<input name="contact[{{ $key }}]" type="{{ $key==='email' ? 'email' : 'text' }}" @required($key==='lastName') maxlength="{{ $key==='email' ? 255 : 100 }}" value="{{ old('contact.'.$key,$quote->contact[$key] ?? '') }}"></label>
 @endif
 @endforeach
+@include('staff.quote-address',['addressLabel'=>'Complément d’adresse de livraison'])
 </div></section>
 <section class="panel" aria-labelledby="s-art"><h2 id="s-art" class="section-title"><span class="step" aria-hidden="true">2</span>Articles</h2>
 <label>Ajouter depuis le catalogue<input type="search" id="article-search" list="article-catalogue" placeholder="Nom ou référence d’un produit"></label>

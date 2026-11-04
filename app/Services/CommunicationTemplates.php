@@ -51,7 +51,8 @@ class CommunicationTemplates
             $financial=$record instanceof Quote ? Quotes\QuoteFinancials::forQuote($record) : Quotes\QuoteFinancials::forSnapshot($record->snapshot);
             $data['montant']=number_format($financial['total'],0,',',' ');
             foreach (['acompte'=>'deposit','solde'=>'balance','remise'=>'discountAmount','total_avant_remise'=>'grossTotal'] as $variable=>$key) $data[$variable]=number_format($financial[$key] ?? 0,0,',',' ');
-            if (isset($financial['depositPercent'])) $data['conditions_paiement']='Un acompte de '.$financial['depositPercent'].' % est obligatoire avant le démarrage des travaux. Le solde est payable à la fin de la prestation.';
+            if ($schedule=Quotes\QuoteFinancials::scheduleText($financial)) $data['conditions_paiement']='Échéancier : '.$schedule;
+            elseif (isset($financial['depositPercent'])) $data['conditions_paiement']='Un acompte de '.$financial['depositPercent'].' % est obligatoire avant le démarrage des travaux. Le solde est payable à la fin de la prestation.';
         }
         if ($record instanceof Appointment) {
             $data['date']=\Carbon\Carbon::parse($record->date)->format('d/m/Y'); $data['heure']=$record->time;

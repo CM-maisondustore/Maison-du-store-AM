@@ -280,14 +280,64 @@ document.querySelectorAll('[data-flash-bubble]').forEach(flash => {
   document.addEventListener('keydown', event => { if (event.key === 'Escape' && !pop.hidden) { closePop(); bell.focus(); } });
 })();
 
-/* Révéler un champ replié : section, carte d'ouverture ou onglet. */
+/* Révéler un champ replié : section, carte d'ouverture, onglet ou étape d'un assistant. */
 const revealField = field => {
+  let allowed = null;
   for (let node = field.parentElement; node; node = node.parentElement) {
     if (node.tagName === 'DETAILS') node.open = true;
     if (node.getAttribute('role') === 'tabpanel' && node.hidden) document.querySelector(`[aria-controls="${node.id}"]`)?.click();
+    const steps = node.dataset?.stepPart || node.dataset?.stepSection;
+    if (steps) allowed = allowed ? allowed.filter(step => steps.split(' ').includes(step)) : steps.split(' ');
+    if (node.wizardGo && allowed?.length && !allowed.includes(node.dataset.step)) node.wizardGo(allowed[0]);
   }
 };
 document.addEventListener('invalid', event => revealField(event.target), true);
+
+/* Assistant en étapes : un seul formulaire, enregistré d'un bloc ; seule l'étape en cours s'affiche. Sans JavaScript, tout reste visible. */
+document.querySelectorAll('form[data-wizard]').forEach(form => {
+  const nav = document.querySelector(`[data-wizard-for="${form.id}"]`);
+  const tabs = [...nav.querySelectorAll('[data-wizard-go]')];
+  const prev = form.querySelector('[data-wizard-prev]'), next = form.querySelector('[data-wizard-next]'), save = form.querySelector('[data-wizard-save]');
+  const inStep = (el, step) => {
+    for (let node = el; node && node !== form; node = node.parentElement) {
+      const steps = node.dataset?.stepPart || node.dataset?.stepSection;
+      if (steps && !steps.split(' ').includes(String(step))) return false;
+    }
+    return true;
+  };
+  const stateOf = step => {
+    const fields = [...form.elements].filter(el => el.name && el.type !== 'hidden' && !el.disabled && el.closest('[data-step-section]') && inStep(el, step));
+    const needs = [...form.querySelectorAll('[data-step-needs]')].filter(section => inStep(section, step));
+    if (needs.some(section => !form.elements[section.dataset.stepNeeds]?.value)) return 'calculate';
+    const required = fields.filter(el => el.required || el.validationMessage);
+    if (required.length) return required.every(el => el.validity.valid) ? 'done' : 'todo';
+    return needs.length ? 'done' : 'optional';
+  };
+  const update = () => tabs.forEach(tab => {
+    const state = stateOf(tab.dataset.wizardGo), note = tab.querySelector('[data-wizard-state]');
+    tab.closest('li').classList.toggle('is-done', state === 'done');
+    note.dataset.wizardState = state;
+    note.textContent = { done: 'Complet', todo: 'À compléter', calculate: 'À calculer', optional: 'Facultatif' }[state];
+  });
+  form.wizardGo = (step, scroll) => {
+    step = String(Math.min(tabs.length, Math.max(1, Number(step))));
+    form.dataset.step = step;
+    tabs.forEach(tab => { if (tab.dataset.wizardGo === step) tab.setAttribute('aria-current', 'step'); else tab.removeAttribute('aria-current'); });
+    const index = Number(step);
+    prev.hidden = index === 1; next.hidden = index === tabs.length;
+    if (index < tabs.length) next.textContent = 'Suivant : ' + tabs[index].querySelector('strong').textContent.toLowerCase();
+    save.classList.toggle('secondary', index < tabs.length);
+    update();
+    if (scroll) nav.scrollIntoView({ block: 'start' });
+  };
+  nav.addEventListener('click', event => { const tab = event.target.closest('[data-wizard-go]'); if (tab) form.wizardGo(tab.dataset.wizardGo, true); });
+  prev.addEventListener('click', () => form.wizardGo(Number(form.dataset.step) - 1, true));
+  next.addEventListener('click', () => form.wizardGo(Number(form.dataset.step) + 1, true));
+  ['input', 'change', 'mds:calculated'].forEach(type => form.addEventListener(type, update));
+  form.addEventListener('click', () => setTimeout(update));
+  document.addEventListener('DOMContentLoaded', update);
+  form.wizardGo(1);
+});
 
 /* Erreurs du serveur : message sous le champ, aria-invalid, sections rouvertes, focus sur le premier champ fautif. */
 (() => {
@@ -321,26 +371,51 @@ document.addEventListener('invalid', event => revealField(event.target), true);
     revealField(field);
   });
   const first = controls.find(el => flagged.has(el));
-  if (first) { first.focus({ preventScroll: true }); first.scrollIntoView({ block: 'center' }); }
+  if (first) { revealField(first); first.focus({ preventScroll: true }); first.scrollIntoView({ block: 'center' }); }
 })();
 
-/* Panneau de création : focus au premier champ à l'ouverture par ancre, fermeture sans recharger. */
+/* Panneaux de création, latéral ou flottant : ouverts par ancre, même sans JavaScript.
+   Ici : focus au premier champ, fermeture sans recharger, Échap et focus gardé dans le formulaire flottant. */
 (() => {
-  const opened = () => {
-    const panel = document.getElementById(location.hash.slice(1));
-    if (panel?.matches('.create-panel') && !document.getElementById('form-errors')) panel.querySelector('input:not([type=hidden]),select,textarea')?.focus({ preventScroll: true });
-    return panel;
+  const panels = '.create-panel,.float-panel';
+  const focusables = panel => [...panel.querySelectorAll('a[href],button:not([disabled]),input:not([type=hidden]):not([disabled]),select:not([disabled]),textarea:not([disabled])')].filter(el => el.getClientRects().length);
+  const openFloat = () => [...document.querySelectorAll('.float-panel')].find(panel => panel.hasAttribute('data-open') || location.hash === '#' + panel.id);
+  /* Le navigateur replace le focus après le défilement vers l'ancre : on attend la fin du chargement. */
+  const focusFirst = panel => {
+    const go = () => panel.querySelector('input:not([type=hidden]),select,textarea')?.focus({ preventScroll: true });
+    if (document.readyState === 'complete') go(); else addEventListener('load', () => setTimeout(go), { once: true });
   };
-  window.addEventListener('hashchange', () => { opened()?.scrollIntoView({ block: 'start' }); });
-  /* À partir de 1200 px, le panneau suit la page : inutile de masquer le titre et la liste à l'arrivée. */
+  const opened = () => {
+    const panel = document.getElementById(location.hash.slice(1)) || openFloat();
+    if (panel?.matches(panels) && !document.getElementById('form-errors')) focusFirst(panel);
+    return panel?.matches(panels) ? panel : null;
+  };
+  const close = panel => {
+    const y = scrollY;
+    panel.removeAttribute('data-open');
+    if (location.hash === '#' + panel.id) location.hash = '';
+    scrollTo(0, y);
+    document.querySelector(`.page-actions [href$="#${panel.id}"]`)?.focus();
+  };
+  window.addEventListener('hashchange', () => { const panel = opened(); if (panel?.matches('.create-panel')) panel.scrollIntoView({ block: 'start' }); });
+  /* À partir de 1200 px, le panneau latéral suit la page : inutile de masquer le titre et la liste à l'arrivée. */
   if (opened()?.matches('.create-panel') && matchMedia('(min-width:1200px)').matches) window.scrollTo(0, 0);
   document.addEventListener('click', event => {
-    const close = event.target.closest('[data-close-panel]');
-    if (!close) return;
+    const button = event.target.closest('[data-close-panel]');
+    const backdrop = event.target.matches?.('.float-panel') ? event.target : null;
+    if (!button && !backdrop) return;
     event.preventDefault();
-    close.closest('.create-panel').removeAttribute('data-open');
-    location.hash = '';
-    document.querySelector(`.page-actions [href$="#${close.closest('.create-panel').id}"]`)?.focus();
+    close(backdrop || button.closest(panels));
+  });
+  document.addEventListener('keydown', event => {
+    const panel = openFloat();
+    if (!panel) return;
+    if (event.key === 'Escape') { close(panel); return; }
+    if (event.key !== 'Tab') return;
+    const items = focusables(panel), first = items[0], last = items[items.length - 1];
+    if (!panel.contains(document.activeElement)) { event.preventDefault(); first?.focus(); }
+    else if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+    else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
   });
 })();
 
@@ -388,11 +463,19 @@ document.addEventListener('click', event => {
   const cards = '[data-window],[data-agent-window]';
   const sync = card => {
     const value = key => card.querySelector(`[name$="][${key}]"]`)?.value.trim() || '';
-    const name = card.querySelector('[data-opening-name]'), sum = card.querySelector('[data-opening-sum]');
-    if (!name || !sum) return;
+    /* Nom et mesures figurent sur la carte de l'étape 1 et sur la ligne de l'étape 2. */
+    const names = card.querySelectorAll('[data-opening-name]'), sums = card.querySelectorAll('[data-opening-sum]');
+    if (!names.length || !sums.length) return;
     const quantity = Number(value('quantity')) || 1;
-    name.textContent = value('label') || 'Ouverture';
-    sum.textContent = (value('width') || value('height') ? `${value('width') || '?'} × ${value('height') || '?'} cm` : 'Mesures à saisir') + (quantity > 1 ? ` ×${quantity}` : '');
+    names.forEach(name => { name.textContent = value('label') || 'Ouverture'; });
+    sums.forEach(sum => { sum.textContent = (value('width') || value('height') ? `${value('width') || '?'} × ${value('height') || '?'} cm` : 'Mesures à saisir') + (quantity > 1 ? ` ×${quantity}` : ''); });
+    /* Schéma à l'échelle de l'ouverture, pour repérer une mesure inversée d'un coup d'œil. */
+    const shape = card.querySelector('[data-opening-shape] i');
+    const width = parseFloat(value('width').replace(',', '.')), height = parseFloat(value('height').replace(',', '.'));
+    if (shape && width > 0 && height > 0) {
+      const scale = 48 / Math.max(width, height);
+      shape.style.width = Math.max(8, Math.round(width * scale)) + 'px'; shape.style.height = Math.max(8, Math.round(height * scale)) + 'px';
+    }
   };
   document.querySelectorAll(cards).forEach(sync);
   document.addEventListener('input', event => { const card = event.target.closest(cards); if (card) sync(card); });
@@ -420,6 +503,73 @@ document.querySelectorAll('[data-image-block]').forEach(block => {
   input.addEventListener('change', refresh); remove?.addEventListener('change', refresh); alt.addEventListener('input', refresh);
   refresh();
 });
+
+/* Durée d'une prestation : raccourcis qui remplissent le même champ en minutes. */
+document.querySelectorAll('[data-duration-chips]').forEach(group => {
+  const input = group.closest('form').elements.duration_minutes;
+  const sync = () => group.querySelectorAll('[data-minutes]').forEach(chip => chip.setAttribute('aria-pressed', String(chip.dataset.minutes === input.value)));
+  group.hidden = false;
+  group.addEventListener('click', event => {
+    const chip = event.target.closest('[data-minutes]');
+    if (!chip) return;
+    input.value = chip.dataset.minutes; input.dispatchEvent(new Event('input', { bubbles: true })); sync();
+  });
+  input.addEventListener('input', sync); sync();
+});
+
+/* Nouvelle prestation : planning de l'agent ce jour-là et premier créneau libre, entre 8 h et 18 h. Le serveur reste seul juge du chevauchement. */
+(() => {
+  const box = document.querySelector('[data-agent-day]'), source = document.getElementById('agent-planning');
+  if (!box || !source) return;
+  const planning = JSON.parse(source.textContent), form = box.closest('form');
+  const agent = form.elements.agent_id, when = form.elements.scheduled_at, duration = form.elements.duration_minutes;
+  const DAY_START = 8 * 60, DAY_END = 18 * 60, STEP = 30;
+  const kinds = { devis_sur_place: 'Devis sur place', installation: 'Installation', sav: 'Après-vente' };
+  const minutes = value => Number(value.slice(11, 13)) * 60 + Number(value.slice(14, 16));
+  const clock = total => String(Math.floor(total / 60)).padStart(2, '0') + ':' + String(total % 60).padStart(2, '0');
+  const track = box.querySelector('[data-day-track]'), free = box.querySelector('[data-day-free-text]'), pick = box.querySelector('[data-day-pick]');
+  const block = (start, end, text, className) => {
+    const item = document.createElement('li');
+    const from = Math.max(start, DAY_START), to = Math.min(end, DAY_END);
+    item.style.left = ((from - DAY_START) / (DAY_END - DAY_START) * 100) + '%';
+    item.style.width = (Math.max(to - from, 10) / (DAY_END - DAY_START) * 100) + '%';
+    item.className = className || ''; item.textContent = text; item.title = text;
+    return item;
+  };
+  const render = () => {
+    const day = when.value.slice(0, 10), length = Number(duration.value) || 0;
+    box.hidden = !agent.value || !day;
+    if (box.hidden) return;
+    const name = agent.selectedOptions[0].textContent.trim();
+    const date = new Date(day + 'T00:00:00Z').toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' });
+    box.querySelector('[data-day-title]').textContent = `Planning de ${name}, ${date}`;
+    pick.hidden = true;
+    if (day < planning.from || day > planning.to) {
+      track.replaceChildren(); free.textContent = 'Planning non chargé pour cette date. Le créneau sera vérifié à l’enregistrement.';
+      return;
+    }
+    // Une prestation qui déborde sur le jour choisi compte de minuit à sa fin.
+    const busy = planning.jobs.filter(job => String(job.agent) === agent.value && job.start.slice(0, 10) <= day && job.end.slice(0, 10) >= day)
+      .map(job => ({ start: job.start.slice(0, 10) < day ? 0 : minutes(job.start), end: job.end.slice(0, 10) > day ? 24 * 60 : minutes(job.end), kind: job.kind }));
+    const clash = (start, end) => busy.some(job => job.start < end && job.end > start);
+    const items = busy.map(job => block(job.start, job.end, `${clock(job.start)}–${clock(job.end)} ${kinds[job.kind] || 'Prestation'}`));
+    const chosen = minutes(when.value), conflict = length > 0 && clash(chosen, chosen + length);
+    if (length > 0) items.push(block(chosen, chosen + length, `Proposé ${clock(chosen)}–${clock(chosen + length)}`, conflict ? 'is-proposed is-clash' : 'is-proposed'));
+    track.replaceChildren(...items);
+    track.setAttribute('aria-label', busy.length ? `${busy.length} ${busy.length > 1 ? 'prestations' : 'prestation'} ce jour-là` : 'Aucune prestation ce jour-là');
+    if (!length) { free.textContent = ''; return; }
+    if (!conflict) { free.textContent = busy.length ? 'Le créneau choisi est libre.' : 'Aucune prestation ce jour-là : le créneau choisi est libre.'; return; }
+    const candidates = [];
+    for (let start = DAY_START; start + length <= DAY_END; start += STEP) candidates.push(start);
+    const next = candidates.find(start => start >= chosen && !clash(start, start + length)) ?? candidates.find(start => !clash(start, start + length));
+    if (next === undefined) { free.textContent = `Aucun créneau libre de ${length} minutes entre 08:00 et 18:00 ce jour-là.`; return; }
+    free.textContent = `Libre à partir de ${clock(next)} :`;
+    pick.textContent = `choisir ${clock(next)}`; pick.dataset.value = `${day}T${clock(next)}`; pick.hidden = false;
+  };
+  pick.addEventListener('click', () => { when.value = pick.dataset.value; when.dispatchEvent(new Event('input', { bubbles: true })); render(); when.focus(); });
+  [agent, when, duration].forEach(field => { field.addEventListener('input', render); field.addEventListener('change', render); });
+  render();
+})();
 
 /* Client : l'origine du consentement devient obligatoire dès que le consentement est coché. */
 document.querySelectorAll('[data-consent]').forEach(box => {
@@ -512,4 +662,22 @@ document.querySelectorAll('[data-specs]').forEach(box => {
   rows.addEventListener('input', write);
   box.querySelector('[data-spec-add]').addEventListener('click', () => { add(); rows.lastElementChild.querySelector('input').focus(); });
   rows.addEventListener('click', event => { const remove = event.target.closest('[data-spec-remove]'); if (!remove) return; remove.closest('.spec-row').remove(); if (!rows.children.length) add(); write(); });
+});
+/* Photo d'ouverture : aperçu immédiat ; une photo trop lourde est réduite sur l'appareil (1600 px, JPEG) avant l'envoi. Sans JavaScript, le fichier part tel quel. */
+document.addEventListener('change', async event => {
+  const input = event.target.closest?.('[data-photo-input]');
+  if (!input || !input.files?.length) return;
+  const box = input.closest('[data-opening-photo]'), preview = box?.querySelector('[data-photo-preview]');
+  let file = input.files[0];
+  if (file.type.startsWith('image/') && (file.size > 1500000 || !/^image\/(jpeg|png|webp)$/.test(file.type)) && window.DataTransfer && window.createImageBitmap) {
+    try {
+      const bitmap = await createImageBitmap(file), scale = Math.min(1, 1600 / Math.max(bitmap.width, bitmap.height));
+      const canvas = document.createElement('canvas'); canvas.width = Math.round(bitmap.width * scale); canvas.height = Math.round(bitmap.height * scale);
+      canvas.getContext('2d').drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.82));
+      if (blob) { const transfer = new DataTransfer(); file = new File([blob], (file.name.replace(/\.[^.]+$/, '') || 'ouverture') + '.jpg', { type: 'image/jpeg' }); transfer.items.add(file); input.files = transfer.files; }
+    } catch (_) {}
+  }
+  if (preview) { if (preview.src) URL.revokeObjectURL(preview.src); preview.src = URL.createObjectURL(file); preview.hidden = false; }
+  box?.querySelector('[data-photo-current]')?.setAttribute('hidden', '');
 });

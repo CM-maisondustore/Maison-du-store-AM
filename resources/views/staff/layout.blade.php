@@ -70,7 +70,7 @@
 <details class="menu">
 <summary class="menu-trigger">
 <span class="avatar" aria-hidden="true">{{ $initials }}</span>
-<span class="user-who"><strong>{{ $me->name }}</strong><span>{{ $me->isAdmin() ? 'Admin-CM' : 'Agent' }}</span></span>
+<span class="user-who"><strong>{{ $me->name }}</strong><span>{{ $me->roleLabel() }}</span></span>
 @include('staff.partials.icon',['n'=>'chevron-down','s'=>16])
 </summary>
 <div class="menu-list" role="menu">

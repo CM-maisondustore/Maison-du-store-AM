@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Nouveau devis, client et ouvertures</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./assets/espace-pro.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="shell">
+<dc-import name="Navigation" active="devis" hint-size="240px,900px"></dc-import>
+<div class="workspace">
+<dc-import name="Haut" hint-size="100%,64px"></dc-import>
+<main class="main" id="contenu">
+<div class="page-head"><div>
+<nav class="crumbs" aria-label="Fil d’Ariane"><a href="#contenu">Devis</a></nav>
+<h1>Nouveau devis</h1>
+<p class="sub">Quatre étapes. Rien n’est envoyé au client tant que le devis n’est pas validé.</p>
+</div></div>
+<section class="shop-picker" aria-labelledby="s-shop">
+<h2 id="s-shop">Boutique</h2>
+<nav class="tile-group" aria-label="Boutique">
+<a class="tile plain shop-tile" href="#contenu" aria-current="true"><span><strong class="uni uni-stores">Stores &amp; Rideaux</strong><small>Fenêtres et mesures</small></span></a>
+<a class="tile plain shop-tile" href="DevisArticles.dc.html"><span><strong class="uni uni-electro">Électroménager</strong><small>Articles, livraison, installation</small></span></a>
+<a class="tile plain shop-tile" href="DevisArticles.dc.html"><span><strong class="uni uni-meubles">Meubles</strong><small>Articles, livraison, montage</small></span></a>
+</nav>
+</section>
+<div style="margin-bottom: 20px"><dc-import name="EtapesDevis" step="1" hint-size="100%,96px"></dc-import></div>
+
+<div style="display: flex; flex-wrap: wrap; align-items: flex-start; gap: 20px">
+<section class="panel" aria-labelledby="h-client" style="flex: 1 1 300px; max-width: 360px; margin: 0">
+<h2 id="h-client" class="section-title"><span class="step" aria-hidden="true">1</span>Client</h2>
+<label>Nom / raison sociale<input type="text" value="Kouassi"></label>
+<label>Prénom<input type="text" value="Aya"></label>
+<label>Téléphone<span class="field-unit"><span class="unit">+225</span><input type="tel" value="07 00 00 00 01" style="text-align: left"></span></label>
+<label>E-mail (facultatif)<input type="email" placeholder="adresse@exemple.invalid"></label>
+<label>Adresse de livraison et de pose<textarea rows="2">Villa 12, Cocody Angré</textarea></label>
+<label>Ville<input type="text" value="Abidjan"></label>
+<p class="hint">Le dossier client est créé, ou retrouvé par son e-mail, à l’enregistrement.</p>
+</section>
+
+<section aria-labelledby="h-ouvertures" style="flex: 999 1 560px; min-width: 0">
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; margin-bottom: 12px">
+<div>
+<h2 id="h-ouvertures" class="section-title"><span class="step" aria-hidden="true">2</span>Ouvertures</h2>
+<p class="muted" style="margin: 4px 0 0">3 ouvertures · 4 exemplaires · mesures en centimètres, de 1 à 2000 cm</p>
+</div>
+<button type="button" class="secondary">Ajouter une ouverture</button>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 16px">
+<sc-for list="{{openings}}" as="o" hint-placeholder-count="3">
+<article class="panel" style="margin: 0; padding: 0; overflow: hidden; border-top: 3px solid var(--pro-gold)">
+<div style="display: flex; align-items: flex-start; gap: 14px; padding: 16px 16px 4px">
+<div style="flex: none; width: 104px; display: flex; flex-direction: column; align-items: center; gap: 6px">
+<div style="width: 104px; height: 104px; display: flex; align-items: center; justify-content: center; background: var(--pro-panel-alt); border-radius: 8px">
+<span role="img" aria-label="{{o.schema}}" style="{{o.shape}}"></span>
+</div>
+<span class="mono" style="font-size: 12.5px; color: var(--pro-text-2)">{{o.ratio}}</span>
+</div>
+<div style="flex: 1; min-width: 0">
+<span class="mono" style="font-size: 12.5px; color: var(--pro-text-2)">{{o.num}}</span>
+<label style="margin-top: 2px">Désignation<input value="{{o.label}}" style="font-size: 17px; font-weight: 600"></label>
+</div>
+</div>
+<div style="padding: 0 16px 16px">
+<div class="opening-measures">
+<label>Largeur<span class="field-unit measure"><input inputmode="decimal" value="{{o.width}}"><span class="unit">cm</span></span></label>
+<label>Hauteur<span class="field-unit measure"><input inputmode="decimal" value="{{o.height}}"><span class="unit">cm</span></span></label>
+</div>
+<label>Exemplaires identiques<span class="stepper"><input type="number" value="{{o.quantity}}"><button type="button" class="minus" aria-label="Un exemplaire de moins">−</button><button type="button" class="plus" aria-label="Un exemplaire de plus">+</button></span></label>
+<label>Notes de l’ouverture<textarea rows="2">{{o.notes}}</textarea></label>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 16px; border-top: 1px solid var(--pro-line); background: var(--pro-panel-alt)">
+<span class="muted">Matériaux : étape 2</span>
+<button type="button" class="quiet">Retirer</button>
+</div>
+</article>
+</sc-for>
+<button type="button" class="quiet" style="min-height: 240px; flex-direction: column; border: 1px dashed var(--pro-line-strong); border-radius: 12px; background: transparent; color: var(--pro-text)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>Ajouter une ouverture<small class="muted" style="font-weight: 400">30 au maximum</small></button>
+</div>
+<section class="panel" style="margin-top: 16px"><label class="mt-0">Notes de terrain<textarea rows="2" placeholder="Accès, étage, contraintes de pose, souhaits du client…"></textarea></label></section>
+</section>
+</div>
+
+<div class="action-bar"><span class="status">Enregistré en brouillon, jamais envoyé sans action de votre part.</span><button type="button" class="secondary">Enregistrer le devis</button><a class="button" href="DevisMateriaux.dc.html">Suivant : matériaux et finitions</a></div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1400}}'>
+class Component extends DCLogic {
+renderVals() {
+const raw = [
+{ label: 'Salon — baie vitrée', width: 380, height: 270, quantity: 1, notes: 'Prise électrique à gauche : prévoir un rail motorisé.' },
+{ label: 'Chambre — fenêtres côté jardin', width: 180, height: 220, quantity: 2, notes: 'Deux fenêtres identiques. Occultation totale souhaitée.' },
+{ label: 'Bureau', width: 140, height: 160, quantity: 1, notes: 'Store plutôt que rideau, au-dessus du bureau.' },
+];
+return { openings: raw.map((o, index) => {
+const scale = 92 / Math.max(o.width, o.height);
+const rw = Math.round(o.width * scale), rh = Math.round(o.height * scale);
+return { ...o, num: String(index + 1).padStart(2, '0'), shape: 'display: block; box-sizing: border-box; width: ' + rw + 'px; height: ' + rh + 'px; border: 2px solid var(--pro-gold-text); background: var(--pro-panel) linear-gradient(var(--pro-line-strong), var(--pro-line-strong)) center / 1.5px 100% no-repeat', ratio: o.width + ' × ' + o.height, schema: 'Proportions de l’ouverture : ' + o.width + ' cm de large, ' + o.height + ' cm de haut' };
+}) };
+}
+}
+</script>
+</body>
+</html>

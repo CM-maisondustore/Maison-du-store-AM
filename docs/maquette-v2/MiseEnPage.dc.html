@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Éditeur de mise en page</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./assets/espace-pro.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.ed-btn{display:inline-flex;align-items:center;justify-content:center;width:40px;min-height:40px;padding:0;border:1px solid var(--pro-line-strong);border-radius:6px;background:var(--pro-panel);color:var(--pro-ink)}
+.ed-side h2{font-size:13px;font-weight:600;color:var(--pro-text-2);margin:14px 0 6px}
+.ed-block{display:flex;align-items:center;gap:10px;width:100%;min-height:40px;padding:0 10px;margin:0 0 4px;border:1px solid var(--pro-line);border-radius:8px;background:var(--pro-panel);color:var(--pro-ink);font:500 13.5px var(--font-ui);text-align:left;cursor:grab}
+.ed-block:hover{border-color:var(--pro-gold-text);filter:none}
+.ed-block svg{flex:none;color:var(--pro-gold-text)}
+.ed-layer{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:40px;padding:0 10px;border:0;border-radius:6px;background:transparent;color:var(--pro-text);font:500 13.5px var(--font-ui);text-align:left}
+.ed-layer:hover{background:var(--pro-panel-alt);filter:none}
+.ed-chip{display:inline-flex;align-items:center;min-height:32px;padding:0 10px;margin:0 6px 6px 0;border:1px solid var(--pro-line-strong);border-radius:999px;background:var(--pro-panel);color:var(--pro-ink);font:400 12px var(--font-data)}
+.ed-pick{position:absolute;inset:0;min-height:0;padding:0;border:0;border-radius:0;background:transparent;cursor:pointer}
+.ed-pick:hover{background:rgba(192,159,106,.08);filter:none}
+.ed-pick:focus-visible{outline:2px solid var(--pro-gold);outline-offset:1px}
+.pdf{font-family:"DejaVu Sans",Verdana,sans-serif;color:#1c1c1c}
+.pdf table{border-collapse:collapse;width:100%}
+.pdf th{background:#f6f0e4;color:#1c1c1c;font-size:7px;padding:4px 5px;text-align:left}
+.pdf td{font-size:7.5px;padding:3px 5px;border-bottom:1px solid #ece7dc}
+.pdf td.n,.pdf th.n{text-align:right;white-space:nowrap}
+.handle{position:absolute;width:8px;height:8px;background:#fff;border:1.5px solid #84642f;border-radius:2px}
+</style>
+</helmet>
+<div id="editeur" style="min-height: 100vh; display: flex; flex-direction: column; background: var(--pro-bg); font-family: var(--font-ui); color: var(--pro-text)">
+
+<header style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 10px 16px; background: var(--pro-panel); border-bottom: 1px solid var(--pro-line)">
+<a class="button quiet" href="#editeur"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg>Mise en page</a>
+<div style="display: flex; flex-direction: column; min-width: 0">
+<strong style="font: 500 22px/1.1 var(--font-title); color: var(--pro-ink)">Modèle du devis</strong>
+<span class="state-row" style="margin-top: 2px"><span class="badge st-progress"><span aria-hidden="true">◐</span>Brouillon en cours</span><span class="badge st-ok"><span aria-hidden="true">✓</span>Version publiée 3</span></span>
+</div>
+<div class="segmented" role="radiogroup" aria-label="Document" style="margin-left: 8px">
+<label><input type="radio" name="doc" checked><span>Devis</span></label>
+<label><input type="radio" name="doc"><span>Facture</span></label>
+<label><input type="radio" name="doc"><span>Reçu</span></label>
+<label><input type="radio" name="doc"><span>Style commun</span></label>
+</div>
+<div style="flex: 1"></div>
+<div class="segmented" role="radiogroup" aria-label="Page">
+<label><input type="radio" name="page" checked><span>Page unique</span></label>
+<label><input type="radio" name="page"><span>Page suite</span></label>
+</div>
+<div style="display: flex; align-items: center; gap: 6px">
+<button type="button" class="ed-btn" aria-label="Annuler la dernière action"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14L4 9l5-5M4 9h11a5 5 0 0 1 0 10h-3"></path></svg></button>
+<button type="button" class="ed-btn" aria-label="Rétablir"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 14l5-5-5-5M20 9H9a5 5 0 0 0 0 10h3"></path></svg></button>
+<button type="button" class="ed-btn" aria-label="Zoom arrière">−</button>
+<span class="mono" style="min-width: 44px; text-align: center">75 %</span>
+<button type="button" class="ed-btn" aria-label="Zoom avant">+</button>
+</div>
+<label style="margin: 0; display: flex; align-items: center; gap: 8px; font-weight: 500">Aperçu<select style="margin: 0; width: auto"><option>Une ouverture</option><option>Trente ouvertures, page suite</option><option>Remise de 10 %</option><option>Total au-delà de 500 000 F</option></select></label>
+<button type="button" class="secondary">Enregistrer le brouillon</button>
+<button type="button">Publier le modèle</button>
+</header>
+
+<div style="flex: 1; display: flex; flex-wrap: wrap; min-height: 0">
+
+<aside class="ed-side" aria-label="Blocs et calques" style="flex: 1 1 240px; max-width: 270px; padding: 6px 14px 16px; background: var(--pro-panel); border-right: 1px solid var(--pro-line)">
+<h2>Blocs à glisser sur la page</h2>
+<button type="button" class="ed-block"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 5h18v14H3zM7 10a1.5 1.5 0 1 0 3 0a1.5 1.5 0 1 0-3 0M21 16l-5-5-8 8"></path></svg>Logo ou image</button>
+<button type="button" class="ed-block"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h13"></path></svg>Texte libre</button>
+<button type="button" class="ed-block"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8a4 4 0 1 0 0 8zM4 21v-1a8 8 0 0 1 16 0v1"></path></svg>Bloc client</button>
+<button type="button" class="ed-block"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 5h18v14H3zM3 10h18M9 10v9"></path></svg>Tableau des désignations</button>
+<button type="button" class="ed-block"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 7h14M5 12h14M12 17h7"></path></svg>Totaux</button>
+<button type="button" class="ed-block"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 6h16v12H4zM4 10h16M8 15h4"></path></svg>Conditions de paiement</button>
+<button type="button" class="ed-block"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 19c4-1 5-9 8-9s2 6 4 6 3-3 4-4"></path></svg>Signature ou cachet</button>
+<button type="button" class="ed-block"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 12h16"></path></svg>Ligne ou cadre</button>
+<h2>Calques</h2>
+<sc-for list="{{blocks}}" as="b" hint-placeholder-count="12">
+<button type="button" class="ed-layer" onClick="{{b.select}}" aria-pressed="{{b.pressed}}" style="{{b.layerStyle}}"><span>{{b.name}}</span><span class="mono" style="font-size: 11.5px; color: var(--pro-text-2)">{{b.kindLabel}}</span></button>
+</sc-for>
+</aside>
+
+<div style="flex: 999 1 660px; min-width: 0; overflow: auto; padding: 24px 24px 32px; display: flex; justify-content: center">
+<div style="position: relative; padding: 22px 0 0 22px">
+<div aria-hidden="true" style="position: absolute; left: 22px; top: 0; width: 595px; height: 18px; display: flex; font: 400 9px var(--font-data); color: var(--pro-text-2); border-bottom: 1px solid var(--pro-line-strong)">
+<sc-for list="{{rulerX}}" as="r" hint-placeholder-count="11"><span style="{{r.style}}">{{r.label}}</span></sc-for>
+</div>
+<div aria-hidden="true" style="position: absolute; left: 0; top: 22px; width: 18px; height: 842px; font: 400 9px var(--font-data); color: var(--pro-text-2); border-right: 1px solid var(--pro-line-strong)">
+<sc-for list="{{rulerY}}" as="r" hint-placeholder-count="15"><span style="{{r.style}}">{{r.label}}</span></sc-for>
+</div>
+<div class="pdf" role="group" aria-label="Page A4 du devis, à 75 %" style="position: relative; width: 595px; height: 842px; background: #ffffff; box-shadow: 0 18px 40px -24px rgba(28, 28, 28, .45)">
+<div aria-hidden="true" style="position: absolute; left: 43px; top: 51px; right: 43px; bottom: 43px; border: 1px dashed rgba(63, 98, 133, .45); pointer-events: none"></div>
+
+<div style="{{pos.logo}}"><img src="./assets/logo-maison-du-store-am.jpg" alt="Logo Maison du Store AM" style="width: 100%; height: 100%; object-fit: contain"><button type="button" class="ed-pick" onClick="{{pick.logo}}" aria-label="Sélectionner le logo"></button></div>
+<div style="{{pos.entreprise}}"><strong style="display: block; font-size: 12px">Maison du Store AM</strong><span style="display: block; font-size: 7.5px; color: #5c5852">Rideaux sur mesure · Stores · Motorisation · Décoration</span><span style="display: block; font-size: 7.5px; color: #5c5852">Abidjan · [TÉLÉPHONE] · [E-MAIL]</span><button type="button" class="ed-pick" onClick="{{pick.entreprise}}" aria-label="Sélectionner les coordonnées de l’entreprise"></button></div>
+<div style="{{pos.titre}}"><strong style="display: block; text-align: right; font-size: 20px; letter-spacing: .04em">DEVIS</strong><span style="display: block; text-align: right; font-size: 7.5px">N° AM-2026-1103-EXE · 03/11/2026 · valable 30 jours</span><button type="button" class="ed-pick" onClick="{{pick.titre}}" aria-label="Sélectionner le titre et le numéro"></button></div>
+<div style="{{pos.client}}"><div style="height: 100%; box-sizing: border-box; padding: 7px 9px; background: #f6f0e4"><span style="display: block; font-size: 6.5px; font-weight: 700; color: #84642f">CLIENT</span><strong style="display: block; font-size: 9px">Client Démonstration</strong><span style="display: block; font-size: 7.5px">+225 07 00 00 00 05 · Cocody, Abidjan</span></div><button type="button" class="ed-pick" onClick="{{pick.client}}" aria-label="Sélectionner le bloc client"></button></div>
+<div style="{{pos.objet}}"><div style="height: 100%; box-sizing: border-box; padding: 7px 9px; border: 1px solid #ece7dc"><span style="display: block; font-size: 6.5px; font-weight: 700; color: #84642f">OBJET</span><span style="display: block; font-size: 8px">Fourniture, confection et pose de rideaux sur mesure</span></div><button type="button" class="ed-pick" onClick="{{pick.objet}}" aria-label="Sélectionner l’objet"></button></div>
+<div style="{{pos.tableau}}"><table><thead><tr><th>Désignation</th><th class="n">Qté</th><th class="n">PU (F)</th><th class="n">Montant (F)</th></tr></thead><tbody>
+<tr><td colspan="4" style="font-weight: 700; background: #fbf9f4">Salon — baie vitrée · 380 × 270 cm · Wavy simple</td></tr>
+<tr><td>Rail wavy simple</td><td class="n">3,8 m</td><td class="n">7 000</td><td class="n">26 600</td></tr>
+<tr><td>Tissu occultant 90 %</td><td class="n">11,4 m</td><td class="n">9 000</td><td class="n">102 600</td></tr>
+<tr><td>Ruflette wavy</td><td class="n">11,4 m</td><td class="n">2 000</td><td class="n">22 800</td></tr>
+<tr><td>Confection</td><td class="n">11,4 m</td><td class="n">2 000</td><td class="n">22 800</td></tr>
+<tr><td>Pose et livraison</td><td class="n">1 ouv.</td><td class="n">7 000</td><td class="n">7 000</td></tr>
+<tr><td colspan="3" style="font-weight: 700">Sous-total salon</td><td class="n" style="font-weight: 700">181 800</td></tr>
+</tbody></table><button type="button" class="ed-pick" onClick="{{pick.tableau}}" aria-label="Sélectionner le tableau des désignations"></button></div>
+<div style="{{pos.totaux}}"><div style="height: 100%; box-sizing: border-box; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; background: #20332c; color: #ffffff"><span style="font-size: 8px; font-weight: 700">TOTAL GÉNÉRAL</span><strong style="font-size: 13px">181 800 F CFA</strong></div><button type="button" class="ed-pick" onClick="{{pick.totaux}}" aria-label="Sélectionner les totaux"></button></div>
+<div style="{{pos.paiement}}"><strong style="display: block; font-size: 8.5px; margin-bottom: 3px">Conditions de paiement</strong><span style="display: block; font-size: 7.5px">Acompte de 70 % à la commande : 127 260 F CFA</span><span style="display: block; font-size: 7.5px">Solde de 30 % à la livraison et pose : 54 540 F CFA</span><span style="display: block; font-size: 7.5px; color: #5c5852">Acompte reçu : 0 F · reste à payer : 181 800 F</span><button type="button" class="ed-pick" onClick="{{pick.paiement}}" aria-label="Sélectionner les conditions de paiement"></button></div>
+<div style="{{pos.engagement}}"><span style="display: block; font-size: 7.5px; font-style: italic; color: #353535"><strong style="font-style: normal">Notre engagement.</strong> La confection est lancée dès réception de l’acompte. Nous menons le chantier jusqu’à la pose finale, avec une finition soignée. L’acompte n’est plus remboursable une fois la confection lancée.</span><button type="button" class="ed-pick" onClick="{{pick.engagement}}" aria-label="Sélectionner la mention Notre engagement"></button></div>
+<div style="{{pos.signature}}"><div style="height: 100%; box-sizing: border-box; padding: 6px 8px; border: 1px solid #ece7dc; font-size: 7px; color: #5c5852">Bon pour accord, signature du client</div><button type="button" class="ed-pick" onClick="{{pick.signature}}" aria-label="Sélectionner la signature du client"></button></div>
+<div style="{{pos.cachet}}"><div style="height: 100%; box-sizing: border-box; padding: 6px 8px; border: 1px solid #ece7dc; font-size: 7px; color: #5c5852">Cachet et signature de l’entreprise</div><button type="button" class="ed-pick" onClick="{{pick.cachet}}" aria-label="Sélectionner le cachet"></button></div>
+<div style="{{pos.pied}}"><span style="display: block; text-align: center; font-size: 6.5px; color: #6b665e">Maison du Store AM · Abidjan · RCCM [À RENSEIGNER] · NCC [À RENSEIGNER] · Page 1 sur 1</span><button type="button" class="ed-pick" onClick="{{pick.pied}}" aria-label="Sélectionner le pied de page"></button></div>
+
+<div aria-hidden="true" style="{{frame}}">
+<span class="handle" style="left: -5px; top: -5px"></span><span class="handle" style="left: calc(50% - 4px); top: -5px"></span><span class="handle" style="right: -5px; top: -5px"></span>
+<span class="handle" style="left: -5px; top: calc(50% - 4px)"></span><span class="handle" style="right: -5px; top: calc(50% - 4px)"></span>
+<span class="handle" style="left: -5px; bottom: -5px"></span><span class="handle" style="left: calc(50% - 4px); bottom: -5px"></span><span class="handle" style="right: -5px; bottom: -5px"></span>
+<span style="position: absolute; left: -2px; top: -24px; padding: 2px 7px; border-radius: 4px; background: #84642f; color: #ffffff; font: 500 11px var(--font-ui); white-space: nowrap">{{selected.name}} · {{selected.wmm}} × {{selected.hmm}} mm</span>
+</div>
+</div>
+</div>
+</div>
+
+<aside aria-label="Propriétés du bloc" style="flex: 1 1 280px; max-width: 320px; padding: 14px 16px 16px; background: var(--pro-panel); border-left: 1px solid var(--pro-line)">
+<p class="muted" style="margin: 0">Bloc sélectionné</p>
+<h2 style="font: 500 24px/1.15 var(--font-title); margin: 2px 0 10px">{{selected.name}}</h2>
+<div class="grid" style="grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 10px">
+<label class="mt-0">X<span class="field-unit"><input value="{{selected.xmm}}"><span class="unit">mm</span></span></label>
+<label class="mt-0">Y<span class="field-unit"><input value="{{selected.ymm}}"><span class="unit">mm</span></span></label>
+<label>Largeur<span class="field-unit"><input value="{{selected.wmm}}"><span class="unit">mm</span></span></label>
+<label>Hauteur<span class="field-unit"><input value="{{selected.hmm}}"><span class="unit">mm</span></span></label>
+</div>
+<div style="display: flex; gap: 6px; margin-top: 10px" role="group" aria-label="Aligner">
+<button type="button" class="ed-btn" aria-label="Aligner à gauche de la marge"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M4 4v16M8 8h10M8 16h6"></path></svg></button>
+<button type="button" class="ed-btn" aria-label="Centrer sur la page"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M12 4v16M6 8h12M8 16h8"></path></svg></button>
+<button type="button" class="ed-btn" aria-label="Aligner à droite de la marge"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M20 4v16M6 8h10M10 16h6"></path></svg></button>
+<button type="button" class="ed-btn" aria-label="Verrouiller la position"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 11h12v10H6zM8 11V7a4 4 0 0 1 8 0v4"></path></svg></button>
+</div>
+
+<sc-if value="{{isTable}}" hint-placeholder-val="{{ true }}">
+<details class="fold" open="{{ true }}"><summary>Tableau<small>Colonnes et enchaînement des pages</small></summary>
+<div class="pills"><label class="pill plain"><input type="checkbox" checked><span>Désignation</span></label><label class="pill plain"><input type="checkbox" checked><span>Quantité</span></label><label class="pill plain"><input type="checkbox" checked><span>Prix unitaire</span></label><label class="pill plain"><input type="checkbox" checked><span>Montant</span></label></div>
+<label class="toggle-row"><span>Regrouper par ouverture<small>Avec un sous-total sous chaque ouverture</small></span><input class="switch" type="checkbox" checked></label>
+<label class="toggle-row"><span>Total juste sous les lignes<small>Pose et livraison puis total général</small></span><input class="switch" type="checkbox" checked></label>
+<label class="toggle-row"><span>Continuer sur une page suite<small>Quand les lignes dépassent la page</small></span><input class="switch" type="checkbox" checked></label>
+<label>En-tête du tableau<select><option>Or clair</option><option>Or</option><option>Blanc</option></select></label>
+</details>
+</sc-if>
+
+<sc-if value="{{isText}}" hint-placeholder-val="{{ false }}">
+<details class="fold" open="{{ true }}"><summary>Texte<small>Police, taille, couleur</small></summary>
+<div class="grid" style="grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 10px">
+<label class="mt-0">Police<select><option>DejaVu Sans</option><option>DejaVu Serif</option></select></label>
+<label class="mt-0">Taille<span class="field-unit"><input value="9"><span class="unit">pt</span></span></label>
+</div>
+<label class="swatch">Couleur du texte<input type="color" value="#1c1c1c"></label>
+<p class="legend mt-12 mb-8">Données à insérer</p>
+<div><span class="ed-chip">{client.nom}</span><span class="ed-chip">{client.telephone}</span><span class="ed-chip">{devis.numero}</span><span class="ed-chip">{devis.date}</span><span class="ed-chip">{total.general}</span><span class="ed-chip">{acompte}</span><span class="ed-chip">{reste_a_payer}</span></div>
+</details>
+</sc-if>
+
+<sc-if value="{{isImage}}" hint-placeholder-val="{{ false }}">
+<details class="fold" open="{{ true }}"><summary>Image<small>PNG ou JPEG, 512 Ko maximum</small></summary>
+<button type="button" class="secondary block">Remplacer l’image</button>
+<label class="toggle-row"><span>Garder les proportions</span><input class="switch" type="checkbox" checked></label>
+</details>
+</sc-if>
+
+<details class="fold"><summary>Fond et bordure</summary>
+<label class="mt-0">Fond<select><option>Aucun</option><option>Or clair</option><option>Sapin</option></select></label>
+<label>Bordure<select><option>Aucune</option><option>Filet fin</option></select></label>
+</details>
+<details class="fold"><summary>Pages où il apparaît</summary>
+<label class="toggle-row"><span>Page unique ou dernière page</span><input class="switch" type="checkbox" checked></label>
+<label class="toggle-row"><span>Pages suite</span><input class="switch" type="checkbox"></label>
+</details>
+</aside>
+</div>
+
+<footer style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 18px; padding: 8px 16px; background: var(--pro-panel); border-top: 1px solid var(--pro-line); font-size: 12.5px; color: var(--pro-text-2)">
+<span>Grille de 5 mm, aimantée aux marges</span><span>Marges : haut 18 mm · bas, gauche et droite 15 mm</span><span>Les blocs rouges sortent de la zone imprimable</span><span style="margin-left: auto">Publier s’applique aux prochains documents uniquement.</span>
+</footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+renderVals() {
+const selectedId = (this.state && this.state.selected) || 'tableau';
+const list = [
+['logo', 'Logo', 'image', 43, 40, 60, 60],
+['entreprise', 'Coordonnées de l’entreprise', 'texte', 112, 44, 220, 52],
+['titre', 'Titre et numéro', 'texte', 352, 42, 200, 46],
+['client', 'Bloc client', 'texte', 43, 118, 250, 70],
+['objet', 'Objet', 'texte', 305, 118, 247, 70],
+['tableau', 'Tableau des désignations', 'tableau', 43, 202, 509, 152],
+['totaux', 'Total général', 'texte', 320, 364, 232, 40],
+['paiement', 'Conditions de paiement', 'texte', 43, 420, 509, 56],
+['engagement', 'Notre engagement', 'texte', 43, 486, 509, 36],
+['signature', 'Signature du client', 'image', 43, 540, 230, 74],
+['cachet', 'Cachet de l’entreprise', 'image', 322, 540, 230, 74],
+['pied', 'Pied de page', 'texte', 43, 772, 509, 20],
+];
+const mm = px => (Math.round(px / 2.835 * 2) / 2).toString().replace('.', ',');
+const pos = {}, pick = {};
+const blocks = list.map(([id, name, kind, x, y, w, h]) => {
+const on = id === selectedId;
+pos[id] = 'position: absolute; left: ' + x + 'px; top: ' + y + 'px; width: ' + w + 'px; height: ' + h + 'px; box-sizing: border-box' + (on ? '' : '');
+pick[id] = () => this.setState({ selected: id });
+return { id, name, kind, x, y, w, h, select: pick[id], pressed: on ? 'true' : 'false', kindLabel: kind, layerStyle: on ? 'background: var(--pro-gold-tint); color: var(--pro-ink); font-weight: 600' : '' };
+});
+const s = blocks.find(b => b.id === selectedId);
+const selected = { name: s.name, xmm: mm(s.x), ymm: mm(s.y), wmm: mm(s.w), hmm: mm(s.h) };
+const frame = 'position: absolute; left: ' + (s.x - 3) + 'px; top: ' + (s.y - 3) + 'px; width: ' + (s.w + 6) + 'px; height: ' + (s.h + 6) + 'px; box-sizing: border-box; border: 2px solid #84642f; pointer-events: none';
+const rulerX = Array.from({ length: 11 }, (_, i) => ({ label: String(i * 20), style: 'position: absolute; left: ' + Math.round(i * 20 * 2.835) + 'px; top: 3px; padding-left: 2px; border-left: 1px solid var(--pro-line-strong); height: 15px' }));
+const rulerY = Array.from({ length: 15 }, (_, i) => ({ label: String(i * 20), style: 'position: absolute; top: ' + Math.round(i * 20 * 2.835) + 'px; left: 0; width: 18px; border-top: 1px solid var(--pro-line-strong); text-align: center' }));
+return { blocks, pos, pick, selected, frame, rulerX, rulerY, isTable: s.kind === 'tableau', isText: s.kind === 'texte', isImage: s.kind === 'image' };
+}
+}
+</script>
+</body>
+</html>

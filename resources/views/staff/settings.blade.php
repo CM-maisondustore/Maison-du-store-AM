@@ -34,7 +34,7 @@
 <div class="actions mb-0"><button>Enregistrer</button></div>
 </section>
 </form>
-@if($me->isAdmin())
+@if($me->isOwner())
 <section class="panel" id="entreprise" aria-labelledby="s-ent"><h2 id="s-ent">Entreprise et documents</h2>
 <p class="muted">Les coordonnées, mentions et conditions reprises sur les devis et factures se règlent dans la mise en page. Aucune valeur légale n’est inventée : une facture ne peut pas être émise tant que ces champs sont vides.</p>
 <div class="actions mb-0"><a class="button quiet" href="{{ route('staff.layouts.edit') }}">Mise en page des documents</a><a class="button quiet" href="{{ route('staff.communications.index') }}">Modèles, e-mails et automatisations</a></div>

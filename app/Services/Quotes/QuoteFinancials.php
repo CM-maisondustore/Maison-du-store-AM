@@ -15,6 +15,13 @@ final class QuoteFinancials
             'paymentStatus'=>$received >= $total ? 'fully_paid' : ($received >= $deposit ? 'deposit_paid' : 'pending_deposit'),
             'productionAuthorized'=>$received >= $deposit && empty($quote->configuration['pricing_review_required']) && empty($quote->configuration['calculation']['pending'])];
     }
+    /** Échéancier lisible : « 50 % à la validation du chantier (257 032 F CFA) ; … ». Null pour un devis à acompte unique. */
+    public static function scheduleText(array $financial): ?string
+    {
+        if (empty($financial['schedule'])) return null;
+        $when=['validation'=>'à la validation du chantier','rails'=>'après installation des rails','pose'=>'après livraison et pose'];
+        return implode(' ; ',array_map(fn($step)=>self::quantity($step['percent']).' % '.($when[$step['key']] ?? mb_strtolower($step['label'])).' ('.number_format($step['amount'],0,',',' ').' F CFA)',$financial['schedule'])).'.';
+    }
     public static function forSnapshot(array $snapshot): array
     {
         return $snapshot['financial'] ?? Pricing::totals($snapshot['lines'] ?? [],$snapshot['tax_basis_points'] ?? 0);

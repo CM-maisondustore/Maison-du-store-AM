@@ -16,6 +16,9 @@ final class StaffInterface
     public const JOB_KINDS=['devis_sur_place'=>'Devis sur place','installation'=>'Installation','sav'=>'Service après-vente'];
     public const SOURCES=['site'=>'Site','interne'=>'Espace interne','sur_place'=>'Sur place'];
     public const QUOTE_TYPES=['store'=>'Store','rideau'=>'Rideau','electromenager'=>'Électroménager','meubles'=>'Meubles'];
+    /** Communes du district d'Abidjan proposées à l'étape 1, puis « Hors Abidjan ». La valeur est enregistrée dans contact[city]. */
+    public const COMMUNES=['Abobo','Adjamé','Anyama','Attécoubé','Bingerville','Cocody','Koumassi','Marcory','Plateau','Port-Bouët','Songon','Treichville','Yopougon'];
+    public const OUTSIDE_ABIDJAN='Hors Abidjan';
 
     public static function status(?string $status): array
     {
@@ -96,12 +99,14 @@ final class StaffInterface
         $layouts=$item('layout','Mise en page','layouts.edit',$is('layouts.*'));
         $visitors=$item('visiteurs','Visiteurs','visitors.index',$is('visitors.*'));
         $team=$item('equipe','Équipe','users.index',$is('users.*'));
+        // Le manager garde le catalogue ; les réglages du site restent à l'admin principal.
+        $site=$user->isOwner() ? [$catalogue,$images,$documents,$layouts,$visitors,$team] : [$catalogue];
         return ['notifications'=>$notifications,
             'sections'=>[['title'=>'','items'=>[$overview]],
                 ['title'=>'Activité','items'=>[$quotes,$materials,$appointments,$jobs]],
                 ['title'=>'Gestion','items'=>[$clients,$invoices,$messages]],
-                ['title'=>'Site et réglages','items'=>[$catalogue,$images,$documents,$layouts,$visitors,$team]]],
+                ['title'=>'Site et réglages','items'=>$site]],
             'tabs'=>[[...$overview,'icon'=>'home','label'=>'Accueil'],[...$quotes],[...$appointments,'label'=>'Planning'],[...$clients,'label'=>'Clients','count'=>0]],
-            'more'=>[['title'=>'Activité','items'=>[$jobs,$materials]],['title'=>'Gestion','items'=>[$invoices,$messages]],['title'=>'Site et réglages','items'=>[$catalogue,$images,$documents,$layouts,$visitors,$team]]]];
+            'more'=>[['title'=>'Activité','items'=>[$jobs,$materials]],['title'=>'Gestion','items'=>[$invoices,$messages]],['title'=>'Site et réglages','items'=>$site]]];
     }
 }

@@ -4,7 +4,7 @@
 @section('page-actions')
 <a class="button" href="{{ route('staff.messages.create') }}">Nouveau message</a>
 <a class="button secondary" href="{{ route('staff.messages.create',['channel'=>'whatsapp']) }}">Nouveau WhatsApp</a>
-<a class="button quiet" href="{{ route('staff.communications.index') }}">Modèles &amp; automatisations</a>
+@if(auth()->user()->isOwner())<a class="button quiet" href="{{ route('staff.communications.index') }}">Modèles &amp; automatisations</a>@endif
 <a class="button quiet" href="https://mail.hostinger.com" target="_blank" rel="noopener">Ouvrir le webmail</a>
 @endsection
 @section('content')

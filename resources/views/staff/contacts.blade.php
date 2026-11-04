@@ -4,8 +4,6 @@
 @section('page-actions')<a class="button" href="#nouveau-contact">@include('staff.partials.icon',['n'=>'plus','s'=>18])Créer un client</a>@endsection
 @section('content')
 @php($keep=request()->except(['type','page']))
-<div class="create-layout">
-<div class="create-list">
 <nav class="chips" aria-label="Type de contact">
 <a class="chip" href="{{ route('staff.contacts.index',$keep) }}" @if(!request('type')) aria-current="true" @endif>Tous<b>{{ $total }}</b></a>
 @foreach(['client'=>'Clients','fournisseur'=>'Fournisseurs','partenaire'=>'Partenaires','archive'=>'Archivés'] as $value=>$label)
@@ -34,14 +32,12 @@
 </div>
 @include('staff.pagination',['paginator'=>$contacts])
 </section>
-</div>
-<section class="panel create-panel" id="nouveau-contact" aria-labelledby="h-nouveau-contact" @if($errors->any()) data-open @endif>
-<div class="create-head"><div><h2 id="h-nouveau-contact">Créer un client</h2><p class="muted">Client, fournisseur ou partenaire : aucun message n’est envoyé.</p></div><a class="button quiet icon-btn" href="{{ route('staff.contacts.index') }}" data-close-panel aria-label="Fermer sans créer">@include('staff.partials.icon',['n'=>'close','s'=>18])</a></div>
-<form method="post" action="{{ route('staff.contacts.store') }}">
+<section class="float-panel" id="nouveau-contact" @if($errors->any()) data-open @endif>
+<form class="float-form" method="post" action="{{ route('staff.contacts.store') }}" role="dialog" aria-modal="true" aria-labelledby="h-nouveau-contact">
 @csrf
-@include('staff.contact-fields',['contact'=>new \App\Models\Contact()])
-<div class="action-bar"><button>Créer un client</button></div>
+<div class="float-head"><div><h2 id="h-nouveau-contact">Créer un client</h2><p class="muted">Client, fournisseur ou partenaire. Aucun message n’est envoyé.</p></div><a class="button quiet icon-btn" href="{{ route('staff.contacts.index') }}" data-close-panel aria-label="Fermer sans créer">@include('staff.partials.icon',['n'=>'close','s'=>18])</a></div>
+<div class="float-body"><div class="float-cols">@include('staff.contact-fields',['contact'=>new \App\Models\Contact()])</div></div>
+<div class="float-foot"><span class="status">Le dossier s’ouvre après la création.</span><a class="button quiet" href="{{ route('staff.contacts.index') }}" data-close-panel>Annuler</a><button>Créer un client</button></div>
 </form>
 </section>
-</div>
 @endsection
