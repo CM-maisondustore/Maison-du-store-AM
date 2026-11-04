@@ -2,7 +2,7 @@
 namespace App\Http\Controllers\Staff;
 
 use App\Models\MediaAsset;
-use App\Services\{Audit, MediaStorage};
+use App\Services\{Audit, MediaStorage, StaffInterface};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\{Auth, DB};
 use Illuminate\Validation\Rule;
@@ -13,6 +13,9 @@ class ProfileController
     public const SKILLS = ['stores' => 'Stores', 'rideaux' => 'Rideaux et voilages', 'motorisation' => 'Motorisation', 'electromenager' => 'Installation électroménager', 'meubles' => 'Montage de meubles', 'sav' => 'Service après-vente'];
     public const DAYS = ['lun' => 'Lundi', 'mar' => 'Mardi', 'mer' => 'Mercredi', 'jeu' => 'Jeudi', 'ven' => 'Vendredi', 'sam' => 'Samedi', 'dim' => 'Dimanche'];
 
+    /** Communes proposées en Oui / Non dans le profil de l'agent, dans l'ordre de l'étape 1 du devis. */
+    public static function zones(): array { return [...StaffInterface::COMMUNES, StaffInterface::OUTSIDE_ABIDJAN]; }
+
     public function profile() { return view('staff.profile'); }
     public function updateProfile(Request $r)
     {
@@ -20,13 +23,15 @@ class ProfileController
             'availability' => 'nullable|in:available,away', 'cover' => MediaStorage::rules()['image'], 'remove_cover' => 'nullable|boolean'];
         $rules += $r->user()->isAdmin()
             ? ['signature' => 'nullable|string|max:500', 'back_on' => 'nullable|date_format:Y-m-d']
-            : ['zones' => 'nullable|string|max:300', 'skills' => 'nullable|string|max:300', 'hours' => 'nullable|string|max:150', 'emergency_name' => 'nullable|string|max:150', 'emergency_phone' => 'nullable|string|max:30',
-                'skill_list' => 'nullable|array', 'skill_list.*' => [Rule::in(array_keys(self::SKILLS))], 'days' => 'nullable|array', 'days.*' => [Rule::in(array_keys(self::DAYS))]];
+            : ['skills' => 'nullable|string|max:300', 'hours' => 'nullable|string|max:150', 'emergency_name' => 'nullable|string|max:150', 'emergency_phone' => 'nullable|string|max:30',
+                'skill_list' => 'nullable|array', 'skill_list.*' => [Rule::in(array_keys(self::SKILLS))], 'days' => 'nullable|array', 'days.*' => [Rule::in(array_keys(self::DAYS))],
+                'zone_list' => 'nullable|array:'.implode(',', self::zones()), 'zone_list.*' => 'in:0,1'];
         $data = $r->validate($rules);
         $name = $data['name']; unset($data['name'], $data['cover'], $data['remove_cover']);
         $profile = [...($r->user()->profile ?? []), ...$data, 'whatsapp' => $r->boolean('whatsapp')];
-        // Cases décochées : le navigateur n'envoie rien, la liste devient vide.
-        if (!$r->user()->isAdmin()) $profile = [...$profile, 'skill_list' => array_values($data['skill_list'] ?? []), 'days' => array_values($data['days'] ?? [])];
+        // Cases décochées : le navigateur n'envoie rien, la liste devient vide. Communes : seules les « Oui » sont gardées.
+        if (!$r->user()->isAdmin()) $profile = [...$profile, 'skill_list' => array_values($data['skill_list'] ?? []), 'days' => array_values($data['days'] ?? []),
+            'zone_list' => array_values(array_intersect(self::zones(), array_keys(array_filter($data['zone_list'] ?? [], fn ($v) => $v === '1'))))];
         $old = $profile['cover_media_id'] ?? null;
         DB::transaction(function () use ($r, $name, $profile, $old) {
             if ($r->hasFile('cover')) $profile['cover_media_id'] = MediaStorage::fromBytes($r->file('cover')->get())->id;

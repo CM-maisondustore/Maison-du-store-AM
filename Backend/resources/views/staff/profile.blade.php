@@ -4,6 +4,8 @@
  $initials=\App\Services\StaffInterface::initials($me->name);
  $field=fn($k,$d='')=>old($k,$p[$k] ?? $d);
  $listed=fn($k)=>(array)old($k,$p[$k] ?? []);
+ // Après une erreur, old('zone_list') vaut [commune => 0|1] ; en base, la liste des communes « Oui ».
+ $zones=is_array(old('zone_list')) ? array_keys(array_filter(old('zone_list'),fn($v)=>$v==='1')) : (array)($p['zone_list'] ?? []);
  $cover=!empty($p['cover_media_id']) ? route('staff.profile.cover').'?v='.$p['cover_media_id'] : null;
  $available=old('availability',$p['availability'] ?? 'available')!=='away';
 @endphp
@@ -43,7 +45,8 @@
 <fieldset class="bare mt-12"><legend>Jours de travail</legend>
 <div class="check-row">@foreach(\App\Http\Controllers\Staff\ProfileController::DAYS as $day=>$label)<label class="check"><input type="checkbox" name="days[]" value="{{ $day }}" @checked(in_array($day,$listed('days'),true))>{{ $label }}</label>@endforeach</div></fieldset>
 <label>Horaires<input name="hours" maxlength="150" value="{{ $field('hours') }}" placeholder="08:00–18:00"></label>
-<label>Communes couvertes<input name="zones" maxlength="300" value="{{ $field('zones') }}" placeholder="Cocody, Marcory, Plateau…"></label>
+<fieldset class="bare mt-12"><legend>Communes couvertes</legend>
+<div class="grid zone-grid">@foreach(\App\Http\Controllers\Staff\ProfileController::zones() as $commune)<label>{{ $commune }}<select name="zone_list[{{ $commune }}]"><option value="0">Non</option><option value="1" @selected(in_array($commune,$zones,true))>Oui</option></select></label>@endforeach</div></fieldset>
 </section>
 <section class="panel" aria-labelledby="p-terrain"><h2 id="p-terrain">Compétences</h2>
 <fieldset class="bare"><legend class="sr-only">Savoir-faire</legend>
@@ -70,7 +73,11 @@
 <div class="modal-body">
 <h2 id="sh-t">Carte de profil à partager</h2>
 <p class="muted">Une image aux couleurs de la maison pour WhatsApp, Facebook, Instagram ou LinkedIn. Modifiez librement les textes : rien n’est enregistré, l’image est créée sur votre appareil.</p>
-<canvas id="profile-card" width="1080" height="1080" class="image-preview" role="img" aria-label="Aperçu de la carte de profil" data-initials="{{ $initials }}" @if($cover) data-cover="{{ $cover }}" @endif></canvas>
+<fieldset class="bare"><legend>Format</legend>
+<div class="tile-group card-formats">
+@foreach(['story'=>['Story mobile','1080 × 1920, WhatsApp et Instagram'],'card'=>['Carte de visite','85 × 55 mm, à imprimer']] as $format=>[$label,$hint])<label class="tile"><input type="radio" name="card_format" value="{{ $format }}" @checked($loop->first)><span><strong>{{ $label }}</strong><small>{{ $hint }}</small></span></label>@endforeach
+</div></fieldset>
+<canvas id="profile-card" width="1080" height="1920" class="profile-card-canvas" role="img" aria-label="Aperçu de la carte de profil" data-initials="{{ $initials }}" @if($cover) data-cover="{{ $cover }}" @endif></canvas>
 <fieldset class="bare"><legend>Fond de la carte</legend>
 <div class="tile-group card-backgrounds">
 @foreach(['green'=>'Vert maison','ink'=>'Noir et or','sand'=>'Sable'] as $bg=>$label)<label class="tile"><input type="radio" name="card_bg" value="{{ $bg }}" @checked($loop->first)><span><span class="card-swatch is-{{ $bg }}" aria-hidden="true"></span><strong>{{ $label }}</strong></span></label>@endforeach
@@ -82,39 +89,87 @@
 <label>Pied de carte<input data-card="foot" maxlength="60" value="maisondustoream.com · Abidjan"></label>
 </div>
 <label class="check"><input type="checkbox" id="card-phone" checked>Afficher mon téléphone</label>
-@if($cover)<label class="check"><input type="checkbox" id="card-cover" checked>Afficher ma photo de couverture</label>@endif
-<div class="modal-actions"><button type="button" class="quiet" data-close-dialog>Fermer</button><a class="button" id="card-download" href="#" download="carte-maison-du-store.png">Télécharger l’image</a></div>
+<label class="check"><input type="checkbox" id="card-photo" @checked($cover)>Afficher une photo à droite</label>
+<label>Photo de la carte<input type="file" id="card-photo-file" accept="image/jpeg,image/png,image/webp"><span class="hint">{{ $cover ? 'Par défaut, votre photo de couverture.' : 'Choisissez une photo de votre appareil.' }} Elle n’est pas envoyée au serveur.</span></label>
+<div class="modal-actions"><button type="button" class="quiet" data-close-dialog>Fermer</button><a class="button" id="card-download" href="#" download="carte-maison-du-store-story.png">Télécharger l’image</a></div>
 </div>
 </dialog>
 <script>
 (() => {
   const canvas=document.getElementById('profile-card'), dialog=document.getElementById('card-dialog'), link=document.getElementById('card-download');
   const themes={green:{bg:'#20332c',text:'#fff',accent:'#c09f6a',sub:'#d3dcd7',foot:'#a9bab2',initials:'#1c1c1c'},ink:{bg:'#1c1c1c',text:'#fff',accent:'#c09f6a',sub:'#d6d2c9',foot:'#a8a296',initials:'#1c1c1c'},sand:{bg:'#f6f0e4',text:'#1c1c1c',accent:'#84642f',sub:'#4d4a44',foot:'#6b665e',initials:'#fff'}};
+  // Tailles en pixels de l'image finale ; la carte de visite fait 85 × 55 mm à 300 dpi.
+  const formats={
+    story:{w:1080,h:1920,pad:80,gap:56,photo:.44,radius:24,brand:52,name:108,role:46,phone:52,foot:34,initials:120,file:'story'},
+    card:{w:1004,h:650,pad:56,gap:40,photo:.38,radius:14,brand:32,name:64,role:28,phone:32,foot:20,initials:0,file:'carte-de-visite'}
+  };
   const value=key=>dialog.querySelector('[data-card="'+key+'"]').value.trim();
-  let cover=null;
-  const draw=()=>{
-    const c=canvas.getContext('2d'), t=themes[dialog.querySelector('[name=card_bg]:checked').value];
-    const showCover=cover&&cover.complete&&cover.naturalWidth&&document.getElementById('card-cover')?.checked;
-    c.fillStyle=t.bg;c.fillRect(0,0,1080,1080);
-    if(showCover){
-      const scale=Math.max(1080/cover.naturalWidth,300/cover.naturalHeight), w=cover.naturalWidth*scale, h=cover.naturalHeight*scale;
-      c.save();c.beginPath();c.rect(0,0,1080,300);c.clip();c.drawImage(cover,(1080-w)/2,(300-h)/2,w,h);c.fillStyle='rgba(0,0,0,.4)';c.fillRect(0,0,1080,300);c.restore();
+  const checked=name=>dialog.querySelector('[name='+name+']:checked').value;
+  let cover=null, picked=null;
+  const load=src=>{const img=new Image();img.onload=()=>draw();img.src=src;return img;};
+  // Coupe en deux lignes équilibrées si besoin, puis réduit la police jusqu'à tenir dans la colonne.
+  const fit=(c,text,weight,size,family,maxW)=>{
+    const min=size/2, words=text.split(/\s+/).filter(Boolean), width=l=>c.measureText(l).width; let lines=[text];
+    c.font=weight+' '+size+'px '+family;
+    if(words.length>1&&width(text)>maxW){
+      for(let cut=1;cut<words.length;cut++){
+        const pair=[words.slice(0,cut).join(' '),words.slice(cut).join(' ')];
+        if(lines.length<2||Math.max(...pair.map(width))<Math.max(...lines.map(width)))lines=pair;
+      }
     }
-    c.strokeStyle=t.accent;c.lineWidth=6;c.beginPath();c.moveTo(90,150);c.lineTo(990,150);c.stroke();
-    c.fillStyle=t.accent;c.beginPath();c.arc(90,150,14,0,7);c.fill();
-    c.fillStyle=showCover?'#fff':t.text;c.font='600 46px "Cormorant Garamond", Georgia, serif';c.fillText('Maison du Store AM',90,100);
-    c.fillStyle=t.accent;c.beginPath();c.arc(210,380,120,0,7);c.fill();
-    c.fillStyle=t.initials;c.font='600 90px Inter, sans-serif';c.textAlign='center';c.fillText(canvas.dataset.initials,210,412);c.textAlign='left';
-    c.fillStyle=t.text;c.font='500 96px "Cormorant Garamond", Georgia, serif';c.fillText(value('name'),90,640,900);
-    c.fillStyle=t.sub;c.font='500 44px Inter, sans-serif';c.fillText(value('role'),90,716,900);
-    if(document.getElementById('card-phone').checked&&value('phone')){c.fillStyle=t.text;c.font='500 50px "IBM Plex Mono", monospace';c.fillText(value('phone'),90,830,900);}
-    c.fillStyle=t.foot;c.font='400 36px Inter, sans-serif';c.fillText(value('foot'),90,990,900);
+    while(size>min&&Math.max(...lines.map(l=>c.measureText(l).width))>maxW){size-=2;c.font=weight+' '+size+'px '+family;}
+    return {lines,size,font:c.font};
+  };
+  const draw=()=>{
+    const f=formats[checked('card_format')], t=themes[checked('card_bg')], c=canvas.getContext('2d');
+    canvas.width=f.w;canvas.height=f.h;
+    const photo=picked||cover, showPhoto=document.getElementById('card-photo').checked&&photo&&photo.complete&&photo.naturalWidth;
+    const top=Math.round(f.h*.1), bottom=Math.round(f.h*.9), x=f.pad;
+    c.fillStyle=t.bg;c.fillRect(0,0,f.w,f.h);
+    // Colonne droite : photo recadrée, marges de 10 % en haut et en bas.
+    let maxW=f.w-2*f.pad;
+    if(showPhoto){
+      const pw=Math.round(f.w*f.photo), px=f.w-f.pad-pw, ph=bottom-top;
+      const scale=Math.max(pw/photo.naturalWidth,ph/photo.naturalHeight), w=photo.naturalWidth*scale, h=photo.naturalHeight*scale;
+      c.save();c.beginPath();if(c.roundRect)c.roundRect(px,top,pw,ph,f.radius);else c.rect(px,top,pw,ph);c.clip();
+      c.drawImage(photo,px+(pw-w)/2,top+(ph-h)/2,w,h);c.restore();
+      maxW=px-f.gap-f.pad;
+    }
+    // Colonne gauche : marque en haut, identité au centre, pied de carte en bas.
+    c.textAlign='left';c.textBaseline='alphabetic';
+    const brand=fit(c,'Maison du Store AM','600',f.brand,'"Cormorant Garamond", Georgia, serif',maxW);
+    c.fillStyle=t.text;c.font=brand.font;
+    let y=top;brand.lines.forEach(l=>{y+=brand.size;c.fillText(l,x,y,maxW);});
+    const lineY=y+brand.size*.6;
+    c.strokeStyle=t.accent;c.lineWidth=Math.max(3,f.brand/9);c.beginPath();c.moveTo(x,lineY);c.lineTo(x+maxW,lineY);c.stroke();
+    c.fillStyle=t.accent;c.beginPath();c.arc(x,lineY,f.brand/4,0,7);c.fill();
+    const name=fit(c,value('name'),'500',f.name,'"Cormorant Garamond", Georgia, serif',maxW);
+    const role=fit(c,value('role'),'500',f.role,'Inter, sans-serif',maxW);
+    const phone=document.getElementById('card-phone').checked&&value('phone');
+    const r=showPhoto?0:f.initials;
+    const height=(r?2*r+f.name*.6:0)+name.lines.length*name.size*1.1+role.lines.length*role.size*1.35+(phone?f.phone*2.2:0);
+    y=lineY+Math.max(0,(bottom-f.foot*2-lineY-height)/2);
+    if(r){
+      c.fillStyle=t.accent;c.beginPath();c.arc(x+r,y+r,r,0,7);c.fill();
+      c.fillStyle=t.initials;c.font='600 '+Math.round(r*.75)+'px Inter, sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText(canvas.dataset.initials,x+r,y+r);
+      c.textAlign='left';c.textBaseline='alphabetic';y+=2*r+f.name*.6;
+    }
+    c.fillStyle=t.text;c.font=name.font;name.lines.forEach(l=>{y+=name.size*1.1;c.fillText(l,x,y,maxW);});
+    c.fillStyle=t.sub;c.font=role.font;role.lines.forEach(l=>{y+=role.size*1.35;c.fillText(l,x,y,maxW);});
+    if(phone){y+=f.phone*2.2;c.fillStyle=t.text;c.font='500 '+f.phone+'px "IBM Plex Mono", monospace';c.fillText(value('phone'),x,y,maxW);}
+    c.fillStyle=t.foot;c.font='400 '+f.foot+'px Inter, sans-serif';c.fillText(value('foot'),x,bottom,maxW);
+    link.download='carte-maison-du-store-'+f.file+'.png';
     link.href=canvas.toDataURL('image/png');
   };
-  if(canvas.dataset.cover){cover=new Image();cover.onload=draw;cover.src=canvas.dataset.cover;}
+  if(canvas.dataset.cover)cover=load(canvas.dataset.cover);
+  document.getElementById('card-photo-file').addEventListener('change',e=>{
+    const file=e.target.files[0]; if(!file)return;
+    if(picked)URL.revokeObjectURL(picked.src);
+    picked=load(URL.createObjectURL(file));document.getElementById('card-photo').checked=true;
+  });
   dialog.addEventListener('input',draw);
   dialog.addEventListener('change',draw);
-  document.querySelector('[data-open-dialog="card-dialog"]').addEventListener('click',draw);
+  document.querySelector('[data-open-dialog="card-dialog"]').addEventListener('click',()=>(document.fonts?document.fonts.ready:Promise.resolve()).then(draw));
 })();
 </script>
 @endsection

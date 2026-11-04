@@ -4,7 +4,7 @@ use App\Models\User;
 use App\Services\Audit;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules\Password;
-use Illuminate\Validation\Rule;
+use Illuminate\Validation\{Rule, ValidationException};
 class UserController
 {
     public function index() { return view('staff.users', ['users' => User::orderBy('name')->get()]); }
@@ -21,7 +21,8 @@ class UserController
             'role' => ['nullable', Rule::in(array_keys(User::ROLES))], 'shops' => 'nullable|array', 'shops.*' => [Rule::in(array_keys(User::SHOPS))]]);
         if (empty($data['password'])) unset($data['password']); else $data['must_change_password'] = true;
         if (empty($data['role'])) unset($data['role']);
-        // Boutiques de l'agent : aucune case cochée revient aux trois boutiques.
+        // Boutiques de l'agent : il ne voit que celles cochées par l'admin, au moins une.
+        if ($r->has('shops_sent') && ($data['role'] ?? $user->role) === 'agent' && empty($data['shops'])) throw ValidationException::withMessages(['shops' => 'Cochez au moins une boutique pour cet agent.']);
         if ($r->has('shops_sent')) $data['profile'] = [...($user->profile ?? []), 'shops' => array_values(array_unique($data['shops'] ?? []))];
         unset($data['shops']);
         $user->update($data); Audit::record('compte_modifie', $user);

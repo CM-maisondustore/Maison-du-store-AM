@@ -1131,3 +1131,9 @@ body:has(.float-panel:target),body:has(.float-panel[data-open]){overflow:hidden}
 /* Le tableau « Par ouverture » défile en largeur : le bloc des quantités reste à la largeur visible, calé à gauche. */
 .openings{container-type:inline-size}
 form[data-step="2"] .opening-row .quote-opening-details{position:sticky;left:0;max-width:calc(100cqi - 2px);box-sizing:border-box}
+/* ---- Carte à partager : story 9:16 ou carte de visite 85 × 55 mm ---- */
+.card-formats{grid-template-columns:1fr 1fr}
+.card-formats small{display:block;font-size:12px;font-weight:400;color:var(--pro-text-2)}
+.profile-card-canvas{display:block;width:auto;height:auto;max-width:100%;max-height:min(52vh,460px);margin:12px auto;border-radius:var(--r-10);box-shadow:0 2px 10px rgba(0,0,0,.12)}
+/* ---- Profil agent : communes couvertes en Oui / Non ---- */
+.zone-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:4px 16px}

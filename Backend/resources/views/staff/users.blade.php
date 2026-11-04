@@ -23,8 +23,8 @@
 </label>
 <label>Rôle<select name="role">@foreach(\App\Models\User::ROLES as $role=>$roleLabel)<option value="{{ $role }}" @selected($user->role===$role)>{{ $roleLabel }}</option>@endforeach</select></label>
 @if($user->role==='agent')<fieldset class="bare"><legend>Boutiques du « Nouveau devis »</legend><input type="hidden" name="shops_sent" value="1">
-<div class="check-row">@foreach(\App\Models\User::SHOPS as $shop=>$shopLabel)<label class="check"><input type="checkbox" name="shops[]" value="{{ $shop }}" @checked(in_array($shop,$user->profile['shops'] ?? [],true))>{{ $shopLabel }}</label>@endforeach</div>
-<span class="hint">Aucune case cochée : les trois boutiques.</span></fieldset>@endif
+<div class="check-row">@foreach(\App\Models\User::SHOPS as $shop=>$shopLabel)<label class="check"><input type="checkbox" name="shops[]" value="{{ $shop }}" @checked(in_array($shop,$user->shops(),true))>{{ $shopLabel }}</label>@endforeach</div>
+<span class="hint">L’agent ne voit que les boutiques cochées. Cochez-en au moins une.</span></fieldset>@endif
 <label>Réinitialisation du mot de passe (optionnelle)<input name="password" type="password" minlength="12" autocomplete="new-password">
 </label>
 <button class="quiet mt-8">Mettre à jour</button>

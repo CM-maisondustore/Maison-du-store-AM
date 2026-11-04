@@ -567,6 +567,10 @@ class StaffInterfaceTest extends TestCase
         $this->put('/admin/equipe/'.$agent->id,['active'=>1,'role'=>'agent','shops_sent'=>1,'shops'=>['electromenager']])->assertRedirect();
         $this->put('/admin/equipe/'.$agent->id,['active'=>1,'shops_sent'=>1,'shops'=>['cuisine']])->assertSessionHasErrors('shops.0');
         $this->assertSame(['electromenager'],$agent->fresh()->profile['shops']);
+        // Aucune boutique cochée : refusé, l'agent garde ses boutiques ; le formulaire coche ce qu'il voit.
+        $this->put('/admin/equipe/'.$agent->id,['active'=>1,'shops_sent'=>1])->assertSessionHasErrors('shops');
+        $this->assertSame(['electromenager'],$agent->fresh()->profile['shops']);
+        $this->get('/admin/equipe')->assertSee('value="electromenager" checked',false)->assertDontSee('value="meubles" checked',false);
         $this->post('/admin/equipe',['username'=>'manager2','name'=>'Manager Deux','email'=>'m2@example.com','role'=>'manager','password'=>'TemporaryPass123!'])->assertRedirect();
         $this->assertSame('manager',User::where('username','manager2')->value('role'));
         // L'agent n'ouvre que ses boutiques, même en forçant l'adresse ou le formulaire.
@@ -598,6 +602,12 @@ class StaffInterfaceTest extends TestCase
         $this->assertSame([],$profile['skill_list']); $this->assertSame('away',$profile['availability']);
         $this->assertArrayNotHasKey('shops',$profile); $this->assertArrayNotHasKey('signature',$profile);
         $this->patch('/admin/profil',['name'=>'Agent Test','skill_list'=>['pilote']])->assertSessionHasErrors('skill_list.0');
+        // Communes couvertes : un menu Oui / Non par commune ; seules les « Oui » sont gardées, une commune inconnue est refusée.
+        $this->get('/admin/profil')->assertSee('name="zone_list[Cocody]"',false)->assertSee('name="zone_list[Hors Abidjan]"',false);
+        $this->patch('/admin/profil',['name'=>'Agent Test','zone_list'=>['Cocody'=>'1','Marcory'=>'0','Plateau'=>'1']])->assertSessionHasNoErrors();
+        $this->assertSame(['Cocody','Plateau'],$agent->fresh()->profile['zone_list']);
+        $this->get('/admin/profil')->assertSee('<option value="1" selected>Oui</option>',false);
+        $this->patch('/admin/profil',['name'=>'Agent Test','zone_list'=>['Paris'=>'1']])->assertSessionHasErrors('zone_list');
         $this->patch('/admin/profil',['name'=>'Agent Test','cover'=>\Illuminate\Http\UploadedFile::fake()->create('cv.pdf',5,'application/pdf')])->assertSessionHasErrors('cover');
         // Chacun ne lit que sa propre couverture.
         $cover=$agent->fresh()->profile['cover_media_id'];
