@@ -2,13 +2,13 @@
 set -euo pipefail
 umask 027
 # Usage: bash release.sh /absolute/domain/root /absolute/release.tar.gz <git-sha>
-# KEEP_RELEASES (5 par défaut) : versions conservées ; current et previous ne sont jamais supprimées.
+# KEEP_RELEASES (3 par défaut) : versions conservées, copies -recovery- comprises ; current et previous ne sont jamais supprimées.
 domain_root=$(realpath -e "${1:?Domain root required}")
 archive=$(realpath -e "${2:?Release archive required}")
 revision=${3:?Git revision required}
 [[ "$domain_root" != / && "$revision" =~ ^[a-f0-9]{40}$ ]] || { echo 'Invalid root or revision' >&2; exit 1; }
 php_bin=${PHP_BIN:-php}
-keep_releases=${KEEP_RELEASES:-5}
+keep_releases=${KEEP_RELEASES:-3}
 [[ "$keep_releases" =~ ^[1-9][0-9]*$ ]] || { echo 'KEEP_RELEASES must be a positive integer.' >&2; exit 1; }
 private="$domain_root/.mds"
 shared="$private/shared"
@@ -79,7 +79,7 @@ current_target=$(readlink -f "$private/current")
 previous_target=$(readlink -f "$private/previous" 2>/dev/null || true)
 ls -1dt "$private/releases"/*/ | tail -n +$((keep_releases + 1)) | while read -r dir; do
     dir=${dir%/}
-    if [[ "$dir" != "$current_target" && "$dir" != "$previous_target" && "$(basename "$dir")" =~ ^[a-f0-9]{40}$ ]]; then
+    if [[ "$dir" != "$current_target" && "$dir" != "$previous_target" && "$(basename "$dir")" =~ ^[a-f0-9]{40}(-recovery-[0-9]{8}T[0-9]{6}Z)?$ ]]; then
         rm -rf -- "$dir"
     fi
 done
