@@ -21,7 +21,7 @@ class QuoteCostingTest extends TestCase
     }
     public function test_all_rates_are_seeded_without_overwriting_admin_changes(): void {
         $this->seed();
-        $this->assertSame(27,QuoteOption::whereNotNull('unit_price')->count());
+        $this->assertSame(28,QuoteOption::whereNotNull('unit_price')->count());
         $o=QuoteOption::where('code','voilage-luxe')->firstOrFail();
         $this->assertSame(14000,$o->unit_price); $o->update(['unit_price'=>15000,'active'=>false]);
         $this->seed(); $this->assertSame(15000,$o->fresh()->unit_price); $this->assertFalse($o->fresh()->active);

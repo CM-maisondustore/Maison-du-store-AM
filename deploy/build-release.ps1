@@ -31,7 +31,8 @@ try {
         npm.cmd run build
         Check-Exit
     } finally { Pop-Location }
-    $archivePaths = @('Backend/app', 'Backend/bootstrap', 'Backend/config', 'Backend/database/data', 'Backend/database/migrations', 'Backend/database/seeders', 'Backend/lang', 'Backend/public', 'Backend/resources/views', 'Backend/routes', 'Backend/artisan', 'Backend/composer.json', 'Backend/composer.lock', 'Backend/deployment-check.php')
+    # Même liste que la CI : deploy/release-files.txt.
+    $archivePaths = @(Get-Content -LiteralPath (Join-Path $PSScriptRoot 'release-files.txt') | ForEach-Object { $_.Trim() } | Where-Object { $_ -and !$_.StartsWith('#') } | ForEach-Object { 'Backend/' + $_ })
     git archive --format=tar -o "$output/source.tar" HEAD @archivePaths
     Check-Exit
     tar -xf "$output/source.tar" -C $output
@@ -54,5 +55,10 @@ try {
     } finally { Pop-Location }
     $hash = (Get-FileHash "$output/hostinger-release.tar.gz" -Algorithm SHA256).Hash.ToLowerInvariant()
     [IO.File]::WriteAllText("$output/hostinger-release.tar.gz.sha256", "$hash  hostinger-release.tar.gz`n", [Text.UTF8Encoding]::new($false))
+    # Même disposition que l'artefact CI : publish.ps1 envoie les scripts de cette révision, pas ceux de la copie locale.
+    git archive --format=tar -o "$output/scripts.tar" HEAD deploy/hostinger/release.sh deploy/hostinger/rollback.sh deploy/hostinger/backup.sh deploy/hostinger/backup-options.php
+    Check-Exit
+    tar -xf "$output/scripts.tar" -C $output
+    Check-Exit
     Write-Output "Release ready: $output/hostinger-release.tar.gz"
 } finally { Pop-Location }

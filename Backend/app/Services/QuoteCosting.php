@@ -46,13 +46,13 @@ class QuoteCosting
         $result=[];
         foreach ($data['windows'] as $w) {
             $cost=['material_quantity'=>isset($w['costing']['material_quantity']) ? (string)$w['costing']['material_quantity'] : null,'zone'=>$w['costing']['zone'],
-                'material_mode'=>$w['costing']['material_mode'] ?? 'manual', 'material_coefficient'=>(string)($w['costing']['material_coefficient'] ?? '2.5'),
+                'material_mode'=>$w['costing']['material_mode'] ?? (($w['category'] ?? 'rideau')==='rideau' ? 'coefficient' : 'manual'), 'material_coefficient'=>(string)($w['costing']['material_coefficient'] ?? '2.5'),
                 'material_unit_price'=>isset($w['costing']['material_unit_price']) ? (int)$w['costing']['material_unit_price'] : null,
                 'finish_unit_price'=>isset($w['costing']['finish_unit_price']) ? (int)$w['costing']['finish_unit_price'] : null,'finish_quantity'=>isset($w['costing']['finish_quantity']) ? (string)$w['costing']['finish_quantity'] : null];
             foreach (self::PARTS as $kind) $cost[$kind]=['option_id'=>!empty($w['costing'][$kind]['option_id']) ? (int)$w['costing'][$kind]['option_id'] : null,
                 'quantity'=>isset($w['costing'][$kind]['quantity']) ? (string)$w['costing'][$kind]['quantity'] : null,
                 'unit_price'=>isset($w['costing'][$kind]['unit_price']) ? (int)$w['costing'][$kind]['unit_price'] : null,
-                'mode'=>$w['costing'][$kind]['mode'] ?? ($kind==='sewing' ? 'per_meter' : 'manual'), 'coefficient'=>(string)($w['costing'][$kind]['coefficient'] ?? '2.5'),'basis'=>$w['costing'][$kind]['basis'] ?? 'primary'];
+                'mode'=>$w['costing'][$kind]['mode'] ?? (in_array($kind,['secondary_material','support','extra_support','tape','extra_tape'],true) ? 'coefficient' : ($kind==='sewing' ? 'per_meter' : 'manual')), 'coefficient'=>(string)($w['costing'][$kind]['coefficient'] ?? (in_array($kind,['support','extra_support','tape','extra_tape'],true) ? '1' : '2.5')),'basis'=>$w['costing'][$kind]['basis'] ?? (in_array($kind,['support','extra_support','tape','extra_tape'],true) ? 'all_fabrics' : 'primary')];
             $cost['installation']['unit_price']=isset($w['costing']['installation']['unit_price']) ? (int)$w['costing']['installation']['unit_price'] : null;
             $result[]=[...(!empty($w['inherit_defaults']) ? $defaults : self::choice($w)), 'label'=>$w['label'],'width'=>(string)$w['width'],'height'=>(string)$w['height'],'quantity'=>(int)$w['quantity'],'costing'=>$cost];
         }

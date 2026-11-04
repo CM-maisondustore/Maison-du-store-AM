@@ -7,6 +7,15 @@ Route::prefix('admin')->group(function () {
     Route::middleware(['auth', 'auth.session', 'staff'])->name('staff.')->group(function () {
         Route::get('/', DashboardController::class)->name('dashboard');
         Route::post('deconnexion', [AuthController::class, 'logout'])->name('logout');
+        Route::get('profil', [App\Http\Controllers\Staff\ProfileController::class, 'edit'])->name('profile.edit');
+        Route::patch('profil', [App\Http\Controllers\Staff\ProfileController::class, 'update'])->name('profile.update');
+        Route::get('parametres', [App\Http\Controllers\Staff\ProfileController::class, 'settings'])->name('settings.edit');
+        Route::patch('parametres', [App\Http\Controllers\Staff\ProfileController::class, 'updateSettings'])->name('settings.update');
+        Route::get('notifications', [App\Http\Controllers\Staff\PushController::class, 'index'])->name('notifications.index');
+        Route::get('push/cle-publique', [App\Http\Controllers\Staff\PushController::class, 'publicKey'])->name('push.public-key');
+        Route::post('push/abonnement', [App\Http\Controllers\Staff\PushController::class, 'subscribe'])->middleware('throttle:20,1')->name('push.subscribe');
+        Route::delete('push/abonnement', [App\Http\Controllers\Staff\PushController::class, 'unsubscribe'])->middleware('throttle:20,1')->name('push.unsubscribe');
+        Route::post('notifications/{notification}/lu', [App\Http\Controllers\Staff\PushController::class, 'markRead'])->name('notifications.read');
         Route::get('mot-de-passe', [AuthController::class, 'password'])->name('password');
         Route::post('mot-de-passe', [AuthController::class, 'changePassword'])->middleware('throttle:5,1')->name('password.update');
         Route::get('devis', [QuoteController::class, 'index'])->name('quotes.index');
@@ -27,6 +36,7 @@ Route::prefix('admin')->group(function () {
         Route::put('prestations/{intervention}', [InterventionController::class, 'update'])->name('interventions.update');
         Route::post('prestations/{intervention}/devis', [QuoteController::class, 'onsite'])->name('interventions.quote');
         Route::middleware('admin')->group(function () {
+            Route::get('visiteurs', [App\Http\Controllers\Staff\VisitorsController::class, 'index'])->name('visitors.index');
             Route::get('mise-en-page/{type?}', [App\Http\Controllers\Staff\DocumentLayoutController::class,'edit'])->name('layouts.edit');
             Route::post('mise-en-page/{type}', [App\Http\Controllers\Staff\DocumentLayoutController::class,'save'])->name('layouts.save');
             Route::post('mise-en-page/{type}/apercu', [App\Http\Controllers\Staff\DocumentLayoutController::class,'preview'])->middleware('throttle:60,1')->name('layouts.preview');

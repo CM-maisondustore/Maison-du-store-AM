@@ -166,6 +166,7 @@
     setBusy(true);
     MDS.api.submitAppointment(payload)
       .then(function (response) {
+        if (!response.demo && MDS.analytics) { MDS.analytics.track('form_submit', {target:'rendez-vous'}); MDS.analytics.track('appointment_received', {target:'rendez-vous'}); }
         showConfirmation(data, response);
         reset();
         if (response.demo) {

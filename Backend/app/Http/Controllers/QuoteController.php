@@ -31,6 +31,9 @@ class QuoteController
             'notes' => $data['notes'] ?? null,
             'terms_accepted_at' => now(),
         ]));
+        app(\App\Services\StaffPushNotifications::class)->admins(
+            'Nouveau devis demandé', 'Une demande '.$quote->reference.' vient d’être reçue.', route('staff.quotes.show', $quote),
+        );
         return response()->json(['data' => ['reference' => $quote->reference, 'status' => 'pending']], 201);
     }
 }

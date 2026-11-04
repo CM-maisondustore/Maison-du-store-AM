@@ -7,14 +7,14 @@ function load(products=[],options=[],finishes=[]){
 test('quote choices contain only database entries, reuse images and omit power supplies',()=>{
  const MDS=load([{id:'product-7',category:'store',name:'Store DB',imageUrl:'/devis/produits/7/image'}],[{id:'cloth',kind:'material',category:'store',label:'Toile DB',motorization:'any',imageUrl:'/devis/produits/7/image'},{id:'finish',kind:'finish',category:'store',label:'Finition DB',motorization:'any'}]);
  const container={innerHTML:''},state={store:{model:'product-7',control:'motorisee',orderType:'installation',fabric:'cloth',finish:'finish'}};
- MDS.quoteStore.STEPS[0].render(container,state);assert.match(container.innerHTML,/Store DB/);assert.match(container.innerHTML,/quote-image--thumb/);assert.doesNotMatch(container.innerHTML,/vénitien/);
+ MDS.quoteStore.STEPS[0].render(container,state);assert.match(container.innerHTML,/Store DB/);assert.match(container.innerHTML,/quote-image--choice/);assert.match(container.innerHTML,/<details class="store-model-card__description">/);assert.match(container.innerHTML,/<summary><span>Description<\/span>/);assert.doesNotMatch(container.innerHTML,/vénitien/);
  MDS.quoteStore.STEPS.find(s=>s.id==='store-control').render(container,state);assert.doesNotMatch(container.innerHTML,/alimentation|store-power|batterie|solaire/i);
  assert.equal(MDS.quoteValidation.validateStoreStep('store-control',state.store).valid,true);
  MDS.quoteStore.STEPS.find(s=>s.id==='store-finish').render(container,state);assert.match(container.innerHTML,/Toile DB/);assert.match(container.innerHTML,/Finition DB/);assert.match(container.innerHTML,/quote-image--fabric/);
 });
 test('public curtain finishes use editable family cards without technical accessories',()=>{
  const MDS=load([{id:'product-8',category:'rideau',name:'Rideau DB'}],[{id:'rail',kind:'support',category:'rideau',label:'Rail DB'}],[{id:'wave',label:'Wave personnalisé',text:'Description DB',imageUrl:'/media/wave'}]);
- const container={innerHTML:''};MDS.quoteCurtain.STEPS.find(s=>s.id==='curtain-finish').render(container,{curtain:{model:'product-8',finish:'wave'}});assert.match(container.innerHTML,/Wave personnalisé/);assert.match(container.innerHTML,/Description DB/);assert.doesNotMatch(container.innerHTML,/Rail DB/);
+ const container={innerHTML:''};MDS.quoteCurtain.STEPS.find(s=>s.id==='curtain-finish').render(container,{curtain:{model:'product-8',finish:'wave'}});assert.match(container.innerHTML,/Wave personnalisé/);assert.match(container.innerHTML,/Description DB/);assert.match(container.innerHTML,/<details class="curtain-option-card__description">/);assert.match(container.innerHTML,/<summary><span>Description<\/span>/);assert.doesNotMatch(container.innerHTML,/Rail DB/);
  assert(!MDS.quoteCurtain.STEPS.some(s=>s.id==='curtain-hanging'));assert(!MDS.quoteStore.STEPS.some(s=>s.id==='store-mount'));
  const empty=load();empty.quoteStore.STEPS[0].render(container,{store:{}});assert.match(container.innerHTML,/Aucun store/);assert.equal(empty.quoteCurtain.FABRICS.length,0);
 });

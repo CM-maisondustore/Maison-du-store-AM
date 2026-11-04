@@ -17,6 +17,10 @@ final class CatalogueCalculator
             $finish=QuoteOption::findOrFail($w['finish_id']); $material=QuoteOption::findOrFail($w['material_id']);
             $cost=$w['costing']; $width=QuoteValidator::decimal($w['width'],'largeur')->dividedByExact(100);
             $height=QuoteValidator::decimal($w['height'],'hauteur')->dividedByExact(100); $lines=[];
+            $hasCurtain=!empty($w['curtain_id']) || ($w['category']==='rideau' && $material->fabric_group==='rideau');
+            $hasSheer=!empty($w['sheer_id']) || ($w['category']==='rideau' && $material->fabric_group==='voilage');
+            $fabricCount=max(1,(int)$hasCurtain+(int)$hasSheer);
+            $manualHeight=$w['category']==='rideau' && $height->isGreaterThan('2.8');
             $add=function(QuoteOption $option,array $part,string $key,string $mode='manual',mixed $default=null) use (&$lines,&$pending,&$items,$w,$i) {
                 $price=$part['unit_price'] ?? $option->unit_price;
                 if ($key==='installation' && !isset($part['unit_price']) && ($w['category']==='rideau' || $w['costing']['zone']==='other')) $price=null;
@@ -36,6 +40,7 @@ final class CatalogueCalculator
             $materialMode=$material->unit==='m2' ? 'area' : $cost['material_mode'];
             if ($material->unit==='m2' && $cost['material_mode']!=='manual_override') $materialPart['quantity']=null;
             if ($materialMode==='manual_override') $materialMode='manual';
+            if ($manualHeight && $material->unit!=='m2' && $materialPart['quantity']===null) $this->invalid($i,'material_quantity','Hauteur supérieure à 2,80 m : saisissez manuellement le métrage du tissu ou du voilage.');
             if ($materialPart['quantity']===null && $materialMode==='manual') $this->invalid($i,'material_quantity','Renseignez le métrage du tissu.');
             $add($material,$materialPart,'material',$materialMode);
             if ($finish->unit_price!==0 || isset($cost['finish_unit_price'])) $add($finish,['quantity'=>$cost['finish_quantity'],'unit_price'=>$cost['finish_unit_price']],'finish',$finish->unit==='m'?'width':'manual',1);
@@ -52,13 +57,18 @@ final class CatalogueCalculator
                 $expected=match($kind){'secondary_material'=>'material','extra_support'=>'support','extra_tape'=>'tape',default=>$kind};
                 $compatible=$o && ($o->compatible($w['category'],0,$w['motorized']) || ($kind==='extra_support' && $o->compatible($w['category'],0,false)));
                 if (!$o || $o->kind!==$expected || !$compatible || ($o->finish_codes && !in_array($finish->code,$o->finish_codes,true) && $kind!=='extra_support')) $this->invalid($i,$kind.'.option_id','Fourniture incompatible avec cette ouverture.');
+                if ($manualHeight && $o->unit==='m' && $part['quantity']===null) $this->invalid($i,$kind.'.quantity','Hauteur supérieure à 2,80 m : saisissez manuellement cette quantité.');
                 $mode=$part['mode']; $default=null;
                 if ($kind==='sewing' && in_array($mode,['fixed','manual'],true)) {
                     $part['quantity']=1; $part['unit']='flat';
                     if ($part['unit_price']===null) $this->invalid($i,'sewing.unit_price','Renseignez le forfait de confection.');
                     $mode='manual';
                 } elseif ($part['quantity']===null) {
-                    if ($mode==='coefficient') { /* Calculated independently from the opening width. */ }
+                    if ($mode==='coefficient') {
+                        if (in_array($kind,['support','extra_support','tape','extra_tape'],true) && $part['basis']==='all_fabrics') {
+                            $part['coefficient']=(string)QuoteValidator::decimal($part['coefficient'],'coefficient')->multipliedBy($fabricCount);
+                        }
+                    }
                     elseif (in_array($kind,['support','extra_support'])) $mode='width';
                     elseif (in_array($kind,['tape','extra_tape','sewing'])) {
                         $default=$primaryQuantity;

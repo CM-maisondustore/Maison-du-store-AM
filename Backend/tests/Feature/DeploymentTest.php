@@ -23,6 +23,14 @@ class DeploymentTest extends TestCase
         $this->get('/robots.txt')->assertOk()->assertSee('Disallow: /')->assertHeader('X-Robots-Tag', 'noindex, nofollow')->assertHeader('X-Content-Type-Options', 'nosniff');
     }
 
+    public function test_hsts_follows_forced_https(): void
+    {
+        config(['deployment.force_https' => true]);
+        $this->get('/robots.txt')->assertOk()->assertHeader('Strict-Transport-Security', 'max-age=31536000');
+        config(['deployment.force_https' => false]);
+        $this->get('/robots.txt')->assertOk()->assertHeaderMissing('Strict-Transport-Security');
+    }
+
     public function test_production_can_be_indexed(): void
     {
         config(['deployment.indexing' => true]);

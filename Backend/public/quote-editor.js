@@ -1,6 +1,7 @@
 (() => {
   'use strict';
   const form=document.getElementById('staff-quote-form'); if(!form)return;
+  form.addEventListener('invalid',event=>event.target.closest('details')?.setAttribute('open',''),true);
   const data=JSON.parse(document.getElementById('quote-catalogue-data').textContent);
   const defaults=document.querySelector('#quote-defaults [data-selection]'),windows=document.getElementById('quote-windows');
   const keys=['category','motorized','curtain_id','sheer_id','store_id','finish_id'];
@@ -8,6 +9,7 @@
   const values=root=>Object.fromEntries(keys.map(key=>[key,field(root,key).value]));
   const units={m:'mètre(s)',m2:'m²',piece:'pièce(s)',lot100:'lot(s) de 100',opening:'ouverture(s)',flat:'forfait(s)'};
   const compatible=(o,v)=>o.active&&o.category===v.category&&(o.motorization==='any'||o.motorization===(v.motorized==='1'?'yes':'no'));
+  const finishLabel=o=>({'wave-manuel':'Wave manuel','wave-electric':'Wave motoris\u00e9','ruflette-wave':'Ruflette Wave','reflete-manuel':'Ruflette','barre-fer':'Barre de fer'}[o.code]||o.label);
   const label=o=>o.label+(Object.hasOwn(o,'unit_price')?' — '+(o.unit_price===null?'à définir':o.unit_price.toLocaleString('fr-FR')+' FCFA / '+units[o.unit]):'');
   function checkbox(container,o,checked,key,attribute){
     const el=document.createElement('label');el.className='check';
@@ -27,9 +29,10 @@
     }
     const select=field(root,'finish_id'),selected=current.finish_id;
     select.replaceChildren(new Option('Sélectionner une finition…',''));
-    data.options.filter(o=>o.kind==='finish'&&compatible(o,v)).forEach(o=>select.add(new Option(o.label,String(o.id))));
+    data.options.filter(o=>o.kind==='finish'&&o.active&&o.category===v.category).forEach(o=>select.add(new Option(finishLabel(o),String(o.id))));
     select.value=String(selected??'');if(select.selectedIndex<0)select.value='';
   }
+  function alignFinish(root,target){const selected=data.options.find(o=>String(o.id)===field(root,'finish_id').value);if(target.dataset.choice==='finish_id'&&(selected?.motorization==='yes'||selected?.motorization==='no'))field(root,'motorized').value=selected.motorization==='yes'?'1':'0';else if(target.dataset.choice==='motorized'&&selected?.motorization!=='any'&&selected?.motorization!==undefined)field(root,'finish_id').value='';}
   function init(root){
     const initial=Object.fromEntries(keys.map(key=>[key,field(root,key).dataset.value]));
     if(!initial.curtain_id&&!initial.sheer_id&&!initial.store_id){
@@ -96,7 +99,7 @@
   form.addEventListener('change',event=>{
     dirty=true;revision++;const target=event.target,root=target.closest('[data-selection]');invalidate(target);
     if(target.dataset.fabric)field(root,target.dataset.fabric).value=target.checked?target.value:'';
-    if(root){if(root!==defaults)root.closest('[data-window]').querySelector('[data-inherit]').checked=false;refresh(root);if(root===defaults)windows.querySelectorAll('[data-window]').forEach(inherit);}
+    if(root){alignFinish(root,target);if(root!==defaults)root.closest('[data-window]').querySelector('[data-inherit]').checked=false;refresh(root);if(root===defaults)windows.querySelectorAll('[data-window]').forEach(inherit);}
     if(target.matches('[data-inherit]'))inherit(target.closest('[data-window]'));
     if(target.dataset.part){const input=target.closest('[data-cost-part]').querySelector('[data-component]');input.value=target.checked?target.value:'';input.dataset.userChoice='1';}
     if(root||target.matches('[data-inherit],[data-material-mode]')||target.dataset.part)windows.querySelectorAll('[data-window]').forEach(row=>components(row));

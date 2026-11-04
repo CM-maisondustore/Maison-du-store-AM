@@ -44,19 +44,19 @@ class QuotePricingIntegrationTest extends TestCase
     public function test_reference_example_is_saved_and_shared_by_pdf_invoice_and_communications(): void
     {
         $this->seed();$this->login();$data=$this->payload();$q=$this->save($data);
-        $f=QuoteFinancials::forQuote($q);$this->assertSame(271875,$f['total']);$this->assertSame(190313,$q->deposit_amount);$this->assertSame(81562,$f['balance']);
-        $this->get('/admin/devis/'.$q->id)->assertOk()->assertSee('271 875')->assertSee('190 313');
-        $this->get('/admin/devis/'.$q->id.'/formulaire')->assertOk()->assertSee('271 875');
-        $context=CommunicationTemplates::context($q);$this->assertSame('271 875',$context['montant']);$this->assertSame('81 562',$context['solde']);
+        $f=QuoteFinancials::forQuote($q);$this->assertSame(261750,$f['total']);$this->assertSame(183225,$q->deposit_amount);$this->assertSame(78525,$f['balance']);
+        $this->get('/admin/devis/'.$q->id)->assertOk()->assertSee('261 750')->assertSee('183 225');
+        $this->get('/admin/devis/'.$q->id.'/formulaire')->assertOk()->assertSee('261 750');
+        $context=CommunicationTemplates::context($q);$this->assertSame('261 750',$context['montant']);$this->assertSame('78 525',$context['solde']);
         $doc=app(Documents::class)->quoteData($q);$html=view('staff.document',QuoteFinancials::document($doc))->render();
-        $this->assertStringContainsString('271 875',$html);$this->assertStringContainsString('solde de 30 %',$html);$this->assertStringNotContainsString('80 %',$html);
+        $this->assertStringContainsString('261 750',$html);$this->assertStringContainsString('solde de 30 %',$html);$this->assertStringNotContainsString('80 %',$html);
         $this->get('/admin/devis/'.$q->id.'/pdf')->assertOk()->assertHeader('Content-Type','application/pdf');
-        QuoteOption::where('code','occultant-80')->update(['unit_price'=>99000]);$this->assertSame(271875,QuoteFinancials::forQuote($q->fresh())['total']);
+        QuoteOption::where('code','occultant-80')->update(['unit_price'=>99000]);$this->assertSame(261750,QuoteFinancials::forQuote($q->fresh())['total']);
         $this->put('/admin/devis/'.$q->id,['lines'=>$q->lines,'tax_rate'=>0,'valid_until'=>$q->valid_until,'status'=>'accepted'])->assertSessionHasNoErrors();
         $this->post('/admin/devis/'.$q->id.'/facture',['due_date'=>today()->addDays(10)->toDateString()])->assertSessionHasNoErrors();
-        $invoice=Invoice::firstOrFail();$this->assertSame(271875,QuoteFinancials::forSnapshot($invoice->snapshot)['total']);
-        $this->assertSame('271 875',CommunicationTemplates::context($invoice)['montant']);
-        $this->get('/admin/factures/'.$invoice->id)->assertOk()->assertSee('190 313');
+        $invoice=Invoice::firstOrFail();$this->assertSame(261750,QuoteFinancials::forSnapshot($invoice->snapshot)['total']);
+        $this->assertSame('261 750',CommunicationTemplates::context($invoice)['montant']);
+        $this->get('/admin/factures/'.$invoice->id)->assertOk()->assertSee('183 225');
         $this->get('/admin/factures/'.$invoice->id.'/pdf')->assertOk();
     }
     public function test_negotiated_total_and_manual_overrides_survive_recalculation_and_catalogue_changes(): void
@@ -86,7 +86,7 @@ class QuotePricingIntegrationTest extends TestCase
         $data['defaults']=['category'=>'store','motorized'=>0,'curtain_id'=>null,'sheer_id'=>null,'store_id'=>null,'finish_id'=>null];
         foreach ($data['windows'] as &$window) $window['inherit_defaults']=0;
         unset($window);
-        $q=$this->save($data);$this->assertSame(271875,QuoteFinancials::forQuote($q)['total']);
+        $q=$this->save($data);$this->assertSame(261750,QuoteFinancials::forQuote($q)['total']);
         $this->assertSame('rideau',$q->type);
         foreach ($q->dimensions as $window) $this->assertFalse($window['inherit_defaults']);
         // Agents can also save their independent technical selections without common choices.
@@ -107,7 +107,7 @@ class QuotePricingIntegrationTest extends TestCase
         $this->seed();$this->login();$data=$this->payload();
         foreach ($data['windows'] as &$window) foreach (['category','motorized','curtain_id','sheer_id','store_id','finish_id','material_id'] as $key) unset($window[$key]);
         unset($window);
-        $q=$this->save($data);$this->assertSame(271875,QuoteFinancials::forQuote($q)['total']);
+        $q=$this->save($data);$this->assertSame(261750,QuoteFinancials::forQuote($q)['total']);
     }
     public function test_catalogue_global_fee_is_frozen_until_explicit_recalculation(): void
     {
@@ -116,11 +116,11 @@ class QuotePricingIntegrationTest extends TestCase
         $data['pricing']['fees']['installation_delivery']['option_id']=$option->id;$data['pricing']['fees']['installation_delivery']['unit_price']=null;
         $signed=$this->calculated($data);$option->update(['unit_price'=>50000]);
         $this->post('/admin/devis',$signed)->assertSessionHasNoErrors();$q=Quote::firstOrFail();
-        $this->assertSame(271875,QuoteFinancials::forQuote($q)['total']);
+        $this->assertSame(261750,QuoteFinancials::forQuote($q)['total']);
         $this->get('/admin/devis/'.$q->id.'/formulaire')->assertOk();
-        $r=$this->postJson('/admin/devis/chiffrer',$data)->assertOk();$this->assertSame(291875,$r->json('financial.total'));
+        $r=$this->postJson('/admin/devis/chiffrer',$data)->assertOk();$this->assertSame(281750,$r->json('financial.total'));
         $data['pricing']['fees']['installation_delivery']['unit_price']=0;
-        $r=$this->postJson('/admin/devis/chiffrer',$data)->assertOk();$this->assertSame(241875,$r->json('financial.total'));
+        $r=$this->postJson('/admin/devis/chiffrer',$data)->assertOk();$this->assertSame(231750,$r->json('financial.total'));
     }
     public function test_global_pose_cannot_duplicate_per_opening_pose_and_zero_fees_are_allowed(): void
     {
@@ -130,7 +130,7 @@ class QuotePricingIntegrationTest extends TestCase
         $data=$this->payload();$data['pricing']['fees']['delivery']['enabled']=1;
         $this->postJson('/admin/devis/chiffrer',$data)->assertUnprocessable()->assertJsonValidationErrors('pricing.fees');
         $data=$this->payload();$data['pricing']['fees']['installation_delivery']['unit_price']=0;
-        $r=$this->postJson('/admin/devis/chiffrer',$data)->assertOk();$this->assertSame(241875,$r->json('financial.total'));$this->assertSame([],$r->json('pending'));
+        $r=$this->postJson('/admin/devis/chiffrer',$data)->assertOk();$this->assertSame(231750,$r->json('financial.total'));$this->assertSame([],$r->json('pending'));
     }
     public function test_motorized_curtain_accepts_extra_manual_rail_heavy_voile_and_fixed_confection(): void
     {
@@ -139,15 +139,15 @@ class QuotePricingIntegrationTest extends TestCase
         $cost=&$data['windows'][0]['costing'];$cost['support']=['option_id'=>$this->id('rail-wave-electric')];unset($cost['tape']);
         $cost['secondary_material']=['quantity'=>4];$cost['extra_support']=['option_id'=>$this->id('rail-simple')];
         $cost['motor']=['option_id'=>$this->id('kit-moteur-rideau'),'quantity'=>1];$cost['sewing']=['option_id'=>$this->id('confection'),'mode'=>'fixed','unit_price'=>25000];
-        $r=$this->postJson('/admin/devis/chiffrer',$data)->assertOk();$this->assertSame(298000,$r->json('financial.total'));
-        $q=$this->save($data);$this->assertSame(298000,QuoteFinancials::forQuote($q)['total']);
+        $r=$this->postJson('/admin/devis/chiffrer',$data)->assertOk();$this->assertSame(352000,$r->json('financial.total'));
+        $q=$this->save($data);$this->assertSame(352000,QuoteFinancials::forQuote($q)['total']);
     }
     public function test_agents_cannot_see_or_submit_any_new_prices(): void
     {
         $this->seed();$this->login();$q=$this->save($this->payload());$agent=$this->login('agent');$q->update(['agent_id'=>$agent->id,'created_by'=>$agent->id]);
         foreach (['','/formulaire'] as $path) {
             $html=$this->get('/admin/devis/'.$q->id.$path)->assertOk()->getContent();
-            foreach (['unit_price','271875','271 875','190313','discount_type','F CFA'] as $secret) $this->assertStringNotContainsString($secret,$html);
+            foreach (['unit_price','261750','261 750','183225','discount_type','F CFA'] as $secret) $this->assertStringNotContainsString($secret,$html);
         }
         $this->postJson('/admin/devis/chiffrer',$this->payload())->assertForbidden();
         $this->post('/admin/devis/'.$q->id.'/avancement',['stage'=>'in_production','edit_version'=>0])->assertForbidden();
@@ -162,7 +162,7 @@ class QuotePricingIntegrationTest extends TestCase
         $this->seed();$this->login();$data=$this->payload();$q=$this->save($data);$q->update(['status'=>'accepted']);
         $url='/admin/devis/'.$q->id;
         $this->post($url.'/avancement',['stage'=>'in_production','edit_version'=>$q->edit_version])->assertSessionHasErrors('stage');
-        $payment=['receipt_amount'=>190313,'receipt_date'=>today()->toDateString(),'receipt_method'=>'cash','receipt_confirmed'=>1,'receipt_token'=>(string)Str::uuid()];
+        $payment=['receipt_amount'=>183225,'receipt_date'=>today()->toDateString(),'receipt_method'=>'cash','receipt_confirmed'=>1,'receipt_token'=>(string)Str::uuid()];
         $this->post($url.'/paiements',$payment)->assertSessionHasNoErrors();$this->assertTrue(QuoteFinancials::forQuote($q->fresh())['productionAuthorized']);
         $this->post($url.'/avancement',['stage'=>'in_production','edit_version'=>$q->edit_version])->assertSessionHasNoErrors();
         $this->assertSame('in_production',$q->fresh()->configuration['workflow_stage']);

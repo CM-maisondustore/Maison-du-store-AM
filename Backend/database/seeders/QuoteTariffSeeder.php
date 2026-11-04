@@ -21,6 +21,7 @@ class QuoteTariffSeeder extends Seeder
             ['wave-electric','finish','rideau','Wave électrique',0,'flat','yes'],
             ['barre-fer','finish','rideau','Barre de fer',0,'flat','no'],
             ['reflete-manuel','finish','rideau','Reflète manuelle',0,'flat','no'],
+            ['ruflette-wave','finish','rideau','Ruflette Wave',0,'flat'],
             ['rail-double','support','rideau','Rail double',10000,'m','no',['reflete-manuel']],
             ['rail-simple','support','rideau','Rail simple',5000,'m','no',['reflete-manuel']],
             ['rail-wave-electric','support','rideau','Rail Wave électrique',22000,'m','yes',['wave-electric']],
@@ -41,5 +42,7 @@ class QuoteTariffSeeder extends Seeder
             QuoteOption::firstOrCreate(['code'=>$code],['kind'=>$kind,'category'=>$category,'label'=>$label,'unit_price'=>$price,'unit'=>$unit,'motorization'=>$row[6] ?? 'any','finish_codes'=>$row[7] ?? [],'active'=>true,'public_choice'=>in_array($kind,['material','finish','support']),
                 'fabric_group'=>$kind==='material' ? (str_starts_with($code,'voilage-') ? 'voilage' : $category) : null]);
         }
+        $waveTape=QuoteOption::where('code','reflete-wave')->where('kind','tape')->first();
+        if ($waveTape) { $waveTape->finish_codes=array_values(array_unique([...($waveTape->finish_codes ?? []),'ruflette-wave'])); $waveTape->save(); }
     }
 }
