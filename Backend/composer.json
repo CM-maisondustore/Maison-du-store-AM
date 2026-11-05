@@ -17,7 +17,7 @@
     "post-autoload-dump": ["Illuminate\\Foundation\\ComposerScripts::postAutoloadDump", "@php artisan package:discover --ansi"],
     "test": "@php vendor/bin/phpunit"
   },
-  "config": { "sort-packages": true, "optimize-autoloader": true },
+  "config": { "sort-packages": true, "optimize-autoloader": true, "platform": { "php": "8.3.0" } },
   "minimum-stability": "stable",
   "prefer-stable": true
 }
