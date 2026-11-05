@@ -90,7 +90,7 @@
 <label>Téléphone<input data-card="phone" type="tel" maxlength="30" value="{{ $p['phone'] ?? '' }}"></label>
 <label>Mon e-mail<input data-card="email" type="email" maxlength="80" value="{{ $me->email }}"></label>
 <label>Compétences<input data-card="skills" maxlength="160" value="{{ $cardSkills }}" placeholder="Stores · Motorisation · SAV"></label>
-<label>Pied de carte<input data-card="foot" maxlength="90" value="contact@maisondustoream.com · maisondustoream.com"><span class="hint">Coordonnées de la maison, sous vos informations. Séparez les éléments par « · ».</span></label>
+<label>Pied de carte<input data-card="foot" maxlength="90" value="contact@maisondustoream.com · maisondustoream.com"><span class="hint">Coordonnées de la maison, en bas de la carte sur toute la largeur. Séparez les éléments par « · ».</span></label>
 </div>
 <label class="check"><input type="checkbox" id="card-phone" checked>Afficher mon téléphone</label>
 <label class="check"><input type="checkbox" id="card-email">Afficher mon e-mail</label>
@@ -173,14 +173,15 @@
     const emailFont=email&&fit(c,email.replace('@',' @'),'400',f.email,'"IBM Plex Mono", monospace',maxW);
     const skillFont='500 '+f.skills+'px Inter, sans-serif';
     const skills=document.getElementById('card-skills').checked&&value('skills')?wrap(c,value('skills'),skillFont,maxW,f.skillLines):[];
-    // Pied de carte : sur une ligne s'il tient, sinon un élément par ligne.
+    // Pied de carte sur toute la largeur, dans la marge du bas, sous la photo ; un élément par ligne s'il ne tient pas.
+    const fullW=f.w-2*f.pad;
     c.font='400 '+f.foot+'px Inter, sans-serif';
-    const foot=value('foot'), footLines=c.measureText(foot).width>maxW?foot.split(/\s+·\s+/).filter(Boolean):[foot];
-    const footTop=bottom-(footLines.length-1)*f.foot*1.4;
+    const foot=value('foot'), footLines=c.measureText(foot).width>fullW?foot.split(/\s+·\s+/).filter(Boolean):[foot];
+    const footTop=bottom+(f.h-bottom-(footLines.length-1)*f.foot*1.4)/2+f.foot*.35;
     const r=showPhoto?0:f.initials;
     const height=(r?2*r+f.name*.6:0)+name.lines.length*name.size*1.1+role.lines.length*role.size*1.35+(phone?f.phone*2.2:0)
       +(email?emailFont.size*(phone?1.6:2.2)+(emailFont.lines.length-1)*emailFont.size*1.3:0)+(skills.length?f.skills*1.4+skills.length*f.skills*1.35:0);
-    y=lineY+Math.max(0,(footTop-f.foot*2-lineY-height)/2);
+    y=lineY+Math.max(0,(bottom-lineY-height)/2);
     if(r){
       c.fillStyle=t.accent;c.beginPath();c.arc(x+r,y+r,r,0,7);c.fill();
       c.fillStyle=t.initials;c.font='600 '+Math.round(r*.75)+'px Inter, sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText(canvas.dataset.initials,x+r,y+r);
@@ -194,7 +195,7 @@
       y+=f.skills*1.4;c.fillStyle=t.accent;c.fillRect(x,y,f.skills*1.5,Math.max(2,f.skills/10));
       c.fillStyle=t.sub;c.font=skillFont;skills.forEach(l=>{y+=f.skills*1.35;c.fillText(l,x,y,maxW);});
     }
-    c.fillStyle=t.foot;c.font='400 '+f.foot+'px Inter, sans-serif';footLines.forEach((l,i)=>c.fillText(l,x,footTop+i*f.foot*1.4,maxW));
+    c.fillStyle=t.foot;c.font='400 '+f.foot+'px Inter, sans-serif';footLines.forEach((l,i)=>c.fillText(l,x,footTop+i*f.foot*1.4,fullW));
     link.download='carte-maison-du-store-'+f.file+'.png';
   };
   const redraw=()=>{if(!frame)frame=requestAnimationFrame(()=>{frame=0;draw();});};
