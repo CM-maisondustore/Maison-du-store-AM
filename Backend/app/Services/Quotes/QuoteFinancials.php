@@ -19,7 +19,8 @@ final class QuoteFinancials
     public static function scheduleText(array $financial): ?string
     {
         if (empty($financial['schedule'])) return null;
-        $when=['validation'=>'à la validation du chantier','rails'=>'après installation des rails','pose'=>'après livraison et pose'];
+        $when=count($financial['schedule'])===2 ? ['validation'=>'à la commande','pose'=>'à la livraison et pose']
+            : ['validation'=>'à la validation du chantier','rails'=>'après installation des rails','pose'=>'après livraison et pose'];
         return implode(' ; ',array_map(fn($step)=>self::quantity($step['percent']).' % '.($when[$step['key']] ?? mb_strtolower($step['label'])).' ('.number_format($step['amount'],0,',',' ').' F CFA)',$financial['schedule'])).'.';
     }
     public static function forSnapshot(array $snapshot): array

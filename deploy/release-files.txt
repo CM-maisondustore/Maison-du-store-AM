@@ -13,5 +13,6 @@ deployment-check.php
 lang
 prepare-document-rollback.php
 public
+resources/brand
 resources/views
 routes

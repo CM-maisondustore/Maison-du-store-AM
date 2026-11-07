@@ -6,23 +6,15 @@ class CommunicationTemplates
 {
     public const LABELS = ['quote_received'=>'Demande de devis reçue','quote'=>'Envoi du devis','invoice'=>'Envoi de facture','appointment'=>'Confirmation de rendez-vous','reminder'=>'Rappel de rendez-vous','commercial'=>'Échange commercial','promotion'=>'Offre et promotion'];
     public const VARIABLES = ['prenom','nom','reference','montant','acompte','solde','remise','total_avant_remise','conditions_paiement','date','heure','adresse','entreprise','statut'];
-    public static function defaults(string $key): array
+    public static function defaults(string $key, string $channel='email'): array
     {
-        return match($key) {
-            'quote_received'=>['Votre demande de devis a été reçue', "Bonjour {{prenom}},\n\nNous avons reçu votre demande {{reference}}. Notre équipe vous contactera pour préparer votre devis.\n\n{{entreprise}}"],
-            'quote'=>['Votre devis {{reference}}', "Bonjour {{prenom}},\n\nVeuillez trouver votre devis de {{montant}} FCFA en pièce jointe. Nous restons disponibles pour toute précision.\n\n{{entreprise}}"],
-            'invoice'=>['Votre facture {{reference}}', "Bonjour {{prenom}},\n\nVeuillez trouver votre facture de {{montant}} FCFA en pièce jointe.\n\n{{entreprise}}"],
-            'appointment'=>['Votre rendez-vous du {{date}}', "Bonjour {{prenom}},\n\nVotre rendez-vous du {{date}} à {{heure}} (heure d’Abidjan) est {{statut}}.\nAdresse : {{adresse}}\n\n{{entreprise}}"],
-            'reminder'=>['Rappel : rendez-vous du {{date}}', "Bonjour {{prenom}},\n\nNous vous rappelons votre rendez-vous du {{date}} à {{heure}} (heure d’Abidjan).\nAdresse : {{adresse}}\n\n{{entreprise}}"],
-            'promotion'=>['Actualités Maison du Store AM', "Bonjour {{prenom}},\n\nDécouvrez notre offre : [compléter avant envoi].\nPour ne plus recevoir nos offres, répondez STOP.\n\n{{entreprise}}"],
-            default=>['Votre projet Maison du Store AM', "Bonjour {{prenom}},\n\n[Votre message]\n\n{{entreprise}}"],
-        };
+        return MdsTemplates::message($key,$channel);
     }
     public static function get(string $channel, string $key): CommunicationTemplate
     {
         $saved = CommunicationTemplate::where('channel',$channel)->where('key',$key)->first();
         if ($saved) return $saved;
-        [$subject,$body] = self::defaults($key);
+        [$subject,$body] = self::defaults($key,$channel);
         return new CommunicationTemplate(['channel'=>$channel,'key'=>$key,'subject'=>$subject,'body'=>$body,'version'=>1,'options'=>[]]);
     }
     public static function validateText(string $text): void
@@ -51,8 +43,8 @@ class CommunicationTemplates
             $financial=$record instanceof Quote ? Quotes\QuoteFinancials::forQuote($record) : Quotes\QuoteFinancials::forSnapshot($record->snapshot);
             $data['montant']=number_format($financial['total'],0,',',' ');
             foreach (['acompte'=>'deposit','solde'=>'balance','remise'=>'discountAmount','total_avant_remise'=>'grossTotal'] as $variable=>$key) $data[$variable]=number_format($financial[$key] ?? 0,0,',',' ');
-            if ($schedule=Quotes\QuoteFinancials::scheduleText($financial)) $data['conditions_paiement']='Échéancier : '.$schedule;
-            elseif (isset($financial['depositPercent'])) $data['conditions_paiement']='Un acompte de '.$financial['depositPercent'].' % est obligatoire avant le démarrage des travaux. Le solde est payable à la fin de la prestation.';
+            if ($schedule=Quotes\QuoteFinancials::scheduleText($financial)) $data['conditions_paiement']='Conditions de paiement : '.$schedule;
+            elseif (isset($financial['depositPercent'])) $data['conditions_paiement']='Conditions de paiement : acompte de '.$financial['depositPercent'].' % à la commande ('.$data['acompte'].' F CFA), solde à la livraison et pose ('.$data['solde'].' F CFA).';
         }
         if ($record instanceof Appointment) {
             $data['date']=\Carbon\Carbon::parse($record->date)->format('d/m/Y'); $data['heure']=$record->time;
@@ -64,7 +56,7 @@ class CommunicationTemplates
     public static function draft(string $key, array $values, string $channel='email'): array
     {
         $t=self::get($channel,$key);
-        return ['subject'=>mb_substr(preg_replace('/[\r\n]+/',' ',self::render($t->subject,$values)),0,200), 'body'=>self::render($t->body,$values), 'template_snapshot'=>['id'=>$t->id,'version'=>$t->version,'key'=>$key,'channel'=>$channel]];
+        return ['subject'=>mb_substr(preg_replace('/[\r\n]+/',' ',self::render($t->subject,$values)),0,200), 'body'=>trim(preg_replace("/\n{3,}/","\n\n",self::render($t->body,$values))), 'template_snapshot'=>['id'=>$t->id,'version'=>$t->version,'key'=>$key,'channel'=>$channel]];
     }
     public static function presentation(string $key): array
     {

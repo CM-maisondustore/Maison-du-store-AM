@@ -56,8 +56,8 @@ final class QuoteTotals
             ? [['key'=>'validation','label'=>'Acompte à la validation du chantier','note'=>'Lance la confection','percent'=>'50'],
                ['key'=>'rails','label'=>'Après installation des rails','note'=>'','percent'=>'30'],
                ['key'=>'pose','label'=>'Après livraison et pose','note'=>'','percent'=>'20']]
-            : [['key'=>'validation','label'=>'Acompte à la validation du chantier','note'=>'Lance la confection','percent'=>QuoteValidator::text($rate)],
-               ['key'=>'pose','label'=>'Solde après livraison et pose','note'=>'','percent'=>QuoteValidator::text(QuoteValidator::decimal(100,'pourcentage')->minus($rate))]];
+            : [['key'=>'validation','label'=>'Acompte à la commande','note'=>'Lance la confection','percent'=>QuoteValidator::text($rate)],
+               ['key'=>'pose','label'=>'Solde à la livraison et pose','note'=>'','percent'=>QuoteValidator::text(QuoteValidator::decimal(100,'pourcentage')->minus($rate))]];
         $left = $final; $last = count($steps)-1;
         foreach ($steps as $i=>&$step) {
             $step['amount'] = $i === $last ? $left : QuoteValidator::rounded(QuoteValidator::decimal($final, 'total définitif')->multipliedBy($step['percent'])->dividedByExact(100));

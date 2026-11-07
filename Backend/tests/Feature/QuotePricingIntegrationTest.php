@@ -188,7 +188,7 @@ class QuotePricingIntegrationTest extends TestCase
         $html=view('documents.pdf',\App\Services\DocumentViewModel::prepare(app(Documents::class)->quoteData($q)))->render();
         $this->assertStringContainsString('APRÈS INSTALLATION DES RAILS (30 %)',$html);
         $this->assertStringContainsString('Notre engagement.',$html);
-        $this->assertStringStartsWith('Échéancier : 50 % à la validation du chantier',CommunicationTemplates::context($q)['conditions_paiement'] ?? '');
+        $this->assertStringStartsWith('Conditions de paiement : 50 % à la validation du chantier',CommunicationTemplates::context($q)['conditions_paiement'] ?? '');
         $this->assertStringContainsString('name="pricing[schedule]" value="three" checked',$this->get('/admin/devis/'.$q->id.'/formulaire')->assertOk()->getContent());
         $this->assertStringContainsString('name="pricing[schedule]" value="auto" checked',$this->get('/admin/devis/nouveau')->assertOk()->getContent());
         $this->postJson('/admin/devis/chiffrer',[...$data,'pricing'=>[...$data['pricing'],'schedule'=>'four']])->assertStatus(422)->assertJsonValidationErrors('pricing.schedule');
