@@ -40,7 +40,7 @@
 @endif
 @if($message->document_snapshot)<p><a href="{{ route('staff.messages.attachment',$message) }}">{{ $message->archive ? 'Télécharger le PDF exact archivé' : 'Télécharger le PDF reconstitué depuis les données historiques' }}</a></p>@endif
 @if(($message->invoice_id || $message->quote_id) && $message->automation_event!=='quote_received')<p class="muted">Document : {{ $message->invoice_id ? 'facture.pdf' : 'devis.pdf' }}</p>
-@if($message->channel==='whatsapp')<p><a href="{{ $message->invoice_id ? route('staff.invoices.pdf',$message->invoice_id) : route('staff.quotes.pdf',$message->quote_id) }}">Télécharger le PDF à joindre manuellement dans WhatsApp</a></p>@endif
+@if($message->channel==='whatsapp')<p><a href="{{ $message->invoice_id ? route('staff.invoices.pdf',$message->invoice_id) : route('staff.quotes.pdf',$message->quote_id) }}">Télécharger le PDF</a> (pour le joindre manuellement si besoin)</p><p class="muted">Un lien sécurisé vers ce PDF, valable {{ \App\Http\Controllers\Staff\MessageController::SHARED_LINK_DAYS }} jours, est ajouté automatiquement à la fin du message WhatsApp. Le PDF est figé à l’ouverture de WhatsApp.</p>@endif
 @endif<div class="actions">
 @if($message->direction==='incoming')<a class="button" href="{{ route('staff.messages.create',['reply'=>$message->id]) }}">Répondre</a>
 @elseif($message->status==='draft' && $message->channel==='whatsapp')

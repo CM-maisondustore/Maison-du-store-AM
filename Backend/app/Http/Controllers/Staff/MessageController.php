@@ -3,10 +3,11 @@ namespace App\Http\Controllers\Staff;
 use App\Models\{CommercialMessage, Contact, Quote, Appointment, Invoice};
 use App\Services\{Audit, CommercialMail};
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\{DB, URL};
 use Illuminate\Validation\ValidationException;
 class MessageController
 {
+    public const SHARED_LINK_DAYS = 30;
     public function index(Request $r, CommercialMail $mail)
     {
         $query = CommercialMessage::with('contact')->latest();
@@ -82,9 +83,18 @@ class MessageController
     public function send(CommercialMessage $message, CommercialMail $mail) { $mail->send($message); return back()->with('success', 'Message accepté par le serveur SMTP Hostinger.'); }
     public function whatsapp(CommercialMessage $message)
     {
-        abort_unless($message->channel==='whatsapp' && $message->status==='draft' && $message->direction==='outgoing',409);
-        app(\App\Services\CommunicationAutomation::class)->validateMessage($message);
-        return redirect()->away('https://wa.me/'.preg_replace('/\D/','',$message->recipient).'?text='.rawurlencode($message->body));
+        [$recipient,$body]=DB::transaction(function () use($message) {
+            $m=CommercialMessage::whereKey($message->id)->lockForUpdate()->firstOrFail();
+            abort_unless($m->channel==='whatsapp' && $m->status==='draft' && $m->direction==='outgoing',409);
+            app(\App\Services\CommunicationAutomation::class)->validateMessage($m);
+            $body=$m->body;
+            if ($this->archiveDocument($m)) {
+                $path=URL::temporarySignedRoute('documents.whatsapp',now()->addDays(self::SHARED_LINK_DAYS),['message'=>$m->id],false);
+                $body.="\n\nVotre document : ".url($path);
+            }
+            return [$m->recipient,$body];
+        });
+        return redirect()->away('https://wa.me/'.preg_replace('/\D/','',$recipient).'?text='.rawurlencode($body));
     }
     public function shared(CommercialMessage $message)
     {
@@ -92,13 +102,7 @@ class MessageController
             $m=CommercialMessage::whereKey($message->id)->lockForUpdate()->firstOrFail();
             abort_unless($m->channel==='whatsapp' && $m->direction==='outgoing' && $m->status==='draft',409);
             app(\App\Services\CommunicationAutomation::class)->validateMessage($m);
-            $documents=app(\App\Services\Documents::class);
-            if ($m->invoice_id) {
-                $snapshot=$documents->invoiceData($m->invoice); $pdf=$documents->invoice($m->invoice);
-            } elseif ($m->quote_id && $m->automation_event!=='quote_received') {
-                $issue=\App\Services\DocumentIssues::quote($m->quote,$documents); $snapshot=$issue->snapshot; $pdf=$issue->archive->contents();
-            }
-            if (isset($snapshot)) { \App\Models\DocumentArchive::capture($pdf,['commercial_message_id'=>$m->id]); $m->document_snapshot=$snapshot; }
+            $this->archiveDocument($m);
             $m->update(['status'=>'shared','sent_at'=>now()]); Audit::record('whatsapp_partage_manuellement',$m);
         });
         return back()->with('success','Partage déclaré. La livraison n’est pas vérifiée par WhatsApp.');
@@ -113,4 +117,18 @@ class MessageController
         return back()->with('success','Brouillon annulé et conservé dans l’historique.');
     }
     public function sync(Request $r, CommercialMail $mail) { $data = $r->validate(['page' => 'required|integer|min:1|max:1000']); $count = $mail->sync($data['page']); return back()->with('success', "$count nouveau(x) message(s) importé(s)."); }
+    /** Freeze the exact PDF of a WhatsApp message once, so the shared link and the archive always match. */
+    private function archiveDocument(CommercialMessage $m): bool
+    {
+        if ($m->archive) return true;
+        $documents=app(\App\Services\Documents::class);
+        if ($m->invoice_id) {
+            $snapshot=$documents->invoiceData($m->invoice); $pdf=$documents->invoice($m->invoice);
+        } elseif ($m->quote_id && $m->automation_event!=='quote_received') {
+            $issue=\App\Services\DocumentIssues::quote($m->quote,$documents); $snapshot=$issue->snapshot; $pdf=$issue->archive->contents();
+        } else return false;
+        \App\Models\DocumentArchive::capture($pdf,['commercial_message_id'=>$m->id]);
+        $m->update(['document_snapshot'=>$snapshot]); $m->unsetRelation('archive');
+        return true;
+    }
 }

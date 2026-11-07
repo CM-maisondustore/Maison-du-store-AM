@@ -123,11 +123,38 @@ class CommunicationsTest extends TestCase
         $this->get('/admin/messages/nouveau?channel=whatsapp&quote_id='.$quote->id)->assertOk()->assertSee('+2250712449319');
         $this->post('/admin/messages',['channel'=>'whatsapp','recipient'=>'+225 07 00 00 00 00','subject'=>'Votre devis','body'=>'Bonjour Awa','kind'=>'devis','quote_id'=>$quote->id])->assertSessionHasNoErrors();
         $message=CommercialMessage::firstOrFail();
-        $this->get('/admin/messages/'.$message->id.'/whatsapp')->assertRedirect('https://wa.me/2250700000000?text=Bonjour%20Awa');
+        $location=$this->get('/admin/messages/'.$message->id.'/whatsapp')->assertRedirect()->headers->get('Location');
+        $this->assertStringStartsWith('https://wa.me/2250700000000?text=Bonjour%20Awa%0A%0AVotre%20document%20%3A%20',$location);
         $this->assertSame('draft',$message->fresh()->status);
+        $archive=$message->fresh()->archive; $this->assertNotNull($archive);
+        parse_str(parse_url($location,PHP_URL_QUERY),$query);
+        $link=substr($query['text'],strpos($query['text'],'http'));
+        $this->assertStringContainsString('/d/'.$message->id.'?expires=',$link);
         $this->post('/admin/messages/'.$message->id.'/envoyer')->assertUnprocessable();
         $this->post('/admin/messages/'.$message->id.'/partage')->assertSessionHasNoErrors();
         $this->assertSame('shared',$message->fresh()->status);
+        $this->assertSame(1,DocumentArchive::where('commercial_message_id',$message->id)->count());
+        auth()->logout();
+        $response=$this->get($link)->assertOk()->assertHeader('Content-Type','application/pdf');
+        $this->assertSame($archive->contents(),$response->getContent());
+        $this->assertStringContainsString('filename="Devis-DEV-TEST.pdf"',$response->headers->get('Content-Disposition'));
+        $this->assertDatabaseHas('audit_events',['action'=>'document_whatsapp_consulte','subject_id'=>$message->id]);
+        $this->get('/d/'.$message->id)->assertForbidden();
+        $this->get(str_replace('signature=','signature=0',$link))->assertForbidden();
+        $this->travel(31)->days();
+        $this->get($link)->assertForbidden();
+    }
+    public function test_whatsapp_link_is_not_added_without_a_document(): void
+    {
+        $this->seed(); $this->actingAs($this->admin()); $contact=Contact::create(['name'=>'Awa','phone'=>'+2250700000000']);
+        $message=CommercialMessage::create(['channel'=>'whatsapp','direction'=>'outgoing','status'=>'draft','kind'=>'commercial','contact_id'=>$contact->id,'recipient'=>'2250700000000','sender'=>'+2250712449319','subject'=>'Info','body'=>'Bonjour']);
+        $this->get('/admin/messages/'.$message->id.'/whatsapp')->assertRedirect('https://wa.me/2250700000000?text=Bonjour');
+        $this->assertNull($message->fresh()->archive);
+    }
+    public function test_whatsapp_number_comes_from_environment(): void
+    {
+        $this->seed(); config(['workspace.whatsapp_number'=>'+2250500000000']); $this->actingAs($this->admin());
+        $this->get('/admin/messages/nouveau?channel=whatsapp')->assertOk()->assertSee('+2250500000000');
     }
     public function test_agents_cannot_manage_templates_or_rules(): void
     {
