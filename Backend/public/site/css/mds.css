@@ -717,3 +717,9 @@ summary::-webkit-details-marker { display: none; } summary { list-style: none; }
 .dv-card { flex: 0 0 210px; scroll-snap-align: start; }
 .dv-cards::-webkit-scrollbar { height: 6px; } .dv-cards::-webkit-scrollbar-thumb { background: var(--a); border-radius: 3px; }
 @media (max-width: 767px) { .dv-card { flex-basis: 68%; max-width: 240px; } }
+
+/* Devis : cartes « Votre projet » (Store / Rideaux) en défilement horizontal, comme les autres cartes */
+.dv-types { display: flex; gap: 12px; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; padding: 4px 4px 14px; margin: 0 -4px; -webkit-overflow-scrolling: touch; scrollbar-width: thin; scrollbar-color: var(--a) transparent; }
+.dv-types::-webkit-scrollbar { height: 6px; } .dv-types::-webkit-scrollbar-thumb { background: var(--a); border-radius: 3px; }
+.dv-type { flex: 0 0 300px; scroll-snap-align: start; }
+@media (max-width: 767px) { .dv-type { flex-basis: 78%; max-width: 300px; } }
