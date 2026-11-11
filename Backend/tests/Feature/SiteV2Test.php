@@ -32,6 +32,21 @@ class SiteV2Test extends TestCase
             ->assertSee('id="realisations"', false);
     }
 
+    public function test_contact_photo_comes_from_espace_pro_and_captions_are_gone(): void
+    {
+        $this->seed();
+        $admin = \App\Models\User::create(['username' => 'SiteAdmin', 'name' => 'Admin', 'email' => 'site@example.invalid', 'role' => 'admin', 'password' => 'TestPassword123!', 'must_change_password' => false]);
+        $card = \App\Models\SiteContent::where('slot', 'contact')->firstOrFail();
+        $this->actingAs($admin)->put('/admin/contents/'.$card->id, ['title' => $card->title, 'description' => 'Showroom', 'position' => 0, 'published' => 1, 'image' => \Illuminate\Http\UploadedFile::fake()->image('showroom.png', 400, 300), 'image_alt' => 'Notre showroom'])->assertSessionHasNoErrors();
+        auth()->logout();
+
+        $this->get('/')->assertOk()
+            ->assertSee($card->fresh()->media->url(), false)->assertSee('alt="Notre showroom"', false)
+            ->assertDontSee('site/images/realisations/showroom.webp', false)
+            ->assertDontSee('<figcaption>Photo d’illustration</figcaption>', false)
+            ->assertSee('class="wa-btn"', false);
+    }
+
     public function test_shops_show_only_published_stores_and_curtains(): void
     {
         $this->seed();

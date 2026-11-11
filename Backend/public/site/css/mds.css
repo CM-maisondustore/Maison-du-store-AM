@@ -697,3 +697,13 @@ summary::-webkit-details-marker { display: none; } summary { list-style: none; }
 .legal-table tr:last-child td { border-bottom: 0; }
 .legal-date { margin-top: 30px; font-size: 13px; color: var(--muted); }
 .legal-table td:first-child { min-width: 150px; }
+
+/* ---------- Retouches du 11/11/2026 ---------- */
+.topbar-r .wa-btn { display: inline-flex; align-items: center; gap: 7px; padding: 4px 12px; border-radius: 999px; background: #25d366; color: #fff; font-weight: 600; font-size: 12.5px; line-height: 1.4; }
+.topbar-r .wa-btn:hover { background: #1fb957; }
+/* Bouton Google Maps centré sur la photo du showroom */
+.map-fig .btn { left: 50%; right: auto; transform: translateX(-50%); white-space: nowrap; }
+@media (max-width: 767px) {
+  /* Barre flottante du rendez-vous centrée en bas d'écran (plus de bouton panier à droite) */
+  .float-rdv { left: 50%; right: auto; width: calc(100% - 24px); max-width: 560px; transform: translateX(-50%); }
+}

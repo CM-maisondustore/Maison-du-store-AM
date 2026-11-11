@@ -84,8 +84,7 @@
                     </div>
                     <figure class="lp-fig">
                         <span aria-hidden="true" class="lp-rod"></span>
-                        <img src="{{ $u['img'] }}" alt="" @if($i === 0) fetchpriority="high" @else loading="lazy" @endif>
-                        <figcaption>{{ $u['caption'] }}</figcaption>
+                        <img src="{{ $u['img'] }}" alt="{{ $u['soon'] ? '' : $u['caption'] }}" @if($i === 0) fetchpriority="high" @else loading="lazy" @endif>
                     </figure>
                 </div>
             @endforeach
@@ -269,7 +268,11 @@
                 <div class="row"><a href="{{ $contact['whatsapp'] }}" rel="noopener" class="btn btn-dark">Écrire sur WhatsApp</a><a href="{{ route('quote') }}" class="btn btn-line">Demander un devis</a></div>
             </div>
             <figure class="map-fig">
-                <img src="{{ asset('site/images/realisations/showroom.webp') }}" alt="Façade du showroom Maison du Store AM à Cocody" loading="lazy">
+                @if($contactImage?->media)
+                    <img src="{{ $contactImage->media->url() }}" alt="{{ $contactImage->image_alt ?: 'Showroom Maison du Store AM à Cocody' }}" loading="lazy">
+                @else
+                    <img src="{{ asset('site/images/realisations/showroom.webp') }}" alt="Showroom Maison du Store AM à Cocody" loading="lazy">
+                @endif
                 <a href="{{ $contact['maps'] }}" rel="noopener" class="btn btn-dark">Ouvrir dans Google Maps</a>
             </figure>
         </div>
