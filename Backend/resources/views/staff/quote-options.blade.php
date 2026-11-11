@@ -21,7 +21,7 @@
 <div class="option-list" id="option-list">
 @forelse($options as $option)
 <details class="option {{ !$option->active ? 'is-off' : '' }}" data-chip-item="{{ $option->kind }}" @if($failedForm===(string)$option->id) open @endif><summary>
-<span class="option-name"><strong>{{ $option->label }}</strong><small>{{ \App\Models\QuoteOption::KINDS[$option->kind] ?? $option->kind }}, {{ $option->category }}</small></span>
+<span class="option-name"><strong>{{ $option->label }}</strong><small>{{ \App\Models\QuoteOption::KINDS[$option->kind] ?? $option->kind }}, {{ $option->category }}@php($calcBits=array_filter([\App\Models\QuoteOption::CALC_MODES[$option->kind][$option->calc_mode] ?? null,$option->calcCoefficient()!==null ? '× '.str_replace('.',',',$option->calcCoefficient()) : null,\App\Models\QuoteOption::CALC_BASES[$option->calc_basis] ?? null]))@if($calcBits) · Chiffrage : {{ implode(', ',$calcBits) }}@endif</small></span>
 @if($option->unit_price===null)<span class="undefined option-price">À définir</span>@else<span class="amount option-price">{{ number_format($option->unit_price,0,',',' ') }} FCFA</span>@endif
 <span class="badge {{ $option->active ? 'st-ok' : 'st-neutral' }}"><span aria-hidden="true">{{ $option->active ? '✓' : '○' }}</span>{{ $option->active ? 'Actif' : 'Inactif' }}</span>
 </summary>

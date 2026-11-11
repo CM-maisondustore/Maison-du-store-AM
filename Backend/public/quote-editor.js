@@ -43,10 +43,22 @@
     refresh(root,initial);
   }
   function inherit(row){if(row.querySelector('[data-inherit]').checked)refresh(row.querySelector('[data-selection]'),values(defaults));}
+  /* Chiffrage configuré dans « Matériaux et finitions » (calcul, coefficient, base si quantité vide) :
+     appliqué quand une option est choisie sur l'ouverture ; un devis enregistré garde ses réglages au chargement. */
+  const setCalc=(el,value)=>{if(!el||value===''||value==null)return;if(el.tagName==='SELECT'&&![...el.options].some(o=>o.value===value))return;el.value=value;};
+  function applyCalc(row,holder,option,fields,initial){
+    const id=option?String(option.id):'',first=holder.dataset.calcFor===undefined;
+    if(holder.dataset.calcFor===id)return;
+    holder.dataset.calcFor=id;
+    if(!option||(first&&initial&&row.querySelector('[data-costing]')?.dataset.costingSaved==='1'))return;
+    const coef=option.calc_coefficient!=null&&option.calc_coefficient!==''?String(Number(option.calc_coefficient)):'';
+    setCalc(fields.mode,option.calc_mode||'');setCalc(fields.coef,coef);setCalc(fields.basis,option.calc_basis||'');
+  }
   function components(row,initial=false){
     const v=values(row.querySelector('[data-selection]')),finish=data.options.find(o=>o.id===Number(v.finish_id));
     const material=data.options.find(o=>o.id===Number(v.category==='store'?v.store_id:(v.curtain_id||v.sheer_id)));
     row.dataset.category=v.category;
+    applyCalc(row,row.querySelector('[data-material-mode]'),material,{mode:row.querySelector('[data-material-mode]'),coef:row.querySelector('[name$="[costing][material_coefficient]"]')},initial);
     const meters=row.querySelector('[data-material-quantity]');meters.disabled=material?.unit==='m2'&&row.querySelector('[data-material-mode]').value!=='manual_override';meters.placeholder=meters.disabled?'Surface calculée à partir des mesures':'Quantité en '+(units[material?.unit]||'mètres');
     row.querySelectorAll('[data-component]').forEach(input=>{
       const kind=input.dataset.component,part=input.closest('[data-cost-part]'),list=part.querySelector('[data-component-list]');
@@ -65,7 +77,10 @@
       else{choices(list,options,input.value,kind,'part','Aucun',list.dataset.name||part.querySelector('h4,[data-part-label]')?.textContent);if(list.dataset.name)partChips(list,options,input);}
       const chosen=options.find(o=>String(o.id)===input.value),unit=row.querySelector('[data-cost-part="'+kind+'"] [data-unit-label]');
       if(unit)unit.textContent=chosen?'('+units[chosen.unit]+')':'';
+      const blocks=[...row.querySelectorAll('[data-cost-part="'+kind+'"]')],inPart=sel=>blocks.map(b=>b.querySelector(sel)).find(Boolean);
+      applyCalc(row,input,chosen,{mode:inPart('[data-part-mode]'),coef:inPart('.cost-coef input'),basis:inPart('select[name$="[basis]"]')||inPart('[data-sewing-basis]')},initial);
     });
+    coefChips(row);
   }
   function selectionValidity(report=false){
     const usesDefaults=[...windows.querySelectorAll('[data-inherit]')].some(input=>input.checked);

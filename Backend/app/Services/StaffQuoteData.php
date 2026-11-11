@@ -8,7 +8,7 @@ class StaffQuoteData
 {
     public static function catalogue(bool $prices=true): array
     {
-        return ['options'=>QuoteOption::orderBy('label')->get(['id','code','kind','category','label','motorization','active','unit','finish_codes','fabric_group','product_ids',...($prices ? ['unit_price'] : [])])->toArray()];
+        return ['options'=>QuoteOption::orderBy('label')->get(['id','code','kind','category','label','motorization','active','unit','finish_codes','fabric_group','product_ids','calc_mode','calc_coefficient','calc_basis',...($prices ? ['unit_price'] : [])])->toArray()];
     }
     public static function validate(Request $r): array
     {

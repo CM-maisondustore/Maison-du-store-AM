@@ -4,7 +4,7 @@
 @php($isOffice=auth()->user()->isAdmin())
 @php($coefPresets=['secondary_material'=>['2','2.5','3'],'support'=>['1','1.5','2'],'extra_support'=>['1','1.5','2'],'tape'=>['1','1.5','2'],'extra_tape'=>['1','1.5','2']])
 <div data-costing data-costing-saved="{{ isset($window['costing']) ? '1' : '0' }}">
-<p class="hint mt-0">Quantités multipliées par le nombre d’exemplaires. Quantité vide : largeur × coefficient (tissu et voilage 2,5 ; rails et ruflettes 1, en cumulant tissu et voilage). Au-delà de 2,80 m de hauteur pour des rideaux, saisissez les métrages. La surface des stores vient des mesures.</p>
+<p class="hint mt-0">Quantités multipliées par le nombre d’exemplaires. Quantité vide : calcul, coefficient et base repris de l’option choisie (réglés dans Matériaux et finitions), sinon largeur × coefficient (tissu et voilage 2,5 ; rails et ruflettes 1, en cumulant tissu et voilage). Au-delà de 2,80 m de hauteur pour des rideaux, saisissez les métrages. La surface des stores vient des mesures.</p>
 <div class="cost-lines">
 <div class="cost-line">
 <span class="choice-name">Tissu / matériau</span><div class="cost-body">

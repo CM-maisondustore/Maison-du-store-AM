@@ -27,6 +27,23 @@
 <p class="hint mt-0">Ne rien cocher pour toutes les finitions de la catégorie.</p>
 <div class="scroll-list">@foreach($options->where('kind','finish') as $finish)<label class="check" data-category="{{ $finish->category }}"><input type="checkbox" name="finish_codes[]" value="{{ $finish->code }}" @checked(in_array($finish->code,$chosenFinishes,true))>{{ $finish->label }}</label>@endforeach<p class="hint" data-empty-note hidden>Aucune finition dans cette catégorie.</p></div>
 </fieldset>
+{{-- Configuration du chiffrage : reprise dans le devis quand l'option est choisie. Vide = réglage habituel du formulaire. --}}
+@foreach(\App\Models\QuoteOption::CALC_MODES as $calcKind=>$modes)
+@php($calcOff=$use('kind',$option->kind ?? 'material')!==$calcKind)
+<fieldset class="bare mt-12" data-for-kinds="{{ $calcKind }}" data-calc-block @disabled($calcOff) @if($calcOff) hidden @endif>
+<legend>Chiffrage dans les devis</legend>
+<p class="hint mt-0">Proposé automatiquement quand cette option est choisie sur une ouverture ; l’agent peut toujours le modifier. Les devis déjà enregistrés gardent leurs réglages.</p>
+<div class="grid">
+<label>Calcul<select name="calc_mode"><option value="">Réglage habituel du formulaire</option>@foreach($modes as $key=>$label)<option value="{{ $key }}" @selected($use('calc_mode',$option->calc_mode)===$key)>{{ $label }}</option>@endforeach</select></label>
+@if(in_array($calcKind,\App\Models\QuoteOption::CALC_COEFFICIENT_KINDS,true))
+<label>Coefficient<span class="field-unit"><input name="calc_coefficient" inputmode="decimal" maxlength="7" value="{{ str_replace('.',',',(string)$use('calc_coefficient',$option->calcCoefficient())) }}" placeholder="{{ str_replace('.',',',\App\Models\QuoteOption::CALC_DEFAULT_COEFFICIENT[$calcKind]) }}"><span class="unit">× largeur</span></span><span class="hint">Vide : {{ str_replace('.',',',\App\Models\QuoteOption::CALC_DEFAULT_COEFFICIENT[$calcKind]) }}.</span></label>
+@endif
+@if(in_array($calcKind,\App\Models\QuoteOption::CALC_BASIS_KINDS,true))
+<label>Base si quantité vide<select name="calc_basis"><option value="">Réglage habituel du formulaire</option>@foreach(\App\Models\QuoteOption::CALC_BASES as $key=>$label)<option value="{{ $key }}" @selected($use('calc_basis',$option->calc_basis)===$key)>{{ $label }}</option>@endforeach</select></label>
+@endif
+</div>
+</fieldset>
+@endforeach
 <input name="active" type="hidden" value="0"><label class="toggle-row"><span>Proposer cette option dans les nouveaux choix<small>Les devis déjà enregistrés conservent leur chiffrage.</small></span><input class="switch" name="active" type="checkbox" value="1" @checked($use('active',$option->active))></label>
 <details class="fold" @if($rareOpen) open @endif>
 <summary>Réglages rares<small>Motorisation, produits associés, demande publique, image</small></summary>

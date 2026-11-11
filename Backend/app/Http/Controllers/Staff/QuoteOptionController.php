@@ -21,6 +21,19 @@ class QuoteOptionController
             $data['fabric_group']=$data['fabric_group'] ?? $data['category'];
             if (($data['fabric_group']==='store')!==($data['category']==='store')) throw ValidationException::withMessages(['fabric_group'=>'Le groupe de tissu doit correspondre à la catégorie.']);
         } else $data['fabric_group']=null;
+        // Configuration du chiffrage : calcul, coefficient, base si quantité vide (selon la nature de l'option).
+        if (is_string($r->input('calc_coefficient'))) $r->merge(['calc_coefficient'=>str_replace(',','.',trim($r->input('calc_coefficient')))]);
+        $kind=$data['kind'];
+        $calc=$r->validate([
+            'calc_mode'=>['nullable',Rule::in(array_keys(QuoteOption::CALC_MODES[$kind] ?? []))],
+            'calc_coefficient'=>'nullable|numeric|min:0.001|max:100',
+            'calc_basis'=>['nullable',Rule::in(array_keys(QuoteOption::CALC_BASES))],
+        ],['calc_mode.in'=>'Ce calcul ne s’applique pas à cette nature d’option.']);
+        $data['calc_mode']=isset(QuoteOption::CALC_MODES[$kind]) ? ($calc['calc_mode'] ?? null) : null;
+        $data['calc_coefficient']=in_array($kind,QuoteOption::CALC_COEFFICIENT_KINDS,true) && ($calc['calc_coefficient'] ?? null)!==null ? (string)$calc['calc_coefficient'] : null;
+        $data['calc_basis']=in_array($kind,QuoteOption::CALC_BASIS_KINDS,true) ? ($calc['calc_basis'] ?? null) : null;
+        // Un formulaire qui n'envoie pas ces réglages ne doit pas effacer ceux déjà enregistrés.
+        if (!$r->has('tariff_form') && !$r->hasAny(['calc_mode','calc_coefficient','calc_basis'])) unset($data['calc_mode'],$data['calc_coefficient'],$data['calc_basis']);
         $data['product_ids']=array_map('intval',$data['product_ids'] ?? []);
         if (Product::whereIn('id',$data['product_ids'])->where('details->type','!=',$data['category'])->exists()) throw ValidationException::withMessages(['product_ids'=>'Tous les types sélectionnés doivent appartenir à la catégorie choisie.']);
         return $data;

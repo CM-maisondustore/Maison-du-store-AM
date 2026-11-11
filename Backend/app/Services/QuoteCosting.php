@@ -54,9 +54,32 @@ class QuoteCosting
                 'unit_price'=>isset($w['costing'][$kind]['unit_price']) ? (int)$w['costing'][$kind]['unit_price'] : null,
                 'mode'=>$w['costing'][$kind]['mode'] ?? (in_array($kind,['secondary_material','support','extra_support','tape','extra_tape'],true) ? 'coefficient' : ($kind==='sewing' ? 'per_meter' : 'manual')), 'coefficient'=>(string)($w['costing'][$kind]['coefficient'] ?? (in_array($kind,['support','extra_support','tape','extra_tape'],true) ? '1' : '2.5')),'basis'=>$w['costing'][$kind]['basis'] ?? (in_array($kind,['support','extra_support','tape','extra_tape'],true) ? 'all_fabrics' : 'primary')];
             $cost['installation']['unit_price']=isset($w['costing']['installation']['unit_price']) ? (int)$w['costing']['installation']['unit_price'] : null;
+            $cost=self::configuredCalc($cost,$w['costing'],!empty($w['inherit_defaults']) ? $defaults : self::choice($w));
             $result[]=[...(!empty($w['inherit_defaults']) ? $defaults : self::choice($w)), 'label'=>$w['label'],'width'=>(string)$w['width'],'height'=>(string)$w['height'],'quantity'=>(int)$w['quantity'],'costing'=>$cost];
         }
         return ['defaults'=>$defaults,'windows'=>$result];
+    }
+    /**
+     * Réglages absents du formulaire (ancien écran, envoi sans JavaScript) : reprise de la configuration
+     * du chiffrage de l'option dans « Matériaux et finitions ». Une valeur envoyée reste toujours prioritaire.
+     */
+    private static function configuredCalc(array $cost,array $posted,array $choice): array
+    {
+        $ids=array_filter([$choice['material_id'] ?? null,...array_map(fn($kind)=>$cost[$kind]['option_id'],self::PARTS)]);
+        $options=QuoteOption::whereIn('id',$ids)->get()->keyBy('id');
+        if ($material=$options[$choice['material_id'] ?? 0] ?? null) {
+            if (!isset($posted['material_mode']) && in_array($material->calc_mode,['manual','coefficient'],true)) $cost['material_mode']=$material->calc_mode;
+            if (!isset($posted['material_coefficient']) && $material->calcCoefficient()!==null) $cost['material_coefficient']=$material->calcCoefficient();
+        }
+        foreach (self::PARTS as $kind) {
+            $o=$options[$cost[$kind]['option_id'] ?? 0] ?? null;
+            if (!$o) continue;
+            $modes=$kind==='sewing' ? ['per_meter','fixed'] : ['manual','coefficient'];
+            if (!isset($posted[$kind]['mode']) && in_array($o->calc_mode,$modes,true)) $cost[$kind]['mode']=$o->calc_mode;
+            if (!isset($posted[$kind]['coefficient']) && $o->calcCoefficient()!==null) $cost[$kind]['coefficient']=$o->calcCoefficient();
+            if (!isset($posted[$kind]['basis']) && $o->calc_basis) $cost[$kind]['basis']=$o->calc_basis;
+        }
+        return $cost;
     }
     private static function choice(array $v): array
     {

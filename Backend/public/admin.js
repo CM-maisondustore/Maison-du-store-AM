@@ -618,6 +618,8 @@ document.querySelectorAll('[data-option-form]').forEach(form => {
   const sync = () => {
     const k = kind.value, c = category.value;
     form.querySelectorAll('[data-for-kinds]').forEach(el => { el.hidden = !el.dataset.forKinds.split(' ').includes(k); });
+    // Blocs « Chiffrage » : un par nature, mêmes noms de champs ; seul le bloc visible est envoyé.
+    form.querySelectorAll('[data-calc-block]').forEach(el => { el.disabled = el.hidden; });
     const valid = groups.filter(option => k === 'material' ? (c === 'store' ? option.value === 'store' : ['rideau', 'voilage'].includes(option.value)) : !option.value);
     const current = group.value;
     group.replaceChildren(...valid); group.value = valid.some(option => option.value === current) ? current : valid[0].value;
