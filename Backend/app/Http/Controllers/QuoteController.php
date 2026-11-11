@@ -15,8 +15,12 @@ class QuoteController
         $data['product']['model_id']=$model['productId'];
         $data['product']['model']=$model['name'];
         $publicOptions=\App\Services\PublicQuoteChoices::options()->keyBy('code');
-        // Preserve the labels the client selected, even after a catalogue rename.
-        foreach (['fabric','sheer',...($request->routeIs('quotes.stores') ? ['finish'] : [])] as $field) if (isset($data['product'][$field]) && isset($publicOptions[$data['product'][$field]])) $data['product'][$field]=$publicOptions[$data['product'][$field]]->label;
+        // Preserve the labels the client selected, even after a catalogue rename,
+        // and keep the codes so the staff quote form can preselect the same options.
+        foreach (['fabric','sheer',...($request->routeIs('quotes.stores') ? ['finish'] : [])] as $field) if (isset($data['product'][$field]) && isset($publicOptions[$data['product'][$field]])) {
+            $data['product'][$field.'_code']=$data['product'][$field];
+            $data['product'][$field]=$publicOptions[$data['product'][$field]]->label;
+        }
         if (!$request->routeIs('quotes.stores')) {
             $finish=collect(\App\Services\PublicQuoteChoices::finishes())->firstWhere('id',$data['product']['finish']);
             $data['product']['finish_code']=$finish['id'];$data['product']['finish']=$finish['label'];

@@ -124,11 +124,19 @@
 </div>
 </form>
 @if(!empty($quote->product))
+@if(\App\Services\PublicQuoteRequest::isPublic($quote))
+<details class="panel" open><summary>Choix du client sur le site</summary>
+<dl class="detail-list">
+@foreach(\App\Services\PublicQuoteRequest::summary($quote) as [$label,$value])<dt>{{ $label }}</dt><dd>{{ $value }}</dd>
+@endforeach</dl>
+@if(empty($quote->configuration['defaults']))<p class="hint">Ces choix pré-remplissent « Préparer le devis » : vérifiez-les avec le client lors de la prise de mesures.</p>@endif
+@else
 <details class="panel"><summary>Demande d’origine</summary>
 <dl class="detail-list">
 @foreach($quote->product as $key=>$value)<dt>{{ config('workspace.labels.'.$key, ucfirst($key)) }}</dt>
 <dd>{{ is_array($value) ? implode(', ',$value) : $value }}</dd>
 @endforeach</dl>
+@endif
 @if($quote->notes)<p class="prose">{{ $quote->notes }}</p>@endif
 </details>
 @endif

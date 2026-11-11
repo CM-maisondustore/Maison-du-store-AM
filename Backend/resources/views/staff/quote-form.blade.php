@@ -6,7 +6,8 @@
 @section('body-class','has-action-bar')
 @section('content')
 @php
- $base=$quote->configuration['defaults'] ?? ['category'=>$quote->type ?? 'store','motorized'=>in_array($quote->product['control'] ?? '',['motorisee','Motorisée'],true)];
+ // Demande du site : type, manœuvre, tissus et finition choisis par le client pré-remplissent les choix communs.
+ $base=$quote->configuration['defaults'] ?? \App\Services\PublicQuoteRequest::defaults($quote);
  $defaults=old('defaults',$base);
  $windows=old('windows',$quote->dimensions ?: [['label'=>'Ouverture 1','quantity'=>1,'inherit_defaults'=>true]]);
  $financial=$quote->configuration['calculation']['financial'] ?? null;
