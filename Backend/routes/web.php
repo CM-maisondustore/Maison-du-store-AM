@@ -8,9 +8,14 @@ use App\Http\Controllers\AppointmentController;
 require __DIR__.'/staff.php';
 
 /* Pages publiques servies par cette application Laravel. */
-Route::get('/', App\Http\Controllers\HomeController::class)->name('home');
+// Site public V2 : boutiques Stores & Rideaux, branchées sur les API de l'espace pro ci-dessous.
+Route::get('/', [App\Http\Controllers\Site\SiteController::class, 'home'])->name('home');
+Route::get('/shop', [App\Http\Controllers\Site\SiteController::class, 'shop'])->name('site.shop');
+Route::get('/shop/{shop}', [App\Http\Controllers\Site\SiteController::class, 'shop'])->whereIn('shop', ['rideaux', 'stores'])->name('site.shop.show');
+Route::get('/produit/{reference}', [App\Http\Controllers\Site\SiteController::class, 'product'])->where('reference', '[A-Za-z0-9._-]+')->name('site.product');
+Route::get('/{page}', [App\Http\Controllers\Site\SiteController::class, 'legal'])->whereIn('page', ['mentions-legales', 'cgv', 'confidentialite', 'cookies'])->name('site.legal');
 Route::get('/media/{media}/{hash}', [App\Http\Controllers\MediaController::class, 'show'])->whereNumber('media')->where('hash', '[a-f0-9]{64}')->name('media.show');
-Route::view('/devis', 'quote')->name('quote');
+Route::get('/devis', [App\Http\Controllers\Site\SiteController::class, 'devis'])->name('quote');
 Route::get('/devis/materiaux/{option}/image', [\App\Http\Controllers\MediaController::class, 'quoteMaterial'])->name('quote.material-image');
 Route::get('/devis/produits/{product}/image',[App\Http\Controllers\MediaController::class,'quoteProduct'])->name('quote.product-image');
 Route::get('/d/{message}', App\Http\Controllers\SharedDocumentController::class)->whereNumber('message')->middleware(['signed:relative','throttle:30,1'])->name('documents.whatsapp');

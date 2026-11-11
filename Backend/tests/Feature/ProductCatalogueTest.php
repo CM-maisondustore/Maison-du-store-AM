@@ -111,8 +111,9 @@ class ProductCatalogueTest extends TestCase
         $this->patch('/admin/catalogue/visibilite', ['visible' => 0])->assertRedirect('/admin/products')->assertSessionHasNoErrors();
         $this->assertDatabaseHas('site_settings', ['key' => 'catalogue_visible', 'enabled' => false]);
         $this->assertDatabaseHas('audit_events', ['action' => 'catalogue_masque']);
-        $this->get('/')->assertOk()->assertDontSee('id="catalogue', false)->assertDontSee('data-featured=', false)->assertDontSee('#catalogue', false)->assertSee('id="realisations"', false);
-        $this->get('/devis')->assertOk()->assertDontSee('#catalogue', false);
+        $this->get('/')->assertOk()->assertDontSee('id="catalogue', false)->assertDontSee('data-featured=', false)->assertDontSee('/shop/stores', false)->assertSee('id="realisations"', false);
+        $this->get('/devis')->assertOk()->assertDontSee('/shop/stores', false);
+        $this->get('/shop')->assertNotFound();
         $this->getJson('/api/products')->assertExactJson(['data' => []]);
         $this->get('/admin/products')->assertOk()->assertSee('Afficher le catalogue')->assertSee('Masqué avec le catalogue');
         $this->get('/admin/devis/nouveau')->assertOk()->assertSee('Voilages')->assertDontSee('name="defaults[product_id]"', false);
@@ -122,7 +123,8 @@ class ProductCatalogueTest extends TestCase
         $this->getJson('/api/products')->assertExactJson(['data' => []]);
         $this->patch('/admin/catalogue/visibilite', ['visible' => 1])->assertSessionHasNoErrors();
         $this->get('/')->assertOk()->assertSee('id="catalogue"', false);
-        $this->get('/devis')->assertOk()->assertSee('#catalogue', false);
+        $this->get('/devis')->assertOk()->assertSee('/shop/stores', false);
+        $this->get('/shop/stores')->assertOk();
         $this->getJson('/api/products')->assertJsonCount($visibleCount, 'data');
         $this->assertFalse($hidden->fresh()->published);
         $this->assertDatabaseHas('audit_events', ['action' => 'catalogue_affiche']);
