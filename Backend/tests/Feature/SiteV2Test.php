@@ -47,6 +47,27 @@ class SiteV2Test extends TestCase
             ->assertSee('class="wa-btn"', false);
     }
 
+    public function test_mds_shop_menu_lists_database_products_with_their_paths(): void
+    {
+        $this->seed();
+        $this->product(['name' => 'Store Zebra'], true, 'ST-A001');
+        $this->product(['name' => 'Store Vénitien'], true, 'ST-A003');
+        $this->product(['name' => 'Rideaux Wave', 'type' => 'rideau', 'features' => ['occultant', 'tamisant']], true, 'RT-001');
+        $this->product(['name' => 'Voilage Ruflette', 'type' => 'rideau', 'features' => ['tamisant']], true, 'VT-001');
+        $this->product(['name' => 'Store masqué'], false, 'ST-HIDE');
+
+        $html = $this->get('/')->assertOk()
+            ->assertSeeInOrder(['Rideaux occultants', 'Rideaux Wave', 'Voilages', 'Voilage Ruflette'])
+            ->assertSee('Store Zebra')->assertSee('Store Vénitien')
+            ->assertSee(route('site.product', 'ST-A001'), false)->assertSee(route('site.product', 'VT-001'), false)
+            ->assertDontSee('Store masqué')->assertDontSee('>Stores enrouleurs<', false)->getContent();
+        foreach (['ST-A001', 'RT-001', 'VT-001'] as $ref) {
+            $this->get('/produit/'.$ref)->assertOk();
+        }
+        $this->assertStringNotContainsString('/shop/stores?q=', $html);
+        $this->assertStringNotContainsString('/shop/rideaux?q=', $html);
+    }
+
     public function test_shops_show_only_published_stores_and_curtains(): void
     {
         $this->seed();

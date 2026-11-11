@@ -53,6 +53,30 @@ class Catalog
         return self::all()->firstWhere('ref', $reference);
     }
 
+    /**
+     * Menu MDS-Shop construit à partir des produits publiés de l'espace pro.
+     * Rideaux : « Rideaux occultants » pour les produits marqués occultants, « Voilages » pour les autres.
+     *
+     * @return array<string, list<array{label: ?string, items: list<array{name: string, href: string}>}>>
+     */
+    public static function menu(): array
+    {
+        $link = fn ($p) => ['name' => $p->name, 'href' => route('site.product', $p->ref)];
+        $all = self::all();
+        $rideaux = $all->where('shop', 'rideaux');
+        $occultant = config('site.features.occultant');
+
+        return [
+            'rideaux' => array_values(array_filter([
+                ['label' => 'Rideaux occultants', 'items' => $rideaux->filter(fn ($p) => in_array($occultant, $p->features, true))->map($link)->values()->all()],
+                ['label' => 'Voilages', 'items' => $rideaux->reject(fn ($p) => in_array($occultant, $p->features, true))->map($link)->values()->all()],
+            ], fn ($g) => $g['items'])),
+            'stores' => array_values(array_filter([
+                ['label' => null, 'items' => $all->where('shop', 'stores')->map($link)->values()->all()],
+            ], fn ($g) => $g['items'])),
+        ];
+    }
+
     public static function present(Product $p): object
     {
         $d = $p->details ?? [];

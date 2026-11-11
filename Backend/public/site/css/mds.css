@@ -707,3 +707,7 @@ summary::-webkit-details-marker { display: none; } summary { list-style: none; }
   /* Barre flottante du rendez-vous centrée en bas d'écran (plus de bouton panier à droite) */
   .float-rdv { left: 50%; right: auto; width: calc(100% - 24px); max-width: 560px; transform: translateX(-50%); }
 }
+/* Menu MDS-Shop tiré des produits de l'espace pro : intitulés de groupe (Rideaux occultants, Voilages) */
+.mega-group { display: block; margin: 14px 0 6px; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--t); }
+.mega-types .mega-group:first-of-type { margin-top: 2px; }
+.m-sub li.m-group { padding: 10px 0 2px; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--t); }

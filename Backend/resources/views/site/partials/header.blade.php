@@ -6,12 +6,8 @@
     $megaStart = isset($shops[$shop]) ? $shop : 'rideaux';
     // Catalogue masqué depuis l'espace pro : les boutiques mènent directement au devis.
     $shopHref = fn (string $k) => $catalogue ? route('site.shop.show', $k) : route('quote', ['type' => $shops[$k]['type']]);
-    // Recherche par mot-clé : indépendante des catégories saisies dans l'espace pro.
-    $typeHref = fn (string $k, string $q) => $catalogue ? route('site.shop.show', [$k, 'q' => $q]) : route('quote', ['type' => $shops[$k]['type']]);
-    $megaTypes = [
-        'rideaux' => ['Rideaux occultants' => 'occultant', 'Rideaux Wave' => 'wave', 'Rideaux à œillets' => 'œillet', 'Voilages' => 'voilage', 'Doublures' => 'doublure'],
-        'stores' => ['Stores enrouleurs' => 'enrouleur', 'Stores vénitiens' => 'vénitien', 'Stores bateau' => 'bateau', 'Stores jour/nuit' => 'jour', 'Stores extérieurs' => 'extérieur'],
-    ];
+    // Liens tirés des produits publiés dans l'espace pro (vide si le catalogue est masqué).
+    $menu = \App\Support\Site\Catalog::menu();
     $truck = 'M3 7h11v9H3zM14 10h4l3 3v3h-7M5 18a2 2 0 1 0 4 0a2 2 0 1 0-4 0M15 18a2 2 0 1 0 4 0a2 2 0 1 0-4 0';
 @endphp
 <div class="sticky-top" data-header>
@@ -57,11 +53,14 @@
                             @if($shops[$k]['open'])
                                 <div class="mega-types">
                                     <span class="kicker">Boutique {{ $shops[$k]['boutique'] }}</span>
-                                    <ul>
-                                        @foreach($megaTypes[$k] as $t => $kw)
-                                            <li><a href="{{ $typeHref($k, $kw) }}">{{ $t }}<x-icon d="M9 6l6 6-6 6" size="14" stroke="1.8" /></a></li>
-                                        @endforeach
-                                    </ul>
+                                    @foreach($menu[$k] ?? [] as $group)
+                                        @if($group['label'])<span class="mega-group">{{ $group['label'] }}</span>@endif
+                                        <ul>
+                                            @foreach($group['items'] as $item)
+                                                <li><a href="{{ $item['href'] }}">{{ $item['name'] }}<x-icon d="M9 6l6 6-6 6" size="14" stroke="1.8" /></a></li>
+                                            @endforeach
+                                        </ul>
+                                    @endforeach
                                     <a href="{{ $shopHref($k) }}" class="btn btn-tint">Entrer dans la boutique {{ $shops[$k]['name'] }}</a>
                                 </div>
                                 <div class="mega-feat">
@@ -126,8 +125,11 @@
                             <summary>{{ $shops[$k]['name'] }}<x-icon d="M6 9l6 6 6-6" size="16" stroke="1.8" class="chev" /></summary>
                             <ul>
                                 <li><a href="{{ $shopHref($k) }}" class="m-whole">Toute la boutique</a></li>
-                                @foreach($megaTypes[$k] as $t => $kw)
-                                    <li><a href="{{ $typeHref($k, $kw) }}">{{ $t }}</a></li>
+                                @foreach($menu[$k] ?? [] as $group)
+                                    @if($group['label'])<li class="m-group">{{ $group['label'] }}</li>@endif
+                                    @foreach($group['items'] as $item)
+                                        <li><a href="{{ $item['href'] }}">{{ $item['name'] }}</a></li>
+                                    @endforeach
                                 @endforeach
                             </ul>
                         </details>
