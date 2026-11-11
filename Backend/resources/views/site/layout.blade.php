@@ -14,6 +14,7 @@
 <title>@yield('title', 'Maison du Store AM — Stores et rideaux sur mesure à Abidjan')</title>
 <meta name="description" content="@yield('description', 'Stores et rideaux sur mesure, confectionnés à Abidjan, livrés et posés par nos équipes. Maison du Store AM, showroom à Cocody.')">
 <meta name="csrf-token" content="{{ csrf_token() }}">
+<meta name="mds-meta-pixel" content="{{ config('site.meta_pixel') }}">
 <link rel="canonical" href="{{ url()->current() }}">
 <link rel="icon" href="{{ asset('site/favicon.svg') }}" type="image/svg+xml">
 <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
@@ -27,6 +28,8 @@
 @include('site.partials.header')
 @yield('content')
 @include('site.partials.footer')
+<script src="{{ $v('site/js/analytics.js') }}" defer></script>
+<script src="{{ $v('site/js/consent.js') }}" defer></script>
 <script src="{{ $v('site/js/mds.js') }}" defer></script>
 @stack('scripts')
 </body>

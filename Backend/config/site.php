@@ -68,6 +68,22 @@ return [
         ['t' => 'Rideaux et voilages Wave', 's' => 'Finition haut de gamme', 'img' => 'site/images/realisations/wave-luxe.jpg'],
     ],
 
+    // Informations légales (mentions légales, CGV, confidentialité).
+    'legal' => [
+        'company' => 'Maison du Store AM SARL',
+        'capital' => '1 000 000 F CFA',
+        'address' => 'Cocody, Saint-Jean, Marché des Arts, Abidjan, Côte d’Ivoire',
+        'rccm' => 'CI-ABJ-03-2026-B13-09023',
+        'ncc' => '2604078 L',
+        'director' => 'Emile Bah, responsable digital et communication',
+        // Numéro de déclaration ARTCI : à renseigner une fois obtenu.
+        'artci' => env('MDS_ARTCI_NUMBER'),
+        'updated' => '11 novembre 2026',
+    ],
+
+    // Identifiant du pixel Meta, chargé seulement avec le consentement « publicité ».
+    'meta_pixel' => env('MDS_META_PIXEL', '1407495181585849'),
+
     // Codes couleur du catalogue de l'espace pro.
     'colors' => [
         'blanc' => ['Blanc', '#f4f1ea'], 'ecru' => ['Écru', '#ece3cf'], 'beige' => ['Beige', '#d8c3a0'],

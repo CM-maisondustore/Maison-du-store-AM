@@ -110,7 +110,7 @@
                     <label class="lbl">Commune<select name="city" class="inp">@foreach($communes as $c)<option>{{ $c }}</option>@endforeach</select></label>
                 </div>
                 <label class="lbl">Précisions <span class="light">(facultatif)</span><textarea name="notes" rows="3" maxlength="3000" class="inp inp-ta" placeholder="Accès, horaires de passage, contraintes particulières…"></textarea></label>
-                <label class="dv-terms"><input type="checkbox" name="acceptTerms" value="1"><span>J’accepte que Maison du Store AM utilise ces informations pour établir mon devis et me recontacter (<a href="{{ route('site.legal', 'confidentialite') }}" class="alink">confidentialité</a>).</span></label>
+                <label class="dv-terms"><input type="checkbox" name="acceptTerms" value="1"><span>J’accepte que Maison du Store AM utilise ces informations pour établir mon devis et me recontacter (<a href="{{ route('site.legal', 'confidentialite') }}" class="alink">confidentialité</a>, <a href="{{ route('site.legal', 'conditions-de-vente') }}" class="alink">conditions de vente</a>).</span></label>
                 <p class="dv-err" role="alert" data-dv-error hidden></p>
             </fieldset>
         </form>

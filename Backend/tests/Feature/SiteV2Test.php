@@ -87,8 +87,21 @@ class SiteV2Test extends TestCase
 
     public function test_legal_pages_render(): void
     {
-        foreach (['mentions-legales', 'cgv', 'confidentialite', 'cookies'] as $page) {
-            $this->get('/'.$page)->assertOk();
+        foreach (['mentions-legales', 'conditions-utilisation', 'conditions-de-vente', 'confidentialite'] as $page) {
+            $this->get('/'.$page)->assertOk()->assertSee('data-cookie-open', false);
         }
+        $this->get('/mentions-legales')->assertSee('CI-ABJ-03-2026-B13-09023')->assertSee('2604078 L')->assertSee('Emile Bah');
+        $this->get('/conditions-de-vente')->assertSee('500 000 F')->assertSee('d’un an sur les moteurs');
+        $this->get('/cgv')->assertRedirect('/conditions-de-vente');
+        $this->get('/cookies')->assertRedirect('/confidentialite#cookies');
+    }
+
+    public function test_pages_carry_meta_pixel_and_tracking_only_behind_consent_script(): void
+    {
+        $this->seed();
+        $this->get('/')->assertOk()
+            ->assertSee('name="mds-meta-pixel" content="1407495181585849"', false)
+            ->assertSee('site/js/consent.js', false)
+            ->assertDontSee('connect.facebook.net', false);
     }
 }

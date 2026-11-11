@@ -13,7 +13,9 @@ Route::get('/', [App\Http\Controllers\Site\SiteController::class, 'home'])->name
 Route::get('/shop', [App\Http\Controllers\Site\SiteController::class, 'shop'])->name('site.shop');
 Route::get('/shop/{shop}', [App\Http\Controllers\Site\SiteController::class, 'shop'])->whereIn('shop', ['rideaux', 'stores'])->name('site.shop.show');
 Route::get('/produit/{reference}', [App\Http\Controllers\Site\SiteController::class, 'product'])->where('reference', '[A-Za-z0-9._-]+')->name('site.product');
-Route::get('/{page}', [App\Http\Controllers\Site\SiteController::class, 'legal'])->whereIn('page', ['mentions-legales', 'cgv', 'confidentialite', 'cookies'])->name('site.legal');
+Route::get('/{page}', [App\Http\Controllers\Site\SiteController::class, 'legal'])->whereIn('page', array_keys(App\Http\Controllers\Site\SiteController::LEGAL))->name('site.legal');
+Route::redirect('/cgv', '/conditions-de-vente', 301);
+Route::redirect('/cookies', '/confidentialite#cookies', 301);
 Route::get('/media/{media}/{hash}', [App\Http\Controllers\MediaController::class, 'show'])->whereNumber('media')->where('hash', '[a-f0-9]{64}')->name('media.show');
 Route::get('/devis', [App\Http\Controllers\Site\SiteController::class, 'devis'])->name('quote');
 Route::get('/devis/materiaux/{option}/image', [\App\Http\Controllers\MediaController::class, 'quoteMaterial'])->name('quote.material-image');

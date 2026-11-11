@@ -120,11 +120,16 @@ class SiteController
         ]);
     }
 
+    public const LEGAL = [
+        'mentions-legales' => 'Mentions légales',
+        'conditions-utilisation' => 'Conditions générales d’utilisation',
+        'conditions-de-vente' => 'Conditions générales de vente',
+        'confidentialite' => 'Politique de confidentialité et cookies',
+    ];
+
     public function legal(string $page)
     {
-        $titles = ['mentions-legales' => 'Mentions légales', 'cgv' => 'Conditions générales', 'confidentialite' => 'Politique de confidentialité', 'cookies' => 'Préférences cookies'];
-
-        return view('site.legal', ['page' => $page, 'title' => $titles[$page]]);
+        return view('site.legal', ['page' => $page, 'title' => self::LEGAL[$page]]);
     }
 
     /** Réserve de produits pour les bulles aléatoires de l'accueil. */

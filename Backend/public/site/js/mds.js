@@ -378,6 +378,8 @@
       request(rdv.action, { method: 'POST', body: body }).then(function () {
         rSent = true; renderRdv(false);
         cta.textContent = 'Envoyée';
+        if (window.MDS && MDS.analytics) MDS.analytics.track('appointment_received');
+        if (window.MDS && MDS.metaPixel) MDS.metaPixel.trackSchedule();
         toast('rdv', 'Rendez-vous demandé', checked('date').dataset.label + ' à ' + body.time + '. Un conseiller vous confirme sous 24 h ouvrées.');
         loadSlots();
       }).catch(function (err) {
@@ -561,6 +563,8 @@
         $('[data-dv-sent-text]').textContent = 'Merci ' + body.contact.firstName + '. ' + (ref ? 'Votre demande ' + ref + ' est enregistrée. ' : '') + 'Un conseiller vous rappelle au ' + body.contact.phone + ' pour fixer la prise de mesures.';
         $('[data-dv-sent]').hidden = false;
         toast('devis', 'Demande de devis envoyée', 'Un conseiller vous rappelle rapidement.');
+        if (window.MDS && MDS.analytics) MDS.analytics.track('quote_received', { target: t });
+        if (window.MDS && MDS.metaPixel) MDS.metaPixel.trackContact();
         var h = $('#demande-t'); if (h) h.scrollIntoView({ block: 'start' });
       }).catch(function (err) {
         var fe = err.status === 422 && firstError(err);

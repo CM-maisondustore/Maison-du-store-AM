@@ -2,7 +2,7 @@
     $off = ! $p->available;
     $devis = route('quote', ['modele' => $p->model]);
 @endphp
-<article @class(['card', 'is-off' => $off]) data-shop="{{ $p->shop }}">
+<article @class(['card', 'is-off' => $off]) data-shop="{{ $p->shop }}" data-product-card>
     <a href="{{ route('site.product', $p->ref) }}" class="card-img" aria-label="Voir la fiche : {{ $p->name }}">
         @if($p->image)
             <img src="{{ $p->image }}" alt="{{ $p->imageAlt }}" loading="lazy">

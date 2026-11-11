@@ -34,6 +34,6 @@
     </div>
     <div class="wrap ft-legal">
         <span>© {{ date('Y') }} Maison du Store AM. Tous droits réservés.</span>
-        <span class="ft-legal-l"><a href="{{ route('site.legal', 'mentions-legales') }}">Mentions légales</a><a href="{{ route('site.legal', 'cgv') }}">CGV</a><a href="{{ route('site.legal', 'confidentialite') }}">Confidentialité</a><a href="{{ route('site.legal', 'cookies') }}">Cookies</a></span>
+        <span class="ft-legal-l"><a href="{{ route('site.legal', 'mentions-legales') }}">Mentions légales</a><a href="{{ route('site.legal', 'conditions-utilisation') }}">CGU</a><a href="{{ route('site.legal', 'conditions-de-vente') }}">CGV</a><a href="{{ route('site.legal', 'confidentialite') }}">Confidentialité</a><button type="button" class="ft-cookie" data-cookie-open>Gérer les cookies</button></span>
     </div>
 </footer>

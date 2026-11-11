@@ -54,6 +54,10 @@ class AnalyticsController
                 'details' => array_filter(['title' => $data['title'] ?? null, 'target' => $data['target'] ?? null]), 'created_at' => $now,
             ]);
         }
+        // Durée annoncée dans la politique de confidentialité : 13 mois. Purge au plus une fois par jour, sans tâche planifiée.
+        if (\Illuminate\Support\Facades\Cache::add('analytics:purge', 1, $now->copy()->addDay())) {
+            SiteVisit::where('last_activity_at', '<', $now->copy()->subMonths(13))->delete();
+        }
         return response()->json(['ok' => true])->header('Cache-Control', 'no-store');
     }
 
