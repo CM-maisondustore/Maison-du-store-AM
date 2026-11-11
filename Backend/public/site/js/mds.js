@@ -408,7 +408,20 @@
     var STORE_COLORS = ['blanc', 'ecru', 'beige', 'taupe', 'gris', 'anthracite'];
     var val = function (name) { var el = $('input[name=' + name + ']:checked', dv); return el ? el.value : ''; };
     var type = function () { return val('type') || 'store'; };
-    var model = function () { return (D.models || []).filter(function (m) { return m.id === val('model'); })[0] || null; };
+    /* Rideaux : le client choisit la finition, le modèle est déduit (fiche produit d'origine, sinon le rideau
+       publié dont le nom contient la finition, sinon le premier rideau publié). Stores : modèle choisi. */
+    var model = function () {
+      if (type() === 'rideau') {
+        var list = (D.models || []).filter(function (m) { return m.category === 'rideau'; });
+        if (!list.length) return null;
+        var pre = list.filter(function (m) { return m.id === D.preset; })[0];
+        if (pre) return pre;
+        var fin = (D.finishes || []).filter(function (f) { return f.id === val('finish'); })[0];
+        var key = fin ? String(fin.label).toLowerCase() : '';
+        return (key && list.filter(function (m) { return String(m.name).toLowerCase().indexOf(key) >= 0; })[0]) || list[0];
+      }
+      return (D.models || []).filter(function (m) { return m.id === val('model'); })[0] || null;
+    };
     var esc = function (s) { var d = document.createElement('div'); d.textContent = s == null ? '' : String(s); return d.innerHTML; };
     var card = function (name, value, title, text, img, on) {
       var media = img ? '<img src="' + esc(img) + '" alt="" loading="lazy">' : '<span class="dv-card-ph" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M3 5h18v14H3zM7 10a1.5 1.5 0 1 0 3 0a1.5 1.5 0 1 0-3 0M21 16l-5-5-8 8"></path></svg></span>';
@@ -420,10 +433,19 @@
       box.innerHTML = html;
     };
     var renderModels = function () {
-      var t = type(); var prev = val('model') || D.preset;
-      var list = (D.models || []).filter(function (m) { return m.category === t; });
-      var box = $('[data-dv-models]');
-      box.innerHTML = list.map(function (m) { return card('model', m.id, m.name, m.text, m.imageUrl, m.id === prev); }).join('');
+      var t = type(); var box = $('[data-dv-models]'); var list;
+      if (t === 'rideau') {
+        list = (D.models || []).some(function (m) { return m.category === 'rideau'; }) ? (D.finishes || []) : [];
+        fill(box, 'finish', list, true, null);
+        $('[data-dv-step1-label]').textContent = 'Finition';
+        box.setAttribute('aria-label', 'Finition');
+      } else {
+        var prev = val('model') || D.preset;
+        list = (D.models || []).filter(function (m) { return m.category === 'store'; });
+        box.innerHTML = list.map(function (m) { return card('model', m.id, m.name, m.text, m.imageUrl, m.id === prev); }).join('');
+        $('[data-dv-step1-label]').textContent = 'Modèle';
+        box.setAttribute('aria-label', 'Modèle');
+      }
       $('[data-dv-models-empty]').hidden = list.length > 0;
       root.dataset.shop = t === 'rideau' ? 'rideaux' : 'stores';
     };
@@ -452,8 +474,9 @@
       $('[data-dv-fabric-label]').innerHTML = t === 'store' ? 'Toile' : 'Tissu de rideau <span class="light">(facultatif si un voilage est choisi)</span>';
       fill($('[data-dv-cards=fabric]'), 'fabric', L.fabric, true, t === 'rideau' ? 'Sans rideau' : null);
       fill($('[data-dv-cards=sheer]'), 'sheer', L.sheer, true, 'Sans voilage');
-      fill($('[data-dv-cards=finish]'), 'finish', L.finish, true, null);
-      $('[data-dv-group=finish]').hidden = !L.finish.length;
+      // Rideaux : la finition est choisie à l'étape 1.
+      if (t === 'rideau') { $('[data-dv-cards=finish]').innerHTML = ''; $('[data-dv-group=finish]').hidden = true; }
+      else { fill($('[data-dv-cards=finish]'), 'finish', L.finish, true, null); $('[data-dv-group=finish]').hidden = !L.finish.length; }
       var colors = (D.colors || []).filter(function (c) { return t === 'rideau' || STORE_COLORS.indexOf(c.id) >= 0; });
       var prevC = val('color');
       $('[data-dv-colors]').innerHTML = colors.map(function (c) { return '<label class="pick"><input type="radio" name="color" value="' + esc(c.id) + '"' + (c.id === prevC ? ' checked' : '') + '><span><span aria-hidden="true" class="sw" style="background:' + esc(c.hex) + '"></span> ' + esc(c.label) + '</span></label>'; }).join('');
@@ -468,9 +491,12 @@
     var renderRecap = function () {
       var t = type(); var m = model(); var L = lists(); var lines = readLines().filter(function (l) { return l.width || l.height; });
       var colorEl = $('input[name=color]:checked', dv);
-      var rows = [['Produit', t === 'store' ? 'Store' : 'Rideaux et voilages'], ['Modèle', m ? m.name : 'À choisir'], [t === 'store' ? 'Toile' : 'Tissu', labelOf(L.fabric, val('fabric')) || (t === 'rideau' && val('fabric') === '' && $('input[name=fabric]:checked', dv) ? 'Sans rideau' : 'À choisir')]];
+      var rows = [['Produit', t === 'store' ? 'Store' : 'Rideaux et voilages']];
+      if (t === 'rideau') rows.push(['Finition', labelOf(L.finish, val('finish')) || 'À choisir']);
+      else rows.push(['Modèle', m ? m.name : 'À choisir']);
+      rows.push([t === 'store' ? 'Toile' : 'Tissu', labelOf(L.fabric, val('fabric')) || (t === 'rideau' && val('fabric') === '' && $('input[name=fabric]:checked', dv) ? 'Sans rideau' : 'À choisir')]);
       if (t === 'rideau') rows.push(['Voilage', labelOf(L.sheer, val('sheer')) || 'Sans voilage']);
-      if (L.finish.length) rows.push(['Finition', labelOf(L.finish, val('finish')) || 'À choisir']);
+      if (t === 'store' && L.finish.length) rows.push(['Finition', labelOf(L.finish, val('finish')) || 'À choisir']);
       rows.push(['Manœuvre', { manuelle: 'Manuelle', motorisee: 'Motorisée', inconnu: 'À définir' }[val('control')] || '']);
       rows.push(['Coloris', colorEl ? colorEl.parentNode.textContent.trim() : 'À choisir']);
       rows.push(['Fenêtres', lines.length ? lines.length + (lines.length > 1 ? ' fenêtres' : ' fenêtre') : 'À préciser']);
@@ -492,12 +518,16 @@
     /* Contrôles par étape, alignés sur la validation serveur de l'espace pro. */
     var problems = function (s) {
       var t = type(); var L = lists(); var out = [];
-      if (s === 1) { if (!model()) out.push('choisissez un modèle'); }
+      if (s === 1) {
+        if (t === 'rideau') {
+          if (!L.finish.length || !model()) out.push('les rideaux ne sont pas encore proposés en ligne, appelez-nous');
+          else if (!val('finish')) out.push('choisissez une finition');
+        } else if (!model()) out.push('choisissez un modèle');
+      }
       if (s === 2) {
         if (t === 'store') { if (!L.fabric.length) out.push('aucune toile n’est disponible en ligne pour ce modèle, appelez-nous'); else if (!val('fabric')) out.push('choisissez une toile'); }
         else if (!val('fabric') && !val('sheer')) out.push('choisissez un tissu de rideau ou un voilage');
-        if (t === 'rideau' && !L.finish.length) out.push('les finitions ne sont pas encore proposées en ligne, appelez-nous');
-        else if (L.finish.length && !val('finish')) out.push('choisissez une finition');
+        if (t === 'store' && L.finish.length && !val('finish')) out.push('choisissez une finition');
         if (!val('color')) out.push('choisissez un coloris');
       }
       if (s === 3) {
@@ -540,7 +570,7 @@
       var s = $('[data-dv-bar-sub]'); s.textContent = 'Il manque : ' + p.join(', '); s.className = 'bar-s ko';
       toast('error', 'Il manque des informations', p[0].charAt(0).toUpperCase() + p[0].slice(1) + '.');
     };
-    var STEP_OF = function (key) { return key === 'product.model' ? 1 : key.indexOf('product.') === 0 ? 2 : key.indexOf('dimensions') === 0 ? 3 : 4; };
+    var STEP_OF = function (key) { return key === 'product.model' || (key === 'product.finish' && type() === 'rideau') ? 1 : key.indexOf('product.') === 0 ? 2 : key.indexOf('dimensions') === 0 ? 3 : 4; };
     var sending = false;
     var send = function () {
       var t = type(); var m = model(); var f = function (n) { var el = $('[name=' + n + ']', dv); return el ? el.value.trim() : ''; };
@@ -582,12 +612,12 @@
     dv.addEventListener('submit', function (e) { e.preventDefault(); nextBtn.click(); });
     dv.addEventListener('change', function (e) {
       if (e.target.name === 'type') { renderModels(); renderChoices(); }
-      if (e.target.name === 'model' || e.target.name === 'control') renderChoices();
+      if (e.target.name === 'model' || e.target.name === 'control' || (e.target.name === 'finish' && type() === 'rideau')) renderChoices();
       renderRecap();
     });
     dv.addEventListener('input', renderRecap);
     renderModels(); renderChoices(); renumber(); renderRecap(); renderStep(false);
-    if (D.preset && model()) { step = 2; renderStep(false); }
+    if (D.preset && type() === 'store' && model()) { step = 2; renderStep(false); }
   }
 
   /* ---------- Échap ferme ce qui est ouvert ---------- */

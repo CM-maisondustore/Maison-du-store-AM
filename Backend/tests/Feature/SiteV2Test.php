@@ -102,6 +102,27 @@ class SiteV2Test extends TestCase
         $this->get('/devis')->assertOk();
     }
 
+    public function test_curtain_quote_with_finish_chosen_first_and_derived_model_is_accepted(): void
+    {
+        $this->seed();
+        $wave = $this->product(['name' => 'Rideaux Wave', 'type' => 'rideau'], true, 'RT-001');
+        $this->get('/devis?type=rideau')->assertOk()
+            ->assertSee('data-dv-step1-label>Finition<', false)
+            ->assertSee('"finishes":[{"id":"wave"', false);
+
+        // Charge utile du formulaire : finition de l'étape 1, modèle déduit (« Rideaux Wave » pour Wave).
+        $this->postJson('/api/quotes/curtains', [
+            'contact' => ['civility' => 'm', 'lastName' => 'Kone', 'firstName' => 'Awa', 'email' => null, 'phoneCountryCode' => '+225', 'phone' => '0700000000', 'address' => 'Riviera 2', 'city' => 'Cocody', 'notes' => null],
+            'product' => ['model' => 'product-'.$wave->id, 'control' => 'manuelle', 'color' => 'beige', 'fabric' => 'occultant-100', 'sheer' => 'voilage-luxe', 'finish' => 'wave'],
+            'dimensions' => [['id' => 'f1', 'label' => 'Chambre', 'width' => '150', 'height' => '240', 'quantity' => 2]],
+            'acceptTerms' => true, 'submittedAt' => now()->toIso8601String(),
+        ])->assertCreated();
+        $quote = Quote::firstOrFail();
+        $this->assertSame('rideau', $quote->type);
+        $this->assertSame('wave', $quote->product['finish_code']);
+        $this->assertSame('Rideaux Wave', $quote->product['model']);
+    }
+
     public function test_quote_page_exposes_espace_pro_choices_and_api_accepts_them(): void
     {
         $this->seed();

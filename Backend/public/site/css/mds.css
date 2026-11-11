@@ -711,3 +711,9 @@ summary::-webkit-details-marker { display: none; } summary { list-style: none; }
 .mega-group { display: block; margin: 14px 0 6px; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--t); }
 .mega-types .mega-group:first-of-type { margin-top: 2px; }
 .m-sub li.m-group { padding: 10px 0 2px; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--t); }
+
+/* Devis : cartes en défilement horizontal (modèles, finitions, tissus, voilages) */
+.dv-cards { display: flex; gap: 12px; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; padding: 4px 4px 14px; margin: 0 -4px; -webkit-overflow-scrolling: touch; scrollbar-width: thin; scrollbar-color: var(--a) transparent; }
+.dv-card { flex: 0 0 210px; scroll-snap-align: start; }
+.dv-cards::-webkit-scrollbar { height: 6px; } .dv-cards::-webkit-scrollbar-thumb { background: var(--a); border-radius: 3px; }
+@media (max-width: 767px) { .dv-card { flex-basis: 68%; max-width: 240px; } }

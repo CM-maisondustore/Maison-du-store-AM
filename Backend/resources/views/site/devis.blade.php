@@ -40,9 +40,9 @@
                     @endforeach
                 </div>
                 <div class="stack-10">
-                    <span class="lbl-t">Modèle</span>
+                    <span class="lbl-t" data-dv-step1-label>{{ $type === 'rideau' ? 'Finition' : 'Modèle' }}</span>
                     <div class="dv-cards" role="radiogroup" aria-label="Modèle" data-dv-models></div>
-                    <p class="small" data-dv-models-empty hidden>Aucun modèle n’est encore proposé en ligne pour ce produit. Appelez-nous au {{ config('site.contact.phones')[0]['label'] }} ou prenez rendez-vous : un conseiller vous présente la collection.</p>
+                    <p class="small" data-dv-models-empty hidden>Ce produit n’est pas encore proposé en ligne. Appelez-nous au {{ config('site.contact.phones')[0]['label'] }} ou prenez rendez-vous : un conseiller vous présente la collection.</p>
                 </div>
             </fieldset>
 
