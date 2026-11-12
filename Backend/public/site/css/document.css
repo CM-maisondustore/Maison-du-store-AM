@@ -1,0 +1,108 @@
+/* Page de téléchargement d'un document transmis (devis, facture, reçu). Charte V2, feuille autonome. */
+@font-face { font-family: 'Cormorant Garamond'; font-style: normal; font-weight: 500; font-display: swap; src: url('/fonts/cormorant-garamond-latin-500-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Cormorant Garamond'; font-style: normal; font-weight: 600; font-display: swap; src: url('/fonts/cormorant-garamond-latin-600-normal.woff2') format('woff2'); }
+@font-face { font-family: Inter; font-style: normal; font-weight: 400; font-display: swap; src: url('/fonts/inter-latin-400-normal.woff2') format('woff2'); }
+@font-face { font-family: Inter; font-style: normal; font-weight: 500; font-display: swap; src: url('/fonts/inter-latin-500-normal.woff2') format('woff2'); }
+@font-face { font-family: Inter; font-style: normal; font-weight: 600; font-display: swap; src: url('/fonts/inter-latin-600-normal.woff2') format('woff2'); }
+
+:root {
+  --ink: #1c1c1c; --text: #353535; --muted: #6b665e; --cream: #f9f8f4; --line: #e8e4db;
+  --gold: #c09f6a; --gold-t: #84642f; --pine: #20332c; --pine-2: #2c423a; --paper: #fff;
+  --serif: 'Cormorant Garamond', Georgia, serif; --sans: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; min-height: 100vh; background: var(--cream); color: var(--text); font: 400 16px/1.55 var(--sans); }
+h1, p, dl, dd { margin: 0; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--pine); outline-offset: 3px; border-radius: 4px; }
+
+/* Mise en page : le message à gauche, la feuille à droite ; sur téléphone, la feuille d'abord. */
+.dl {
+  max-width: 1080px; margin: 0 auto; padding: 32px 32px 40px;
+  display: grid; gap: 0 72px; align-items: center;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 400px);
+  grid-template-areas: "brand brand" "note stage" "foot foot";
+  min-height: 100vh; grid-template-rows: auto 1fr auto;
+}
+.dl-brand { grid-area: brand; display: flex; align-items: center; gap: 12px; color: var(--ink); font-weight: 600; font-size: 15px; }
+.dl-brand img { border-radius: 50%; }
+.dl-brand small { display: block; font-weight: 400; font-size: 13px; color: var(--muted); }
+
+.dl-note { grid-area: note; max-width: 30em; padding: 48px 0; }
+.dl-note h1 { font: 500 clamp(34px, 4.4vw, 50px)/1.08 var(--serif); color: var(--ink); letter-spacing: -.01em; margin-bottom: 22px; }
+.dl-note p { font-size: 16.5px; color: var(--text); margin-bottom: 12px; }
+.dl-note .dl-expiry { font-size: 14.5px; color: var(--muted); padding-top: 12px; border-top: 1px solid var(--line); margin-top: 22px; }
+.dl-expiry strong { color: var(--ink); font-weight: 600; }
+.dl-help { display: inline-flex; align-items: center; gap: 10px; margin-top: 14px; color: var(--pine); font-weight: 500; font-size: 15px; text-underline-offset: 4px; }
+.dl-help svg { color: #1f9d55; flex: none; }
+
+/* La feuille, sortie de sa pochette. */
+.dl-stage { grid-area: stage; position: relative; padding: 24px 0 64px; }
+.dl-sleeve {
+  position: absolute; left: -18px; right: -18px; bottom: 28px; height: 46%;
+  background: linear-gradient(170deg, var(--pine-2), var(--pine) 60%);
+  border-radius: 6px 6px 10px 10px;
+}
+.dl-sleeve::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: var(--gold); border-radius: 6px 6px 0 0; }
+.dl-sheet {
+  position: relative; z-index: 1; margin: 0 auto; width: 100%; max-width: 400px; aspect-ratio: 1 / 1.414;
+  display: flex; flex-direction: column; background: var(--paper); border-radius: 3px;
+  padding: 34px 32px 0;
+  box-shadow: 0 1px 0 var(--line), 0 18px 30px -18px rgba(32, 51, 44, .45), 0 40px 60px -40px rgba(32, 51, 44, .35);
+  animation: dl-rise .8s cubic-bezier(.2, .75, .2, 1) .15s both;
+}
+@keyframes dl-rise { from { transform: translateY(70px); } to { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .dl-sheet { animation: none; } }
+
+.dl-head { padding-bottom: 20px; border-bottom: 1px solid var(--gold); }
+.dl-type { font: 600 21px/1.2 var(--serif); color: var(--gold-t); }
+.dl-type span { font: 500 13px var(--sans); color: var(--muted); margin-left: 6px; }
+.dl-number { font: 500 clamp(24px, 6vw, 29px)/1.15 var(--serif); letter-spacing: -.005em; color: var(--ink); margin-top: 6px; overflow-wrap: anywhere; }
+
+.dl-facts { padding: 16px 0 8px; font-variant-numeric: tabular-nums; }
+.dl-facts div { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 7px 0; }
+.dl-facts dt { font-size: 14px; color: var(--muted); }
+.dl-facts dd { font-size: 15px; color: var(--ink); font-weight: 500; text-align: right; }
+.dl-facts .dl-amount { margin-top: 8px; padding-top: 14px; border-top: 1px solid var(--line); }
+.dl-facts .dl-amount { flex-wrap: wrap; }
+.dl-amount dd { font: 600 26px/1.1 var(--serif); color: var(--ink); white-space: nowrap; margin-left: auto; }
+
+/* Talon détachable : perforation et encoches, puis l'action. */
+.dl-stub {
+  position: relative; margin: auto -32px 0; padding: 26px 32px 26px;
+  display: flex; flex-direction: column; align-items: stretch; gap: 10px; text-align: center;
+  background-image: linear-gradient(90deg, var(--line) 50%, transparent 0);
+  background-size: 12px 1.5px; background-repeat: repeat-x; background-position: 0 0;
+}
+.dl-stub::before, .dl-stub::after {
+  content: ""; position: absolute; top: -11px; width: 22px; height: 22px; border-radius: 50%; background: var(--cream);
+}
+.dl-stub::before { left: -11px; } .dl-stub::after { right: -11px; }
+.dl-download {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 52px; padding: 0 20px;
+  background: var(--pine); color: #fff; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 16px;
+  transition: background-color .15s ease;
+}
+.dl-download:hover { background: var(--pine-2); }
+.dl-open { color: var(--pine); font-size: 15px; font-weight: 500; text-underline-offset: 4px; padding: 4px; }
+.dl-file { font-size: 12.5px; color: var(--muted); overflow-wrap: anywhere; }
+
+/* Lien expiré : feuille vierge. */
+.dl-void { flex: 1; display: flex; flex-direction: column; gap: 14px; padding-top: 18px; }
+.dl-void-line { display: block; height: 10px; border-radius: 3px; background: var(--line); }
+.dl-void-line.short { width: 55%; }
+.dl-void p { margin-top: auto; padding: 0 0 40px; text-align: center; font: 500 22px var(--serif); color: var(--muted); }
+[data-kind=expire] .dl-sheet { filter: grayscale(1); }
+
+.dl-foot { grid-area: foot; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 24px; padding-top: 24px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); }
+.dl-foot nav { display: flex; gap: 18px; }
+
+@media (max-width: 820px) {
+  .dl { grid-template-columns: minmax(0, 1fr); grid-template-areas: "brand" "stage" "note" "foot"; padding: 20px 16px 28px; min-height: 0; }
+  .dl-stage { padding: 28px 8px 56px; }
+  .dl-sleeve { left: -8px; right: -8px; }
+  .dl-sheet { aspect-ratio: auto; min-height: 0; padding: 28px 22px 0; }
+  .dl-stub { margin: 24px -22px 0; padding: 24px 22px; }
+  .dl-note { padding: 8px 0 32px; }
+}

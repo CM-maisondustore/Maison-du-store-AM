@@ -20,7 +20,9 @@ Route::get('/media/{media}/{hash}', [App\Http\Controllers\MediaController::class
 Route::get('/devis', [App\Http\Controllers\Site\SiteController::class, 'devis'])->name('quote');
 Route::get('/devis/materiaux/{option}/image', [\App\Http\Controllers\MediaController::class, 'quoteMaterial'])->name('quote.material-image');
 Route::get('/devis/produits/{product}/image',[App\Http\Controllers\MediaController::class,'quoteProduct'])->name('quote.product-image');
-Route::get('/d/{message}', App\Http\Controllers\SharedDocumentController::class)->whereNumber('message')->middleware(['signed:relative','throttle:30,1'])->name('documents.whatsapp');
+// Lien de document envoyé sur WhatsApp : page de téléchargement (signature vérifiée par le contrôleur), puis le PDF.
+Route::get('/d/{message}', [App\Http\Controllers\SharedDocumentController::class, 'show'])->whereNumber('message')->middleware('throttle:30,1')->name('documents.whatsapp');
+Route::get('/d/{message}/pdf', [App\Http\Controllers\SharedDocumentController::class, 'file'])->whereNumber('message')->middleware(['signed:relative','throttle:30,1'])->name('documents.whatsapp.file');
 Route::get('/health/ready', App\Http\Controllers\ReadinessController::class)->middleware('throttle:60,1');
 Route::post('/api/analytics/collect', [App\Http\Controllers\AnalyticsController::class, 'collect'])->middleware('throttle:120,1');
 Route::get('/robots.txt', function () {

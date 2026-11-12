@@ -135,14 +135,22 @@ class CommunicationsTest extends TestCase
         $this->assertSame('shared',$message->fresh()->status);
         $this->assertSame(1,DocumentArchive::where('commercial_message_id',$message->id)->count());
         auth()->logout();
-        $response=$this->get($link)->assertOk()->assertHeader('Content-Type','application/pdf');
+        // Le lien ouvre la page de téléchargement, qui mène au PDF archivé (lien signé, même échéance).
+        $page=$this->get($link)->assertOk()->assertHeader('X-Robots-Tag','noindex, nofollow')
+            ->assertSee('voici votre devis.',false)->assertSee('DEV-TEST')->assertSee('Télécharger le PDF')->assertSee('Montant du devis')->assertSee('50 000 FCFA');
+        preg_match('#href="([^"]+/d/'.$message->id.'/pdf\?[^"]*telecharger=1[^"]*)"#',$page->getContent(),$m);
+        $download=html_entity_decode($m[1]);
+        $response=$this->get($download)->assertOk()->assertHeader('Content-Type','application/pdf');
         $this->assertSame($archive->contents(),$response->getContent());
-        $this->assertStringContainsString('filename="Devis-DEV-TEST.pdf"',$response->headers->get('Content-Disposition'));
+        $this->assertStringContainsString('attachment; filename="Devis-DEV-TEST.pdf"',$response->headers->get('Content-Disposition'));
         $this->assertDatabaseHas('audit_events',['action'=>'document_whatsapp_consulte','subject_id'=>$message->id]);
-        $this->get('/d/'.$message->id)->assertForbidden();
-        $this->get(str_replace('signature=','signature=0',$link))->assertForbidden();
+        // Lien absent, altéré ou expiré : page « lien expiré », sans aucune donnée du document.
+        $this->get('/d/'.$message->id)->assertStatus(410)->assertSee('Ce lien n’est plus valable.',false)->assertDontSee('DEV-TEST');
+        $this->get(str_replace('signature=','signature=0',$link))->assertStatus(410)->assertDontSee('DEV-TEST');
+        $this->get('/d/'.$message->id.'/pdf')->assertForbidden();
         $this->travel(31)->days();
-        $this->get($link)->assertForbidden();
+        $this->get($link)->assertStatus(410)->assertDontSee('DEV-TEST');
+        $this->get($download)->assertForbidden();
     }
     public function test_whatsapp_link_is_not_added_without_a_document(): void
     {
