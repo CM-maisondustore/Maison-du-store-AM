@@ -75,17 +75,20 @@
       }
       case 'text': add(b.text || 'Texte libre', b.text ? 'eb-prose' : 'eb-placeholder'); break;
       case 'commitment': { const p = el('p', b.text ? 'eb-prose' : 'eb-placeholder'); p.append(el('strong', '', label(b, 'Notre engagement.') + ' ')); p.append(b.text || 'Texte du modèle, modifiable dans Réglages du document › Entreprise'); body.append(p); break; }
-      case 'company': add(data.issuer || 'Entreprise', 'eb-strong eb-big'); add('Activités · adresse · téléphone · e-mail', 'eb-muted'); break;
+      case 'company': if (gridOn(b)) { body.append(gridSample(b, { name: data.issuer || 'Entreprise', activities: 'Activités', address: 'Adresse', phone: 'Téléphone', email: 'e-mail' })); break; }
+        add(data.issuer || 'Entreprise', 'eb-strong eb-big'); add('Activités · adresse · téléphone · e-mail', 'eb-muted'); break;
       case 'title': add(label(b, { invoice: 'FACTURE', receipt: 'REÇU' }[data.kind] || 'DEVIS'), 'eb-strong eb-huge'); add('N° du document · date'); break;
-      case 'client': add(label(b, 'Client').toUpperCase(), 'eb-eyebrow'); add('Nom du client', 'eb-strong'); add('Téléphone · adresse'); break;
+      case 'client': add(label(b, 'Client').toUpperCase(), 'eb-eyebrow'); if (gridOn(b)) { body.append(gridSample(b, { name: 'Nom du client', phone: '07 00 00 00 00', address: 'Adresse, commune', email: 'client@exemple.ci' })); break; }
+        add('Nom du client', 'eb-strong'); add('Téléphone · adresse'); break;
       case 'object': add(label(b, 'Objet').toUpperCase(), 'eb-eyebrow'); add('Objet du document'); break;
       case 'lines': {
         const table = el('div', 'eb-table');
-        const head = el('div', 'eb-row eb-head'); head.append(el('span', '', label(b, 'Désignation')));
-        b.columns.forEach(column => head.append(el('span', 'n', { quantity: 'Qté', unit_price: 'PU (F)', amount: 'Montant (F)' }[column])));
-        table.append(head);
+        const head = el('div', 'eb-row eb-head'), cl = b.column_labels || {}; head.append(el('span', '', cl.designation || label(b, 'Désignation')));
+        b.columns.forEach(column => head.append(el('span', 'n', cl[column] || { quantity: 'Qté', unit_price: 'PU (F)', amount: 'Montant (F)' }[column])));
+        if (b.header_bg) head.style.background = b.header_bg; if (b.header_color) head.style.color = b.header_color;
+        if (!b.hide_header) table.append(head);
         for (let i = 0; i < 3; i++) { const row = el('div', 'eb-row'); row.append(el('span', 'eb-bar')); b.columns.forEach(() => row.append(el('span', 'eb-bar n'))); table.append(row); }
-        body.append(table); body.append(el('p', 'eb-muted', b.follow ? 'Toutes les désignations, puis la pose et la livraison' : 'Désignations'));
+        body.append(table); body.append(el('p', 'eb-muted', rowKeys(b).filter(k => rowSet()[k]).map(k => rowSet()[k]).join(' · ') || 'Aucune ligne affichée'));
         break;
       }
       case 'total': { const row = el('div', 'eb-total'); row.append(el('span', '', label(b, data.kind === 'receipt' ? 'MONTANT REÇU' : 'TOTAL GÉNÉRAL'))); row.append(el('strong', '', '000 000 F CFA')); body.append(row); break; }
@@ -96,18 +99,51 @@
     }
     // Texte complémentaire des blocs automatiques, imprimé sous leur contenu.
     if ((data.complement || []).includes(b.type) && (b.text || '').trim()) add(b.text, 'eb-prose');
+    // Ligne sous l'intitulé : premier élément du bloc ; « --- » dans un texte : séparation.
+    if ((b.separators || []).includes('label') && (data.labels || {})[b.type]) body.firstElementChild?.classList.add('eb-under');
+    body.querySelectorAll('.eb-prose').forEach(p => {
+      if (!/^\s*-{3,}\s*$/m.test(p.textContent)) return;
+      const parts = p.textContent.split(/\r?\n/), frag = document.createDocumentFragment(); let buffer = [];
+      const flush = () => { if (buffer.length) { frag.append(el('p', 'eb-prose', buffer.join('\n'))); buffer = []; } };
+      parts.forEach(line => { if (/^\s*-{3,}\s*$/.test(line)) { flush(); const hr = el('span', 'eb-sep'); hr.style.borderTopColor = b.border_color; frag.append(hr); } else buffer.push(line); });
+      flush(); p.replaceWith(frag);
+    });
     return body;
   }
   function label(b, fallback) { return (b.label || '').trim() || fallback; }
+  const gridOn = b => Array.isArray(b.fields) || b.field_labels || b.grid_h || b.grid_v;
+  const fieldKeys = b => Array.isArray(b.fields) ? b.fields : Object.keys((data.blockFields || {})[b.type] || {});
+  function gridSample(b, values) {
+    const labels = (data.blockFields || {})[b.type] || {}, keys = fieldKeys(b), grid = el('div', 'eb-grid');
+    keys.forEach((key, i) => {
+      const row = el('div', 'eb-grid-row' + (b.grid_h && i < keys.length - 1 ? ' h' : ''));
+      if (b.field_labels) row.append(el('span', 'eb-grid-k' + (b.grid_v ? ' v' : ''), labels[key]));
+      row.append(el('span', key === 'name' ? 'eb-strong' : '', values[key] || ''));
+      row.style.borderColor = b.border_color; row.firstChild.style.borderColor = b.border_color; grid.append(row);
+    });
+    return grid;
+  }
+  // Lignes du tableau : celles du document édité (reçu ou devis / facture), dans l'ordre enregistré.
+  const rowSet = () => data.kind === 'receipt' ? (data.receiptRows || {}) : (data.rows || {});
+  const allRows = () => [...Object.keys(data.rows || {}), ...Object.keys(data.receiptRows || {})];
+  const rowKeys = b => Array.isArray(b.row_order) ? b.row_order : allRows();
   const FONT_STACKS = { 'DejaVu Serif': '"DejaVu Serif",Georgia,serif', 'Arial': 'Arial,Helvetica,sans-serif', 'Times New Roman': '"Times New Roman",Times,serif' };
   function paint(node, b) {
     const s = scale();
     Object.assign(node.style, { left: b.x * s + 'px', top: b.y * s + 'px', width: b.w * s + 'px', height: (b.type === 'shape' && b.shape === 'line' ? 0 : b.h) * s + 'px',
       fontSize: b.size * 0.3528 * s + 'px', color: b.color, textAlign: b.align, background: b.background || '',
-      fontFamily: FONT_STACKS[b.font] || '"DejaVu Sans",Verdana,sans-serif',
+      fontFamily: FONT_STACKS[b.font] || '"DejaVu Sans",Verdana,sans-serif', fontWeight: b.bold ? '700' : '', fontStyle: b.italic ? 'italic' : '',
+      lineHeight: b.line_height ? String(b.line_height) : '', letterSpacing: b.letter_spacing ? b.letter_spacing * 0.3528 * s + 'px' : '', textTransform: b.uppercase ? 'uppercase' : '',
+      borderRadius: b.radius ? b.radius * s + 'px' : '', borderStyle: b.border_style || '',
       border: b.type === 'shape' ? '' : (b.border_width > 0 ? `${Math.max(1, b.border_width * s)}px solid ${b.border_color}` : ''),
       borderTop: b.type === 'shape' ? `${Math.max(1, Math.max(0.2, b.border_width) * s)}px solid ${b.border_color}` : undefined });
     if (b.type === 'shape' && b.shape === 'frame') node.style.border = `${Math.max(1, Math.max(0.2, b.border_width) * s)}px solid ${b.border_color}`;
+    if (b.type !== 'shape') ['top', 'bottom'].forEach(side => { if ((b.separators || []).includes(side)) node.style['border' + side[0].toUpperCase() + side.slice(1)] = `${Math.max(1, 0.3 * s)}px ${b.border_style || 'solid'} ${b.border_color}`; });
+    if (b.type === 'shape' && b.border_style) { node.style.borderTopStyle = b.border_style; if (b.shape === 'frame') node.style.borderStyle = b.border_style; }
+    const body = node.querySelector('.eb-body');
+    if (body) Object.assign(body.style, { padding: b.padding !== undefined ? b.padding * s + 'px' : '', display: b.valign ? 'flex' : '', flexDirection: b.valign ? 'column' : '',
+      justifyContent: { middle: 'center', bottom: 'flex-end' }[b.valign] || '' });
+    node.querySelectorAll('.eb-eyebrow,.eb-under').forEach(x => { x.style.color = b.label_color || ''; });
     node.classList.toggle('is-out', isOut(b)); node.classList.toggle('is-locked', b.locked);
     node.setAttribute('aria-label', describe(b));
   }
@@ -171,6 +207,49 @@
     $('[data-text-hint]', props).textContent = main ? '' : 'Imprimé sous le contenu automatique du bloc. Laissez vide pour ne rien ajouter.';
     $$('[data-align]', props).forEach(button => button.setAttribute('aria-pressed', String(b.align === button.dataset.align)));
     $$('[data-column]', props).forEach(box => { box.checked = (b.columns || []).includes(box.dataset.column); });
+    $$('[data-toggle]', props).forEach(button => button.setAttribute('aria-pressed', String(!!b[button.dataset.toggle])));
+    $$('[data-valign]', props).forEach(button => button.setAttribute('aria-pressed', String((b.valign || 'top') === button.dataset.valign)));
+    ['label_color', 'header_bg', 'header_color'].forEach(key => { const f = $(`[data-prop="${key}"]`, props); if (f) f.value = b[key] || (key === 'header_color' ? '#111111' : key === 'header_bg' ? '#F5ECD4' : '#666666'); });
+    const desig = $('[data-col-label="designation"]', props); if (desig && document.activeElement !== desig) desig.value = (b.column_labels || {}).designation || '';
+    const colOrder = $('[data-col-order]', props);
+    if (colOrder && b.type === 'lines') {
+      const shown = (b.columns || []).filter(k => data.columns[k]), hidden = Object.keys(data.columns).filter(k => !shown.includes(k)), cl = b.column_labels || {};
+      const defaultsLabel = { quantity: 'Qté', unit_price: 'PU (F)', amount: 'Montant (F)' };
+      colOrder.replaceChildren(...[...shown, ...hidden].map((key, i) => {
+        const li = el('li', 'row-item'), on = shown.includes(key), box = el('input'), lab = el('label', 'check'), name = el('input', 'col-name');
+        box.type = 'checkbox'; box.checked = on; box.dataset.colKey = key; lab.append(box, data.columns[key]);
+        name.maxLength = 40; name.placeholder = defaultsLabel[key]; name.value = cl[key] || ''; name.dataset.colLabel = key; name.setAttribute('aria-label', `Intitulé de la colonne ${data.columns[key]}`);
+        const up = el('button', 'secondary icon-btn', '↑'), down = el('button', 'secondary icon-btn', '↓');
+        [[up, -1, 'Monter'], [down, 1, 'Descendre']].forEach(([btn, dir, word]) => { btn.type = 'button'; btn.dataset.colMove = key; btn.dataset.dir = String(dir); btn.setAttribute('aria-label', `${word} : ${data.columns[key]}`);
+          btn.disabled = !on || (dir < 0 ? i === 0 : i === shown.length - 1); });
+        li.append(lab, name, up, down); return li;
+      }));
+    }
+    $$('[data-separator]', props).forEach(box => { box.checked = (b.separators || []).includes(box.dataset.separator); });
+    const fieldOrder = $('[data-field-order]', props);
+    if (fieldOrder && (data.blockFields || {})[b.type]) {
+      const set = data.blockFields[b.type], shown = fieldKeys(b), hidden = Object.keys(set).filter(k => !shown.includes(k));
+      fieldOrder.replaceChildren(...[...shown, ...hidden].map((key, i) => {
+        const li = el('li', 'row-item'), on = shown.includes(key), box = el('input'), lab = el('label', 'check');
+        box.type = 'checkbox'; box.checked = on; box.dataset.fieldKey = key; lab.append(box, set[key]);
+        const up = el('button', 'secondary icon-btn', '↑'), down = el('button', 'secondary icon-btn', '↓');
+        [[up, -1, 'Monter'], [down, 1, 'Descendre']].forEach(([btn, dir, word]) => { btn.type = 'button'; btn.dataset.fieldMove = key; btn.dataset.dir = String(dir); btn.setAttribute('aria-label', `${word} : ${set[key]}`);
+          btn.disabled = !on || (dir < 0 ? i === 0 : i === shown.length - 1); });
+        li.append(lab, up, down); return li;
+      }));
+    }
+    const order = $('[data-row-order]', props);
+    if (order && b.type === 'lines') {
+      const set = rowSet(), shown = rowKeys(b).filter(k => set[k]), hidden = Object.keys(set).filter(k => !shown.includes(k));
+      order.replaceChildren(...[...shown, ...hidden].map((key, i) => {
+        const li = el('li', 'row-item'), on = shown.includes(key), box = el('input'), lab = el('label', 'check');
+        box.type = 'checkbox'; box.checked = on; box.dataset.rowKey = key; lab.append(box, set[key]);
+        const up = el('button', 'secondary icon-btn', '↑'), down = el('button', 'secondary icon-btn', '↓');
+        [[up, -1, 'Monter'], [down, 1, 'Descendre']].forEach(([btn, dir, word]) => { btn.type = 'button'; btn.dataset.rowMove = key; btn.dataset.dir = String(dir); btn.setAttribute('aria-label', `${word} : ${set[key]}`);
+          btn.disabled = !on || (dir < 0 ? i === 0 : i === shown.length - 1); });
+        li.append(lab, up, down); return li;
+      }));
+    }
     $$('[data-page-kind]', props).forEach(box => { box.checked = b.pages.includes(box.dataset.pageKind); });
   }
   function select(id, focus) {
@@ -181,7 +260,10 @@
     const b = find(selected); if (!b) return;
     if (!editing) { push(snapshot()); editing = true; }
     const key = field.dataset.prop;
-    if (['x', 'y', 'w', 'h', 'border_width'].includes(key)) { const value = parseFloat(String(field.value).replace(',', '.')); if (Number.isNaN(value)) return; b[key] = key === 'border_width' ? round(clamp(value, 0, 3)) : value; fit(b); }
+    const OPTIONAL = { line_height: [0.9, 2.5], letter_spacing: [0, 3], padding: [0, 8], radius: [0, 6] };
+    if (OPTIONAL[key]) { const value = parseFloat(String(field.value).replace(',', '.')); if (field.value === '' || Number.isNaN(value)) delete b[key]; else b[key] = Math.round(clamp(value, ...OPTIONAL[key]) * 100) / 100; }
+    else if (key === 'border_style') { if (field.value) b.border_style = field.value; else delete b.border_style; }
+    else if (['x', 'y', 'w', 'h', 'border_width'].includes(key)) { const value = parseFloat(String(field.value).replace(',', '.')); if (Number.isNaN(value)) return; b[key] = key === 'border_width' ? round(clamp(value, 0, 3)) : value; fit(b); }
     else if (key === 'size') { const value = parseInt(field.value, 10); if (Number.isNaN(value)) return; b.size = clamp(value, 6, 28); }
     else if (key === 'has_background') b.background = field.checked ? $('[data-prop="background"]', props).value.toUpperCase() : null;
     else if (key === 'background') { b.background = field.value.toUpperCase(); $('[data-prop="has_background"]', props).checked = true; }
@@ -189,14 +271,36 @@
     else b[key] = key.endsWith('color') ? field.value.toUpperCase() : field.value;
     save();
     const node = layer.querySelector(`[data-id="${CSS.escape(b.id)}"]`);
-    if (node && !['text', 'label', 'locked', 'source', 'shape', 'group', 'follow'].includes(key)) { paint(node, b); node.querySelector('.eb-tag')?.replaceChildren(`${data.types[b.type]} · ${String(b.w).replace('.', ',')} × ${String(b.h).replace('.', ',')} mm`); }
+    if (node && !['text', 'label', 'locked', 'source', 'shape', 'group', 'follow', 'field_labels', 'grid_h', 'grid_v', 'hide_header', 'stripes', 'no_row_lines', 'header_bg', 'header_color', 'label_color', 'padding'].includes(key)) { paint(node, b); node.querySelector('.eb-tag')?.replaceChildren(`${data.types[b.type]} · ${String(b.w).replace('.', ',')} × ${String(b.h).replace('.', ',')} mm`); }
     else render();
   }
-  props.addEventListener('input', event => { if (event.target.dataset.prop) update(event.target); });
+  props.addEventListener('input', event => {
+    if (event.target.dataset.prop) update(event.target);
+    const col = event.target.dataset.colLabel, b = find(selected);
+    if (col && b) {
+      if (!editing) { push(snapshot()); editing = true; }
+      const labels = { ...(b.column_labels || {}) }; if (event.target.value.trim()) labels[col] = event.target.value; else delete labels[col];
+      if (Object.keys(labels).length) b.column_labels = labels; else delete b.column_labels;
+      save(); const node = layer.querySelector(`[data-id="${CSS.escape(b.id)}"]`); if (node) { node.querySelector('.eb-body')?.replaceWith(sample(b)); paint(node, b); }
+    }
+  });
   props.addEventListener('change', event => {
     const field = event.target, b = find(selected); if (!b) return;
     if (field.dataset.prop) { update(field); editing = false; fill(); return; }
     if (field.dataset.column) commit(() => { b.columns = $$('[data-column]', props).filter(box => box.checked).map(box => box.dataset.column); });
+    if (field.dataset.colKey) commit(() => {
+      const shown = (b.columns || []).filter(k => k !== field.dataset.colKey);
+      b.columns = field.checked ? [...(b.columns || []), field.dataset.colKey] : shown;
+    });
+    if (field.dataset.fieldKey) commit(() => {
+      const shown = fieldKeys(b);
+      b.fields = field.checked ? [...shown, field.dataset.fieldKey] : shown.filter(k => k !== field.dataset.fieldKey);
+    });
+    if (field.dataset.separator) commit(() => { b.separators = $$('[data-separator]', props).filter(box => box.checked).map(box => box.dataset.separator); });
+    if (field.dataset.rowKey) commit(() => {
+      const set = rowSet(), others = rowKeys(b).filter(k => !set[k]), shown = rowKeys(b).filter(k => set[k]);
+      b.row_order = field.checked ? [...shown, field.dataset.rowKey, ...others] : [...shown.filter(k => k !== field.dataset.rowKey), ...others];
+    });
     if (field.dataset.pageKind) {
       const pages = $$('[data-page-kind]', props).filter(box => box.checked).map(box => box.dataset.pageKind);
       if (!pages.length) { field.checked = true; return; }
@@ -208,6 +312,38 @@
     const b = find(selected); if (!b) return;
     const align = event.target.closest('[data-align]'), insert = event.target.closest('[data-insert]');
     if (align) commit(() => { b.align = align.dataset.align; });
+    const toggle = event.target.closest('[data-toggle]'), move = event.target.closest('[data-row-move]'), fieldMove = event.target.closest('[data-field-move]');
+    const colMove = event.target.closest('[data-col-move]'), valign = event.target.closest('[data-valign]'), clear = event.target.closest('[data-clear-prop]'), layerMove = event.target.closest('[data-layer-move]');
+    if (colMove) {
+      const key = colMove.dataset.colMove, dir = Number(colMove.dataset.dir);
+      commit(() => { const cols = [...(b.columns || [])], i = cols.indexOf(key), j = i + dir; if (i < 0 || j < 0 || j >= cols.length) return; [cols[i], cols[j]] = [cols[j], cols[i]]; b.columns = cols; });
+      props.querySelector(`[data-col-move="${CSS.escape(key)}"][data-dir="${colMove.dataset.dir}"]`)?.focus();
+    }
+    if (valign) commit(() => { if (valign.dataset.valign === 'top') delete b.valign; else b.valign = valign.dataset.valign; });
+    if (clear) commit(() => { delete b[clear.dataset.clearProp]; });
+    if (layerMove) commit(() => { state.items = state.items.filter(item => item !== b); if (layerMove.dataset.layerMove === 'front') state.items.push(b); else state.items.unshift(b); });
+    if (event.target.closest('[data-duplicate-block]')) {
+      if (state.items.length >= 60) return;
+      let id = b.type; for (let n = 2; find(id); n++) id = `${b.type}-${n}`;
+      const copy = { ...JSON.parse(JSON.stringify(b)), id, x: b.x + 5, y: b.y + 5, locked: false }; fit(copy);
+      commit(() => { state.items.push(copy); selected = id; });
+      layer.querySelector(`[data-id="${CSS.escape(id)}"]`)?.focus();
+    }
+    if (fieldMove) {
+      const key = fieldMove.dataset.fieldMove, dir = Number(fieldMove.dataset.dir);
+      commit(() => { const shown = [...fieldKeys(b)], i = shown.indexOf(key), j = i + dir; if (i < 0 || j < 0 || j >= shown.length) return; [shown[i], shown[j]] = [shown[j], shown[i]]; b.fields = shown; });
+      props.querySelector(`[data-field-move="${CSS.escape(key)}"][data-dir="${fieldMove.dataset.dir}"]`)?.focus();
+    }
+    if (toggle) commit(() => { b[toggle.dataset.toggle] = !b[toggle.dataset.toggle]; });
+    if (move) {
+      const key = move.dataset.rowMove, dir = Number(move.dataset.dir);
+      commit(() => {
+        const set = rowSet(), shown = rowKeys(b).filter(k => set[k]), others = rowKeys(b).filter(k => !set[k]), i = shown.indexOf(key), j = i + dir;
+        if (i < 0 || j < 0 || j >= shown.length) return;
+        [shown[i], shown[j]] = [shown[j], shown[i]]; b.row_order = [...shown, ...others];
+      });
+      props.querySelector(`[data-row-move="${CSS.escape(key)}"][data-dir="${move.dataset.dir}"]`)?.focus();
+    }
     if (insert) {
       const area = $('[data-prop="text"]', props), start = area.selectionStart ?? area.value.length, end = area.selectionEnd ?? start;
       area.value = area.value.slice(0, start) + insert.dataset.insert + area.value.slice(end);

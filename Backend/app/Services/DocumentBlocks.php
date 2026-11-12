@@ -33,6 +33,19 @@ final class DocumentBlocks
     /** Intitulés modifiables par bloc (vide : intitulé par défaut). */
     public const LABELS=['title'=>'DEVIS','client'=>'Client','object'=>'Objet','lines'=>'Désignation','total'=>'TOTAL GÉNÉRAL','payment'=>'Conditions de paiement',
         'commitment'=>'Notre engagement.','signature'=>'Bon pour accord, signature du client','stamp'=>'Cachet et signature de l’entreprise'];
+    /** Lignes des tableaux, dans l'ordre par défaut ; l'éditeur choisit celles affichées et leur ordre. */
+    public const ROWS=['designations'=>'Désignations (par ouverture)','fees'=>'Pose, livraison et frais','subtotal'=>'Sous-total (avec taxes ou remise)','tax'=>'Taxes','discount'=>'Remise commerciale'];
+    public const RECEIPT_ROWS=['received'=>'Montant reçu','method'=>'Moyen de paiement','reference'=>'Référence du paiement','quote_total'=>'Total du devis','cumulative'=>'Cumul reçu à l’édition','remaining'=>'Reste à payer à l’édition'];
+    /** Lignes de séparation d'un bloc (couleur de bordure du bloc). Dans un texte, une ligne « --- » trace aussi une séparation. */
+    public const SEPARATORS=['top'=>'Au-dessus du bloc','label'=>'Sous l’intitulé','bottom'=>'Sous le bloc'];
+    /**
+     * Lignes qui composent les blocs Client et Entreprise. Avec l'option grille, chaque ligne est affichée séparément,
+     * dans l'ordre choisi, avec son intitulé, des traits horizontaux entre les lignes et un trait vertical entre intitulé et valeur.
+     */
+    public const BLOCK_FIELDS=[
+        'client'=>['name'=>'Nom','phone'=>'Téléphone','address'=>'Adresse','email'=>'E-mail'],
+        'company'=>['name'=>'Entreprise','activities'=>'Activités','address'=>'Adresse','phone'=>'Téléphone','email'=>'E-mail'],
+    ];
     /** Blocs automatiques qui acceptent un texte complémentaire, imprimé sous leur contenu. */
     public const COMPLEMENT_TYPES=['company','title','client','object','total','payment','signature','stamp','footer'];
     public const COLUMNS=['quantity'=>'Quantité','unit_price'=>'Prix unitaire','amount'=>'Montant'];
@@ -75,6 +88,20 @@ final class DocumentBlocks
                 'size'=>max(6,min(28,(int)($item['size'] ?? 9))),
                 'color'=>$color('color','#111111'),'background'=>$color('background',null),
                 'border_width'=>round(max(0,min(3,(float)($item['border_width'] ?? 0))),1),'border_color'=>$color('border_color','#C9A037')];
+            // Options facultatives : absentes, le bloc garde exactement son rendu habituel.
+            $opt=function (string $key,float $min,float $max,int $decimals=1) use ($item) {
+                $value=$item[$key] ?? null;
+                return is_int($value) || is_float($value) || (is_string($value) && is_numeric($value)) ? round(max($min,min($max,(float)$value)),$decimals) : null;
+            };
+            foreach ([['line_height',0.9,2.5,2],['padding',0,8,1],['letter_spacing',0,3,1],['radius',0,6,1]] as [$key,$min,$max,$dec]) if (($v=$opt($key,$min,$max,$dec))!==null) $block[$key]=$v;
+            if (in_array($item['valign'] ?? '',['middle','bottom'],true)) $block['valign']=$item['valign'];
+            if (in_array($item['border_style'] ?? '',['dashed','dotted'],true)) $block['border_style']=$item['border_style'];
+            if (($item['uppercase'] ?? false)===true) $block['uppercase']=true;
+            if ($c=$color('label_color',null)) $block['label_color']=$c;
+            if ($type!=='shape') {
+                $block['bold']=($item['bold'] ?? false)===true; $block['italic']=($item['italic'] ?? false)===true;
+                $block['separators']=array_values(array_intersect(array_keys(self::SEPARATORS),is_array($item['separators'] ?? null) ? $item['separators'] : []));
+            }
             if (in_array($type,self::TEXT_TYPES,true) || in_array($type,self::COMPLEMENT_TYPES,true)) {
                 $text=$item['text'] ?? '';
                 if (!is_string($text) || mb_strlen($text)>2000) $fail(self::TYPES[$type].' : 2 000 caractères au maximum.');
@@ -86,9 +113,25 @@ final class DocumentBlocks
                 if (trim($label)!=='') $block['label']=trim($label);
             }
             if ($type==='lines') {
-                $block['columns']=array_values(array_intersect(array_keys(self::COLUMNS),is_array($item['columns'] ?? null) ? $item['columns'] : array_keys(self::COLUMNS)));
                 $block['group']=($item['group'] ?? true)!==false;
                 $block['follow']=($item['follow'] ?? true)!==false;
+                // Colonnes dans l'ordre choisi, intitulés de colonnes, en-tête et lignes du tableau.
+                $block['columns']=array_values(array_unique(array_filter(is_array($item['columns'] ?? null) ? $item['columns'] : array_keys(self::COLUMNS),fn($c)=>is_string($c) && isset(self::COLUMNS[$c]))));
+                $labels=[];
+                foreach (['designation','quantity','unit_price','amount'] as $col) {
+                    $text=$item['column_labels'][$col] ?? null;
+                    if (is_string($text) && trim($text)!=='') $labels[$col]=mb_substr(trim($text),0,40);
+                }
+                if ($labels) $block['column_labels']=$labels;
+                foreach (['hide_header','no_row_lines','stripes'] as $flag) if (($item[$flag] ?? false)===true) $block[$flag]=true;
+                foreach (['header_bg','header_color'] as $key) if ($c=$color($key,null)) $block[$key]=$c;
+                // Lignes affichées, dans l'ordre choisi ; absent : toutes, dans l'ordre par défaut.
+                $known=[...array_keys(self::ROWS),...array_keys(self::RECEIPT_ROWS)];
+                $block['row_order']=is_array($item['row_order'] ?? null) ? array_values(array_unique(array_filter($item['row_order'],fn($k)=>is_string($k) && in_array($k,$known,true)))) : $known;
+            }
+            if (isset(self::BLOCK_FIELDS[$type])) {
+                if (is_array($item['fields'] ?? null)) $block['fields']=array_values(array_unique(array_filter($item['fields'],fn($k)=>is_string($k) && isset(self::BLOCK_FIELDS[$type][$k]))));
+                foreach (['field_labels','grid_h','grid_v'] as $flag) $block[$flag]=($item[$flag] ?? false)===true;
             }
             if ($type==='logo') $block['source']=array_key_exists($item['source'] ?? '',self::SOURCES) ? $item['source'] : 'logo';
             if ($type==='shape') $block['shape']=($item['shape'] ?? '')==='line' ? 'line' : 'frame';
@@ -140,27 +183,32 @@ final class DocumentBlocks
             'unit_price'=>!empty($l['pending']) ? 'À définir' : $money($l['unitPrice'] ?? $l['unit_price'] ?? 0),
             'amount'=>!empty($l['pending']) ? 'À définir' : $money($l['displayAmount'] ?? $l['amount'] ?? 0)];
         $rows=[];
+        $order=$block['row_order'] ?? [...array_keys(self::ROWS),...array_keys(self::RECEIPT_ROWS)];
         if (($vm['kind'] ?? '')==='receipt') {
-            foreach (['Montant reçu'=>$money($vm['receipt']['amount'] ?? 0),'Moyen de paiement'=>$vm['receipt']['method'] ?? '','Référence du paiement'=>($vm['receipt']['reference'] ?? '') ?: '—',
-                'Total du devis'=>$money($vm['totals']['total'] ?? 0),'Cumul reçu à l’édition'=>$money($vm['payment_plan']['received'] ?? 0),'Reste à payer à l’édition'=>$money($vm['remaining_amount'] ?? 0)] as $label=>$value)
-                $rows[]=['kind'=>'sum','label'=>$label,'amount'=>$value];
+            $values=['received'=>$money($vm['receipt']['amount'] ?? 0),'method'=>$vm['receipt']['method'] ?? '','reference'=>($vm['receipt']['reference'] ?? '') ?: '—',
+                'quote_total'=>$money($vm['totals']['total'] ?? 0),'cumulative'=>$money($vm['payment_plan']['received'] ?? 0),'remaining'=>$money($vm['remaining_amount'] ?? 0)];
+            foreach ($order as $key) if (isset(self::RECEIPT_ROWS[$key])) $rows[]=['kind'=>'sum','label'=>self::RECEIPT_ROWS[$key],'amount'=>$values[$key]];
             return $rows;
         }
-        $groups=$vm['opening_groups'] ?? [];
-        foreach ($groups as $room=>$openings) {
-            if ($room!=='' && $block['group']) $rows[]=['kind'=>'room','label'=>$room];
-            foreach ($openings as $opening) {
-                if ($block['group']) $rows[]=['kind'=>'opening','label'=>$opening['label'].' · '.$opening['dimensions'].(($opening['quantity'] ?? 1)>1 ? ' · '.$opening['quantity'].' exemplaires' : '')];
-                foreach ($opening['lines'] as $l) $rows[]=$line($l,$block['group'] ? '' : $opening['label'].' — ');
-                if ($block['group']) $rows[]=['kind'=>'subtotal','label'=>'Sous-total '.$opening['label'],'amount'=>$money($opening['subtotal'])];
-            }
-        }
-        if (!$groups) foreach ($vm['lines'] ?? [] as $l) $rows[]=$line($l);
-        foreach ($vm['fee_rows'] ?? [] as $fee) $rows[]=$line($fee);
         $totals=$vm['totals'] ?? [];
-        if (!empty($totals['tax']) || !empty($totals['discountAmount'])) $rows[]=['kind'=>'sum','label'=>'Sous-total','amount'=>$money($totals['subtotal'] ?? 0)];
-        if (!empty($totals['tax'])) $rows[]=['kind'=>'sum','label'=>'Taxes','amount'=>$money($totals['tax'])];
-        if (!empty($totals['discountAmount'])) $rows[]=['kind'=>'sum','label'=>'Remise commerciale','amount'=>'−'.$money($totals['discountAmount'])];
+        foreach ($order as $key) switch ($key) {
+            case 'designations':
+                $groups=$vm['opening_groups'] ?? [];
+                foreach ($groups as $room=>$openings) {
+                    if ($room!=='' && $block['group']) $rows[]=['kind'=>'room','label'=>$room];
+                    foreach ($openings as $opening) {
+                        if ($block['group']) $rows[]=['kind'=>'opening','label'=>$opening['label'].' · '.$opening['dimensions'].(($opening['quantity'] ?? 1)>1 ? ' · '.$opening['quantity'].' exemplaires' : '')];
+                        foreach ($opening['lines'] as $l) $rows[]=$line($l,$block['group'] ? '' : $opening['label'].' — ');
+                        if ($block['group']) $rows[]=['kind'=>'subtotal','label'=>'Sous-total '.$opening['label'],'amount'=>$money($opening['subtotal'])];
+                    }
+                }
+                if (!$groups) foreach ($vm['lines'] ?? [] as $l) $rows[]=$line($l);
+                break;
+            case 'fees': foreach ($vm['fee_rows'] ?? [] as $fee) $rows[]=$line($fee); break;
+            case 'subtotal': if (!empty($totals['tax']) || !empty($totals['discountAmount'])) $rows[]=['kind'=>'sum','label'=>'Sous-total','amount'=>$money($totals['subtotal'] ?? 0)]; break;
+            case 'tax': if (!empty($totals['tax'])) $rows[]=['kind'=>'sum','label'=>'Taxes','amount'=>$money($totals['tax'])]; break;
+            case 'discount': if (!empty($totals['discountAmount'])) $rows[]=['kind'=>'sum','label'=>'Remise commerciale','amount'=>'−'.$money($totals['discountAmount'])]; break;
+        }
         return $rows;
     }
 

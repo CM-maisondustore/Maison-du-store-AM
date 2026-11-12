@@ -116,3 +116,22 @@ input.editor-name:hover,input.editor-name:focus{border-color:var(--pro-line-stro
   .doc-settings .check{min-height:44px}
   .swatch{min-height:48px}
 }
+/* Séparations et ordre des lignes du tableau */
+.eb-under{border-bottom:1px solid currentColor;padding-bottom:.2em;margin-bottom:.3em!important}
+.eb-sep{display:block;border-top:1px solid #C9A037;margin:.3em 0}
+.row-order{list-style:none;margin:6px 0 10px;padding:0;display:flex;flex-direction:column;gap:4px}
+.row-item{display:flex;align-items:center;gap:6px;padding:4px 6px;border:1px solid var(--pro-line);border-radius:var(--r-6);background:var(--pro-panel)}
+.row-item .check{flex:1;margin:0}
+.row-item .icon-btn{min-height:30px;min-width:30px;padding:0}
+/* Grille des blocs Client et Entreprise */
+.eb-grid{display:flex;flex-direction:column}
+.eb-grid-row{display:flex;gap:.5em;padding:.15em 0}
+.eb-grid-row.h{border-bottom:1px solid}
+.eb-grid-k{flex:0 0 28%;color:#666;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.eb-grid-k.v{border-right:1px solid;padding-right:.4em}
+/* Options de mise en page : couleurs avec retour par défaut, colonnes du tableau */
+.color-reset{display:flex;align-items:center;gap:6px}
+.color-reset input[type=color]{flex:0 0 44px}
+.row-item .col-name{flex:1;min-width:0;min-height:30px;padding:2px 6px}
+.row-item .col-name+.icon-btn{margin-left:2px}
+.col-designation{margin-top:4px}

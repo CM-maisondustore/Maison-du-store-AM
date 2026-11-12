@@ -94,25 +94,85 @@ class LayoutMessagesLinksTest extends TestCase
         $this->get(route('staff.quotes.layout', $quote))->assertStatus(409);
     }
 
-    public function test_messages_are_professional_with_site_links_except_document_links(): void
+    public function test_message_templates_use_a_professional_style_and_site_link_variables(): void
     {
+        $this->seed();
         config(['app.url' => 'https://maisondustoream.com']);
+        // Style des messages : liens vers le site, sauf WhatsApp devis / facture (lien du document), emojis discrets.
         [, $waQuote] = MdsTemplates::message('quote', 'whatsapp');
-        $this->assertStringNotContainsString('{{site}}', $waQuote, 'Le message WhatsApp du devis porte déjà le lien du document.');
-        $this->assertStringNotContainsString('{{lien_', $waQuote);
-        foreach (['quote_received', 'appointment', 'promotion', 'commercial'] as $key) {
-            foreach (['email', 'whatsapp'] as $channel) {
-                [, $body] = MdsTemplates::message($key, $channel);
-                $this->assertMatchesRegularExpression('/\{\{(site|lien_[a-z_]+)\}\}/', $body, "$key / $channel : lien vers le site attendu.");
-                CommunicationTemplates::validateText($body);
-                $this->assertLessThanOrEqual(4, preg_match_all('/[\x{1F300}-\x{1FAFF}\x{2600}-\x{27BF}\x{23F0}]/u', $body), "$key / $channel : emojis discrets.");
-            }
+        $this->assertDoesNotMatchRegularExpression('/\{\{(site|lien_[a-z_]+)\}\}/', $waQuote);
+        foreach (['quote_received', 'appointment', 'promotion', 'commercial'] as $key) foreach (['email', 'whatsapp'] as $channel) {
+            [, $body] = MdsTemplates::message($key, $channel);
+            $this->assertMatchesRegularExpression('/\{\{(site|lien_[a-z_]+)\}\}/', $body, "$key / $channel : lien vers le site attendu.");
+            CommunicationTemplates::validateText($body);
+            $this->assertLessThanOrEqual(4, preg_match_all('/[\x{1F300}-\x{1FAFF}\x{2600}-\x{27BF}\x{23F0}]/u', $body));
         }
-        $draft = CommunicationTemplates::draft('quote_received', [...CommunicationTemplates::context(), 'prenom' => 'Awa', 'reference' => 'AM-1'], 'whatsapp');
+        $saved = CommunicationTemplate::where('channel', 'whatsapp')->where('key', 'quote_received')->firstOrFail();
+
+        // Options à insérer soi-même : variables de liens, avec la provenance du message.
+        foreach (['site', 'lien_devis', 'lien_realisations', 'lien_boutique', 'lien_rendez_vous'] as $variable) $this->assertContains($variable, CommunicationTemplates::VARIABLES);
+        CommunicationTemplates::validateText('Découvrez nos réalisations 👉 {{lien_realisations}} · {{site}}');
+        $saved->update(['body' => "Bonjour {{prenom}},\n✅ Demande reçue.\nNos réalisations : {{lien_realisations}}\n🌐 {{site}}"]);
+        $draft = CommunicationTemplates::draft('quote_received', [...CommunicationTemplates::context(), 'prenom' => 'Awa'], 'whatsapp');
         $this->assertStringContainsString('https://maisondustoream.com/?utm_source=whatsapp&utm_medium=message&utm_campaign=quote_received#realisations', $draft['body']);
         $this->assertStringContainsString('🌐 maisondustoream.com', $draft['body']);
-        [, $email] = MdsTemplates::message('quote', 'email');
-        $this->assertStringContainsString('{{lien_realisations}}', $email, 'L’e-mail joint le PDF : il peut porter un lien vers le site.');
+        $this->actingAs($this->admin())->get(route('staff.communications.edit', $saved))->assertOk()->assertSee('Liens vers le site');
+    }
+
+    public function test_table_rows_separators_and_client_grid_are_options_off_by_default(): void
+    {
+        $starter = DocumentBlocks::starter();
+        $plain = DocumentBlocks::normalize(json_encode($starter));
+        $data = fn (array $blocks) => DocumentViewModel::prepare(DocumentPreview::data('quote', 'discount', [...DocumentLayout::defaults(), 'blocks' => $blocks]));
+        $before = view('documents.blocks', $data($plain))->render();
+        $this->assertStringNotContainsString('border-right:0.25mm', $before, 'Sans option, le bloc client garde sa présentation.');
+
+        foreach ($starter['items'] as &$item) {
+            if ($item['id'] === 'lines') $item['row_order'] = ['discount', 'designations'];
+            if ($item['type'] === 'client') $item = [...$item, 'fields' => ['phone', 'name'], 'field_labels' => true, 'grid_h' => true, 'grid_v' => true, 'separators' => ['label', 'bottom'], 'bold' => true];
+            if ($item['type'] === 'payment') $item['text'] = "Avant\n---\nAprès";
+        }
+        unset($item);
+        $blocks = DocumentBlocks::normalize(json_encode($starter));
+        $lines = collect($blocks['items'])->firstWhere('id', 'lines');
+        $this->assertSame(['discount', 'designations'], $lines['row_order']);
+        $rows = DocumentBlocks::rows($data($blocks), $lines);
+        $this->assertSame('Remise commerciale', $rows[0]['label'], 'La remise passe en premier.');
+        $this->assertNotContains('Pose et livraison', array_column($rows, 'label'), 'Les frais ne sont plus affichés.');
+
+        $html = html_entity_decode(view('documents.blocks', $data($blocks))->render());
+        $this->assertMatchesRegularExpression('/Téléphone<\/td><td[^>]*>[^<]+<\/td><\/tr><tr><td[^>]*border-right:0\.25mm[^>]*>Nom/u', $html, 'Téléphone puis Nom, intitulés et trait vertical.');
+        $this->assertStringContainsString('border-bottom:0.25mm solid', $html);
+        $this->assertStringContainsString('font-weight:bold;', $html);
+        $this->assertStringContainsString('>Avant</p><div style="border-top:0.25mm solid', $html);
+        $this->assertStringStartsWith('%PDF', app(Documents::class)->render(DocumentPreview::data('quote', 'discount', [...DocumentLayout::defaults(), 'blocks' => $blocks])));
+    }
+
+    public function test_extra_layout_options_render_only_when_chosen(): void
+    {
+        $starter = DocumentBlocks::starter();
+        $plain = DocumentBlocks::normalize(json_encode($starter));
+        $vm = fn (array $blocks) => DocumentViewModel::prepare(DocumentPreview::data('quote', 'four', [...DocumentLayout::defaults(), 'blocks' => $blocks]));
+        $html = view('documents.blocks', $vm($plain))->render();
+        foreach (['line-height:1.6', 'letter-spacing:0.5pt', 'border-radius:2mm', '0.3mm dashed', 'padding:3mm', 'color:#AA0000'] as $absent) $this->assertStringNotContainsString($absent, $html, "$absent absent sans option.");
+
+        foreach ($starter['items'] as &$item) {
+            if ($item['id'] === 'lines') $item = [...$item, 'columns' => ['amount', 'quantity'], 'column_labels' => ['designation' => 'Article', 'amount' => 'Total'], 'stripes' => true, 'no_row_lines' => true, 'header_bg' => '#123456', 'header_color' => '#FFFFFF'];
+            if ($item['type'] === 'client') $item = [...$item, 'line_height' => 1.6, 'letter_spacing' => 0.5, 'uppercase' => true, 'radius' => 2, 'padding' => 3, 'valign' => 'middle', 'border_style' => 'dashed', 'border_width' => 0.3, 'label_color' => '#AA0000'];
+            if ($item['type'] === 'company') $item = [...$item, 'line_height' => 9, 'valign' => 'sideways', 'border_style' => 'wavy'];
+        }
+        unset($item);
+        $blocks = DocumentBlocks::normalize(json_encode($starter));
+        $company = collect($blocks['items'])->firstWhere('type', 'company');
+        $this->assertSame(2.5, $company['line_height'], 'Valeur bornée.');
+        $this->assertArrayNotHasKey('valign', $company); $this->assertArrayNotHasKey('border_style', $company);
+        $this->assertSame(['amount', 'quantity'], collect($blocks['items'])->firstWhere('id', 'lines')['columns'], 'Ordre des colonnes conservé.');
+
+        $html = html_entity_decode(view('documents.blocks', $vm($blocks))->render());
+        foreach (['line-height:1.6;', 'letter-spacing:0.5pt;', 'text-transform:uppercase;', 'border-radius:2mm;', 'padding:3mm;', 'vertical-align:middle', '0.3mm dashed', 'color:#AA0000;',
+            '>Article</th>', 'background:#123456;color:#FFFFFF;', 'border-bottom:0;'] as $needle) $this->assertStringContainsString($needle, $html, $needle);
+        $this->assertMatchesRegularExpression('/>Total<\/th>\s*<th[^>]*>Qté<\/th>/u', $html, 'Montant puis quantité.');
+        $this->assertStringStartsWith('%PDF', app(Documents::class)->render(DocumentPreview::data('quote', 'four', [...DocumentLayout::defaults(), 'blocks' => $blocks])));
     }
 
     public function test_visitors_page_follows_transmitted_links(): void

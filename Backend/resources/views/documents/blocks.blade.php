@@ -8,10 +8,48 @@
  $box=function(array $b){
    $css='left:'.$b['x'].'mm;top:'.$b['y'].'mm;width:'.$b['w'].'mm;height:'.$b['h'].'mm;font-family:'.\App\Services\DocumentBlocks::fontStack($b['font']).';font-size:'.$b['size'].'pt;color:'.$b['color'].';text-align:'.$b['align'].';';
    if ($b['background']) $css.='background:'.$b['background'].';';
-   if ($b['border_width']>0) $css.='border:'.$b['border_width'].'mm solid '.$b['border_color'].';';
+   $bs=$b['border_style'] ?? 'solid';
+   if ($b['border_width']>0) $css.='border:'.$b['border_width'].'mm '.$bs.' '.$b['border_color'].';';
+   if (!empty($b['bold'])) $css.='font-weight:bold;';
+   if (!empty($b['italic'])) $css.='font-style:italic;';
+   if (isset($b['line_height'])) $css.='line-height:'.$b['line_height'].';';
+   if (isset($b['letter_spacing'])) $css.='letter-spacing:'.$b['letter_spacing'].'pt;';
+   if (!empty($b['uppercase'])) $css.='text-transform:uppercase;';
+   if (isset($b['radius'])) $css.='border-radius:'.$b['radius'].'mm;';
+   $sep='0.3mm '.$bs.' '.$b['border_color'];
+   if (in_array('top',$b['separators'] ?? [],true)) $css.='border-top:'.$sep.';';
+   if (in_array('bottom',$b['separators'] ?? [],true)) $css.='border-bottom:'.$sep.';';
    return $css;
  };
+ // Ligne sous l'intitulé d'un bloc (option « Sous l'intitulé »).
+ $under=fn(array $b)=>(in_array('label',$b['separators'] ?? [],true) ? 'border-bottom:0.25mm '.($b['border_style'] ?? 'solid').' '.$b['border_color'].';padding-bottom:0.8mm;margin-bottom:1.2mm;' : '')
+   .(!empty($b['label_color']) ? 'color:'.$b['label_color'].';' : '');
+ // Marge intérieure et alignement vertical : seulement si l'option est choisie.
+ $inStyle=fn(array $b)=>isset($b['padding']) ? 'padding:'.$b['padding'].'mm;' : '';
+ // Texte saisi : échappé ; une ligne « --- » devient une ligne de séparation.
+ $prose=function(string $text,array $b) use (&$fields){
+   $html=''; $buffer=[];
+   $flush=function() use (&$buffer,&$html){ if ($buffer) { $html.='<p class="prose">'.e(implode("\n",$buffer)).'</p>'; $buffer=[]; } };
+   foreach (preg_split('/\r?\n/',strtr($text,$fields)) as $line) {
+     if (preg_match('/^\s*-{3,}\s*$/',$line)) { $flush(); $html.='<div style="border-top:0.25mm solid '.$b['border_color'].';margin:1mm 0"></div>'; } else $buffer[]=$line;
+   }
+   $flush(); return $html;
+ };
  $money=fn($value)=>\App\Services\DocumentViewModel::money($value);
+ // Bloc en grille (Client, Entreprise) : une ligne par information, intitulés et traits facultatifs.
+ $gridOn=fn(array $b)=>isset($b['fields']) || !empty($b['field_labels']) || !empty($b['grid_h']) || !empty($b['grid_v']);
+ $grid=function(array $b,array $values){
+   $labels=\App\Services\DocumentBlocks::BLOCK_FIELDS[$b['type']]; $keys=$b['fields'] ?? array_keys($labels);
+   $rows=array_values(array_filter(array_map(fn($k)=>[$k,$labels[$k],trim((string)($values[$k] ?? ''))],$keys),fn($r)=>$r[2]!==''));
+   $line='0.25mm solid '.$b['border_color']; $html='<table style="width:100%;border-collapse:collapse">';
+   foreach ($rows as $i=>[$key,$label,$value]) {
+     $h=!empty($b['grid_h']) && $i<count($rows)-1 ? 'border-bottom:'.$line.';' : '';
+     $html.='<tr>';
+     if (!empty($b['field_labels'])) $html.='<td style="'.$h.'padding:0.6mm 1.5mm 0.6mm 0;width:28%;vertical-align:top;color:#666;white-space:nowrap;'.(!empty($b['grid_v']) ? 'border-right:'.$line.';' : '').'">'.e($label).'</td>';
+     $html.='<td style="'.$h.'padding:0.6mm 0 0.6mm '.(!empty($b['field_labels']) ? '1.5mm' : '0').';vertical-align:top;'.($key==='name' ? 'font-weight:bold;' : '').'">'.e($value).'</td></tr>';
+   }
+   return $html.'</table>';
+ };
  // Intitulé saisi dans l'éditeur, sinon celui par défaut ; texte complémentaire sous le contenu automatique.
  $label=fn(array $b,string $default)=>trim($b['label'] ?? '')!=='' ? $b['label'] : $default;
  $complement=fn(array $b)=>in_array($b['type'],\App\Services\DocumentBlocks::COMPLEMENT_TYPES,true) && trim($b['text'] ?? '')!=='' ? strtr($b['text'],$fields) : '';
@@ -52,45 +90,48 @@ img.fit { max-width:100%; max-height:100%; }
 @foreach($page['items'] as $b)
 @php $type=$b['type']; @endphp
 @if($type==='shape')
-<div class="b" style="left:{{ $b['x'] }}mm;top:{{ $b['y'] }}mm;width:{{ $b['w'] }}mm;height:{{ $b['shape']==='line' ? 0 : $b['h'] }}mm;{{ $b['shape']==='line' ? 'border-top:'.max(0.2,$b['border_width']).'mm solid '.$b['border_color'] : 'border:'.max(0.2,$b['border_width']).'mm solid '.$b['border_color'] }};{{ $b['background'] && $b['shape']==='frame' ? 'background:'.$b['background'] : '' }}"></div>
+<div class="b" style="left:{{ $b['x'] }}mm;top:{{ $b['y'] }}mm;width:{{ $b['w'] }}mm;height:{{ $b['shape']==='line' ? 0 : $b['h'] }}mm;{{ $b['shape']==='line' ? 'border-top:'.max(0.2,$b['border_width']).'mm '.($b['border_style'] ?? 'solid').' '.$b['border_color'] : 'border:'.max(0.2,$b['border_width']).'mm '.($b['border_style'] ?? 'solid').' '.$b['border_color'].(isset($b['radius']) ? ';border-radius:'.$b['radius'].'mm' : '') }};{{ $b['background'] && $b['shape']==='frame' ? 'background:'.$b['background'] : '' }}"></div>
 @elseif($type==='logo')
 @if(!empty($style[$b['source']]))<div class="b" style="{{ $box($b) }}"><img class="fit" src="{{ $style[$b['source']] }}" alt="{{ \App\Services\DocumentBlocks::SOURCES[$b['source']] }}" style="max-width:{{ $b['w'] }}mm;max-height:{{ $b['h'] }}mm"></div>@endif
 @elseif($type==='lines')
 @php
  $rh=round(\App\Services\DocumentBlocks::rowHeight($b)-0.3,2);
- $cols=array_values(array_intersect(['quantity','unit_price','amount'],$b['columns']));
+ $cols=array_values(array_intersect($b['columns'],['quantity','unit_price','amount']));
+ $colLabel=fn(string $c,string $default)=>$b['column_labels'][$c] ?? $default;
+ $thStyle=(!empty($b['header_bg']) ? 'background:'.$b['header_bg'].';' : '').(!empty($b['header_color']) ? 'color:'.$b['header_color'].';' : '');
+ $tdLine=!empty($b['no_row_lines']) ? 'border-bottom:0;' : '';
  $widths=['quantity'=>0.14,'unit_price'=>0.17,'amount'=>0.19];
  $designation=1-array_sum(array_map(fn($c)=>$widths[$c],$cols));
  $span=count($cols)+1;
 @endphp
-<div class="b" style="{{ $box($b) }}"><table class="lines"><thead><tr>@if($kind==='receipt')<th style="height:{{ $rh }}mm" colspan="{{ max(1,$span-1) }}">Détail</th>@if($span>1)<th class="n" style="height:{{ $rh }}mm">Valeur</th>@endif @else<th style="height:{{ $rh }}mm;width:{{ round($designation*100,2) }}%">{{ $label($b,'Désignation') }}</th>
-@foreach($cols as $c)<th class="n" style="height:{{ $rh }}mm;width:{{ $widths[$c]*100 }}%">{{ ['quantity'=>'Qté','unit_price'=>'PU (F)','amount'=>'Montant (F)'][$c] }}</th>@endforeach @endif</tr></thead><tbody>
+<div class="b" style="{{ $box($b) }}"><table class="lines">@if(empty($b['hide_header']))<thead><tr>@if($kind==='receipt')<th style="height:{{ $rh }}mm;{{ $thStyle }}" colspan="{{ max(1,$span-1) }}">{{ $colLabel('designation','Détail') }}</th>@if($span>1)<th class="n" style="height:{{ $rh }}mm;{{ $thStyle }}">{{ $colLabel('amount','Valeur') }}</th>@endif @else<th style="height:{{ $rh }}mm;width:{{ round($designation*100,2) }}%;{{ $thStyle }}">{{ $colLabel('designation',$label($b,'Désignation')) }}</th>
+@foreach($cols as $c)<th class="n" style="height:{{ $rh }}mm;width:{{ $widths[$c]*100 }}%;{{ $thStyle }}">{{ $colLabel($c,['quantity'=>'Qté','unit_price'=>'PU (F)','amount'=>'Montant (F)'][$c]) }}</th>@endforeach @endif</tr></thead>@endif<tbody>
 @foreach($b['rows'] as $row)
-<tr class="{{ $row['kind'] }}">
-@if(in_array($row['kind'],['opening','room'],true))<td style="height:{{ $rh }}mm" colspan="{{ $span }}">{{ $clip($row['label'],$b['w']-3,$b['size']) }}</td>
-@elseif(in_array($row['kind'],['subtotal','sum'],true))<td style="height:{{ $rh }}mm" colspan="{{ max(1,$span-1) }}">{{ $clip($row['label'],$b['w']*0.6,$b['size']) }}</td>@if($span>1)<td class="n" style="height:{{ $rh }}mm">{{ $row['amount'] }}</td>@endif
-@else<td style="height:{{ $rh }}mm">{{ $clip($row['label'],$b['w']*$designation-2.4,$b['size']) }}</td>@foreach($cols as $c)<td class="n" style="height:{{ $rh }}mm">{{ $row[$c] }}</td>@endforeach
+<tr class="{{ $row['kind'] }}" @if($tdLine || (!empty($b['stripes']) && $row['kind']==='line' && $loop->even)) style="{{ !empty($b['stripes']) && $row['kind']==='line' && $loop->even ? 'background:'.$style['stripe_color'].';' : '' }}" @endif>
+@if(in_array($row['kind'],['opening','room'],true))<td style="height:{{ $rh }}mm;{{ $tdLine }}" colspan="{{ $span }}">{{ $clip($row['label'],$b['w']-3,$b['size']) }}</td>
+@elseif(in_array($row['kind'],['subtotal','sum'],true))<td style="height:{{ $rh }}mm;{{ $tdLine }}" colspan="{{ max(1,$span-1) }}">{{ $clip($row['label'],$b['w']*0.6,$b['size']) }}</td>@if($span>1)<td class="n" style="height:{{ $rh }}mm;{{ $tdLine }}">{{ $row['amount'] }}</td>@endif
+@else<td style="height:{{ $rh }}mm;{{ $tdLine }}">{{ $clip($row['label'],$b['w']*$designation-2.4,$b['size']) }}</td>@foreach($cols as $c)<td class="n" style="height:{{ $rh }}mm;{{ $tdLine }}">{{ $row[$c] }}</td>@endforeach
 @endif
 </tr>
 @endforeach
 </tbody></table></div>
 @else
-<div class="b" style="{{ $box($b) }}"><div class="in">
+<div class="b" style="{{ $box($b) }}">@if(!empty($b['valign']))<table style="width:100%;height:100%;border-collapse:collapse"><tr><td style="padding:0;vertical-align:{{ $b['valign'] }}">@endif<div class="in" style="{{ $inStyle($b) }}">
 @switch($type)
-@case('text')<p class="prose">{{ strtr($b['text'],$fields) }}</p>@break
-@case('commitment')@php $commitment=trim($b['text'])!=='' ? $b['text'] : ($style['commitment_text'] ?? ''); @endphp @if(trim($commitment)!=='')<p class="prose"><span class="strong">{{ $label($b,'Notre engagement.') }}</span> {{ strtr($commitment,$fields) }}</p>@endif @break
-@case('company')<p class="strong" style="font-size:1.6em">{{ $issuer['name'] }}</p>@if($style['show_activities'] && $style['activities'])<p class="muted">{{ $style['activities'] }}</p>@endif<p class="muted">{{ implode(' · ',array_filter([$issuer['address'] ?? '',$style['issuer_phone'] ?? '',$issuer['email'] ?? ''])) }}</p>@break
-@case('title')<p class="doc-name" style="font-size:2.6em">{{ $label($b,$shortTitle) }}</p><p>N° {{ $number }} · {{ $date }}@if($due) · {{ $kind==='quote' ? 'valable jusqu’au' : 'échéance' }} {{ $due }}@endif</p>@if(!empty($quote_reference))<p class="muted">Devis {{ $quote_reference }}</p>@endif @break
-@case('client')<p class="eyebrow">{{ $label($b,'Client') }}</p><p class="strong">{{ trim(($customer['firstName'] ?? '').' '.($customer['lastName'] ?? '')) }}</p><p>{{ implode(' · ',array_filter([$customer['phone'] ?? '',trim(($customer['address'] ?? '').' '.($customer['city'] ?? ''))])) }}</p>@if(!empty($customer['email']))<p>{{ $customer['email'] }}</p>@endif @break
-@case('object')@php $objectText=$kind==='receipt' ? 'Versement reçu pour le devis '.($quote_reference ?? $number) : trim($object ?? ''); @endphp @if($objectText!=='')<p class="eyebrow">{{ $label($b,'Objet') }}</p><p class="prose">{{ $objectText }}</p>@endif @break
+@case('text'){!! $prose($b['text'],$b) !!}@break
+@case('commitment')@php $commitment=trim($b['text'])!=='' ? $b['text'] : ($style['commitment_text'] ?? ''); @endphp @if(trim($commitment)!=='')@if($under($b)==='' && !preg_match('/^\s*-{3,}\s*$/m',$commitment))<p class="prose"><span class="strong">{{ $label($b,'Notre engagement.') }}</span> {{ strtr($commitment,$fields) }}</p>@else<p class="strong" style="{{ $under($b) }}">{{ $label($b,'Notre engagement.') }}</p>{!! $prose($commitment,$b) !!}@endif @endif @break
+@case('company')@if($gridOn($b)){!! $grid($b,['name'=>$issuer['name'] ?? '','activities'=>$style['show_activities'] ? ($style['activities'] ?? '') : '','address'=>$issuer['address'] ?? '','phone'=>$style['issuer_phone'] ?? '','email'=>$issuer['email'] ?? '']) !!}@break @endif<p class="strong" style="font-size:1.6em">{{ $issuer['name'] }}</p>@if($style['show_activities'] && $style['activities'])<p class="muted">{{ $style['activities'] }}</p>@endif<p class="muted">{{ implode(' · ',array_filter([$issuer['address'] ?? '',$style['issuer_phone'] ?? '',$issuer['email'] ?? ''])) }}</p>@break
+@case('title')<p class="doc-name" style="font-size:2.6em;{{ $under($b) }}">{{ $label($b,$shortTitle) }}</p><p>N° {{ $number }} · {{ $date }}@if($due) · {{ $kind==='quote' ? 'valable jusqu’au' : 'échéance' }} {{ $due }}@endif</p>@if(!empty($quote_reference))<p class="muted">Devis {{ $quote_reference }}</p>@endif @break
+@case('client')<p class="eyebrow" style="{{ $under($b) }}">{{ $label($b,'Client') }}</p>@if($gridOn($b)){!! $grid($b,['name'=>trim(($customer['firstName'] ?? '').' '.($customer['lastName'] ?? '')),'phone'=>$customer['phone'] ?? '','address'=>trim(($customer['address'] ?? '').' '.($customer['city'] ?? '')),'email'=>$customer['email'] ?? '']) !!}@break @endif<p class="strong">{{ trim(($customer['firstName'] ?? '').' '.($customer['lastName'] ?? '')) }}</p><p>{{ implode(' · ',array_filter([$customer['phone'] ?? '',trim(($customer['address'] ?? '').' '.($customer['city'] ?? ''))])) }}</p>@if(!empty($customer['email']))<p>{{ $customer['email'] }}</p>@endif @break
+@case('object')@php $objectText=$kind==='receipt' ? 'Versement reçu pour le devis '.($quote_reference ?? $number) : trim($object ?? ''); @endphp @if($objectText!=='')<p class="eyebrow" style="{{ $under($b) }}">{{ $label($b,'Objet') }}</p><p class="prose">{{ $objectText }}</p>@endif @break
 @case('total')<table class="total-row"><tr><td class="total-label">{{ $label($b,$kind==='receipt' ? 'MONTANT REÇU' : 'TOTAL GÉNÉRAL') }}</td><td class="total-amount">{{ $money($kind==='receipt' ? ($receipt['amount'] ?? 0) : ($totals['total'] ?? 0)) }}</td></tr></table>@break
-@case('payment')<p class="strong">{{ $label($b,'Conditions de paiement') }}</p>@foreach($payment['lines'] as $line)<p>{{ $line }}</p>@endforeach @if($payment['extra'])<p class="prose muted">{{ $payment['extra'] }}</p>@endif @break
-@case('signature')<p class="muted">{{ $label($b,$kind==='receipt' ? 'Signature du client' : 'Bon pour accord, signature du client') }}</p>@break
-@case('stamp')<p class="muted">{{ $label($b,'Cachet et signature de l’entreprise') }}</p>@if(!empty($style['signature']))<p>{{ $style['signature'] }}</p>@endif @foreach(['stamp_image','signature_image'] as $asset)@if(!empty($style[$asset]))<img src="{{ $style[$asset] }}" alt="" style="max-width:{{ $b['w']/2-3 }}mm;max-height:{{ $b['h']-9 }}mm">@endif @endforeach @break
+@case('payment')<p class="strong" style="{{ $under($b) }}">{{ $label($b,'Conditions de paiement') }}</p>@foreach($payment['lines'] as $line)<p>{{ $line }}</p>@endforeach @if($payment['extra'])<p class="prose muted">{{ $payment['extra'] }}</p>@endif @break
+@case('signature')<p class="muted" style="{{ $under($b) }}">{{ $label($b,$kind==='receipt' ? 'Signature du client' : 'Bon pour accord, signature du client') }}</p>@break
+@case('stamp')<p class="muted" style="{{ $under($b) }}">{{ $label($b,'Cachet et signature de l’entreprise') }}</p>@if(!empty($style['signature']))<p>{{ $style['signature'] }}</p>@endif @foreach(['stamp_image','signature_image'] as $asset)@if(!empty($style[$asset]))<img src="{{ $style[$asset] }}" alt="" style="max-width:{{ $b['w']/2-3 }}mm;max-height:{{ $b['h']-9 }}mm">@endif @endforeach @break
 @case('footer')<p>{{ implode(' · ',array_filter([$issuer['name'] ?? '',$issuer['address'] ?? '',$style['issuer_rccm'] ? 'RCCM '.$style['issuer_rccm'] : '',$style['issuer_ncc'] ? 'NCC '.$style['issuer_ncc'] : '',$issuer['registration'] ?? ''])) }}</p>@if(!empty($issuer['tax_note']))<p class="prose">{{ $issuer['tax_note'] }}</p>@endif @if(!empty($style['footer']))<p class="prose">{{ $style['footer'] }}</p>@endif @break
 @endswitch
-@if($complement($b)!=='')<p class="prose">{{ $complement($b) }}</p>@endif
-</div></div>
+@if(trim($b['text'] ?? '')!=='' && in_array($b['type'],\App\Services\DocumentBlocks::COMPLEMENT_TYPES,true)){!! $prose($b['text'],$b) !!}@endif
+</div>@if(!empty($b['valign']))</td></tr></table>@endif</div>
 @endif
 @endforeach
 </div>

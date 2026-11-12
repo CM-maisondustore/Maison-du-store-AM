@@ -13,7 +13,7 @@
  $types=['quote'=>'Devis','invoice'=>'Facture','receipt'=>'Reçu','global'=>'Style commun'];
  $editorData=['types'=>\App\Services\DocumentBlocks::TYPES,'fields'=>\App\Services\DocumentBlocks::FIELDS,'sources'=>\App\Services\DocumentBlocks::SOURCES,
    'columns'=>\App\Services\DocumentBlocks::COLUMNS,'fonts'=>\App\Services\DocumentBlocks::FONTS,'followers'=>\App\Services\DocumentBlocks::FOLLOWERS,
-   'labels'=>\App\Services\DocumentBlocks::LABELS,'complement'=>\App\Services\DocumentBlocks::COMPLEMENT_TYPES,
+   'labels'=>\App\Services\DocumentBlocks::LABELS,'rows'=>\App\Services\DocumentBlocks::ROWS,'blockFields'=>\App\Services\DocumentBlocks::BLOCK_FIELDS,'receiptRows'=>\App\Services\DocumentBlocks::RECEIPT_ROWS,'complement'=>\App\Services\DocumentBlocks::COMPLEMENT_TYPES,
    'margins'=>\App\Services\PdfLetterhead::margins($options),'issuer'=>$issuer['name'] ?? '','kind'=>$template->key==='global' ? 'quote' : $template->key];
 @endphp
 @if($quoteLayout)
@@ -85,19 +85,54 @@
 <label class="mt-0">Taille<span class="field-unit"><input type="number" step="any" data-prop="size" inputmode="numeric"><span class="unit">pt</span></span></label>
 <label>Couleur<input type="color" data-prop="color"></label>
 </div>
+<div class="prop-row" role="group" aria-label="Style du texte"><button type="button" class="secondary" data-toggle="bold" aria-pressed="false"><strong>Gras</strong></button><button type="button" class="secondary" data-toggle="italic" aria-pressed="false"><em>Italique</em></button><button type="button" class="secondary" data-toggle="uppercase" aria-pressed="false">MAJUSCULES</button></div>
+<div class="grid props-grid">
+<label>Interligne<input type="number" step="0.05" min="0.9" max="2.5" data-prop="line_height" inputmode="decimal" placeholder="1,25"></label>
+<label>Espacement<span class="field-unit"><input type="number" step="0.1" min="0" max="3" data-prop="letter_spacing" inputmode="decimal" placeholder="0"><span class="unit">pt</span></span></label>
+</div>
+<div data-for-types="{{ implode(' ',array_keys(\App\Services\DocumentBlocks::LABELS)) }}"><label>Couleur de l’intitulé<span class="color-reset"><input type="color" data-prop="label_color"><button type="button" class="quiet" data-clear-prop="label_color">Par défaut</button></span></label></div>
 <div data-for-types="{{ implode(' ',array_keys(\App\Services\DocumentBlocks::LABELS)) }}"><label>Intitulé<input data-prop="label" maxlength="120" data-label-input></label><p class="hint">Laissez vide pour garder l’intitulé proposé.</p></div>
 <div data-for-types="text commitment {{ implode(' ',\App\Services\DocumentBlocks::COMPLEMENT_TYPES) }}"><label><span data-text-label>Contenu</span><textarea rows="4" maxlength="2000" data-prop="text"></textarea></label>
 <p class="hint" data-text-hint></p>
 <p class="hint">Données à insérer, remplacées dans chaque document :</p><div class="chips field-chips">@foreach(\App\Services\DocumentBlocks::FIELDS as $field)<button type="button" class="chip" data-insert="{{ $field }}">{{ $field }}</button>@endforeach</div></div>
 </details>
-<details class="fold" data-for-types="lines" open><summary>Tableau<small>Colonnes et enchaînement des pages</small></summary>
-<div class="prop-row">@foreach(\App\Services\DocumentBlocks::COLUMNS as $key=>$label)<label class="check"><input type="checkbox" data-column="{{ $key }}">{{ $label }}</label>@endforeach</div>
+<details class="fold" data-for-types="client company" open><summary>Lignes du bloc<small>Ordre, intitulés et traits entre les lignes</small></summary>
+<p class="hint mt-0" id="field-order-h">Lignes affichées, dans l’ordre :</p>
+<ol class="row-order" data-field-order aria-labelledby="field-order-h"></ol>
+<label class="toggle-row"><span>Intitulé de chaque ligne<small>« Téléphone », « Adresse »… à gauche de la valeur</small></span><input class="switch" type="checkbox" data-prop="field_labels"></label>
+<label class="toggle-row"><span>Traits horizontaux<small>Entre chaque ligne du bloc</small></span><input class="switch" type="checkbox" data-prop="grid_h"></label>
+<label class="toggle-row"><span>Trait vertical<small>Entre l’intitulé et la valeur</small></span><input class="switch" type="checkbox" data-prop="grid_v"></label>
+</details>
+<details class="fold" data-for-types="logo text company title client object lines total payment commitment signature stamp footer"><summary>Lignes de séparation<small>Traits dans la couleur de bordure du bloc</small></summary>
+@foreach(\App\Services\DocumentBlocks::SEPARATORS as $key=>$label)<label class="check" @if($key==='label') data-for-types="{{ implode(' ',array_keys(\App\Services\DocumentBlocks::LABELS)) }}" @endif><input type="checkbox" data-separator="{{ $key }}">{{ $label }}</label>@endforeach
+<p class="hint">Dans un texte, une ligne contenant seulement <span class="mono">---</span> trace une séparation à cet endroit.</p>
+</details>
+<details class="fold" data-for-types="lines" open><summary>Tableau<small>Lignes, colonnes et enchaînement des pages</small></summary>
+<p class="hint mt-0" id="row-order-h">Lignes affichées, dans l’ordre du tableau :</p>
+<ol class="row-order" data-row-order aria-labelledby="row-order-h"></ol>
+<p class="hint" id="col-order-h">Colonnes affichées, leur ordre et leur intitulé :</p>
+<label class="col-designation">Colonne Désignation<input data-col-label="designation" maxlength="40" placeholder="Désignation"></label>
+<ol class="row-order" data-col-order aria-labelledby="col-order-h"></ol>
+<label class="toggle-row"><span>Masquer l’en-tête du tableau</span><input class="switch" type="checkbox" data-prop="hide_header"></label>
+<label class="toggle-row"><span>Lignes alternées<small>Fond clair une ligne sur deux</small></span><input class="switch" type="checkbox" data-prop="stripes"></label>
+<label class="toggle-row"><span>Sans trait entre les lignes</span><input class="switch" type="checkbox" data-prop="no_row_lines"></label>
+<div class="grid props-grid">
+<label>Fond de l’en-tête<span class="color-reset"><input type="color" data-prop="header_bg"><button type="button" class="quiet" data-clear-prop="header_bg">Par défaut</button></span></label>
+<label>Texte de l’en-tête<span class="color-reset"><input type="color" data-prop="header_color"><button type="button" class="quiet" data-clear-prop="header_color">Par défaut</button></span></label>
+</div>
 <label class="toggle-row"><span>Regrouper par ouverture<small>Avec un sous-total sous chaque ouverture</small></span><input class="switch" type="checkbox" data-prop="group"></label>
 <label class="toggle-row"><span>Total juste sous les lignes<small>Pose et livraison, puis total et conditions de paiement</small></span><input class="switch" type="checkbox" data-prop="follow"></label>
 <p class="hint">Un document trop long continue toujours sur des pages suite, qui reprennent les blocs marqués « Pages suite ».</p>
 </details>
 <label data-for-types="logo">Image<select data-prop="source">@foreach(\App\Services\DocumentBlocks::SOURCES as $key=>$label)<option value="{{ $key }}">{{ $label }}</option>@endforeach</select></label>
 <label data-for-types="shape">Forme<select data-prop="shape"><option value="frame">Cadre</option><option value="line">Ligne</option></select></label>
+<details class="fold"><summary>Disposition<small>Marge intérieure, alignement vertical, coins</small></summary>
+<div class="grid props-grid">
+<label class="mt-0">Marge intérieure<span class="field-unit"><input type="number" step="0.5" min="0" max="8" data-prop="padding" inputmode="decimal" placeholder="1,5"><span class="unit">mm</span></span></label>
+<label class="mt-0">Coins arrondis<span class="field-unit"><input type="number" step="0.5" min="0" max="6" data-prop="radius" inputmode="decimal" placeholder="0"><span class="unit">mm</span></span></label>
+</div>
+<div class="prop-row" role="group" aria-label="Alignement vertical">@foreach(['top'=>'En haut','middle'=>'Au milieu','bottom'=>'En bas'] as $value=>$label)<button type="button" class="secondary" data-valign="{{ $value }}" aria-pressed="false">{{ $label }}</button>@endforeach</div>
+</details>
 <details class="fold"><summary>Fond et bordure</summary>
 <label class="check"><input type="checkbox" data-prop="has_background">Fond coloré</label>
 <label>Couleur du fond<input type="color" data-prop="background"></label>
@@ -105,11 +140,13 @@
 <label>Bordure<span class="field-unit"><input type="number" step="any" data-prop="border_width" inputmode="decimal"><span class="unit">mm</span></span></label>
 <label>Couleur<input type="color" data-prop="border_color"></label>
 </div>
+<label>Style de trait<select data-prop="border_style"><option value="">Continu</option><option value="dashed">Tirets</option><option value="dotted">Pointillés</option></select><span class="hint">S’applique aussi aux lignes de séparation.</span></label>
 </details>
 <details class="fold" open><summary>Pages où il apparaît</summary>
 <label class="check"><input type="checkbox" data-page-kind="single">Page unique ou dernière page</label>
 <label class="check"><input type="checkbox" data-page-kind="continuation">Pages suite</label>
 </details>
+<div class="actions"><button type="button" class="secondary" data-duplicate-block>Dupliquer</button><button type="button" class="secondary" data-layer-move="front">Premier plan</button><button type="button" class="secondary" data-layer-move="back">Arrière-plan</button></div>
 <div class="actions"><button type="button" class="quiet" data-remove-block>Retirer ce bloc</button><button type="button" class="secondary" data-deselect>Terminer</button></div>
 </section>
 

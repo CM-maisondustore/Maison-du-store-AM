@@ -24,6 +24,7 @@
 <p>Adresse de contact : {{ $issuer['email'] }}. Les montants et taxes proviennent du devis ou de la facture.</p></section>
 @else
 <section class="panel"><p>Variables disponibles : @foreach(\App\Services\CommunicationTemplates::VARIABLES as $variable)<code>&#123;&#123;{{ $variable }}&#125;&#125;</code> @endforeach</p>
+<p class="hint">Liens vers le site : <code>&#123;&#123;site&#125;&#125;</code> (adresse du site), <code>&#123;&#123;lien_devis&#125;&#125;</code>, <code>&#123;&#123;lien_realisations&#125;&#125;</code>, <code>&#123;&#123;lien_boutique&#125;&#125;</code>, <code>&#123;&#123;lien_rendez_vous&#125;&#125;</code>. Chaque lien indique d’où vient le visiteur (WhatsApp ou e-mail, et le type de message) : les visites apparaissent dans Visiteurs. Les messages WhatsApp de devis et de facture reçoivent déjà le lien du document. Les emojis sont acceptés.</p>
 <p>Les informations disponibles dépendent du document associé. Les variables sans valeur restent vides. Utilisez l’aperçu pour vérifier votre modèle.</p>
 <label>Objet / titre<input name="subject" maxlength="200" value="{{ old('subject',$template->subject) }}" required></label>
 <label>Message<textarea name="body" rows="15" maxlength="{{ $template->channel==='whatsapp' ? 3000 : 10000 }}" required>{{ old('body',$template->body) }}</textarea></label></section>

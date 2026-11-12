@@ -69,7 +69,7 @@ class CommunicationController
                 'customer'=>['firstName'=>'Client','lastName'=>'Exemple','address'=>'Adresse de démonstration','email'=>'exemple@example.invalid'],
                 'lines'=>$lines,'tax_basis_points'=>0]))->header('Content-Type','application/pdf')->header('Content-Disposition','inline; filename="apercu.pdf"');
         }
-        $values=['prenom'=>'Awa','nom'=>'Awa Exemple','reference'=>'DEV-EXEMPLE','montant'=>'50 000','acompte'=>'25 000','date'=>now()->addDay()->format('d/m/Y'),'heure'=>'10:00','adresse'=>'Adresse de démonstration, Abidjan','entreprise'=>'Maison du Store AM','statut'=>'confirmé'];
+        $values=['prenom'=>'Awa','nom'=>'Awa Exemple','reference'=>'DEV-EXEMPLE','montant'=>'50 000','acompte'=>'25 000','date'=>now()->addDay()->format('d/m/Y'),'heure'=>'10:00','adresse'=>'Adresse de démonstration, Abidjan','entreprise'=>'Maison du Store AM','statut'=>'confirmé',...CommunicationTemplates::links($template->key,$template->channel)];
         return view('staff.communication-preview',['subject'=>CommunicationTemplates::render($data['subject'],$values),'body'=>CommunicationTemplates::render($data['body'],$values)]);
     }
     public function rule(Request $r, CommunicationRule $rule, MailConnection $mail)
