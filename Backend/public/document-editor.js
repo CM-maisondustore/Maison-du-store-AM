@@ -74,33 +74,37 @@
         break;
       }
       case 'text': add(b.text || 'Texte libre', b.text ? 'eb-prose' : 'eb-placeholder'); break;
-      case 'commitment': { const p = el('p', b.text ? 'eb-prose' : 'eb-placeholder'); p.append(el('strong', '', 'Notre engagement. ')); p.append(b.text || 'Texte du modèle, modifiable dans Réglages du document › Entreprise'); body.append(p); break; }
+      case 'commitment': { const p = el('p', b.text ? 'eb-prose' : 'eb-placeholder'); p.append(el('strong', '', label(b, 'Notre engagement.') + ' ')); p.append(b.text || 'Texte du modèle, modifiable dans Réglages du document › Entreprise'); body.append(p); break; }
       case 'company': add(data.issuer || 'Entreprise', 'eb-strong eb-big'); add('Activités · adresse · téléphone · e-mail', 'eb-muted'); break;
-      case 'title': add({ invoice: 'FACTURE', receipt: 'REÇU' }[data.kind] || 'DEVIS', 'eb-strong eb-huge'); add('N° du document · date'); break;
-      case 'client': add('CLIENT', 'eb-eyebrow'); add('Nom du client', 'eb-strong'); add('Téléphone · adresse'); break;
-      case 'object': add('OBJET', 'eb-eyebrow'); add('Objet du document'); break;
+      case 'title': add(label(b, { invoice: 'FACTURE', receipt: 'REÇU' }[data.kind] || 'DEVIS'), 'eb-strong eb-huge'); add('N° du document · date'); break;
+      case 'client': add(label(b, 'Client').toUpperCase(), 'eb-eyebrow'); add('Nom du client', 'eb-strong'); add('Téléphone · adresse'); break;
+      case 'object': add(label(b, 'Objet').toUpperCase(), 'eb-eyebrow'); add('Objet du document'); break;
       case 'lines': {
         const table = el('div', 'eb-table');
-        const head = el('div', 'eb-row eb-head'); head.append(el('span', '', 'Désignation'));
+        const head = el('div', 'eb-row eb-head'); head.append(el('span', '', label(b, 'Désignation')));
         b.columns.forEach(column => head.append(el('span', 'n', { quantity: 'Qté', unit_price: 'PU (F)', amount: 'Montant (F)' }[column])));
         table.append(head);
         for (let i = 0; i < 3; i++) { const row = el('div', 'eb-row'); row.append(el('span', 'eb-bar')); b.columns.forEach(() => row.append(el('span', 'eb-bar n'))); table.append(row); }
         body.append(table); body.append(el('p', 'eb-muted', b.follow ? 'Toutes les désignations, puis la pose et la livraison' : 'Désignations'));
         break;
       }
-      case 'total': { const row = el('div', 'eb-total'); row.append(el('span', '', data.kind === 'receipt' ? 'MONTANT REÇU' : 'TOTAL GÉNÉRAL')); row.append(el('strong', '', '000 000 F CFA')); body.append(row); break; }
-      case 'payment': add('Conditions de paiement', 'eb-strong'); add('Échéances · acompte reçu · reste à payer'); break;
-      case 'signature': add('Bon pour accord, signature du client', 'eb-muted'); break;
-      case 'stamp': add('Cachet et signature de l’entreprise', 'eb-muted'); break;
+      case 'total': { const row = el('div', 'eb-total'); row.append(el('span', '', label(b, data.kind === 'receipt' ? 'MONTANT REÇU' : 'TOTAL GÉNÉRAL'))); row.append(el('strong', '', '000 000 F CFA')); body.append(row); break; }
+      case 'payment': add(label(b, 'Conditions de paiement'), 'eb-strong'); add('Échéances · acompte reçu · reste à payer'); break;
+      case 'signature': add(label(b, 'Bon pour accord, signature du client'), 'eb-muted'); break;
+      case 'stamp': add(label(b, 'Cachet et signature de l’entreprise'), 'eb-muted'); break;
       case 'footer': add('Mentions légales et pied de page', 'eb-muted'); break;
     }
+    // Texte complémentaire des blocs automatiques, imprimé sous leur contenu.
+    if ((data.complement || []).includes(b.type) && (b.text || '').trim()) add(b.text, 'eb-prose');
     return body;
   }
+  function label(b, fallback) { return (b.label || '').trim() || fallback; }
+  const FONT_STACKS = { 'DejaVu Serif': '"DejaVu Serif",Georgia,serif', 'Arial': 'Arial,Helvetica,sans-serif', 'Times New Roman': '"Times New Roman",Times,serif' };
   function paint(node, b) {
     const s = scale();
     Object.assign(node.style, { left: b.x * s + 'px', top: b.y * s + 'px', width: b.w * s + 'px', height: (b.type === 'shape' && b.shape === 'line' ? 0 : b.h) * s + 'px',
       fontSize: b.size * 0.3528 * s + 'px', color: b.color, textAlign: b.align, background: b.background || '',
-      fontFamily: b.font === 'DejaVu Serif' ? '"DejaVu Serif",Georgia,serif' : '"DejaVu Sans",Verdana,sans-serif',
+      fontFamily: FONT_STACKS[b.font] || '"DejaVu Sans",Verdana,sans-serif',
       border: b.type === 'shape' ? '' : (b.border_width > 0 ? `${Math.max(1, b.border_width * s)}px solid ${b.border_color}` : ''),
       borderTop: b.type === 'shape' ? `${Math.max(1, Math.max(0.2, b.border_width) * s)}px solid ${b.border_color}` : undefined });
     if (b.type === 'shape' && b.shape === 'frame') node.style.border = `${Math.max(1, Math.max(0.2, b.border_width) * s)}px solid ${b.border_color}`;
@@ -159,6 +163,12 @@
       else if (document.activeElement !== field) field.value = b[key] ?? '';
     });
     $$('[data-for-types]', props).forEach(box => { box.hidden = !box.dataset.forTypes.split(' ').includes(b.type); });
+    // Intitulé proposé en indication ; contenu principal (texte libre, engagement) ou texte complémentaire (blocs automatiques).
+    const labelInput = $('[data-label-input]', props);
+    if (labelInput) labelInput.placeholder = b.type === 'title' ? ({ invoice: 'FACTURE', receipt: 'REÇU' }[data.kind] || 'DEVIS') : (b.type === 'total' && data.kind === 'receipt' ? 'MONTANT REÇU' : (data.labels || {})[b.type] || '');
+    const main = ['text', 'commitment'].includes(b.type);
+    $('[data-text-label]', props).textContent = main ? 'Contenu' : 'Texte complémentaire';
+    $('[data-text-hint]', props).textContent = main ? '' : 'Imprimé sous le contenu automatique du bloc. Laissez vide pour ne rien ajouter.';
     $$('[data-align]', props).forEach(button => button.setAttribute('aria-pressed', String(b.align === button.dataset.align)));
     $$('[data-column]', props).forEach(box => { box.checked = (b.columns || []).includes(box.dataset.column); });
     $$('[data-page-kind]', props).forEach(box => { box.checked = b.pages.includes(box.dataset.pageKind); });
@@ -179,7 +189,7 @@
     else b[key] = key.endsWith('color') ? field.value.toUpperCase() : field.value;
     save();
     const node = layer.querySelector(`[data-id="${CSS.escape(b.id)}"]`);
-    if (node && !['text', 'locked', 'source', 'shape', 'group', 'follow'].includes(key)) { paint(node, b); node.querySelector('.eb-tag')?.replaceChildren(`${data.types[b.type]} · ${String(b.w).replace('.', ',')} × ${String(b.h).replace('.', ',')} mm`); }
+    if (node && !['text', 'label', 'locked', 'source', 'shape', 'group', 'follow'].includes(key)) { paint(node, b); node.querySelector('.eb-tag')?.replaceChildren(`${data.types[b.type]} · ${String(b.w).replace('.', ',')} × ${String(b.h).replace('.', ',')} mm`); }
     else render();
   }
   props.addEventListener('input', event => { if (event.target.dataset.prop) update(event.target); });

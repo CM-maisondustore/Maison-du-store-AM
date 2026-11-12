@@ -1,7 +1,7 @@
 <?php
 namespace App\Http\Controllers\Staff;
 
-use App\Models\{SiteVisit, SiteVisitEvent};
+use App\Models\{CommercialMessage, SharedLinkEvent, SiteVisit, SiteVisitEvent};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -31,6 +31,21 @@ class VisitorsController
         $todayVisits = SiteVisit::whereDate('arrived_at',today())->count();
         $yesterdayVisits = SiteVisit::whereDate('arrived_at',today()->subDay())->count();
         $trafficSpike = $todayVisits >= 10 && $todayVisits >= max(1, $yesterdayVisits) * 2;
-        return view('staff.visitors', compact('live','daily','events','abandoned','origins','pages','returning','countries','campaigns','todayEvents','todayVisits','trafficSpike','pageViews'));
+        // Liens transmis aux clients : documents envoyés sur WhatsApp (ouverture, PDF, lien expiré) et visites venues des messages.
+        $sent = CommercialMessage::with('contact')->withCount([
+                'linkEvents as opens' => fn ($q) => $q->whereIn('event', ['opened', 'viewed']),
+                'linkEvents as downloads' => fn ($q) => $q->where('event', 'downloaded'),
+                'linkEvents as expired' => fn ($q) => $q->where('event', 'expired'),
+            ])->withMax('linkEvents as last_action', 'created_at')
+            ->where('channel', 'whatsapp')->where('direction', 'outgoing')->whereHas('archive')->where('created_at', '>=', $since);
+        $links = ['total' => (clone $sent)->count(),
+            'opened' => (clone $sent)->whereHas('linkEvents', fn ($q) => $q->whereIn('event', ['opened', 'viewed', 'downloaded']))->count(),
+            'downloaded' => (clone $sent)->whereHas('linkEvents', fn ($q) => $q->where('event', 'downloaded'))->count(),
+            'expired' => SharedLinkEvent::where('event', 'expired')->where('created_at', '>=', $since)->distinct()->count('commercial_message_id')];
+        $linkRows = $sent->latest('id')->limit(20)->get();
+        $messageVisits = SiteVisit::where('arrived_at', '>=', $since)->where('campaign', 'like', '%utm_medium=message%')
+            ->select('campaign', DB::raw('COUNT(*) as total'))->groupBy('campaign')->orderByDesc('total')->get()
+            ->map(function ($row) { parse_str((string) $row->campaign, $utm); return ['source' => $utm['utm_source'] ?? '', 'template' => $utm['utm_campaign'] ?? '', 'total' => $row->total]; });
+        return view('staff.visitors', compact('live','daily','events','abandoned','origins','pages','returning','countries','campaigns','todayEvents','todayVisits','trafficSpike','pageViews','links','linkRows','messageVisits'));
     }
 }

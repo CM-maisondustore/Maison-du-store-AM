@@ -39,7 +39,12 @@
 </label>
 <label>Message<textarea name="body" required rows="14">{{ old('body',$draft['body']) }}</textarea>
 </label>
-@if(!empty($draft['invoice_id']) || !empty($draft['quote_id']))<p data-message-attachment>{{ $draft['channel']==='whatsapp' ? 'Le PDF devra être ajouté manuellement dans WhatsApp.' : 'Le document PDF sera joint lors de l’envoi.' }}</p>
+@if(!empty($draft['invoice_id']) || !empty($draft['quote_id']))<div class="attachment-row"><p data-message-attachment>{{ $draft['channel']==='whatsapp' ? 'Le PDF devra être ajouté manuellement dans WhatsApp.' : 'Le document PDF sera joint lors de l’envoi.' }}</p>
+@if(!empty($draft['quote_id']))@php($sendQuote=\App\Models\Quote::find($draft['quote_id']))
+{{-- Crayon : mise en page de ce devis seulement ; œil : le PDF tel qu'il partira. --}}
+<span class="attachment-tools">@if($sendQuote && $sendQuote->status!=='accepted' && !\App\Models\Invoice::withTrashed()->where('quote_id',$sendQuote->id)->exists())<a class="button quiet icon-text" href="{{ route('staff.quotes.layout',$sendQuote) }}" title="Modifier la mise en page de ce devis">@include('staff.partials.icon',['n'=>'pencil','s'=>18])Mise en page</a>@endif
+@if($sendQuote)<a class="button quiet icon-text" href="{{ route('staff.quotes.pdf',[$sendQuote,'apercu'=>1]) }}" target="_blank" rel="noopener" title="Voir le PDF du devis">@include('staff.partials.icon',['n'=>'eye','s'=>18])Aperçu</a>@endif</span>
+@endif</div>
 @endif<p class="muted">Pour une promotion, indiquez comment demander l’arrêt des communications. L’envoi exige un consentement enregistré dans le dossier.</p>
 <div class="actions">
 <button>Enregistrer le brouillon</button>

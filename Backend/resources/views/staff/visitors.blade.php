@@ -48,6 +48,34 @@
 <p class="muted">Le pays et la ville ne sont affichés que si l’hébergeur transmet une localisation approximative. L’adresse IP brute n’est pas conservée dans ce tableau de bord.</p></section>
 </aside>
 </div>
+<section class="panel flush links-panel" aria-labelledby="liens-t">
+<div class="panel-head"><div><h2 id="liens-t">Liens transmis aux clients</h2><p class="muted">Devis et factures envoyés sur WhatsApp, 30 derniers jours. L’ouverture est notée sans adresse IP ; les aperçus automatiques de WhatsApp ne comptent pas.</p></div></div>
+<dl class="link-kpis">
+<div><dt>Liens envoyés</dt><dd>{{ $links['total'] }}</dd></div>
+<div><dt>Ouverts</dt><dd>{{ $links['opened'] }}@if($links['total'])<small>{{ round($links['opened']/$links['total']*100) }} % des liens</small>@endif</dd></div>
+<div><dt>PDF téléchargés</dt><dd>{{ $links['downloaded'] }}</dd></div>
+<div><dt>Liens expirés consultés</dt><dd>{{ $links['expired'] }}<small>clients à relancer</small></dd></div>
+</dl>
+<div class="table-wrap"><table class="cards"><thead><tr><th scope="col">Client</th><th scope="col">Document</th><th scope="col">Envoyé</th><th scope="col">Suivi</th><th scope="col">Dernière action</th></tr></thead><tbody>
+@forelse($linkRows as $m)
+@php($doc=$m->document_snapshot ?? [])
+<tr>
+<td class="primary">@if($m->contact)<a class="row-link" href="{{ route('staff.contacts.show',$m->contact) }}">{{ $m->contact->name }}</a>@else{{ $m->recipient }}@endif</td>
+<td data-label="Document"><a href="{{ route('staff.messages.show',$m) }}">{{ $doc['title'] ?? ($m->invoice_id ? 'Facture' : 'Devis') }} {{ $doc['number'] ?? '' }}</a></td>
+<td data-label="Envoyé"><span class="mono">{{ ($m->sent_at ?? $m->created_at)->format('d/m/Y H:i') }}</span><small>{{ $m->status==='shared' ? 'Partage déclaré' : 'Ouvert dans WhatsApp, partage non déclaré' }}</small></td>
+<td data-label="Suivi">@if(!$m->opens && !$m->downloads && !$m->expired)<span class="badge st-neutral"><span aria-hidden="true">○</span>Pas encore ouvert</span>@else
+@if($m->opens)<span class="badge st-ok"><span aria-hidden="true">✓</span>Ouvert {{ $m->opens }} fois</span>@endif
+@if($m->downloads)<span class="badge st-ok"><span aria-hidden="true">↓</span>PDF téléchargé</span>@endif
+@if($m->expired)<span class="badge st-warn"><span aria-hidden="true">!</span>Lien expiré consulté</span>@endif @endif</td>
+<td data-label="Dernière action" class="mono">{{ $m->last_action ? \Illuminate\Support\Carbon::parse($m->last_action)->format('d/m/Y H:i') : '—' }}</td>
+</tr>
+@empty<tr><td colspan="5" class="empty">Aucun document envoyé sur WhatsApp ces 30 derniers jours.</td></tr>@endforelse
+</tbody></table></div>
+<div class="panel-body"><h3 class="choice-title">Visites du site venues des messages</h3>
+<p class="muted">Clics sur les liens vers le site insérés dans les e-mails et les messages WhatsApp, pour les visiteurs qui ont accepté la mesure des visites.</p>
+@forelse($messageVisits as $row)<div class="meter-row"><span>{{ \App\Services\CommunicationTemplates::LABELS[$row['template']] ?? $row['template'] }}, {{ $row['source']==='whatsapp' ? 'WhatsApp' : 'e-mail' }}</span><strong class="mono">{{ $row['total'] }}</strong></div>@empty<p class="muted">Aucune visite venue des messages pour l’instant.</p>@endforelse
+</div>
+</section>
 <script>
 (() => { const count=document.getElementById('live-visitors-count'), table=document.getElementById('live-visitors-table');
   document.querySelectorAll('.meter-t i').forEach(bar=>{bar.style.width=bar.dataset.w+'%'});

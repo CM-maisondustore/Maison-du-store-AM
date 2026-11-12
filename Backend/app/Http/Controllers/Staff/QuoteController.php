@@ -75,5 +75,12 @@ class QuoteController
         });
         return back()->with('success', 'Devis enregistré.');
     }
-    public function pdf(Request $r, Quote $quote, Documents $documents) { abort_unless($r->user()->isAdmin(),403); $this->access($r, $quote); return response($documents->quote($quote))->header('Content-Type', 'application/pdf')->header('Content-Disposition', 'attachment; filename="devis-'.$quote->reference.'.pdf"'); }
+    public function pdf(Request $r, Quote $quote, Documents $documents)
+    {
+        abort_unless($r->user()->isAdmin(),403); $this->access($r, $quote);
+        // Aperçu avant envoi : rendu du devis tel qu'il partira, affiché dans le navigateur, sans émettre de document.
+        if ($r->boolean('apercu')) return response($documents->render($documents->quoteData($quote)))->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', 'inline; filename="apercu-'.$quote->reference.'.pdf"')->header('Cache-Control', 'private, no-store');
+        return response($documents->quote($quote))->header('Content-Type', 'application/pdf')->header('Content-Disposition', 'attachment; filename="devis-'.$quote->reference.'.pdf"');
+    }
 }

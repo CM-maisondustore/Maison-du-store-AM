@@ -9,7 +9,8 @@ class Documents
         if (in_array($quote->status,['approved','accepted'])) return DocumentIssues::quote($quote,$this)->archive->contents();
         return $this->render($this->quoteData($quote));
     }
-    public function quoteData(Quote $quote): array
+    /** @param array|null $override mise en page propre au devis en cours d'édition (aperçu), sinon celle enregistrée. */
+    public function quoteData(Quote $quote, ?array $override=null): array
     {
         $presentation=CommunicationTemplates::presentation('quote');
         // Unmodified pre-refactor validated quotes keep the baseline. Unissued drafts use the active model.
@@ -19,9 +20,12 @@ class Documents
             $old=json_decode($baseline->snapshot,true,512,JSON_THROW_ON_ERROR);
             $presentation=[...($old['options'] ?? []),'introduction'=>$old['body'] ?? '', 'template_version'=>$baseline->version];
         }
+        // Mise en page propre à ce devis (crayon de la page d'envoi) : elle remplace le modèle publié pour ce seul devis.
+        $custom=$override ?? ($quote->document_metadata['presentation_override'] ?? null);
+        if ($custom) $presentation=[...$presentation,...$custom['options'],'introduction'=>$custom['body'] ?? ($presentation['introduction'] ?? ''),'quote_override'=>true];
         return ['presentation'=>$presentation, 'title' => 'Devis', 'number' => $quote->reference, 'draft' => !in_array($quote->status, ['approved', 'accepted']), 'date' => $quote->quote_date ? \Carbon\Carbon::parse($quote->quote_date)->format('d/m/Y') : $quote->created_at->format('d/m/Y'), 'due' => $quote->valid_until, 'issuer' => CommunicationTemplates::issuer($presentation), 'customer' => $quote->contact, 'lines' => $quote->lines ?? [], 'tax_basis_points' => $quote->tax_basis_points,
             'windows'=>$quote->configuration ? $quote->dimensions : [], 'pending_costs'=>$quote->configuration['calculation']['pending'] ?? [], 'schedule'=>['delivery'=>$quote->delivery_date,'installation'=>$quote->installation_date],
-            ...($quote->document_metadata ?? []),
+            ...\Illuminate\Support\Arr::except($quote->document_metadata ?? [],['presentation_override']),
             'financial'=>Quotes\QuoteFinancials::forQuote($quote),
             'payment_plan'=>['mode'=>$quote->payment_mode,'deposit'=>$quote->deposit_amount,'received'=>$quote->receivedAmount()]];
     }

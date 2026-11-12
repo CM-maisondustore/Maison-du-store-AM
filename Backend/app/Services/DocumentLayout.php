@@ -25,7 +25,7 @@ final class DocumentLayout
     public static function validate(Request $r, array $saved): array
     {
         $rules=['version'=>'required|integer|min:1','name'=>'required|string|max:150','body'=>'nullable|string|max:10000','inherit_global'=>'sometimes|boolean',
-            'font_family'=>'required|in:DejaVu Sans,DejaVu Serif','font_size'=>'required|integer|min:8|max:12','activities'=>'nullable|string|max:300',
+            'font_family'=>'required|in:'.implode(',',DocumentBlocks::FONTS),'font_size'=>'required|integer|min:8|max:12','activities'=>'nullable|string|max:300',
             'footer'=>'nullable|string|max:2000','signature'=>'nullable|string|max:1000','issuer_name'=>'required|string|max:150','issuer_email'=>'sometimes|required|email:rfc|max:254',
             'issuer_address'=>'nullable|string|max:1000','issuer_registration'=>'nullable|string|max:300','issuer_tax_note'=>'nullable|string|max:1000','issuer_payment_terms'=>'nullable|string|max:2000',
             'blocks'=>'sometimes|nullable|string|max:200000','commitment_text'=>'sometimes|nullable|string|max:1000'];

@@ -18,7 +18,23 @@ final class DocumentBlocks
         'signature'=>'Signature du client','stamp'=>'Cachet','footer'=>'Pied de page','shape'=>'Ligne ou cadre'];
     /** single : page unique ou dernière page ; continuation : pages suite d'un document trop long. */
     public const PAGES=['single','continuation'];
-    public const FONTS=['DejaVu Sans','DejaVu Serif'];
+    /** Polices proposées. Arial et Times New Roman utilisent les polices standard du PDF (Helvetica, Times) : jeu de caractères occidental. */
+    public const FONTS=['DejaVu Sans','DejaVu Serif','Arial','Times New Roman'];
+    /** Pile CSS lue par Dompdf : il prend la première famille installée. */
+    public static function fontStack(?string $font): string
+    {
+        return match ($font) {
+            'Arial' => '"Arial", "Helvetica", sans-serif',
+            'Times New Roman' => '"Times New Roman", "Times", serif',
+            'DejaVu Serif' => '"DejaVu Serif", serif',
+            default => '"DejaVu Sans", sans-serif',
+        };
+    }
+    /** Intitulés modifiables par bloc (vide : intitulé par défaut). */
+    public const LABELS=['title'=>'DEVIS','client'=>'Client','object'=>'Objet','lines'=>'Désignation','total'=>'TOTAL GÉNÉRAL','payment'=>'Conditions de paiement',
+        'commitment'=>'Notre engagement.','signature'=>'Bon pour accord, signature du client','stamp'=>'Cachet et signature de l’entreprise'];
+    /** Blocs automatiques qui acceptent un texte complémentaire, imprimé sous leur contenu. */
+    public const COMPLEMENT_TYPES=['company','title','client','object','total','payment','signature','stamp','footer'];
     public const COLUMNS=['quantity'=>'Quantité','unit_price'=>'Prix unitaire','amount'=>'Montant'];
     public const SOURCES=['logo'=>'Logo','signature_image'=>'Signature de l’entreprise','stamp_image'=>'Cachet'];
     public const FIELDS=['{client.nom}','{client.telephone}','{devis.numero}','{devis.date}','{total.general}','{acompte}','{reste_a_payer}'];
@@ -59,10 +75,15 @@ final class DocumentBlocks
                 'size'=>max(6,min(28,(int)($item['size'] ?? 9))),
                 'color'=>$color('color','#111111'),'background'=>$color('background',null),
                 'border_width'=>round(max(0,min(3,(float)($item['border_width'] ?? 0))),1),'border_color'=>$color('border_color','#C9A037')];
-            if (in_array($type,self::TEXT_TYPES,true)) {
+            if (in_array($type,self::TEXT_TYPES,true) || in_array($type,self::COMPLEMENT_TYPES,true)) {
                 $text=$item['text'] ?? '';
                 if (!is_string($text) || mb_strlen($text)>2000) $fail(self::TYPES[$type].' : 2 000 caractères au maximum.');
-                $block['text']=$text;
+                if (in_array($type,self::TEXT_TYPES,true) || trim($text)!=='') $block['text']=$text;
+            }
+            if (isset(self::LABELS[$type])) {
+                $label=$item['label'] ?? '';
+                if (!is_string($label) || mb_strlen($label)>120) $fail(self::TYPES[$type].' : intitulé de 120 caractères au maximum.');
+                if (trim($label)!=='') $block['label']=trim($label);
             }
             if ($type==='lines') {
                 $block['columns']=array_values(array_intersect(array_keys(self::COLUMNS),is_array($item['columns'] ?? null) ? $item['columns'] : array_keys(self::COLUMNS)));

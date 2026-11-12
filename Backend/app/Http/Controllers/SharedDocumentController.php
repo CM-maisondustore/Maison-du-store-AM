@@ -22,8 +22,13 @@ class SharedDocumentController
     public function show(Request $request, int $message)
     {
         $m = $request->hasValidSignature(false) ? $this->shared($message) : null;
+        // Lien authentique mais périmé : noté pour savoir quel client relancer.
+        if (!$m && app("url")->hasCorrectSignature($request, false) && !app("url")->signatureHasNotExpired($request) && \App\Models\CommercialMessage::whereKey($message)->exists()) {
+            \App\Models\SharedLinkEvent::record($message, 'expired', $request->userAgent());
+        }
         if (!$m) return response()->view('documents.shared', ['doc' => null, 'contact' => config('site.contact')], 410)->withHeaders(self::HEADERS);
 
+        \App\Models\SharedLinkEvent::record($m, 'opened', $request->userAgent());
         $s = $m->document_snapshot ?? [];
         $title = $s['title'] ?? ($m->invoice_id ? 'Facture' : 'Devis');
         [$slug, $heading, $dueLabel, $amountLabel] = self::KINDS[$title] ?? self::KINDS['Devis'];
@@ -52,6 +57,7 @@ class SharedDocumentController
         $m = $this->shared($message);
         abort_unless($m, 404);
         Audit::record('document_whatsapp_consulte', $m);
+        \App\Models\SharedLinkEvent::record($m, $request->boolean('telecharger') ? 'downloaded' : 'viewed', $request->userAgent());
         return response($m->archive->contents())->withHeaders([...self::HEADERS,
             'Content-Type' => 'application/pdf',
             'Content-Disposition' => ($request->boolean('telecharger') ? 'attachment' : 'inline').'; filename="'.$this->filename($m).'"',

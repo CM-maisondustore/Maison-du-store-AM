@@ -27,7 +27,7 @@
       if (current !== sequence) return;
       if (url) URL.revokeObjectURL(url);
       url = URL.createObjectURL(blob); frame.src = url + '#view=FitH'; download.href = url; download.hidden = false;
-      status.textContent = 'Aperçu à jour · données fictives · modifications non publiées';
+      status.textContent = form.dataset.previewLabel || 'Aperçu à jour';
     } catch (error) {
       if (error.name !== 'AbortError' && current === sequence) status.textContent = error.message;
     }

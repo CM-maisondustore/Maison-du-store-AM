@@ -77,29 +77,40 @@ final class MdsTemplates
         return DocumentBlocks::normalize(json_encode(['items'=>$items],JSON_THROW_ON_ERROR));
     }
 
-    /** Messages préremplis : [objet, message]. Le canal WhatsApp n'évoque pas de pièce jointe (un lien sécurisé est ajouté à l'ouverture). */
+    /**
+     * Messages préremplis : [objet, message]. Ton professionnel et accessible : phrases courtes, une idée par paragraphe,
+     * deux ou trois emojis en début de phrase (jamais à la place d'un mot). Les liens vers le site portent la provenance
+     * du message (suivi dans Visiteurs). Un message WhatsApp de devis ou de facture reçoit déjà le lien sécurisé du
+     * document : il n'ajoute pas de lien vers le site.
+     */
     public static function message(string $key, string $channel='email'): array
     {
         $wa=$channel==='whatsapp';
-        $sign=$wa ? "{{entreprise}}" : "Cordialement,\n{{entreprise}}\n".self::PHONES."\n".self::SLOGAN;
+        $b=fn(string $text)=>$wa ? '*'.$text.'*' : $text;
+        $documentLink=$wa && in_array($key,['quote','invoice'],true);
+        $sign=$wa
+            ? "L’équipe {{entreprise}}".($documentLink ? '' : "\n🌐 {{site}}")
+            : "Bien cordialement,\nL’équipe {{entreprise}}\n📞 ".self::PHONES."\n🌐 {{site}}\n\n".self::SLOGAN;
+        $reply=$wa ? 'répondez simplement à ce message' : 'répondez simplement à cet e-mail';
         return match($key) {
             'quote_received'=>['Votre demande de devis {{reference}} est bien reçue',
-                "Bonjour {{prenom}},\n\nMerci pour votre demande de devis".($wa ? ' *{{reference}}*' : ' {{reference}}').". Un conseiller vous contacte rapidement pour convenir de la prise de mesures et préparer votre devis sur mesure.\n\n$sign"],
+                "Bonjour {{prenom}},\n\n✅ Merci, votre demande de devis ".$b('{{reference}}')." est bien reçue.\n\nUn conseiller vous appelle très vite pour convenir de la prise de mesures, chez vous ou à notre showroom. Votre devis sur mesure vous est ensuite envoyé.\n\nEn attendant, découvrez nos réalisations : {{lien_realisations}}\n\n$sign"],
             'quote'=>['Votre devis {{reference}} – {{montant}} F CFA',
-                "Bonjour {{prenom}},\n\nMerci pour votre confiance. ".($wa ? "Voici votre devis *{{reference}}* d’un montant de *{{montant}} F CFA*." : "Vous trouverez en pièce jointe votre devis {{reference}} d’un montant de {{montant}} F CFA.")
-                ."\n\n{{conditions_paiement}}\n\nDès réception de votre acompte, nous lançons la confection sur mesure et nous vous accompagnons jusqu’à la pose finale.\n\n"
-                .($wa ? "Le devis complet est accessible avec le lien ci-dessous. Pour le valider ou poser une question, répondez simplement à ce message." : "Pour valider le devis ou poser une question, répondez simplement à ce message.")
+                "Bonjour {{prenom}},\n\nMerci pour votre confiance. ".($wa ? "Voici votre devis ".$b('{{reference}}').", d’un montant de ".$b('{{montant}} F CFA')."." : "Vous trouverez en pièce jointe votre devis {{reference}}, d’un montant de {{montant}} F CFA.")
+                ."\n\n{{conditions_paiement}}\n\n✂️ Dès réception de votre acompte, nous lançons la confection sur mesure. Nous vous accompagnons ensuite jusqu’à la pose finale.\n\n"
+                .($wa ? "📄 Votre devis complet s’ouvre avec le lien ci-dessous. Pour le valider ou poser une question, $reply." : "Pour valider le devis ou poser une question, $reply.\nNos réalisations : {{lien_realisations}}")
                 ."\n\n$sign"],
             'invoice'=>['Votre facture {{reference}}',
-                "Bonjour {{prenom}},\n\n".($wa ? "Voici votre facture *{{reference}}* d’un montant de *{{montant}} F CFA*. Elle est accessible avec le lien ci-dessous." : "Vous trouverez en pièce jointe votre facture {{reference}} d’un montant de {{montant}} F CFA.")
-                ."\n\nMerci pour votre confiance. Nous restons à votre disposition pour toute question.\n\n$sign"],
+                "Bonjour {{prenom}},\n\n".($wa ? "📄 Voici votre facture ".$b('{{reference}}').", d’un montant de ".$b('{{montant}} F CFA').". Elle s’ouvre avec le lien ci-dessous." : "Vous trouverez en pièce jointe votre facture {{reference}}, d’un montant de {{montant}} F CFA.")
+                ."\n\nMerci pour votre confiance 🙏 Pour toute question, $reply.\n\n$sign"],
             'appointment'=>['Votre rendez-vous du {{date}} à {{heure}}',
-                "Bonjour {{prenom}},\n\nVotre rendez-vous du ".($wa ? '*{{date}} à {{heure}}*' : '{{date}} à {{heure}}')." (heure d’Abidjan) est {{statut}}.\nAdresse : {{adresse}}\n\nEn cas d’empêchement, prévenez-nous en répondant à ce message.\n\n$sign"],
+                "Bonjour {{prenom}},\n\n📅 Votre rendez-vous du ".$b('{{date}} à {{heure}}')." (heure d’Abidjan) est {{statut}}.\n📍 Adresse : {{adresse}}\n\nEn cas d’empêchement, prévenez-nous : $reply.\n\nPour préparer la visite, parcourez nos stores et rideaux : {{lien_boutique}}\n\n$sign"],
             'reminder'=>['Rappel : votre rendez-vous du {{date}} à {{heure}}',
-                "Bonjour {{prenom}},\n\nPetit rappel : nous avons rendez-vous le ".($wa ? '*{{date}} à {{heure}}*' : '{{date}} à {{heure}}')." (heure d’Abidjan).\nAdresse : {{adresse}}\n\nEn cas d’empêchement, prévenez-nous en répondant à ce message.\n\n$sign"],
+                "Bonjour {{prenom}},\n\n⏰ Petit rappel : nous avons rendez-vous le ".$b('{{date}} à {{heure}}')." (heure d’Abidjan).\n📍 Adresse : {{adresse}}\n\nEn cas d’empêchement, prévenez-nous : $reply.\n\n$sign"],
             'promotion'=>['Les nouveautés Maison du Store AM',
-                "Bonjour {{prenom}},\n\n[Présentez l’offre ici : produit, avantage, date limite.]\n\nPour en profiter, répondez simplement à ce message.\nPour ne plus recevoir nos offres, répondez STOP.\n\n$sign"],
-            default=>['Votre projet Maison du Store AM', "Bonjour {{prenom}},\n\n[Votre message]\n\n$sign"],
+                "Bonjour {{prenom}},\n\n✨ [Présentez l’offre ici : produit, avantage, date limite.]\n\nPour en profiter, demandez votre devis en ligne : {{lien_devis}}\nVous pouvez aussi $reply.\n\nPour ne plus recevoir nos offres, répondez STOP.\n\n$sign"],
+            default=>['Votre projet Maison du Store AM',
+                "Bonjour {{prenom}},\n\n[Votre message]\n\nVotre devis en ligne, en quelques minutes : {{lien_devis}}\n\n$sign"],
         };
     }
 

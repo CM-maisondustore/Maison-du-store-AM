@@ -62,6 +62,11 @@ Route::prefix('admin')->group(function () {
             });
             Route::get('documents/{issue}/archive', [App\Http\Controllers\Staff\DocumentLayoutController::class,'archive'])->name('layouts.archive');
             Route::post('devis/{quote}/presentation', [App\Http\Controllers\Staff\DocumentLayoutController::class,'metadata'])->name('layouts.metadata');
+            // Mise en page propre à un devis, modifiable avant l'envoi.
+            Route::get('devis/{quote}/mise-en-page', [App\Http\Controllers\Staff\QuoteLayoutController::class,'edit'])->name('quotes.layout');
+            Route::post('devis/{quote}/mise-en-page', [App\Http\Controllers\Staff\QuoteLayoutController::class,'save'])->name('quotes.layout.save');
+            Route::post('devis/{quote}/mise-en-page/apercu', [App\Http\Controllers\Staff\QuoteLayoutController::class,'preview'])->middleware('throttle:60,1')->name('quotes.layout.preview');
+            Route::delete('devis/{quote}/mise-en-page', [App\Http\Controllers\Staff\QuoteLayoutController::class,'reset'])->name('quotes.layout.reset');
             Route::get('devis/{quote}/paiements/{payment}/recu', [App\Http\Controllers\Staff\DocumentLayoutController::class,'receipt'])->name('layouts.receipt');
             Route::post('devis/{quote}/avancement', [App\Http\Controllers\Staff\QuoteWorkflowController::class,'update'])->name('quotes.workflow');
             Route::patch('catalogue/visibilite', [ProductController::class, 'catalogueVisibility'])->name('catalogue.visibility');

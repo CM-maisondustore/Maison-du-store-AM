@@ -5,7 +5,16 @@ use Illuminate\Validation\ValidationException;
 class CommunicationTemplates
 {
     public const LABELS = ['quote_received'=>'Demande de devis reçue','quote'=>'Envoi du devis','invoice'=>'Envoi de facture','appointment'=>'Confirmation de rendez-vous','reminder'=>'Rappel de rendez-vous','commercial'=>'Échange commercial','promotion'=>'Offre et promotion'];
-    public const VARIABLES = ['prenom','nom','reference','montant','acompte','solde','remise','total_avant_remise','conditions_paiement','date','heure','adresse','entreprise','statut'];
+    public const VARIABLES = ['prenom','nom','reference','montant','acompte','solde','remise','total_avant_remise','conditions_paiement','date','heure','adresse','entreprise','statut',
+        'site','lien_devis','lien_realisations','lien_boutique','lien_rendez_vous'];
+    /** Liens vers le site insérés dans les messages ; la provenance (utm) apparaît dans Visiteurs. */
+    public static function links(string $key, string $channel): array
+    {
+        $base=rtrim((string) config('app.url'),'/');
+        $tag='utm_source='.($channel==='whatsapp' ? 'whatsapp' : 'email').'&utm_medium=message&utm_campaign='.$key;
+        return ['site'=>preg_replace('#^https?://#','',$base),'lien_devis'=>$base.'/devis?'.$tag,'lien_realisations'=>$base.'/?'.$tag.'#realisations',
+            'lien_boutique'=>$base.'/shop?'.$tag,'lien_rendez_vous'=>$base.'/?'.$tag.'#rendez-vous'];
+    }
     public static function defaults(string $key, string $channel='email'): array
     {
         return MdsTemplates::message($key,$channel);
@@ -56,6 +65,7 @@ class CommunicationTemplates
     public static function draft(string $key, array $values, string $channel='email'): array
     {
         $t=self::get($channel,$key);
+        $values=[...$values,...self::links($key,$channel)];
         return ['subject'=>mb_substr(preg_replace('/[\r\n]+/',' ',self::render($t->subject,$values)),0,200), 'body'=>trim(preg_replace("/\n{3,}/","\n\n",self::render($t->body,$values))), 'template_snapshot'=>['id'=>$t->id,'version'=>$t->version,'key'=>$key,'channel'=>$channel]];
     }
     public static function presentation(string $key): array

@@ -1,7 +1,7 @@
 @php($margins=\App\Services\PdfLetterhead::margins($style))
 <style>
 @page { margin:{{ $margins['top'] }}mm {{ $margins['right'] }}mm {{ $margins['bottom'] }}mm {{ $margins['left'] }}mm; }
-body { margin:0; font-family:"{{ $style['font_family'] }}",sans-serif; font-size:{{ $style['font_size'] }}pt; color:{{ $style['text_color'] }}; line-height:1.35; }
+body { margin:0; font-family:{!! \App\Services\DocumentBlocks::fontStack($style['font_family']) !!}; font-size:{{ $style['font_size'] }}pt; color:{{ $style['text_color'] }}; line-height:1.35; }
 h1 { font-size:23pt; margin:12pt 0; } h2 { font-size:12pt; margin:14pt 0 7pt; page-break-after:avoid; } h3 { font-size:11pt; margin:8pt 0 3pt; page-break-after:avoid; }
 p { margin:6pt 0; overflow-wrap:break-word; } .muted {color:{{ $style['muted_color'] }};font-size:9pt}.prose {white-space:pre-wrap;overflow-wrap:break-word}
 .brand {font-size:17pt;font-weight:bold}.logo {max-width:150pt;max-height:60pt}.eyebrow {color:{{ $style['muted_color'] }};font-size:8pt;letter-spacing:1pt}

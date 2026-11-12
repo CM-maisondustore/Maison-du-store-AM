@@ -1173,3 +1173,23 @@ form[data-step="2"] .opening-row .quote-opening-details{position:sticky;left:0;m
 .share-preview{display:flex;justify-content:center;background:var(--pro-bg);border-radius:var(--r-10);padding:12px}
 .share-preview canvas{display:block;width:auto;max-width:100%;height:auto;max-height:520px;border-radius:4px;box-shadow:0 10px 24px -14px rgba(32,51,44,.5)}
 @media (max-width:820px){.share-grid{grid-template-columns:minmax(0,1fr)}}
+
+/* ---- Envoi d'un devis : mise en page et aperçu ---- */
+.attachment-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px;margin:12px 0}
+.attachment-row p{margin:0}
+.attachment-tools{display:flex;flex-wrap:wrap;gap:8px}
+.icon-text{display:inline-flex;align-items:center;gap:6px}
+.quote-layout-note p{margin:0}
+.quote-layout-note .actions{margin:10px 0 0}
+
+/* ---- Visiteurs : liens transmis ---- */
+.links-panel{margin-top:24px}
+.links-panel .panel-head p{margin:4px 0 0}
+.link-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin:0;border-bottom:1px solid var(--pro-line)}
+.link-kpis div{padding:14px 20px;border-right:1px solid var(--pro-line)}
+.link-kpis div:last-child{border-right:0}
+.link-kpis dt{font-size:13px;color:var(--pro-text-2)}
+.link-kpis dd{margin:4px 0 0;font-size:24px;font-weight:600;line-height:1.1;color:var(--pro-ink)}
+.link-kpis small{display:block;font-size:12px;font-weight:400;color:var(--pro-text-2);margin-top:2px}
+.links-panel td .badge{margin:0 4px 4px 0}
+@media (max-width:720px){.link-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.link-kpis div:nth-child(2){border-right:0}}

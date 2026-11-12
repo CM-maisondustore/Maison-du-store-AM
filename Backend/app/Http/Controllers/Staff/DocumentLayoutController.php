@@ -91,7 +91,7 @@ class DocumentLayoutController
             $q=Quote::whereKey($quote->id)->lockForUpdate()->firstOrFail();
             abort_if($q->status==='accepted' || \App\Models\Invoice::where('quote_id',$q->id)->exists(),409,'Devis accepté ou facturé : document verrouillé.');
             if ($q->edit_version!==$data['edit_version']) throw ValidationException::withMessages(['edit_version'=>'Rechargez le devis avant modification.']);
-            $q->update(['document_metadata'=>['object'=>$data['object'] ?? '', 'rooms'=>$data['rooms'] ?? []],'edit_version'=>$q->edit_version+1]);
+            $q->update(['document_metadata'=>[...($q->document_metadata ?? []),'object'=>$data['object'] ?? '', 'rooms'=>$data['rooms'] ?? []],'edit_version'=>$q->edit_version+1]);
             Audit::record('presentation_devis_modifiee',$q);
         });
         return back()->with('success','Présentation enregistrée. Les éditions précédentes restent accessibles.');

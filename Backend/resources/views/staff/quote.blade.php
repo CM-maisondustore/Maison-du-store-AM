@@ -31,6 +31,7 @@
 </div>
 <div class="page-actions">
 <a class="button quiet" href="{{ route('staff.quotes.pdf',$quote) }}">@include('staff.partials.icon',['n'=>'download','s'=>18])Télécharger le PDF</a>
+<a class="button quiet" href="{{ route('staff.quotes.pdf',[$quote,'apercu'=>1]) }}" target="_blank" rel="noopener">@include('staff.partials.icon',['n'=>'eye','s'=>18])Aperçu</a>
 <a class="button quiet" href="{{ route('staff.messages.create',['quote_id'=>$quote->id]) }}">Préparer l’envoi du devis</a>
 @if($quote->status!=='accepted')<a class="button quiet" href="{{ route('staff.quotes.edit',$quote) }}">Ouvrir le formulaire complet</a>@endif
 @if(in_array($quote->status,['pending','draft']) && $canValidate)

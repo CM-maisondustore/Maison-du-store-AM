@@ -1,6 +1,7 @@
 @extends('staff.layout')
-@section('title','Mise en page des documents')
-@section('back',route('staff.communications.index'))
+@php $quoteLayout=$quoteLayout ?? null; @endphp
+@section('title',$quoteLayout ? 'Mise en page du devis '.\App\Services\StaffInterface::ref($quoteLayout->reference) : 'Mise en page des documents')
+@section('back',$quoteLayout ? route('staff.messages.create',['quote_id'=>$quoteLayout->id]) : route('staff.communications.index'))
 @section('body-class','has-action-bar')
 @section('content')
 <link rel="stylesheet" href="{{ asset('document-layout.css') }}?v={{ filemtime(public_path('document-layout.css')) }}">
@@ -12,10 +13,18 @@
  $types=['quote'=>'Devis','invoice'=>'Facture','receipt'=>'Reçu','global'=>'Style commun'];
  $editorData=['types'=>\App\Services\DocumentBlocks::TYPES,'fields'=>\App\Services\DocumentBlocks::FIELDS,'sources'=>\App\Services\DocumentBlocks::SOURCES,
    'columns'=>\App\Services\DocumentBlocks::COLUMNS,'fonts'=>\App\Services\DocumentBlocks::FONTS,'followers'=>\App\Services\DocumentBlocks::FOLLOWERS,
+   'labels'=>\App\Services\DocumentBlocks::LABELS,'complement'=>\App\Services\DocumentBlocks::COMPLEMENT_TYPES,
    'margins'=>\App\Services\PdfLetterhead::margins($options),'issuer'=>$issuer['name'] ?? '','kind'=>$template->key==='global' ? 'quote' : $template->key];
 @endphp
-<form id="layout-form" class="pdf-editor" method="post" enctype="multipart/form-data" action="{{ route('staff.layouts.save',$template->key) }}" data-preview="{{ route('staff.layouts.preview',$template->key) }}">
-@csrf<input type="hidden" name="version" value="{{ $template->version }}">
+@if($quoteLayout)
+{{-- Mode « ce devis seulement » : la mise en page est enregistrée dans le devis, le modèle commun reste inchangé. --}}
+<div class="notice quote-layout-note"><p><strong>Vous modifiez la mise en page de ce devis uniquement.</strong> Le modèle de devis publié reste utilisé pour les autres devis. L’aperçu montre le vrai devis, avec ses montants.</p>
+<p class="actions"><a class="button quiet" href="{{ route('staff.quotes.pdf',[$quoteLayout,'apercu'=>1]) }}" target="_blank" rel="noopener">Aperçu du devis enregistré</a><a class="button quiet" href="{{ route('staff.messages.create',['quote_id'=>$quoteLayout->id]) }}">Retour à l’envoi</a>
+@if(!empty($quoteLayout->document_metadata['presentation_override']))<button type="submit" form="quote-layout-reset" class="quiet">Reprendre le modèle commun</button>@endif</p></div>
+<form id="quote-layout-reset" method="post" action="{{ route('staff.quotes.layout.reset',$quoteLayout) }}" data-confirm="Abandonner la mise en page propre à ce devis et reprendre le modèle de devis publié ?">@csrf @method('DELETE')</form>
+@endif
+<form id="layout-form" class="pdf-editor" method="post" enctype="multipart/form-data" action="{{ $quoteLayout ? route('staff.quotes.layout.save',$quoteLayout) : route('staff.layouts.save',$template->key) }}" data-preview="{{ $quoteLayout ? route('staff.quotes.layout.preview',$quoteLayout) : route('staff.layouts.preview',$template->key) }}" data-preview-label="{{ $quoteLayout ? 'Aperçu à jour · vrai devis · modifications non enregistrées' : 'Aperçu à jour · données fictives · modifications non publiées' }}">
+@csrf<input type="hidden" name="version" value="{{ $template->version }}">@if($quoteLayout)<input type="hidden" name="edit_version" value="{{ $quoteLayout->edit_version ?? 0 }}"><input type="hidden" name="inherit_global" value="0">@endif
 {{-- Mise en page libre : JSON validé par le serveur (DocumentBlocks). Vide : le rendu actuel reste utilisé. --}}
 <input type="hidden" name="blocks" id="layout-blocks" value="{{ old('blocks',$blocks ? json_encode($blocks,JSON_UNESCAPED_UNICODE) : '') }}">
 <script type="application/json" id="layout-editor-data">@json($editorData)</script>
@@ -23,21 +32,21 @@
 
 <header class="editor-bar">
 <div class="editor-title">
-<label class="sr-only" for="layout-name">Nom du modèle</label><input id="layout-name" class="editor-name" name="name" maxlength="150" required value="{{ old('name',$draft['name'] ?? $template->name) }}">
-<p class="editor-state">@if($draft)<span class="badge st-progress"><span aria-hidden="true">◐</span>Brouillon en cours</span>@endif<span class="badge st-ok"><span aria-hidden="true">✓</span>Version publiée{{ $template->published_version ? ' '.$template->published_version : '' }}</span>
+@if($quoteLayout)<input type="hidden" name="name" value="{{ $template->name }}"><p class="editor-name">Devis {{ $quoteLayout->reference }}</p>@else<label class="sr-only" for="layout-name">Nom du modèle</label><input id="layout-name" class="editor-name" name="name" maxlength="150" required value="{{ old('name',$draft['name'] ?? $template->name) }}">@endif
+<p class="editor-state">@if($quoteLayout)<span class="badge {{ !empty($quoteLayout->document_metadata['presentation_override']) ? 'st-progress' : 'st-neutral' }}">{{ !empty($quoteLayout->document_metadata['presentation_override']) ? 'Mise en page propre à ce devis' : 'Modèle de devis publié' }}</span>@endif @if($draft)<span class="badge st-progress"><span aria-hidden="true">◐</span>Brouillon en cours</span>@endif<span class="badge st-ok"><span aria-hidden="true">✓</span>Version publiée{{ $template->published_version ? ' '.$template->published_version : '' }}</span>
 @if($template->key!=='global')<span class="badge st-info layout-if-inherit"><span aria-hidden="true">↗</span>Style commun hérité</span><span class="badge st-neutral layout-if-custom"><span aria-hidden="true">○</span>Style personnalisé</span>@endif</p>
 </div>
-<nav class="segmented" aria-label="Type de document">@foreach($types as $key=>$label)<a href="{{ route('staff.layouts.edit',$key) }}" @if($key===$template->key) aria-current="page" @endif>{{ $label }}</a>@endforeach</nav>
+@unless($quoteLayout)<nav class="segmented" aria-label="Type de document">@foreach($types as $key=>$label)<a href="{{ route('staff.layouts.edit',$key) }}" @if($key===$template->key) aria-current="page" @endif>{{ $label }}</a>@endforeach</nav>@endunless
 <div class="segmented" role="group" aria-label="Page affichée" data-editor-only hidden><button type="button" data-view="single" aria-pressed="true">Page unique</button><button type="button" data-view="continuation" aria-pressed="false">Page suite</button></div>
 <div class="editor-tools" data-editor-only hidden>
 <button type="button" class="secondary icon-btn" data-undo disabled aria-label="Annuler la dernière modification" title="Annuler (Ctrl+Z)">↶</button><button type="button" class="secondary icon-btn" data-redo disabled aria-label="Rétablir" title="Rétablir (Ctrl+Y)">↷</button>
 <span class="zoom" role="group" aria-label="Zoom"><button type="button" class="secondary icon-btn" data-zoom="-1" aria-label="Réduire le zoom">−</button><output data-zoom-value aria-live="polite">100 %</output><button type="button" class="secondary icon-btn" data-zoom="1" aria-label="Agrandir le zoom">+</button></span>
 </div>
-<div class="editor-preview-choice">
+<div class="editor-preview-choice" @if($quoteLayout) hidden @endif>
 <label>Aperçu<select name="scenario">@foreach(['single'=>'Une ouverture','four'=>'Quatre fenêtres','eight'=>'Huit ouvertures','twenty'=>'Vingt ouvertures','thirty'=>'Trente ouvertures (plusieurs pages)','store'=>'Store','discount'=>'Remise de 10 %','negotiated'=>'Total négocié','individual'=>'Quatre exemplaires individuels'] as $key=>$label)<option value="{{ $key }}">{{ $label }}</option>@endforeach</select></label>
 <label>Document<select name="preview_type">@foreach(['quote'=>'Devis','invoice'=>'Facture','receipt'=>'Reçu'] as $key=>$label)<option value="{{ $key }}" @selected($key===($template->key==='global'?'quote':$template->key))>{{ $label }}</option>@endforeach</select></label>
 </div>
-<div class="editor-save"><button name="action" value="draft" class="secondary">Enregistrer le brouillon</button><button name="action" value="publish">Publier le modèle</button></div>
+<div class="editor-save">@if($quoteLayout)<button>Enregistrer pour ce devis</button>@else<button name="action" value="draft" class="secondary">Enregistrer le brouillon</button><button name="action" value="publish">Publier le modèle</button>@endif</div>
 </header>
 
 <div class="editor-cols">
@@ -76,7 +85,9 @@
 <label class="mt-0">Taille<span class="field-unit"><input type="number" step="any" data-prop="size" inputmode="numeric"><span class="unit">pt</span></span></label>
 <label>Couleur<input type="color" data-prop="color"></label>
 </div>
-<div data-for-types="text commitment"><label>Contenu<textarea rows="4" maxlength="2000" data-prop="text"></textarea></label>
+<div data-for-types="{{ implode(' ',array_keys(\App\Services\DocumentBlocks::LABELS)) }}"><label>Intitulé<input data-prop="label" maxlength="120" data-label-input></label><p class="hint">Laissez vide pour garder l’intitulé proposé.</p></div>
+<div data-for-types="text commitment {{ implode(' ',\App\Services\DocumentBlocks::COMPLEMENT_TYPES) }}"><label><span data-text-label>Contenu</span><textarea rows="4" maxlength="2000" data-prop="text"></textarea></label>
+<p class="hint" data-text-hint></p>
 <p class="hint">Données à insérer, remplacées dans chaque document :</p><div class="chips field-chips">@foreach(\App\Services\DocumentBlocks::FIELDS as $field)<button type="button" class="chip" data-insert="{{ $field }}">{{ $field }}</button>@endforeach</div></div>
 </details>
 <details class="fold" data-for-types="lines" open><summary>Tableau<small>Colonnes et enchaînement des pages</small></summary>
@@ -104,7 +115,7 @@
 
 <section class="doc-settings" aria-labelledby="h-doc-settings">
 <h2 id="h-doc-settings" class="editor-h">Réglages du document</h2>
-<details class="fold" @if($errors->hasAny(['name','inherit_global','apply_all'])) open @endif><summary>Modèle<small>Style commun et application aux autres documents</small></summary>
+@unless($quoteLayout)<details class="fold" @if($errors->hasAny(['name','inherit_global','apply_all'])) open @endif><summary>Modèle<small>Style commun et application aux autres documents</small></summary>
 @if($template->key==='global')
 <input type="hidden" name="apply_all" value="0"><label class="toggle-row"><span>Appliquer le style commun aux devis, factures et reçus lors de la publication<small>Les modèles déjà rattachés suivent toujours le style commun. Cette option rattache aussi les modèles personnalisés.</small></span><input class="switch" type="checkbox" name="apply_all" value="1" checked></label>
 @foreach($templates as $other)<input type="hidden" name="target_versions[{{ $other->id }}]" value="{{ $other->version }}">@endforeach
@@ -112,11 +123,11 @@
 <input type="hidden" name="inherit_global" value="0"><label class="toggle-row"><span>Utiliser le style commun publié<small>Décochez cette option pour personnaliser le style et la mise en page. L’introduction reste propre à ce type de document.</small></span><input class="switch" type="checkbox" name="inherit_global" value="1" @checked(old('inherit_global',$options['inherit_global'] ?? false))></label>
 @endif
 <p class="muted">Version de travail {{ $template->version }} · {{ $premium ? 'Modèle premium publié' : 'Réglages historiques conservés' }}@if(isset($activePresentation['global_template_version'])) · style commun v{{ $activePresentation['global_template_version'] }}@endif. {{ $draft ? 'La version publiée reste utilisée pour les documents.' : 'Préparez un brouillon, vérifiez le PDF puis publiez le modèle.' }}</p>
-</details>
+</details>@endunless
 <details class="fold"><summary>Identité<small>Couleurs, police, logo, signature et cachet</small></summary>
 <div class="grid">@foreach(\App\Services\DocumentLayout::COLORS as $key=>$label)<label class="swatch">{{ $label }}<input type="color" name="{{ $key }}" value="{{ old($key,$options[$key]) }}" required></label>@endforeach</div>
 <div class="grid">
-<label>Police<select name="font_family">@foreach(['DejaVu Sans','DejaVu Serif'] as $font)<option @selected(old('font_family',$options['font_family'])===$font)>{{ $font }}</option>@endforeach</select></label>
+<label>Police<select name="font_family">@foreach(\App\Services\DocumentBlocks::FONTS as $font)<option @selected(old('font_family',$options['font_family'])===$font)>{{ $font }}</option>@endforeach</select></label>
 <label>Taille du texte<span class="field-unit"><input type="number" name="font_size" min="8" max="12" required value="{{ old('font_size',$options['font_size']) }}"><span class="unit">pt</span></span></label>
 </div>
 @foreach(['logo'=>'Logo PNG ou JPEG','signature_image'=>'Signature entreprise','stamp_image'=>'Cachet'] as $key=>$label)
@@ -130,7 +141,7 @@
 </details>
 <details class="fold"><summary>Contenu<small>Introduction, éléments affichés, signature</small></summary>
 <label class="mt-0">Activités<input name="activities" maxlength="300" value="{{ old('activities',$options['activities']) }}"></label>
-<label>Introduction<textarea name="body" rows="3" maxlength="10000">{{ old('body',$draft['body'] ?? $template->body) }}</textarea></label>
+<label>Introduction<textarea name="body" rows="3" maxlength="10000">{{ old('body',$quoteLayout ? ($quoteBody ?? '') : ($draft['body'] ?? $template->body)) }}</textarea></label>
 @foreach(\App\Services\DocumentLayout::TOGGLES as $key=>$label)<input type="hidden" name="{{ $key }}" value="0"><label class="toggle-row"><span>{{ $label }}</span><input class="switch" type="checkbox" name="{{ $key }}" value="1" @checked(old($key,$options[$key]))></label>@endforeach
 <p class="muted">Si le logo figure déjà dans le filigrane, désactivez son affichage pour éviter de le répéter.</p>
 <label>Responsable / mention de signature<input name="signature" maxlength="1000" value="{{ old('signature',$options['signature'] ?? '') }}"></label>
@@ -153,10 +164,10 @@
 </aside>
 </div>
 </form>
-<details class="panel mt-12"><summary>Historique des modèles publiés</summary>
+@unless($quoteLayout)<details class="panel mt-12"><summary>Historique des modèles publiés</summary>
 @forelse($revisions as $revision)<form class="actions" method="post" action="{{ route('staff.layouts.restore',[$template->key,$revision->id]) }}">@csrf<input type="hidden" name="version" value="{{ $template->version }}"><span>Version {{ $revision->version }}, <span class="mono">{{ $revision->created_at }}</span></span><button class="secondary">Reprendre en brouillon</button></form>@empty<p>Aucune publication enregistrée pour ce modèle.</p>@endforelse
-</details>
-<div class="action-bar editor-foot"><span class="status"><span data-editor-only hidden>Grille de 5 mm aimantée · Marges : haut {{ $editorData['margins']['top'] }} mm, bas {{ $editorData['margins']['bottom'] }} mm, gauche {{ $editorData['margins']['left'] }} mm, droite {{ $editorData['margins']['right'] }} mm · Les blocs rouges sortent de la zone imprimable. </span>Publier s’applique aux prochains documents uniquement ; les PDF déjà émis restent inchangés.</span></div>
+</details>@endunless
+<div class="action-bar editor-foot"><span class="status"><span data-editor-only hidden>Grille de 5 mm aimantée · Marges : haut {{ $editorData['margins']['top'] }} mm, bas {{ $editorData['margins']['bottom'] }} mm, gauche {{ $editorData['margins']['left'] }} mm, droite {{ $editorData['margins']['right'] }} mm · Les blocs rouges sortent de la zone imprimable. </span>{{ $quoteLayout ? 'Enregistrer s’applique à ce devis seulement ; les PDF déjà émis restent inchangés.' : 'Publier s’applique aux prochains documents uniquement ; les PDF déjà émis restent inchangés.' }}</span></div>
 <script src="{{ asset('pdf-letterhead.js') }}?v={{ filemtime(public_path('pdf-letterhead.js')) }}" defer></script>
 <script src="{{ asset('document-layout.js') }}?v={{ filemtime(public_path('document-layout.js')) }}" defer></script>
 <script src="{{ asset('document-editor.js') }}?v={{ filemtime(public_path('document-editor.js')) }}" defer></script>
