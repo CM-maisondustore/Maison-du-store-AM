@@ -28,7 +28,9 @@ class SiteImagesTest extends TestCase
             ->assertSee('Images du site')->assertSee('Carte Électroménager')->assertSee('Image du menu Rideaux &amp; voilages', false)
             ->assertSee('Photo du showroom')->assertSee('Image d’origine du site')->assertSee('Réalisations');
         $card = SiteContent::where('slot', 'boutique-electro')->firstOrFail();
-        $this->get(route('staff.contents.edit', $card))->assertOk()->assertSee('Accueil · Nos boutiques · Carte Électroménager')->assertSee('site/images/soon/electro.jpg', false);
+        $this->get(route('staff.contents.edit', $card))->assertOk()->assertSee('Accueil · Nos boutiques · Carte Électroménager')->assertSee('site/images/soon/electro.jpg', false)
+            // Recadrage au format de l'emplacement (16:10 sur l'accueil) et carte à partager.
+            ->assertSee('data-aspect="16/10"', false)->assertSee('Recadrer l’image')->assertSee('Carte à partager')->assertSee('Story · 1080×1920')->assertSee('image-studio.js', false);
 
         $this->put(route('staff.contents.update', $card), ['title' => $card->title, 'description' => '', 'published' => 1, 'position' => 0,
             'image' => UploadedFile::fake()->image('electro.jpg', 64, 48), 'image_alt' => 'Cuisine équipée'])->assertSessionHasNoErrors();

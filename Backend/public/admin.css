@@ -1156,3 +1156,20 @@ form[data-step="2"] .opening-row .quote-opening-details{position:sticky;left:0;m
 /* ---- Images du site ---- */
 .content-group{margin:8px 0 28px}
 .content-fallback{display:block;width:100%;max-width:320px;height:auto;max-height:180px;object-fit:cover;margin:6px 0 4px;border-radius:var(--r-10);border:1px solid var(--pro-line)}
+
+/* ---- Recadrage et carte à partager ---- */
+.cropper{margin-top:14px;padding:14px;border:1px solid var(--pro-line);border-radius:var(--r-12);background:var(--pro-panel-alt)}
+.cropper-head h2{font-size:15px}
+.cropper .chip-set{margin:10px 0 4px}
+.cropper-stage{display:flex;justify-content:center;margin:12px 0 8px;background:var(--pro-bg);border-radius:var(--r-10);padding:10px}
+.cropper-stage canvas{display:block;max-width:100%;cursor:grab;touch-action:none;border-radius:4px;box-shadow:0 0 0 1px var(--pro-line-strong)}
+.cropper-stage canvas:active{cursor:grabbing}
+.cropper-zoom{display:flex;align-items:center;gap:12px}
+.cropper-zoom input{flex:1}
+.share-card{margin-top:24px}
+.share-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:24px;align-items:start;margin-top:14px}
+.share-controls{display:flex;flex-direction:column;gap:12px}
+.share-controls label{margin:0}
+.share-preview{display:flex;justify-content:center;background:var(--pro-bg);border-radius:var(--r-10);padding:12px}
+.share-preview canvas{display:block;width:auto;max-width:100%;height:auto;max-height:520px;border-radius:4px;box-shadow:0 10px 24px -14px rgba(32,51,44,.5)}
+@media (max-width:820px){.share-grid{grid-template-columns:minmax(0,1fr)}}

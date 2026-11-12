@@ -25,6 +25,20 @@ final class SiteImages
         'contact' => ['contact', 'Accueil · Contact', 'Photo du showroom', 'site/images/realisations/showroom.webp', 'Showroom Maison du Store AM à Cocody'],
     ];
 
+    /**
+     * Format affiché sur le site pour une fiche (proportions CSS de mds.css), proposé par défaut au recadrage.
+     * @return array{0:int,1:int,2:string} largeur, hauteur, description
+     */
+    public static function aspect(SiteContent $c): array
+    {
+        $kind = self::SLOTS[$c->slot][0] ?? $c->kind;
+        return match (true) {
+            in_array($kind, ['hero', 'boutique'], true) => [16, 10, 'bandeau et cartes de l’accueil'],
+            $kind === 'quote' && !str_starts_with((string) $c->slot, 'finish-') => [16, 9, 'carte du devis en ligne'],
+            default => [4, 3, $kind === 'portfolio' ? 'réalisations de l’accueil' : 'format de l’emplacement'],
+        };
+    }
+
     /** Fiches publiées des emplacements fixes, chargées une fois par requête (attribut de la requête, pas de cache statique). */
     private static function rows(): Collection
     {
