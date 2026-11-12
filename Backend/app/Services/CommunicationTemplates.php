@@ -5,7 +5,7 @@ use Illuminate\Validation\ValidationException;
 class CommunicationTemplates
 {
     public const LABELS = ['quote_received'=>'Demande de devis reçue','quote'=>'Envoi du devis','invoice'=>'Envoi de facture','appointment'=>'Confirmation de rendez-vous','reminder'=>'Rappel de rendez-vous','commercial'=>'Échange commercial','promotion'=>'Offre et promotion'];
-    public const VARIABLES = ['prenom','nom','reference','montant','acompte','solde','remise','total_avant_remise','conditions_paiement','date','heure','adresse','entreprise','statut',
+    public const VARIABLES = ['civilite','prenom','nom','reference','montant','acompte','solde','remise','total_avant_remise','conditions_paiement','date','heure','adresse','entreprise','statut',
         'site','lien_devis','lien_realisations','lien_boutique','lien_rendez_vous'];
     /** Liens vers le site insérés dans les messages ; la provenance (utm) apparaît dans Visiteurs. */
     public static function links(string $key, string $channel): array
@@ -14,6 +14,11 @@ class CommunicationTemplates
         $tag='utm_source='.($channel==='whatsapp' ? 'whatsapp' : 'email').'&utm_medium=message&utm_campaign='.$key;
         return ['site'=>preg_replace('#^https?://#','',$base),'lien_devis'=>$base.'/devis?'.$tag,'lien_realisations'=>$base.'/?'.$tag.'#realisations',
             'lien_boutique'=>$base.'/shop?'.$tag,'lien_rendez_vous'=>$base.'/?'.$tag.'#rendez-vous'];
+    }
+    /** Civilité en toutes lettres (« Madame », « Monsieur ») ; vide si elle n'est pas connue. */
+    public static function civility(?string $value): string
+    {
+        return match(mb_strtolower(trim((string) $value))) {'mme','mme.','madame'=>'Madame','m','m.','mr','monsieur'=>'Monsieur',default=>''};
     }
     public static function defaults(string $key, string $channel='email'): array
     {
@@ -42,6 +47,7 @@ class CommunicationTemplates
         $c = $record instanceof Quote ? $record->contact : ($record instanceof Invoice ? $record->snapshot['customer'] : ($record?->details ?? []));
         $data = array_fill_keys(self::VARIABLES,'');
         $data['entreprise'] = config('workspace.issuer.name');
+        $data['civilite'] = self::civility($c['civility'] ?? null);
         $data['prenom'] = $c['firstName'] ?? $contact?->name ?? '';
         $data['nom'] = trim(($c['firstName'] ?? '').' '.($c['lastName'] ?? '')) ?: ($contact?->name ?? '');
         $data['adresse'] = trim(($c['address'] ?? $contact?->address ?? '').' '.($c['city'] ?? ''));
@@ -66,7 +72,7 @@ class CommunicationTemplates
     {
         $t=self::get($channel,$key);
         $values=[...$values,...self::links($key,$channel)];
-        return ['subject'=>mb_substr(preg_replace('/[\r\n]+/',' ',self::render($t->subject,$values)),0,200), 'body'=>trim(preg_replace("/\n{3,}/","\n\n",self::render($t->body,$values))), 'template_snapshot'=>['id'=>$t->id,'version'=>$t->version,'key'=>$key,'channel'=>$channel]];
+        return ['subject'=>mb_substr(trim(preg_replace(['/[\r\n]+/','/ {2,}/u'],' ',self::render($t->subject,$values))),0,200), 'body'=>trim(preg_replace(["/\n{3,}/",'/(?<=\S) {2,}(?=\S)/u'],["\n\n",' '],self::render($t->body,$values))), 'template_snapshot'=>['id'=>$t->id,'version'=>$t->version,'key'=>$key,'channel'=>$channel]];
     }
     public static function presentation(string $key): array
     {

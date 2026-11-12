@@ -50,7 +50,7 @@ final class DocumentBlocks
     public const COMPLEMENT_TYPES=['company','title','client','object','total','payment','signature','stamp','footer'];
     public const COLUMNS=['quantity'=>'Quantité','unit_price'=>'Prix unitaire','amount'=>'Montant'];
     public const SOURCES=['logo'=>'Logo','signature_image'=>'Signature de l’entreprise','stamp_image'=>'Cachet'];
-    public const FIELDS=['{client.nom}','{client.telephone}','{devis.numero}','{devis.date}','{total.general}','{acompte}','{reste_a_payer}'];
+    public const FIELDS=['{client.civilite}','{client.nom}','{client.telephone}','{devis.numero}','{devis.date}','{total.general}','{acompte}','{reste_a_payer}'];
     public const TEXT_TYPES=['text','commitment'];
     /** Blocs qui remontent juste sous la dernière ligne ; signatures, cachet et pied de page restent à leur place. */
     public const FOLLOWERS=['total','payment','commitment'];
@@ -251,7 +251,7 @@ final class DocumentBlocks
     {
         $money=fn($value)=>DocumentViewModel::money($value);
         $totals=$vm['totals'] ?? [];
-        return ['{client.nom}'=>trim(($vm['customer']['firstName'] ?? '').' '.($vm['customer']['lastName'] ?? '')),'{client.telephone}'=>$vm['customer']['phone'] ?? '',
+        return ['{client.civilite}'=>CommunicationTemplates::civility($vm['customer']['civility'] ?? null),'{client.nom}'=>trim(($vm['customer']['firstName'] ?? '').' '.($vm['customer']['lastName'] ?? '')),'{client.telephone}'=>$vm['customer']['phone'] ?? '',
             '{devis.numero}'=>$vm['quote_reference'] ?? $vm['number'] ?? '','{devis.date}'=>$vm['date'] ?? '','{total.general}'=>$money($totals['total'] ?? 0),
             '{acompte}'=>$money($totals['deposit'] ?? $vm['payment_plan']['deposit'] ?? 0),'{reste_a_payer}'=>$money($vm['remaining_amount'] ?? 0)];
     }

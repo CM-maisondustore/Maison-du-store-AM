@@ -208,4 +208,22 @@ class LayoutMessagesLinksTest extends TestCase
             ->assertSee('Liens transmis aux clients')->assertSee('Awa Exemple')->assertSee('Ouvert 1 fois')->assertSee('PDF téléchargé')->assertSee('Lien expiré consulté')
             ->assertSee('Demande de devis reçue, WhatsApp');
     }
+
+    public function test_civility_tag_in_documents_and_messages(): void
+    {
+        $this->assertSame('Madame', CommunicationTemplates::civility('mme'));
+        $this->assertSame('Monsieur', CommunicationTemplates::civility('M.'));
+        $this->assertSame('', CommunicationTemplates::civility(null));
+        $this->assertContains('{client.civilite}', DocumentBlocks::FIELDS);
+        $this->assertSame('Monsieur', DocumentBlocks::fields(['customer' => ['civility' => 'm', 'firstName' => 'Yao']])['{client.civilite}']);
+
+        // Modèles de messages : « Bonjour Madame Awa Kouassi, » ; sans civilité, pas de double espace.
+        foreach (array_keys(CommunicationTemplates::LABELS) as $key) foreach (['email', 'whatsapp'] as $channel) {
+            [, $body] = MdsTemplates::message($key, $channel);
+            $this->assertStringStartsWith('Bonjour {{civilite}} {{nom}},', $body, "$key / $channel");
+        }
+        $values = ['civilite' => 'Madame', 'nom' => 'Awa Kouassi'];
+        $this->assertStringStartsWith('Bonjour Madame Awa Kouassi,', CommunicationTemplates::draft('commercial', $values)['body']);
+        $this->assertStringStartsWith('Bonjour Awa Kouassi,', CommunicationTemplates::draft('commercial', ['civilite' => '', 'nom' => 'Awa Kouassi'])['body']);
+    }
 }
