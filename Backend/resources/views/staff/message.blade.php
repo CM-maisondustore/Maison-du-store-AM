@@ -57,4 +57,5 @@
 @endif
 </section>
 </div>
+@include('staff.partials.record-actions',['type'=>'messages','record'=>$message])
 @endsection

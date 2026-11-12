@@ -51,7 +51,8 @@ class QuoteFormController
         $email=mb_strtolower(trim($data['email'] ?? ''));
         if ($quote?->contact_id && $email===mb_strtolower(trim($quote->contact['email'] ?? ''))) return Contact::findOrFail($quote->contact_id);
         $values=['kind'=>'client','name'=>trim(($data['firstName'] ?? '').' '.$data['lastName']),'phone'=>$data['phone'],'address'=>trim($data['address'].' '.($data['city'] ?? ''))];
-        $contact=$email ? Contact::firstOrCreate(['email'=>$email],$values) : Contact::create([...$values,'email'=>null]);
+        $contact=$email ? Contact::withTrashed()->firstOrCreate(['email'=>$email],$values) : Contact::create([...$values,'email'=>null]);
+        if ($contact->trashed()) \App\Services\Trash::restore($contact);
         if ($contact->archived_at || $contact->kind!=='client') throw ValidationException::withMessages(['contact.email'=>'Ce dossier est archivé ou ne correspond pas à un client. Admin-CM doit vérifier le dossier.']);
         return $contact;
     }

@@ -64,7 +64,7 @@
                                     <a href="{{ $shopHref($k) }}" class="btn btn-tint">Entrer dans la boutique {{ $shops[$k]['name'] }}</a>
                                 </div>
                                 <div class="mega-feat">
-                                    <img src="{{ asset($shops[$k]['featImage']) }}" alt="" loading="lazy" class="mega-img">
+                                    <img src="{{ \App\Support\Site\SiteImages::url('menu-'.$k) }}" alt="" loading="lazy" class="mega-img">
                                     <span class="serif-20">{{ $shops[$k]['featTitle'] }}</span>
                                     <span class="small">{{ $shops[$k]['featText'] }}</span>
                                 </div>

@@ -67,4 +67,5 @@
 </form>
 </dialog>
 @endif
+@include('staff.partials.record-actions',['type'=>'factures','record'=>$invoice])
 @endsection

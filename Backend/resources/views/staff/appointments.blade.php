@@ -10,6 +10,10 @@
 @endif
 @endsection
 @section('content')
+@include('staff.partials.list-states',['type'=>'rendez-vous','state'=>$state])
+@if($state==='corbeille')
+@include('staff.partials.trash-table',['type'=>'rendez-vous','items'=>$appointments])
+@else
 <nav class="chips" aria-label="Affichage">
 @foreach(['semaine'=>'Semaine','jour'=>'Jour','liste'=>'Liste'] as $key=>$label)<a class="chip" href="{{ route('staff.appointments.index',['vue'=>$key]) }}" @if($view===$key) aria-current="true" @endif>{{ $label }}</a>@endforeach
 @if($view==='liste')
@@ -45,4 +49,5 @@
 </div>
 @endif
 </section>
+@endif
 @endsection

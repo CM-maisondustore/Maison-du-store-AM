@@ -86,4 +86,5 @@
 </div>
 <div class="action-bar"><a class="button quiet" href="{{ route('staff.products.index') }}">Retour au catalogue</a><button>Enregistrer le produit et les coûts</button></div>
 </form>
+@if($product->exists)@include('staff.partials.record-actions',['type'=>'catalogue','record'=>$product])@endif
 @endsection

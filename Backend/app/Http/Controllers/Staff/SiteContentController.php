@@ -7,7 +7,12 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 class SiteContentController
 {
-    public function index() { return view('staff.contents', ['contents' => SiteContent::with('media')->orderBy('kind')->orderBy('position')->orderBy('id')->paginate(16)]); }
+    public function index()
+    {
+        // Chaque image fixe du site a sa fiche, même avant tout import : on voit et on remplace ce que le site affiche.
+        \App\Support\Site\SiteImages::ensure();
+        return view('staff.contents', ['contents' => SiteContent::with('media')->orderBy('position')->orderBy('id')->get()]);
+    }
     public function create() { return view('staff.content', ['content' => new SiteContent(['kind' => 'portfolio', 'position' => 0, 'published' => false])]); }
     public function edit(SiteContent $content) { return view('staff.content', compact('content')); }
     private function data(Request $request): array

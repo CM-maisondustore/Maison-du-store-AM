@@ -5,6 +5,10 @@
 <a class="button quiet" href="{{ route('staff.quote-options.index') }}">Tarifs, matériaux et finitions des devis</a>
 @endsection
 @section('content')
+@include('staff.partials.list-states',['type'=>'catalogue','state'=>$state])
+@if($state==='corbeille')
+@include('staff.partials.trash-table',['type'=>'catalogue','items'=>$products])
+@else
 <form class="panel" method="post" action="{{ route('staff.catalogue.visibility') }}" data-confirm="{{ $catalogueVisible ? 'Masquer le catalogue sur le site ? Les produits et leur utilisation dans les devis sont conservés.' : 'Afficher le catalogue sur le site ?' }}">
 @csrf @method('PATCH')
 <div class="title-row between">
@@ -67,4 +71,5 @@
 </div>
 @include('staff.pagination',['paginator'=>$products])
 </section>
+@endif
 @endsection

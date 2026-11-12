@@ -10,7 +10,8 @@ class InvoiceController
     public function index(Request $r)
     {
         $status = $r->validate(['status' => 'nullable|in:draft,issued,paid'])['status'] ?? null;
-        return view('staff.invoices', ['invoices' => Invoice::with('contact')->when($status, fn ($q) => $q->where('status', $status))->latest()->paginate(25)->withQueryString(), 'counts' => Invoice::selectRaw('status, COUNT(*) as total')->groupBy('status')->pluck('total', 'status')]);
+        $state = \App\Services\Trash::state($r);
+        return view('staff.invoices', ['state' => $state, 'invoices' => \App\Services\Trash::order(Invoice::with('contact')->listState($state)->when($status, fn ($q) => $q->where('status', $status))->latest(), $state)->paginate(25)->withQueryString(), 'counts' => Invoice::listState($state)->selectRaw('status, COUNT(*) as total')->groupBy('status')->pluck('total', 'status')]);
     }
     public function create(Request $r, Quote $quote)
     {
@@ -18,6 +19,8 @@ class InvoiceController
         $invoice = DB::transaction(function () use ($quote, $data) {
             $q = Quote::whereKey($quote->id)->lockForUpdate()->firstOrFail();
             abort_unless($q->status === 'accepted' && $q->contact_id && count($q->lines ?? []), 422, 'Un devis accepté et chiffré est requis.');
+            $old = Invoice::onlyTrashed()->where('quote_id', $q->id)->first();
+            if ($old && !\App\Services\Trash::purge($old)) abort(409, 'Une ancienne facture de ce devis est à la corbeille : restaurez-la.');
             return Invoice::firstOrCreate(['quote_id' => $q->id], ['contact_id' => $q->contact_id, 'due_date' => $data['due_date'], 'snapshot' => ['issuer' => config('workspace.issuer'), 'customer' => $q->contact, 'lines' => $q->lines, 'tax_basis_points' => $q->tax_basis_points,
                 'quote_reference'=>$q->reference,...($q->document_metadata ?? []),
                 'financial'=>\App\Services\Quotes\QuoteFinancials::forQuote($q), 'windows'=>$q->dimensions, 'payment_plan'=>['mode'=>$q->payment_mode,'deposit'=>$q->deposit_amount,'received'=>$q->receivedAmount()]]]);

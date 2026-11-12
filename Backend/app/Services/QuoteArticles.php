@@ -23,7 +23,7 @@ final class QuoteArticles
     /** Noms et références seulement : ce catalogue est aussi servi aux agents. */
     public static function catalogue(?string $type): array
     {
-        return Product::whereIn('details->universe',self::UNIVERSES[$type] ?? [])->orderBy('id')->get(['id','reference','details'])
+        return Product::unarchived()->whereIn('details->universe',self::UNIVERSES[$type] ?? [])->orderBy('id')->get(['id','reference','details'])
             ->map(fn($p)=>['name'=>$p->details['name'] ?? $p->reference,'reference'=>$p->reference])->all();
     }
 

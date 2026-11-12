@@ -18,7 +18,8 @@ class ProductController
             'available' => 'nullable|in:0,1', 'type' => 'nullable|in:store,rideau',
             'universe' => 'nullable|in:stores_rideaux,electromenager,meubles_bureau,meubles_domicile',
         ]);
-        $query = Product::query();
+        $state = \App\Services\Trash::state($request);
+        $query = Product::query()->listState($state);
         if (!empty($filters['q'])) {
             $query->where(fn ($q) => $q->where('reference', 'like', '%'.$filters['q'].'%')
                 ->orWhere('details->name', 'like', '%'.$filters['q'].'%'));
@@ -31,11 +32,12 @@ class ProductController
         $catalogueVisible = SiteSetting::catalogueVisible();
         return view('staff.products', [
             'catalogueVisible' => $catalogueVisible,
-            'products' => $query->orderBy('id')->paginate(20)->withQueryString(),
+            'state' => $state,
+            'products' => \App\Services\Trash::order($query->orderBy('id'), $state)->paginate(20)->withQueryString(),
             'counts' => [
-                'Produits' => Product::count(),
-                'Visibles sur le site' => $catalogueVisible ? Product::where('published', true)->count() : 0,
-                'Disponibles' => Product::where('details->available', true)->count(),
+                'Produits' => Product::unarchived()->count(),
+                'Visibles sur le site' => $catalogueVisible ? Product::unarchived()->where('published', true)->count() : 0,
+                'Disponibles' => Product::unarchived()->where('details->available', true)->count(),
             ],
         ]);
     }

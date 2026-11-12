@@ -8,6 +8,10 @@
 <a class="button quiet" href="https://mail.hostinger.com" target="_blank" rel="noopener">Ouvrir le webmail</a>
 @endsection
 @section('content')
+@include('staff.partials.list-states',['type'=>'messages','state'=>$state])
+@if($state==='corbeille')
+@include('staff.partials.trash-table',['type'=>'messages','items'=>$messages])
+@else
 @unless($configured)<div class="notice">Connexion Hostinger Email à activer. Vous pouvez déjà préparer des brouillons et consulter l’historique enregistré.</div>
 @endunless
 <div class="mail">
@@ -25,4 +29,5 @@
 <p class="muted">Sélectionnez un message dans la liste pour le lire.</p>
 </form>
 </div>
+@endif
 @endsection

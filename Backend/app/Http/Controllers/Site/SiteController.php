@@ -33,7 +33,6 @@ class SiteController
 
         return view('site.landing', [
             'hero' => $contents->firstWhere('slot', 'hero'),
-            'contactImage' => $contents->firstWhere('slot', 'contact'),
             'portfolio' => $portfolio,
             'bubblePool' => $this->bubblePool(),
             'dates' => $this->appointmentDates($schedule),

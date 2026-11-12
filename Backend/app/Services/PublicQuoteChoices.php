@@ -26,7 +26,7 @@ class PublicQuoteChoices
     }
     public static function products(): \Illuminate\Database\Eloquent\Collection
     {
-        return Product::with('media')->where('published',true)->where('details->available',true)->orderBy('id')->get();
+        return Product::with('media')->unarchived()->where('published',true)->where('details->available',true)->orderBy('id')->get();
     }
     public static function models(): array
     {

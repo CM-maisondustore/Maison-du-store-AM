@@ -1091,6 +1091,11 @@ body:has(.float-panel:target),body:has(.float-panel[data-open]){overflow:hidden}
 /* ---- Étape 3, formulaire de calcul : coefficients et pose en pastilles à cocher ---- */
 .calc-form{margin:4px 0 18px;padding:4px 16px 12px;border:1px solid var(--pro-line);border-radius:var(--r-12);background:var(--pro-bg)}
 .calc-form .choice-title{margin-top:12px}
+.calc-group{margin-top:8px;padding-top:4px}
+.calc-group+.calc-group{margin-top:16px;padding-top:12px;border-top:1px solid var(--pro-line)}
+.calc-group[hidden],[data-calc-empty][hidden]{display:none}
+.calc-group-title{font-size:1rem}
+.choice-sub-title{margin:10px 0 2px;font-size:.8125rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--pro-text-2)}
 .chip-radio{position:relative;display:inline-flex;margin:0}
 .chip-radio input{position:absolute;opacity:0;width:1px;height:1px}
 .chip-radio span{display:inline-flex;align-items:center;min-height:38px;padding:0 16px;border-radius:var(--r-pill);border:1px solid var(--pro-line-strong);background:var(--pro-panel);color:var(--pro-text);font:500 14px var(--font-ui);cursor:pointer}
@@ -1139,3 +1144,15 @@ form[data-step="2"] .opening-row .quote-opening-details{position:sticky;left:0;m
 .card-crop{display:flex;flex-wrap:wrap;align-items:end;gap:8px 12px;margin:8px 0}.card-crop label{flex:1 1 200px}.card-crop .hint{flex-basis:100%}
 /* ---- Profil agent : communes couvertes en Oui / Non ---- */
 .zone-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:4px 16px}
+
+/* ---- Archives et corbeille ---- */
+.tab svg{flex:none}
+.trash-actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+.trash-actions form{margin:0}
+.record-actions .actions{margin:10px 0 0}
+.record-actions .actions form{margin:0}
+@media (max-width:720px){.trash-actions{justify-content:flex-start}}
+
+/* ---- Images du site ---- */
+.content-group{margin:8px 0 28px}
+.content-fallback{display:block;width:100%;max-width:320px;height:auto;max-height:180px;object-fit:cover;margin:6px 0 4px;border-radius:var(--r-10);border:1px solid var(--pro-line)}

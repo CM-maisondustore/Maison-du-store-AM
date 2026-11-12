@@ -63,10 +63,10 @@ class CommercialMail
             foreach ($messages as $mail) {
                 $sender = mb_strtolower((string) ($mail->getFrom()->first()?->mail ?? ''));
                 $key = hash('sha256', config('mail.mailers.smtp.username').'|INBOX|'.$validity.'|'.$mail->getUid());
-                if (CommercialMessage::where('remote_key', $key)->exists()) continue;
+                if (CommercialMessage::withTrashed()->where('remote_key', $key)->exists()) continue;
                 $body = $mail->getTextBody() ?: html_entity_decode(strip_tags($mail->getHTMLBody()), ENT_QUOTES | ENT_HTML5, 'UTF-8');
                 try { $receivedAt = $mail->getDate()->toDate(); } catch (\Throwable $e) { $receivedAt = now(); }
-                $message = CommercialMessage::firstOrCreate(['remote_key' => $key], ['direction' => 'incoming', 'status' => 'received', 'sender' => mb_substr($sender, 0, 250), 'recipient' => config('mail.from.address'), 'subject' => mb_substr((string) $mail->getSubject(), 0, 250), 'body' => mb_substr($body, 0, 200000), 'received_at' => $receivedAt, 'contact_id' => Contact::where('email', $sender)->value('id')]);
+                $message = CommercialMessage::withTrashed()->firstOrCreate(['remote_key' => $key], ['direction' => 'incoming', 'status' => 'received', 'sender' => mb_substr($sender, 0, 250), 'recipient' => config('mail.from.address'), 'subject' => mb_substr((string) $mail->getSubject(), 0, 250), 'body' => mb_substr($body, 0, 200000), 'received_at' => $receivedAt, 'contact_id' => Contact::where('email', $sender)->value('id')]);
                 if ($message->wasRecentlyCreated) $count++;
             }
             return $count;

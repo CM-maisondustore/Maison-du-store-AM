@@ -198,4 +198,5 @@
 </form>
 </dialog>
 @endif
+@include('staff.partials.record-actions',['type'=>'devis','record'=>$quote])
 @endsection

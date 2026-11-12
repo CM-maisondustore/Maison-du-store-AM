@@ -3,6 +3,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 class Contact extends Model
 {
+    use \Illuminate\Database\Eloquent\SoftDeletes, Concerns\Archivable;
     protected $guarded = ['id'];
     protected $casts = ['marketing_consent_at' => 'datetime', 'archived_at' => 'datetime'];
     protected static function booted(): void

@@ -20,6 +20,7 @@
     catch (_) { return false; }
   }
   let visitor = null, session = null;
+  function referrerHost() { try { return document.referrer ? new URL(document.referrer).hostname.slice(0, 190) : ''; } catch (_) { return ''; } }
   function send(event, extra) {
     if (!enabled) return;
     if (!visitor) visitor = uuid(VISITOR, localStorage, true);
@@ -28,7 +29,10 @@
     const payload = Object.assign({
       visitor_id: visitor, session_id: session, event,
       path: location.pathname, title: document.title.slice(0, 180),
-      campaign: ['utm_source','utm_medium','utm_campaign'].map(k => campaign.has(k) ? k + '=' + campaign.get(k) : '').filter(Boolean).join('&').slice(0, 190)
+      campaign: ['utm_source','utm_medium','utm_campaign'].map(k => campaign.has(k) ? k + '=' + campaign.get(k) : '')
+        .concat(campaign.has('fbclid') ? 'src=fbclid' : '', campaign.has('gclid') ? 'src=gclid' : '').filter(Boolean).join('&').slice(0, 190),
+      // Provenance réelle : l'en-tête Referer de cette requête est la page du site elle-même, pas le site d'origine.
+      referrer: event === 'page_view' ? referrerHost() : ''
     }, extra || {});
     const token = document.querySelector('meta[name="csrf-token"]')?.content;
     fetch('/api/analytics/collect', {method:'POST', credentials:'same-origin', keepalive:true,

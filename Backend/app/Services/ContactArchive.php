@@ -12,6 +12,10 @@ class ContactArchive
             'address' => trim(($data['address'] ?? '').' '.($data['city'] ?? '')),
         ];
         $email=mb_strtolower(trim($data['email'] ?? ''));
-        return $email ? Contact::firstOrCreate(['email'=>$email],$values) : Contact::create([...$values,'email'=>null]);
+        if (!$email) return Contact::create([...$values,'email'=>null]);
+        // Un dossier à la corbeille garde son e-mail : il est restauré plutôt que dupliqué.
+        $contact=Contact::withTrashed()->firstOrCreate(['email'=>$email],$values);
+        if ($contact->trashed()) \App\Services\Trash::restore($contact);
+        return $contact;
     }
 }

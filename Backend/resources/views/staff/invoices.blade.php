@@ -2,6 +2,10 @@
 @section('title','Factures')
 @section('subtitle','Préparez une facture depuis un devis accepté. Les factures émises conservent les coordonnées et montants d’origine.')
 @section('content')
+@include('staff.partials.list-states',['type'=>'factures','state'=>$state])
+@if($state==='corbeille')
+@include('staff.partials.trash-table',['type'=>'factures','items'=>$invoices])
+@else
 <nav class="chips" aria-label="Filtrer par état">
 <a class="chip" href="{{ route('staff.invoices.index') }}" @if(!request('status')) aria-current="true" @endif>Toutes<b>{{ $counts->sum() }}</b></a>
 @foreach(['draft'=>'Brouillon','issued'=>'Émise','paid'=>'Payée'] as $value=>$label)<a class="chip" href="{{ route('staff.invoices.index',['status'=>$value]) }}" @if(request('status')===$value) aria-current="true" @endif>{{ $label }}<b>{{ $counts[$value] ?? 0 }}</b></a>@endforeach
@@ -22,4 +26,5 @@
 </table>
 @include('staff.pagination',['paginator'=>$invoices])
 </section>
+@endif
 @endsection

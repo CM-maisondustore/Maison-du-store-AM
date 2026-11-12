@@ -53,4 +53,5 @@
 </section>
 </aside>
 </div>
+@include('staff.partials.record-actions',['type'=>'clients','record'=>$contact])
 @endsection

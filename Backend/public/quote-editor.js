@@ -263,10 +263,20 @@
     calcForm.hidden=false;
     const targets={material:'[name$="[costing][material_coefficient]"]',secondary:'[name$="[costing][secondary_material][coefficient]"]',tape:'[name$="[costing][tape][coefficient]"],[name$="[costing][extra_tape][coefficient]"]'};
     const normal=value=>String(value||'').trim().replace(',','.');
+    const rows=()=>[...windows.querySelectorAll('[data-window]')];
+    const kindOf=row=>{const v=values(row.querySelector('[data-selection]'));return {curtain:v.category==='rideau'&&!!v.curtain_id,sheer:v.category==='rideau'&&!!v.sheer_id,store:v.category==='store'};};
+    /* Coefficients des seules ouvertures concernées : un store n'en a pas. Tissu = rideaux avec tissu ; Voilage = voilage séparé
+       d'une ouverture rideau + voilage, ou métrage d'une ouverture voilage seul ; Ruflette = ouvertures rideau où une ruflette est choisie. */
+    const within=(row,sel)=>[...row.querySelectorAll(sel)];
+    const tapeOn=field=>!!field.closest('[data-cost-part]')?.querySelector('[data-component]')?.value;
+    const coefFields=key=>rows().flatMap(row=>{const k=kindOf(row);
+      if(key==='material')return k.curtain?within(row,targets.material):[];
+      if(key==='secondary')return k.sheer?within(row,k.curtain?targets.secondary:targets.material):[];
+      return k.curtain||k.sheer?within(row,targets.tape).filter(tapeOn):[];});
     const syncCoef=key=>{
-      const line=calcForm.querySelector('[data-coef="'+key+'"]'),fields=[...windows.querySelectorAll(targets[key])],seen=[...new Set(fields.map(f=>normal(f.value)).filter(Boolean))];
+      const line=calcForm.querySelector('[data-coef="'+key+'"]'),fields=coefFields(key),seen=[...new Set(fields.map(f=>normal(f.value)).filter(Boolean))];
       const custom=line.querySelector('[name$="_custom]"]'),radios=[...line.querySelectorAll('[type=radio]')],note=line.querySelector('[data-coef-note]');
-      radios.forEach(r=>r.checked=false);note.textContent='';
+      radios.forEach(r=>r.checked=false);note.textContent='';line.hidden=!fields.length;
       if(seen.length===1){const preset=radios.find(r=>r.value===seen[0]);if(preset)preset.checked=true;else{radios.find(r=>r.value==='custom').checked=true;custom.value=seen[0].replace('.',',');}}
       else if(seen.length>1)note.textContent='Valeurs différentes selon les ouvertures.';
       custom.disabled=!radios.find(r=>r.value==='custom').checked;
@@ -276,7 +286,7 @@
       custom.disabled=choice?.value!=='custom';if(!choice)return;
       const value=choice.value==='custom'?normal(custom.value):choice.value;
       if(!/^\d+(\.\d+)?$/.test(value)||Number(value)<=0)return;
-      windows.querySelectorAll(targets[key]).forEach(f=>{if(f.value!==value){f.value=value;invalidate(f);}});dirty=true;revision++;coefChips();
+      coefFields(key).forEach(f=>{if(f.value!==value){f.value=value;invalidate(f);}});dirty=true;revision++;coefChips();
     };
     const fee=key=>form.elements['pricing[fees][installation_delivery]['+key+']'];
     const syncInstall=()=>{
@@ -295,10 +305,8 @@
     /* Confection : tissus, voilage et store pilotent la confection (sewing) de chaque ouverture concernée.
        Rideau et voilage sur une même ouverture : une seule ligne de confection, au tarif des tissus, qui compte aussi le métrage du voilage. */
     form.classList.add('calc-ready');
-    const rows=()=>[...windows.querySelectorAll('[data-window]')];
     const own=(row,key)=>[...row.querySelectorAll('[name]')].find(el=>el.name.endsWith(']['+key+']')&&!el.name.includes('[costing]')&&!el.closest('[data-selection]'));
     const costValue=(row,path)=>Number(decimal(row.querySelector('[name$="[costing]'+path+'"]')?.value))||0;
-    const kindOf=row=>{const v=values(row.querySelector('[data-selection]'));return {curtain:v.category==='rideau'&&!!v.curtain_id,sheer:v.category==='rideau'&&!!v.sheer_id,store:v.category==='store'};};
     const sew=row=>{const part=row.querySelector('[data-cost-part="sewing"]');return {input:part.querySelector('[data-component]'),price:part.querySelector('[data-part-price]'),mode:part.querySelector('[data-part-mode]'),basis:part.querySelector('[data-sewing-basis]'),ids:[...part.querySelectorAll('[data-component-list] select option')].map(o=>o.value).filter(Boolean)};};
     const sewingRows={curtain:row=>kindOf(row).curtain,sheer:row=>kindOf(row).sheer&&!kindOf(row).curtain,store:row=>kindOf(row).store};
     const mixed=()=>rows().filter(row=>kindOf(row).curtain&&kindOf(row).sheer);
@@ -348,8 +356,12 @@
     const city=form.elements['contact[city]'];
     city?.addEventListener('change',()=>{if(city.value)applyZone(city.value==='Hors Abidjan'?'other':'abidjan');});
     const syncCount=()=>{const n=rows().reduce((sum,row)=>sum+(Number(own(row,'quantity')?.value)||1),0);calcForm.querySelector('[data-install-count]').textContent=n+(n>1?' ouvertures':' ouverture');};
-    const sewingKeys=Object.keys(sewingRows),syncAll=()=>{sewingKeys.forEach(syncSewing);syncZone();syncCount();};
-    Object.keys(targets).forEach(syncCoef);syncInstall();syncAll();
+    // Parties affichées selon les ouvertures du devis : Rideaux et voilages, Stores, ou les deux sur la même carte.
+    const syncGroups=()=>{const kinds=rows().map(kindOf),rideau=kinds.some(k=>k.curtain||k.sheer),store=kinds.some(k=>k.store);
+      calcForm.querySelector('[data-calc-group="rideau"]').hidden=!rideau;calcForm.querySelector('[data-calc-group="store"]').hidden=!store;
+      calcForm.querySelector('[data-calc-empty]').hidden=rideau||store;};
+    const sewingKeys=Object.keys(sewingRows),syncAll=()=>{Object.keys(targets).forEach(syncCoef);sewingKeys.forEach(syncSewing);syncZone();syncCount();syncGroups();};
+    syncInstall();syncAll();
     calcForm.addEventListener('change',event=>{
       const key=event.target.closest('[data-coef]')?.dataset.coef;
       if(key){applyCoef(key);if(event.target.type==='radio'&&event.target.value==='custom')calcForm.querySelector('[name="coefficient_ui['+key+'_custom]"]').focus();}
@@ -360,7 +372,7 @@
       event.stopPropagation();
     });
     calcForm.addEventListener('input',event=>{const sewing=event.target.closest('[data-sewing]')?.dataset.sewing;if(sewing&&event.target.type==='number')applySewing(sewing);const key=event.target.closest('[data-coef]')?.dataset.coef;if(key&&event.target.type!=='radio')applyCoef(key);if(event.target.name==='install_ui_price'&&fee('unit_price')){fee('unit_price').value=event.target.value;invalidate(fee('unit_price'));}event.stopPropagation();});
-    form.addEventListener('change',event=>{if(!calcForm.contains(event.target)&&event.target.closest('[data-window],#quote-defaults')){Object.keys(targets).forEach(syncCoef);syncAll();}if(event.target.name?.startsWith('pricing[fees][installation_delivery]'))syncInstall();});
+    form.addEventListener('change',event=>{if(!calcForm.contains(event.target)&&event.target.closest('[data-window],#quote-defaults'))syncAll();if(event.target.name?.startsWith('pricing[fees][installation_delivery]'))syncInstall();});
     document.getElementById('add-quote-window').addEventListener('click',()=>{Object.keys(targets).forEach(key=>calcForm.querySelector('[data-coef="'+key+'"] [type=radio]:checked')?applyCoef(key):syncCoef(key));const zone=zoneLine.querySelector('[type=radio]:checked');if(zone)applyZone(zone.value);sewingKeys.forEach(key=>{if(calcForm.querySelector('[data-sewing="'+key+'"] [type=radio]:checked'))applySewing(key);});syncAll();coefChips();});
     form.addEventListener('input',event=>{if(!calcForm.contains(event.target)&&event.target.closest('[data-window]'))syncAll();});
     windows.addEventListener('click',event=>{if(event.target.closest('[data-remove-window]'))setTimeout(syncAll);});

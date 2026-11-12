@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class Quote extends Model
 {
+    use \Illuminate\Database\Eloquent\SoftDeletes, Concerns\Archivable;
     protected static function booted(): void
     {
         static::creating(function (Quote $quote) {
@@ -20,7 +21,7 @@ class Quote extends Model
     protected $casts = ['document_metadata'=>'array','contact' => 'array', 'product' => 'array', 'dimensions' => 'array', 'lines' => 'array', 'configuration'=>'array', 'deposit_amount'=>'integer', 'edit_version'=>'integer', 'terms_accepted_at' => 'datetime'];
     public function payments() { return $this->hasMany(QuotePayment::class); }
     public function receivedAmount(): int { return (int)$this->payments()->whereNull('voided_at')->sum('amount'); }
-    public function customer() { return $this->belongsTo(Contact::class, 'contact_id'); }
+    public function customer() { return $this->belongsTo(Contact::class, 'contact_id')->withTrashed(); }
     public function agent() { return $this->belongsTo(User::class, 'agent_id'); }
     public function scopeVisibleTo(Builder $query, User $user): Builder
     {

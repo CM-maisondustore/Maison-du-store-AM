@@ -22,6 +22,19 @@ class AnalyticsTest extends TestCase
         $this->assertNotContains('ip_address', \Illuminate\Support\Facades\Schema::getColumnListing('site_visits'));
     }
 
+    public function test_origin_comes_from_the_page_referrer_and_survives_an_expired_session(): void
+    {
+        // Requête sans jeton CSRF (page restée ouverte, session expirée) : la mesure anonyme est acceptée.
+        $this->withMiddleware()->post('/api/analytics/collect', [
+            'visitor_id' => (string) Str::uuid(), 'session_id' => $session = (string) Str::uuid(),
+            'event' => 'page_view', 'path' => '/', 'referrer' => 'l.facebook.com',
+        ], ['Referer' => 'http://localhost/', 'Accept' => 'application/json'])->assertOk();
+        $this->assertDatabaseHas('site_visits', ['origin' => 'facebook_instagram', 'referrer_host' => 'l.facebook.com']);
+        $this->postJson('/api/analytics/collect', ['visitor_id' => (string) Str::uuid(), 'session_id' => (string) Str::uuid(), 'event' => 'page_view', 'path' => '/', 'referrer' => 'www.google.com'])->assertOk();
+        $this->postJson('/api/analytics/collect', ['visitor_id' => (string) Str::uuid(), 'session_id' => (string) Str::uuid(), 'event' => 'page_view', 'path' => '/', 'referrer' => 'maisondustoream.com'])->assertOk();
+        $this->assertSame(['direct' => 1, 'facebook_instagram' => 1, 'google' => 1], \App\Models\SiteVisit::pluck('origin')->countBy()->sortKeys()->all());
+    }
+
     public function test_visitors_dashboard_is_admin_only(): void
     {
         $agent = User::create(['username' => Str::random(10), 'name' => 'Agent', 'email' => Str::random(10).'@example.com', 'password' => 'TemporaryPass123!', 'role' => 'agent', 'must_change_password' => false]);

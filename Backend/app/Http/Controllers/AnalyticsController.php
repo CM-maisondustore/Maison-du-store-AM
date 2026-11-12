@@ -15,6 +15,7 @@ class AnalyticsController
             'event' => ['required','in:page_view,heartbeat,form_start,form_submit,quote_received,appointment_received,whatsapp_click,quote_click,appointment,product_view'],
             'path' => ['nullable','string','max:500'], 'title' => ['nullable','string','max:180'],
             'target' => ['nullable','string','max:120'], 'campaign' => ['nullable','string','max:190'],
+            'referrer' => ['nullable','string','max:190'],
         ]);
 
         $visitorId = hash_hmac('sha256', Str::lower($data['visitor_id']), (string) config('app.key'));
@@ -23,12 +24,14 @@ class AnalyticsController
         $visit = SiteVisit::firstOrNew(['session_key' => $sessionId]);
         $now = now();
         if (!$visit->exists) {
-            $referer = parse_url((string) $request->header('referer'), PHP_URL_HOST) ?: '';
+            // Hôte d'origine envoyé par le site (document.referrer) ; l'en-tête Referer ne donne que la page du site elle-même.
+            $sent = strtolower(trim((string) ($data['referrer'] ?? '')));
+            $referer = preg_match('/^[a-z0-9.-]+$/', $sent) ? $sent : (parse_url((string) $request->header('referer'), PHP_URL_HOST) ?: '');
             $source = strtolower($referer.' '.($data['campaign'] ?? ''));
             $origin = str_contains($source, 'whatsapp') ? 'whatsapp'
                 : (str_contains($source, 'facebook') || str_contains($source, 'instagram') || str_contains($source, 'fbclid') ? 'facebook_instagram'
                 : (str_contains($source, 'google') || str_contains($source, 'gclid') ? 'google'
-                : ($referer !== '' && !str_contains($referer, $request->getHost()) ? 'other_site' : 'direct')));
+                : ($referer !== '' && !str_contains($referer, $request->getHost()) && !str_ends_with($referer, 'maisondustoream.com') ? 'other_site' : 'direct')));
             $ua = (string) $request->userAgent();
             $visit->fill([
                 'visitor_key' => $visitorId,

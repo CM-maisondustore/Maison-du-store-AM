@@ -4,11 +4,12 @@
     $shopAll = $catalogue ? route('site.shop') : route('quote');
     $rideaux = $catalogue ? route('site.shop.show', 'rideaux') : route('quote', ['type' => 'rideau']);
     $stores = $catalogue ? route('site.shop.show', 'stores') : route('quote', ['type' => 'store']);
-    $heroImg = $hero?->media ? $hero->media->url() : asset('site/images/realisations/habillage-salon.webp');
+    // Images administrées dans « Images et portfolio » ; sans image importée, celles livrées avec le site.
+    $heroImg = \App\Support\Site\SiteImages::url('hero');
     $heroTabs = [
         ['k' => 'stores', 'name' => 'Stores & Rideaux', 'mob' => 'Stores & Rideaux', 'short' => 'Confection sur mesure', 'title' => $hero?->title, 'line' => $hero?->description ?: 'Stores et rideaux confectionnés à Abidjan, mesurés et posés chez vous par nos équipes.', 'img' => $heroImg, 'caption' => $hero?->image_alt ?: 'Habillage complet d’un salon, réalisation Maison du Store', 'cats' => ['Stores intérieurs', 'Stores extérieurs', 'Rideaux', 'Voilages'], 'ctas' => [['Rideaux & voilages', $rideaux], ['Stores', $stores]], 'soon' => false],
-        ['k' => 'electro', 'name' => 'Électroménager', 'mob' => 'Électro', 'short' => 'Bientôt disponible', 'title' => null, 'line' => 'Réfrigérateurs, lave-linge, cuisinières et climatiseurs, livrés et installés à domicile. La boutique ouvre bientôt.', 'img' => asset('site/images/soon/electro-hero.jpg'), 'caption' => 'Photo d’illustration', 'cats' => ['Téléviseurs', 'Climatisation', 'Froid', 'Cuisine', 'Lavage'], 'ctas' => [], 'soon' => true],
-        ['k' => 'meubles', 'name' => 'Meubles', 'mob' => 'Meubles', 'short' => 'Bientôt disponible', 'title' => null, 'line' => 'Du bureau de direction à la table de famille, un mobilier choisi pour durer. La boutique ouvre bientôt.', 'img' => asset('site/images/soon/meubles-hero.jpg'), 'caption' => 'Photo d’illustration', 'cats' => ['Bureau', 'Domicile'], 'ctas' => [], 'soon' => true],
+        ['k' => 'electro', 'name' => 'Électroménager', 'mob' => 'Électro', 'short' => 'Bientôt disponible', 'title' => null, 'line' => 'Réfrigérateurs, lave-linge, cuisinières et climatiseurs, livrés et installés à domicile. La boutique ouvre bientôt.', 'img' => \App\Support\Site\SiteImages::url('hero-electro'), 'caption' => 'Photo d’illustration', 'cats' => ['Téléviseurs', 'Climatisation', 'Froid', 'Cuisine', 'Lavage'], 'ctas' => [], 'soon' => true],
+        ['k' => 'meubles', 'name' => 'Meubles', 'mob' => 'Meubles', 'short' => 'Bientôt disponible', 'title' => null, 'line' => 'Du bureau de direction à la table de famille, un mobilier choisi pour durer. La boutique ouvre bientôt.', 'img' => \App\Support\Site\SiteImages::url('hero-meubles'), 'caption' => 'Photo d’illustration', 'cats' => ['Bureau', 'Domicile'], 'ctas' => [], 'soon' => true],
     ];
     $reassure = [
         ['Pose incluse', 'Stores et rideaux posés par nos équipes.', 'M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.5-.5-.5-2.5z'],
@@ -17,9 +18,9 @@
         ['Livraison à Abidjan', 'Date fixée avec vous, partout à Abidjan.', 'M3 7h11v9H3zM14 10h4l3 3v3h-7M5 18a2 2 0 1 0 4 0a2 2 0 1 0-4 0M15 18a2 2 0 1 0 4 0a2 2 0 1 0-4 0'],
     ];
     $boutiques = [
-        ['k' => 'stores', 'name' => 'Stores & Rideaux', 'img' => asset('site/images/realisations/rideaux-occultants.webp'), 'line' => 'Le métier d’origine de la maison : confection d’atelier et pose par nos équipes.', 'cats' => ['Stores intérieurs', 'Stores extérieurs', 'Rideaux', 'Voilages'], 'ctas' => [['Rideaux & voilages', $rideaux], ['Stores', $stores]], 'soon' => false],
-        ['k' => 'electro', 'name' => 'Électroménager', 'img' => asset('site/images/soon/electro.jpg'), 'line' => 'Téléviseurs, climatiseurs, réfrigérateurs, cuisine et lavage, livrés et installés.', 'cats' => ['Téléviseurs', 'Climatisation', 'Froid', 'Cuisine', 'Lavage'], 'ctas' => [], 'soon' => true],
-        ['k' => 'meubles', 'name' => 'Meubles', 'img' => asset('site/images/soon/meubles.jpg'), 'line' => 'Deux entrées : l’aménagement de vos bureaux et le mobilier de la maison.', 'cats' => ['Salon', 'Salle à manger', 'Chambre', 'Bureau'], 'ctas' => [], 'soon' => true],
+        ['k' => 'stores', 'name' => 'Stores & Rideaux', 'img' => \App\Support\Site\SiteImages::url('boutique-stores'), 'line' => 'Le métier d’origine de la maison : confection d’atelier et pose par nos équipes.', 'cats' => ['Stores intérieurs', 'Stores extérieurs', 'Rideaux', 'Voilages'], 'ctas' => [['Rideaux & voilages', $rideaux], ['Stores', $stores]], 'soon' => false],
+        ['k' => 'electro', 'name' => 'Électroménager', 'img' => \App\Support\Site\SiteImages::url('boutique-electro'), 'line' => 'Téléviseurs, climatiseurs, réfrigérateurs, cuisine et lavage, livrés et installés.', 'cats' => ['Téléviseurs', 'Climatisation', 'Froid', 'Cuisine', 'Lavage'], 'ctas' => [], 'soon' => true],
+        ['k' => 'meubles', 'name' => 'Meubles', 'img' => \App\Support\Site\SiteImages::url('boutique-meubles'), 'line' => 'Deux entrées : l’aménagement de vos bureaux et le mobilier de la maison.', 'cats' => ['Salon', 'Salle à manger', 'Chambre', 'Bureau'], 'ctas' => [], 'soon' => true],
     ];
     $pillars = [
         ['01', 'Confection', 'Coupe, ourlets et finitions réalisés dans notre atelier, à partir de vos mesures exactes.', ['Rideaux occultants, à œillets, Wave ou à plis', 'Voilages légers et doublures thermiques', 'Stores enrouleurs, vénitiens, bateau et extérieurs']],
@@ -268,11 +269,7 @@
                 <div class="row"><a href="{{ $contact['whatsapp'] }}" rel="noopener" class="btn btn-dark">Écrire sur WhatsApp</a><a href="{{ route('quote') }}" class="btn btn-line">Demander un devis</a></div>
             </div>
             <figure class="map-fig">
-                @if($contactImage?->media)
-                    <img src="{{ $contactImage->media->url() }}" alt="{{ $contactImage->image_alt ?: 'Showroom Maison du Store AM à Cocody' }}" loading="lazy">
-                @else
-                    <img src="{{ asset('site/images/realisations/showroom.webp') }}" alt="Showroom Maison du Store AM à Cocody" loading="lazy">
-                @endif
+                <img src="{{ \App\Support\Site\SiteImages::url('contact') }}" alt="{{ \App\Support\Site\SiteImages::alt('contact') }}" loading="lazy">
                 <a href="{{ $contact['maps'] }}" rel="noopener" class="btn btn-dark">Ouvrir dans Google Maps</a>
             </figure>
         </div>

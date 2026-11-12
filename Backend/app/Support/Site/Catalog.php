@@ -37,7 +37,7 @@ class Catalog
             return collect();
         }
 
-        return Product::with('media')->where('published', true)->orderBy('id')->get()
+        return Product::with('media')->unarchived()->where('published', true)->orderBy('id')->get()
             ->filter(fn (Product $p) => self::shopFor($p->details['type'] ?? '') && ($p->details['universe'] ?? 'stores_rideaux') === 'stores_rideaux')
             ->map(fn (Product $p) => self::present($p))
             ->values();

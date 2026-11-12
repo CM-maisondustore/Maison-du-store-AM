@@ -19,15 +19,17 @@ class QuoteController
     public function index(Request $r)
     {
         $filters = $r->validate(['q' => 'nullable|string|max:150', 'type' => 'nullable|in:store,rideau,electromenager,meubles', 'source' => 'nullable|in:site,interne,sur_place', 'agent' => 'nullable|string|max:20', 'sort' => 'nullable|in:asc,desc']);
-        $query = Quote::with('agent')->visibleTo($r->user());
+        $state = \App\Services\Trash::state($r);
+        $query = Quote::with('agent')->visibleTo($r->user())->listState($state);
         $query = ($filters['sort'] ?? 'desc') === 'asc' ? $query->oldest() : $query->latest();
+        $query = \App\Services\Trash::order($query, $state);
         if ($r->filled('status')) $query->where('status', $r->string('status')->toString());
         if (!empty($filters['q'])) $query->where(fn ($b) => $b->where('reference', 'like', '%'.$filters['q'].'%')->orWhereRaw('LOWER(CAST(contact AS CHAR)) LIKE ?', ['%'.mb_strtolower($filters['q']).'%']));
         if (!empty($filters['type'])) $query->where('type', $filters['type']);
         if (!empty($filters['source'])) $query->where('source', $filters['source']);
         if ($r->user()->isAdmin() && !empty($filters['agent'])) $filters['agent'] === 'none' ? $query->whereNull('agent_id') : $query->where('agent_id', (int) $filters['agent']);
-        $counts = Quote::visibleTo($r->user())->selectRaw('status, COUNT(*) as total')->groupBy('status')->pluck('total', 'status');
-        return view('staff.quotes', ['quotes' => $query->paginate(25)->withQueryString(), 'counts' => $counts, 'agents' => $r->user()->isAdmin() ? User::where('role', 'agent')->where('active', true)->orderBy('name')->get() : collect()]);
+        $counts = Quote::visibleTo($r->user())->listState($state)->selectRaw('status, COUNT(*) as total')->groupBy('status')->pluck('total', 'status');
+        return view('staff.quotes', ['state' => $state, 'quotes' => $query->paginate(25)->withQueryString(), 'counts' => $counts, 'agents' => $r->user()->isAdmin() ? User::where('role', 'agent')->where('active', true)->orderBy('name')->get() : collect()]);
     }
     public function show(Request $r, Quote $quote) { $this->access($r, $quote); return view($r->user()->isAdmin() ? 'staff.quote' : 'staff.quote-technical', ['quote' => $quote, 'agents' => User::where('role', 'agent')->where('active', true)->get()]); }
     public function onsite(Request $r, Intervention $intervention)

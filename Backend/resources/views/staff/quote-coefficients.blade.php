@@ -1,25 +1,34 @@
 {{-- Étape 3 : coefficients, confection et pose communs. Ces contrôles remplissent les champs de chaque ouverture et les frais du devis ;
      ils ne sont pas enregistrés eux-mêmes. Sans JavaScript, ils restent cachés et les champs par ouverture servent directement. --}}
 <div class="calc-form" data-calc-form hidden>
-<h3 class="choice-title">Coefficients</h3>
-<p class="hint">Appliqués à toutes les ouvertures quand le métrage est vide. Chaque ouverture reste modifiable à l’étape 2.</p>
+{{-- Carte adaptée au devis : la partie Rideaux n'apparaît qu'avec des ouvertures rideau ou voilage, la partie Stores qu'avec des stores. --}}
+<p class="hint" data-calc-empty>Choisissez d’abord le projet et les tissus ou matériaux à l’étape 2.</p>
+<div class="calc-group" data-calc-group="rideau" hidden>
+<h3 class="choice-title calc-group-title">Rideaux et voilages</h3>
+<h4 class="choice-sub-title">Coefficients</h4>
+<p class="hint">Appliqués aux ouvertures rideau ou voilage quand le métrage est vide. Chaque ouverture reste modifiable à l’étape 2.</p>
 @foreach(['material'=>['Tissu',['2','2.5','3']],'secondary'=>['Voilage',['2','2.5','3']],'tape'=>['Ruflette',['1','1.5','2']]] as $key=>[$label,$values])
-<div class="choice-line" data-coef="{{ $key }}" role="radiogroup" aria-labelledby="coef-{{ $key }}"><span class="choice-name" id="coef-{{ $key }}">{{ $label }}</span>
+<div class="choice-line" data-coef="{{ $key }}" role="radiogroup" hidden aria-labelledby="coef-{{ $key }}"><span class="choice-name" id="coef-{{ $key }}">{{ $label }}</span>
 <div class="chip-set">@foreach($values as $value)<label class="chip-radio"><input type="radio" name="coefficient_ui[{{ $key }}]" value="{{ $value }}"><span>{{ str_replace('.',',',$value) }}</span></label>@endforeach
 <label class="chip-radio"><input type="radio" name="coefficient_ui[{{ $key }}]" value="custom"><span>Saisir</span></label>
 <label class="coef-custom"><span class="sr-only">{{ $label }} : coefficient saisi</span><input inputmode="decimal" name="coefficient_ui[{{ $key }}_custom]" maxlength="6" placeholder="ex. 2,2" disabled></label>
 <small class="hint" data-coef-note></small></div>
 </div>
 @endforeach
-<h3 class="choice-title mt-12">Confection</h3>
-<p class="hint">Auto : le tarif de confection du catalogue, sur la quantité coefficiée. Saisir : votre prix à l’unité pour toutes les ouvertures concernées.</p>
 @foreach(['curtain'=>['Confection tissus','quantité coefficiée','Prix par mètre'],'sheer'=>['Confection voilage','quantité coefficiée','Prix par mètre'],'store'=>['Confection store','quantité en m²','Prix par m²']] as $key=>[$label,$basis,$placeholder])
+@if($key==='curtain')<h4 class="choice-sub-title mt-12">Confection</h4>
+<p class="hint">Auto : le tarif de confection du catalogue, sur la quantité coefficiée. Saisir : votre prix au mètre pour toutes les ouvertures concernées.</p>@endif
+@if($key==='store')</div>
+<div class="calc-group" data-calc-group="store" hidden>
+<h3 class="choice-title calc-group-title">Stores</h3>
+<p class="hint">Pas de coefficient : un store se chiffre à la surface (largeur × hauteur). Auto : le tarif de confection du catalogue ; Saisir : votre prix au m².</p>@endif
 <div class="choice-line" data-sewing="{{ $key }}" role="radiogroup" aria-labelledby="sew-{{ $key }}" hidden><span class="choice-name" id="sew-{{ $key }}">{{ $label }}<small class="choice-sub">{{ $basis }} : <span data-sewing-qty>—</span></small></span>
 <div class="chip-set"><label class="chip-radio"><input type="radio" name="sewing_ui[{{ $key }}]" value="auto"><span>Auto</span></label><label class="chip-radio"><input type="radio" name="sewing_ui[{{ $key }}]" value="manual"><span>Saisir</span></label><label class="chip-radio"><input type="radio" name="sewing_ui[{{ $key }}]" value="none"><span>Non</span></label>
 <label class="field-unit is-price coef-custom"><span class="sr-only">{{ $label }} : prix saisi</span><input type="number" min="0" max="100000000" step="1" name="sewing_ui_price[{{ $key }}]" placeholder="{{ $placeholder }}" disabled><span class="unit">FCFA</span></label>
 <small class="hint" data-sewing-note></small></div>
 </div>
 @endforeach
+</div>
 <h3 class="choice-title mt-12">Pose et livraison</h3>
 <div class="choice-line" data-zone-line role="radiogroup" aria-labelledby="zone-title"><span class="choice-name" id="zone-title">Zone de pose</span>
 <div class="chip-set"><label class="chip-radio"><input type="radio" name="zone_ui" value="abidjan"><span>Abidjan</span></label><label class="chip-radio"><input type="radio" name="zone_ui" value="other"><span>Hors Abidjan</span></label>

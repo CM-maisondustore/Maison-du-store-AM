@@ -9,6 +9,9 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->append(App\Http\Middleware\ResponseHeaders::class);
         $middleware->redirectGuestsTo('/admin/connexion');
+        // Mesure anonyme des visites : sans effet sur un compte, elle ne doit pas échouer (419) quand une page reste
+        // ouverte au-delà de la session ou est servie depuis un cache. Limitée par throttle et par la validation.
+        $middleware->validateCsrfTokens(except: ['api/analytics/collect']);
         $middleware->alias(['staff' => App\Http\Middleware\StaffAccess::class, 'admin' => App\Http\Middleware\AdminAccess::class, 'owner' => App\Http\Middleware\OwnerAccess::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {})

@@ -1,30 +1,49 @@
 @extends('staff.layout')
 @section('title', 'Images & portfolio')
-@section('subtitle','Modifiez les illustrations et les textes affichés sur le site. Les images des produits se gèrent dans le catalogue.')
+@section('subtitle','Les images affichées sur le site, emplacement par emplacement. Sans image importée, le site garde son image d’origine. Les images des produits se gèrent dans le catalogue.')
 @section('page-actions')
-<a class="button quiet" href="{{ route('home') }}#realisations" target="_blank" rel="noopener">Voir le portfolio</a>
+<a class="button quiet" href="{{ route('home') }}" target="_blank" rel="noopener">Voir le site</a>
 <a class="button" href="{{ route('staff.contents.create') }}">Ajouter une réalisation</a>
 @endsection
-@php($kinds=['hero'=>'Accueil','portfolio'=>'Portfolio','quote'=>'Devis','contact'=>'Contact'])
 @section('content')
-<div class="chips" data-chip-filter="media-grid">
-<button type="button" class="chip" data-chip="all" aria-pressed="true">Toutes</button>
-@foreach($kinds as $key=>$label)@if($contents->getCollection()->where('kind',$key)->isNotEmpty())<button type="button" class="chip" data-chip="{{ $key }}" aria-pressed="false">{{ $label }}</button>@endif @endforeach
-</div>
-<div class="media-grid" id="media-grid">
-@foreach($contents as $content)
-<article class="media-card" data-chip-item="{{ $content->kind }}">
-@if($content->media_asset_id)<img src="{{ route('staff.media.preview',$content->media_asset_id) }}" alt="{{ $content->image_alt }}" loading="lazy">@else<div class="media-empty">@include('staff.partials.icon',['n'=>'images','s'=>26])<span>Aucune image importée</span></div>@endif
-<div class="media-body">
-<span class="muted">{{ ['hero'=>'Hero — accueil','contact'=>'Contact — showroom','portfolio'=>'Portfolio','quote'=>str_starts_with($content->slot ?? '', 'finish-') ? 'Finition du devis public' : (str_starts_with($content->slot ?? '', 'quote-message-') ? 'Message du récapitulatif' : 'Carte — démarrer un devis')][$content->kind] }}</span>
-<h2>{{ $content->title }}</h2>
-<p class="muted">{{ \Illuminate\Support\Str::limit($content->description,110) }}</p>
-<p class="media-meta"><span class="badge {{ $content->published ? 'st-ok' : 'st-neutral' }}"><span aria-hidden="true">{{ $content->published ? '✓' : '○' }}</span>{{ $content->published ? 'Visible sur le site' : 'Masqué' }}</span>@if($content->kind==='portfolio')<span class="muted">Ordre {{ $content->position }}</span>@endif</p>
-@if($content->media_asset_id && !$content->image_alt)<p class="undefined media-alert">Texte alternatif manquant</p>@endif
-<a class="button quiet block" href="{{ route('staff.contents.edit',$content) }}">Modifier</a>
-</div>
-</article>
+@php
+ $slots=\App\Support\Site\SiteImages::SLOTS;
+ $fixed=$contents->whereIn('slot',array_keys($slots))->sortBy(fn($c)=>array_search($c->slot,array_keys($slots)))->groupBy(fn($c)=>$slots[$c->slot][1]);
+ $portfolio=$contents->where('kind','portfolio')->sortBy([['position','asc'],['id','asc']]);
+ $portfolioDefaults=\App\Support\Site\SiteImages::portfolioFallbacks($portfolio);
+ $quote=$contents->where('kind','quote');
+ $quoteLabel=fn($c)=>str_starts_with($c->slot ?? '','finish-') ? 'Finition du devis public' : (str_starts_with($c->slot ?? '','quote-message-') ? 'Message du récapitulatif' : 'Carte — démarrer un devis');
+@endphp
+<nav class="chips" aria-label="Rubriques">
+<a class="chip" href="#images-site">Images du site<b>{{ $fixed->flatten()->count() }}</b></a>
+<a class="chip" href="#realisations">Réalisations<b>{{ $portfolio->count() }}</b></a>
+@if($quote->isNotEmpty())<a class="chip" href="#devis-en-ligne">Devis en ligne<b>{{ $quote->count() }}</b></a>@endif
+</nav>
+
+<h2 class="section-title" id="images-site">Images du site</h2>
+@foreach($fixed as $group=>$items)
+<h3 class="choice-title">{{ $group }}</h3>
+<div class="media-grid content-group">
+@foreach($items as $content)
+@include('staff.partials.content-card',['content'=>$content,'label'=>$slots[$content->slot][2],'fallback'=>\App\Support\Site\SiteImages::fallback($content->slot)])
 @endforeach
 </div>
-@include('staff.pagination',['paginator'=>$contents])
+@endforeach
+
+<h2 class="section-title" id="realisations">Réalisations</h2>
+<p class="muted">Affichées sur l’accueil, des plus petits numéros d’ordre aux plus grands.@if($portfolio->isEmpty()) Aucune réalisation enregistrée : le site affiche ses réalisations d’origine.@endif</p>
+<div class="media-grid content-group">
+@foreach($portfolio as $content)
+@include('staff.partials.content-card',['content'=>$content,'label'=>'Réalisation · ordre '.$content->position,'fallback'=>$portfolioDefaults[$content->id] ?? null])
+@endforeach
+</div>
+
+@if($quote->isNotEmpty())
+<h2 class="section-title" id="devis-en-ligne">Devis en ligne</h2>
+<div class="media-grid content-group">
+@foreach($quote as $content)
+@include('staff.partials.content-card',['content'=>$content,'label'=>$quoteLabel($content),'fallback'=>null])
+@endforeach
+</div>
+@endif
 @endsection

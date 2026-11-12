@@ -56,4 +56,5 @@
 @endif</section>
 </aside>
 </div>
+@include('staff.partials.record-actions',['type'=>'rendez-vous','record'=>$appointment])
 @endsection

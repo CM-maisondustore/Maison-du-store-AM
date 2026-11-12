@@ -82,9 +82,10 @@ final class StaffInterface
                 'sections'=>[['title'=>'','items'=>[$today]],['title'=>'Mon activité','items'=>[$jobs,$appointments,$quotes]]],
                 'tabs'=>[[...$today],[...$jobs,'label'=>'Prestations'],[...$quotes,'label'=>'Devis'],[...$appointments,'label'=>'RDV'],$profile]];
         }
-        $quoteCount=Quote::whereIn('status',['pending','draft'])->count();
-        $appointmentCount=Appointment::where('status','pending')->count();
-        $messageCount=CommercialMessage::where('direction','incoming')->whereNull('read_at')->count();
+        $quoteCount=Quote::unarchived()->whereIn('status',['pending','draft'])->count();
+        $appointmentCount=Appointment::unarchived()->where('status','pending')->count();
+        $messageCount=CommercialMessage::unarchived()->where('direction','incoming')->whereNull('read_at')->count();
+        \App\Services\Trash::purgeDaily();
         $overview=$item('overview','Vue d’ensemble','dashboard',$is('dashboard'));
         $quotes=$item('devis','Devis','quotes.index',$is('quotes.*'),$quoteCount,'devis à traiter');
         $materials=$item('materiaux','Matériaux et finitions','quote-options.index',$is('quote-options.*'));
@@ -100,7 +101,8 @@ final class StaffInterface
         $visitors=$item('visiteurs','Visiteurs','visitors.index',$is('visitors.*'));
         $team=$item('equipe','Équipe','users.index',$is('users.*'));
         // Le manager garde le catalogue ; les réglages du site restent à l'admin principal.
-        $site=$user->isOwner() ? [$catalogue,$images,$documents,$layouts,$visitors,$team] : [$catalogue];
+        $trash=$item('trash','Corbeille','trash.index',$is('trash.*'));
+        $site=$user->isOwner() ? [$catalogue,$images,$documents,$layouts,$visitors,$team,$trash] : [$catalogue,$trash];
         return ['notifications'=>$notifications,
             'sections'=>[['title'=>'','items'=>[$overview]],
                 ['title'=>'Activité','items'=>[$quotes,$materials,$appointments,$jobs]],

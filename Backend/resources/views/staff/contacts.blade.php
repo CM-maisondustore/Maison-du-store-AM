@@ -3,16 +3,21 @@
 @section('subtitle', ($stats['client'] ?? 0).' client(s), '.($stats['fournisseur'] ?? 0).' fournisseur(s), '.($stats['partenaire'] ?? 0).' partenaire(s).')
 @section('page-actions')<a class="button" href="#nouveau-contact">@include('staff.partials.icon',['n'=>'plus','s'=>18])Créer un client</a>@endsection
 @section('content')
+@include('staff.partials.list-states',['type'=>'clients','state'=>$state])
+@if($state==='corbeille')
+@include('staff.partials.trash-table',['type'=>'clients','items'=>$contacts])
+@else
 @php($keep=request()->except(['type','page']))
 <nav class="chips" aria-label="Type de contact">
 <a class="chip" href="{{ route('staff.contacts.index',$keep) }}" @if(!request('type')) aria-current="true" @endif>Tous<b>{{ $total }}</b></a>
-@foreach(['client'=>'Clients','fournisseur'=>'Fournisseurs','partenaire'=>'Partenaires','archive'=>'Archivés'] as $value=>$label)
+@foreach(['client'=>'Clients','fournisseur'=>'Fournisseurs','partenaire'=>'Partenaires'] as $value=>$label)
 <a class="chip" href="{{ route('staff.contacts.index',[...$keep,'type'=>$value]) }}" @if(request('type')===$value) aria-current="true" @endif>{{ $label }}<b>{{ $stats[$value] ?? 0 }}</b></a>
 @endforeach
 </nav>
 <section class="panel flush" aria-label="Contacts">
 <form method="get" class="filters">
 @if(request('type'))<input type="hidden" name="type" value="{{ request('type') }}">@endif
+@if($state)<input type="hidden" name="etat" value="{{ $state }}">@endif
 <label class="grow">Rechercher<input type="search" name="q" placeholder="Nom, e-mail ou téléphone" value="{{ request('q') }}"></label>
 <button class="secondary">Rechercher</button>
 </form>
@@ -40,4 +45,5 @@
 <div class="float-foot"><span class="status">Le dossier s’ouvre après la création.</span><a class="button quiet" href="{{ route('staff.contacts.index') }}" data-close-panel>Annuler</a><button>Créer un client</button></div>
 </form>
 </section>
+@endif
 @endsection

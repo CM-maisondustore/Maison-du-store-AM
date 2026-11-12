@@ -81,6 +81,13 @@ Route::prefix('admin')->group(function () {
             Route::post('factures/{invoice}/emettre', [InvoiceController::class, 'issue'])->name('invoices.issue');
             Route::post('factures/{invoice}/paiement', [InvoiceController::class, 'paid'])->name('invoices.paid');
             Route::get('factures/{invoice}/pdf', [InvoiceController::class, 'pdf'])->name('invoices.pdf');
+            // Archives et corbeille : {type} = devis, catalogue, clients, rendez-vous, messages, factures.
+            Route::get('corbeille', [App\Http\Controllers\Staff\TrashController::class, 'index'])->name('trash.index');
+            Route::post('elements/{type}/{id}/archiver', [App\Http\Controllers\Staff\TrashController::class, 'archive'])->whereNumber('id')->name('trash.archive');
+            Route::post('elements/{type}/{id}/desarchiver', [App\Http\Controllers\Staff\TrashController::class, 'unarchive'])->whereNumber('id')->name('trash.unarchive');
+            Route::delete('elements/{type}/{id}', [App\Http\Controllers\Staff\TrashController::class, 'destroy'])->whereNumber('id')->name('trash.destroy');
+            Route::post('corbeille/{type}/{id}/restaurer', [App\Http\Controllers\Staff\TrashController::class, 'restore'])->whereNumber('id')->name('trash.restore');
+            Route::delete('corbeille/{type}/{id}', [App\Http\Controllers\Staff\TrashController::class, 'forceDestroy'])->whereNumber('id')->name('trash.force');
             Route::get('messages', [MessageController::class, 'index'])->name('messages.index');
             Route::get('messages/nouveau', [MessageController::class, 'create'])->name('messages.create');
             Route::post('messages', [MessageController::class, 'store'])->name('messages.store');

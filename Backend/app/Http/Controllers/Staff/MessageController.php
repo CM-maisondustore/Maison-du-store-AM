@@ -10,9 +10,10 @@ class MessageController
     public const SHARED_LINK_DAYS = 30;
     public function index(Request $r, CommercialMail $mail)
     {
-        $query = CommercialMessage::with('contact')->latest();
+        $state = \App\Services\Trash::state($r);
+        $query = CommercialMessage::with('contact')->listState($state)->latest();
         if (in_array($r->input('direction'), ['incoming', 'outgoing'])) $query->where('direction', $r->input('direction'));
-        return view('staff.messages', ['messages' => $query->paginate(25)->withQueryString(), 'configured' => $mail->configured()]);
+        return view('staff.messages', ['state' => $state, 'messages' => \App\Services\Trash::order($query, $state)->paginate(25)->withQueryString(), 'configured' => $mail->configured()]);
     }
     public function create(Request $r)
     {
