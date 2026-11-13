@@ -17,6 +17,7 @@ class DemoSeeder extends Seeder
         $this->call(DatabaseSeeder::class);
         $user=fn($username,$name,$role)=>User::updateOrCreate(['username'=>$username],['name'=>$name,'email'=>$username.'@exemple.invalid','password'=>self::PASSWORD,'role'=>$role,'must_change_password'=>false,'active'=>true]);
         $admin=$user('demo-admin','Aïcha Diabaté','admin');
+        $user('demo-manager','Mariam Koné','manager');
         $koffi=$user('demo-agent','Koffi Brou','agent');
         $yao=$user('demo-agent2','Yao Serge','agent');
         $contact=fn($name,$phone,$address)=>Contact::firstOrCreate(['name'=>$name],['kind'=>'client','phone'=>$phone,'email'=>\Illuminate\Support\Str::slug($name).'@exemple.invalid','address'=>$address]);

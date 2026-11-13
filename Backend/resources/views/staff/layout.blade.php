@@ -3,6 +3,10 @@
  $ui=\App\Services\StaffInterface::navigation($me);
  $prefs=$me->preferences ?? [];
  $initials=\App\Services\StaffInterface::initials($me->name);
+ // Aide : guide de la page affichée (bouton « ? »), sinon la page Aide.
+ $pageGuide=request()->routeIs('staff.help.*') ? null : \App\Support\Help\HelpGuides::forRoute($me,request()->route()?->getName());
+ $helpHref=$pageGuide ? route('staff.help.show',$pageGuide['slug']) : route('staff.help.index');
+ $helpLabel=$pageGuide ? 'Aide sur cette page : '.$pageGuide['title'] : 'Aide et guides d’utilisation';
  $pageTitle=html_entity_decode(trim($__env->yieldContent('title','Espace interne')),ENT_QUOTES|ENT_HTML5,'UTF-8');
 @endphp
 <!DOCTYPE html>
@@ -45,6 +49,7 @@
 @endforeach
 </div>
 <div class="nav-foot">
+<a class="nav-link" href="{{ route('staff.help.index') }}" title="Aide" @if(request()->routeIs('staff.help.*')) aria-current="page" @endif>@include('staff.partials.icon',['n'=>'help'])<span class="nav-label">Aide</span></a>
 <a class="nav-link" href="{{ route('home') }}" target="_blank" rel="noopener" title="Voir le site">@include('staff.partials.icon',['n'=>'external'])<span class="nav-label">Voir le site</span></a>
 <button type="button" class="nav-link" data-collapse aria-expanded="true" aria-label="Réduire ou déplier le menu">@include('staff.partials.icon',['n'=>'chevron-left'])<span class="nav-label">Réduire le menu</span></button>
 </div>
@@ -68,6 +73,7 @@
 </div>
 </details>
 @endif
+<a class="bell help-link" href="{{ $helpHref }}" aria-label="{{ $helpLabel }}" title="{{ $helpLabel }}" data-help-link>@include('staff.partials.icon',['n'=>'help'])</a>
 <div class="bell-wrap"><a class="bell" href="{{ route('staff.notifications.index') }}" aria-label="Notifications : {{ $ui['notifications'] }} non lue(s)" data-bell>@include('staff.partials.icon',['n'=>'bell'])<b class="notification-count" @if(!$ui['notifications']) hidden @endif>{{ $ui['notifications'] }}</b></a>
 <div class="bell-pop" data-bell-pop hidden><div class="bell-pop-head"><h2>Notifications</h2></div><ul class="bell-list" data-bell-list></ul><a class="bell-pop-foot" href="{{ route('staff.notifications.index') }}">Voir toutes les notifications</a></div></div>
 <details class="menu">
@@ -80,6 +86,7 @@
 <a role="menuitem" href="{{ route('staff.profile') }}">Mon profil</a>
 <a role="menuitem" href="{{ route('staff.settings') }}">Paramètres</a>
 <a role="menuitem" href="{{ route('staff.password') }}">Changer le mot de passe</a>
+<a role="menuitem" href="{{ route('staff.help.index') }}">Aide et guides</a>
 <button type="button" role="menuitem" id="push-toggle" data-configured="{{ filled(config('push.public_key')) ? '1' : '0' }}" data-public-key-url="{{ route('staff.push.public-key') }}" data-subscribe-url="{{ route('staff.push.subscribe') }}" data-unsubscribe-url="{{ route('staff.push.unsubscribe') }}">Activer les notifications</button>
 <button type="button" role="menuitem" id="pwa-install" hidden>Installer l’application</button>
 <a role="menuitem" href="{{ route('home') }}" target="_blank" rel="noopener">Voir le site</a>
@@ -92,6 +99,7 @@
 <div class="mobile-head">
 @hasSection('back')<a href="@yield('back')" aria-label="Retour">@include('staff.partials.icon',['n'=>'chevron-left','s'=>24])</a>@endif
 <strong aria-hidden="true">{{ $pageTitle }}</strong>
+<a href="{{ $helpHref }}" aria-label="{{ $helpLabel }}" data-help-link>@include('staff.partials.icon',['n'=>'help','s'=>22])</a>
 <a href="{{ route('staff.search') }}" aria-label="Recherche globale">@include('staff.partials.icon',['n'=>'search','s'=>22])</a>
 <a href="{{ route('staff.notifications.index') }}" class="bell" aria-label="Notifications : {{ $ui['notifications'] }} non lue(s)">@include('staff.partials.icon',['n'=>'bell','s'=>22])<b class="notification-count" @if(!$ui['notifications']) hidden @endif>{{ $ui['notifications'] }}</b></a>
 </div>
@@ -133,6 +141,7 @@
 <a class="sheet-link" href="{{ route('staff.profile') }}">Modifier mon profil</a>
 <a class="sheet-link" href="{{ route('staff.settings') }}">Paramètres</a>
 <a class="sheet-link" href="{{ route('staff.password') }}">Changer le mot de passe</a>
+<a class="sheet-link" href="{{ route('staff.help.index') }}">Aide et guides</a>
 <a class="sheet-link" href="{{ route('home') }}" target="_blank" rel="noopener">Voir le site</a>
 </div>
 </dialog>

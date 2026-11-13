@@ -16,6 +16,9 @@ Route::prefix('admin')->group(function () {
         Route::get('mot-de-passe', [AuthController::class, 'password'])->name('password');
         Route::post('mot-de-passe', [AuthController::class, 'changePassword'])->middleware('throttle:5,1')->name('password.update');
         Route::get('recherche', App\Http\Controllers\Staff\SearchController::class)->name('search');
+        // Aide : guides d'utilisation adaptés au rôle (resources/help).
+        Route::get('aide', [App\Http\Controllers\Staff\HelpController::class, 'index'])->name('help.index');
+        Route::get('aide/{slug}', [App\Http\Controllers\Staff\HelpController::class, 'show'])->where('slug', '[a-z0-9-]+')->name('help.show');
         Route::get('profil', [App\Http\Controllers\Staff\ProfileController::class, 'profile'])->name('profile');
         Route::patch('profil', [App\Http\Controllers\Staff\ProfileController::class, 'updateProfile'])->name('profile.update');
         Route::get('profil/couverture', [App\Http\Controllers\Staff\ProfileController::class, 'cover'])->name('profile.cover');

@@ -14,5 +14,6 @@ lang
 prepare-document-rollback.php
 public
 resources/brand
+resources/help
 resources/views
 routes

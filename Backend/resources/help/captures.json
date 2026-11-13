@@ -1,0 +1,28 @@
+{
+  "comment": "Captures des guides d'aide, produites par scripts/help-captures.mjs sur les données de démonstration (DemoSeeder). follow : sélecteurs dont on suit le premier lien, dans l'ordre. clip : élément à cadrer. mobile : écran de téléphone.",
+  "captures": [
+    { "name": "agent-aujourdhui", "role": "agent", "mobile": true, "path": "/admin" },
+    { "name": "agent-prestation", "role": "agent", "mobile": true, "path": "/admin/prestations", "follow": ["main a[href*='/admin/prestations/']"] },
+    { "name": "agent-releve", "role": "agent", "mobile": true, "path": "/admin/devis", "follow": ["main a[href*='/admin/devis/']:not([href$='/nouveau'])", "a[href$='/formulaire']"] },
+    { "name": "agent-rendez-vous", "role": "agent", "mobile": true, "path": "/admin/rendez-vous" },
+    { "name": "profil", "role": "admin", "path": "/admin/profil" },
+    { "name": "bureau-accueil", "role": "admin", "path": "/admin" },
+    { "name": "devis-liste", "role": "manager", "path": "/admin/devis" },
+    { "name": "devis-fiche", "role": "manager", "path": "/admin/devis?status=pending", "follow": ["main a[href*='/admin/devis/']:not([href$='/nouveau'])"] },
+    { "name": "devis-formulaire", "role": "manager", "path": "/admin/devis/nouveau" },
+    { "name": "envoi-devis", "role": "manager", "path": "/admin/devis", "follow": ["main a[href*='/admin/devis/']:not([href$='/nouveau'])", "a[href*='messages/nouveau?quote_id']"] },
+    { "name": "devis-suivi", "role": "manager", "path": "/admin/factures", "follow": ["main a[href*='/admin/factures/']", "main a[href*='/admin/devis/']"], "clip": "#paiements", "prepare": "document.querySelector('#paiements details').open = true" },
+    { "name": "facture", "role": "manager", "path": "/admin/factures", "follow": ["main a[href*='/admin/factures/']"] },
+    { "name": "rendez-vous", "role": "manager", "path": "/admin/rendez-vous", "follow": ["main a[href*='/admin/rendez-vous/']"] },
+    { "name": "prestation-nouvelle", "role": "manager", "path": "/admin/prestations", "clip": "#planifier", "prepare": "document.querySelector('#planifier').setAttribute('data-open', '')" },
+    { "name": "client-dossier", "role": "manager", "path": "/admin/contacts", "follow": ["main a[href*='/admin/contacts/']"] },
+    { "name": "messagerie", "role": "manager", "path": "/admin/messages" },
+    { "name": "materiaux", "role": "manager", "path": "/admin/options-devis" },
+    { "name": "listes-onglets", "role": "manager", "path": "/admin/devis", "height": 420 },
+    { "name": "mise-en-page", "role": "admin", "path": "/admin/mise-en-page" },
+    { "name": "modele-message", "role": "admin", "path": "/admin/communications", "follow": ["a[href*='/communications/modeles/']"] },
+    { "name": "images-recadrage", "role": "admin", "path": "/admin/contents", "follow": ["main a[href*='/admin/contents/'][href$='/edit']"], "prepare": "document.querySelector('[data-crop-current]').click()", "wait": 2000, "clip": "[data-cropper]" },
+    { "name": "visiteurs", "role": "admin", "path": "/admin/visiteurs" },
+    { "name": "equipe", "role": "admin", "path": "/admin/equipe" }
+  ]
+}
