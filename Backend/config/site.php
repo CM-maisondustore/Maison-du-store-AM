@@ -18,9 +18,13 @@ return [
         'maps' => 'https://maps.google.com/?q=Maison+du+Store+AM+Cocody',
     ],
 
-    // Pages officielles de la maison (Facebook, Instagram, TikTok, fiche Google…), séparées par des virgules.
-    // Reprises dans les données structurées (sameAs) pour relier le site à ses profils.
-    'profiles' => array_values(array_filter(array_map('trim', explode(',', (string) env('MDS_SOCIAL_PROFILES', ''))))),
+    // Pages officielles de la maison : liées dans le pied de page, la page Contact, llms.txt
+    // et les données structurées (sameAs). Ajouter ici la fiche Google une fois créée.
+    'profiles' => [
+        'Facebook' => 'https://www.facebook.com/profile.php?id=61575563643317',
+        'Instagram' => 'https://www.instagram.com/maisondustoream/',
+        'TikTok' => 'https://www.tiktok.com/@maisondustoream',
+    ],
 
     'communes' => ['Cocody', 'Plateau', 'Marcory', 'Yopougon', 'Treichville', 'Bingerville', 'Abobo', 'Adjamé', 'Koumassi', 'Port-Bouët', 'Attécoubé', 'Anyama', 'Songon', 'Grand-Bassam', 'Autre'],
 

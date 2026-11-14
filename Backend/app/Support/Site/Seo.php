@@ -138,6 +138,8 @@ class Seo
             '- Électroménager et meubles : boutiques bientôt ouvertes.',
             '- Téléphone : '.$phones.' ; WhatsApp : '.$c['whatsapp'].' ; e-mail : '.$c['email'],
             '',
+            ...array_map(fn ($network, $url) => '- '.(is_string($network) ? $network : 'Profil').' : '.$url, array_keys((array) config('site.profiles')), (array) config('site.profiles')),
+            '',
             '## Pages principales',
             '',
             '- [Accueil]('.route('home').') : boutiques, savoir-faire, réalisations, prise de rendez-vous',

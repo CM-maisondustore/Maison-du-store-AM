@@ -30,6 +30,7 @@
             <a href="{{ $c['maps'] }}" rel="noopener">{{ $c['address'][0] }}</a>
             @foreach($c['phones'] as $ph)<a href="tel:{{ $ph['tel'] }}">{{ $ph['label'] }}</a>@endforeach
             <a href="mailto:{{ $c['email'] }}">{{ $c['email'] }}</a>
+            @foreach(config('site.profiles') as $network => $url)<a href="{{ $url }}" rel="noopener me">{{ is_string($network) ? $network : $url }}</a>@endforeach
         </nav>
     </div>
     <div class="wrap ft-legal">

@@ -13,5 +13,12 @@
 <h2>E-mail</h2>
 <p><a href="mailto:{{ $c['email'] }}">{{ $c['email'] }}</a></p>
 
+@if(config('site.profiles'))
+<h2>Réseaux sociaux</h2>
+<ul>
+    @foreach(config('site.profiles') as $network => $url)<li><a href="{{ $url }}" rel="noopener me">{{ is_string($network) ? $network : $url }}</a></li>@endforeach
+</ul>
+
+@endif
 <h2>Devis et rendez-vous</h2>
 <p>Pour un projet de stores ou de rideaux, <a href="{{ route('quote') }}">demandez un devis en ligne</a> ou <a href="{{ route('home') }}#rendez-vous">prenez rendez-vous</a> : au showroom, chez vous ou par téléphone.</p>

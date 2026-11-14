@@ -74,7 +74,8 @@ class SiteAiVisibilityTest extends TestCase
         $graph = json_decode($m[1][0], true, flags: JSON_THROW_ON_ERROR)['@graph'];
         $this->assertSame(['Organization', 'HomeGoodsStore', 'WebSite'], array_column($graph, '@type'));
         $this->assertSame('Abidjan', $graph[1]['address']['addressLocality']);
-        $this->assertArrayNotHasKey('sameAs', $graph[0], 'Sans profil renseigné, pas de sameAs vide.');
+        $this->assertContains('https://www.instagram.com/maisondustoream/', $graph[0]['sameAs']);
+        $this->assertStringContainsString('href="https://www.tiktok.com/@maisondustoream" rel="noopener me">TikTok</a>', $html);
         $this->assertStringContainsString('property="og:title"', $html);
 
         config(['site.profiles' => ['https://www.facebook.com/maisondustoream']]);
