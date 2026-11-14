@@ -98,6 +98,7 @@ class Catalog
             'featured' => (bool) ($d['featured'] ?? false),
             'colors' => collect($d['colors'] ?? [])->filter(fn ($c) => isset($colors[$c]))->map(fn ($c) => $colors[$c])->values()->all(),
             'features' => collect($d['features'] ?? [])->filter(fn ($f) => isset($features[$f]))->map(fn ($f) => $features[$f])->values()->all(),
+            'updated' => $p->updated_at?->toDateString(),
             'specs' => collect($d['specs'] ?? [])->map(fn ($s) => [$s['label'] ?? '', $s['value'] ?? ''])->filter(fn ($s) => $s[0] !== '')->values()->all(),
         ];
     }

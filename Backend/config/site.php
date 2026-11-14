@@ -18,6 +18,10 @@ return [
         'maps' => 'https://maps.google.com/?q=Maison+du+Store+AM+Cocody',
     ],
 
+    // Pages officielles de la maison (Facebook, Instagram, TikTok, fiche Google…), séparées par des virgules.
+    // Reprises dans les données structurées (sameAs) pour relier le site à ses profils.
+    'profiles' => array_values(array_filter(array_map('trim', explode(',', (string) env('MDS_SOCIAL_PROFILES', ''))))),
+
     'communes' => ['Cocody', 'Plateau', 'Marcory', 'Yopougon', 'Treichville', 'Bingerville', 'Abobo', 'Adjamé', 'Koumassi', 'Port-Bouët', 'Attécoubé', 'Anyama', 'Songon', 'Grand-Bassam', 'Autre'],
 
     // Ordre d'affichage dans la navigation : les deux premières sont ouvertes.

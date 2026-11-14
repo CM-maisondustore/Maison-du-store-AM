@@ -7,6 +7,7 @@ use App\Services\AppointmentSchedule;
 use App\Services\PublicQuoteChoices;
 use App\Services\QuotePhone;
 use App\Support\Site\Catalog;
+use App\Support\Site\Seo;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
 
@@ -17,8 +18,14 @@ use Illuminate\Http\Request;
  */
 class SiteController
 {
-    public function home(AppointmentSchedule $schedule)
+    public function home(Request $request, AppointmentSchedule $schedule)
     {
+        // Agents IA : la présentation en Markdown ; pour tous : les ressources annoncées dans l'en-tête Link.
+        $link = '<'.url('/llms.txt').'>; rel="describedby"; type="text/markdown", <'.url('/sitemap.xml').'>; rel="sitemap"; type="application/xml"';
+        if (Seo::wantsMarkdown($request)) {
+            return Seo::markdown(Seo::llms())->header('Link', $link);
+        }
+
         $contents = SiteContent::with('media')->where('published', true)->orderBy('position')->orderBy('id')->get();
         $fallback = config('site.realisations');
         $portfolio = $contents->where('kind', 'portfolio')->values()->map(fn (SiteContent $c, int $i) => [
@@ -31,13 +38,13 @@ class SiteController
             $portfolio = collect($fallback)->map(fn ($r) => ['t' => $r['t'], 's' => $r['s'], 'img' => asset($r['img']), 'alt' => $r['t']]);
         }
 
-        return view('site.landing', [
+        return response()->view('site.landing', [
             'hero' => $contents->firstWhere('slot', 'hero'),
             'portfolio' => $portfolio,
             'bubblePool' => $this->bubblePool(),
             'dates' => $this->appointmentDates($schedule),
             'slots' => config('appointments.slots'),
-        ]);
+        ])->header('Link', $link)->header('Vary', 'Accept');
     }
 
     public function shop(Request $request, ?string $shop = null)
@@ -84,10 +91,13 @@ class SiteController
         return view('site.shop.index', $data);
     }
 
-    public function product(string $reference)
+    public function product(Request $request, string $reference)
     {
         $p = Catalog::find($reference);
         abort_unless($p, 404);
+        if (Seo::wantsMarkdown($request)) {
+            return Seo::markdown(Seo::productMarkdown($p, config('site.shops.'.$p->shop)));
+        }
         $similar = Catalog::forShop($p->shop)->where('ref', '!=', $p->ref)
             ->sortByDesc(fn ($s) => $s->type === $p->type)->take(4);
 
@@ -130,6 +140,27 @@ class SiteController
     public function legal(string $page)
     {
         return view('site.legal', ['page' => $page, 'title' => self::LEGAL[$page]]);
+    }
+
+    /** Pages « À propos » et « Contact », liées dans le pied de page. */
+    public const INFO = [
+        'a-propos' => 'À propos de Maison du Store',
+        'contact' => 'Nous contacter',
+    ];
+
+    public function info(string $info)
+    {
+        return view('site.info', ['page' => $info, 'title' => self::INFO[$info]]);
+    }
+
+    public function sitemap()
+    {
+        return response()->view('site.sitemap', ['urls' => Seo::sitemap()])->header('Content-Type', 'application/xml; charset=UTF-8');
+    }
+
+    public function llms()
+    {
+        return response(Seo::llms(), 200, ['Content-Type' => 'text/markdown; charset=UTF-8']);
     }
 
     /** Réserve de produits pour les bulles aléatoires de l'accueil. */

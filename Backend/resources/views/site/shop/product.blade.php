@@ -27,8 +27,10 @@
 @endphp
 @section('title', $p->name.' — '.$m['name'].' | Maison du Store AM')
 @section('description', \Illuminate\Support\Str::limit(trim($p->description.' Sur mesure, pose incluse à Abidjan.'), 155))
+@section('og_image', $p->image ? url($p->image) : \App\Support\Site\SiteImages::url('hero'))
 @push('head')
-<script type="application/ld+json">{!! json_encode(array_filter(['@context' => 'https://schema.org', '@type' => 'Product', 'name' => $p->name, 'sku' => $p->ref, 'description' => $p->description, 'image' => $p->image ? url($p->image) : null, 'category' => $m['name']]), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
+<script type="application/ld+json">{!! json_encode(array_filter(['@context' => 'https://schema.org', '@type' => 'Product', 'name' => $p->name, 'sku' => $p->ref, 'description' => $p->description, 'image' => $p->image ? url($p->image) : null, 'category' => $m['name'], 'brand' => ['@type' => 'Brand', 'name' => 'Maison du Store AM']]), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
+<script type="application/ld+json">{!! \App\Support\Site\Seo::json(\App\Support\Site\Seo::breadcrumb([['Accueil', route('home')], [$m['name'], route('site.shop.show', $p->shop)], [$p->name, route('site.product', $p->ref)]])) !!}</script>
 @endpush
 @section('content')
 <main id="contenu" class="wrap page-pad" data-shop="{{ $p->shop }}" data-product data-name="{{ $p->name }}">

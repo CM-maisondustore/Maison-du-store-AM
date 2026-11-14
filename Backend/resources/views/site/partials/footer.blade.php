@@ -5,8 +5,8 @@
         : [['Rideaux & voilages', route('quote', ['type' => 'rideau'])], ['Stores', route('quote', ['type' => 'store'])]];
     $cols = [
         ['MDS-Shop', [...$shopLinks, ['Électroménager (bientôt)', null], ['Meubles (bientôt)', null]]],
-        ['La maison', [['Notre savoir-faire', route('home').'#savoir-faire'], ['Réalisations', route('home').'#realisations'], ['MDS-Services (bientôt)', null], ['Nos boutiques', route('home').'#boutiques']]],
-        ['Demande rapide', [['Devis store', route('quote', ['type' => 'store'])], ['Devis rideau', route('quote', ['type' => 'rideau'])], ['Prendre rendez-vous', route('home').'#rendez-vous'], ['WhatsApp', $c['whatsapp']]]],
+        ['La maison', [['À propos', route('site.info', 'a-propos')], ['Notre savoir-faire', route('home').'#savoir-faire'], ['Réalisations', route('home').'#realisations'], ['MDS-Services (bientôt)', null], ['Nos boutiques', route('home').'#boutiques']]],
+        ['Demande rapide', [['Devis store', route('quote', ['type' => 'store'])], ['Devis rideau', route('quote', ['type' => 'rideau'])], ['Prendre rendez-vous', route('home').'#rendez-vous'], ['Contact', route('site.info', 'contact')], ['WhatsApp', $c['whatsapp']]]],
     ];
 @endphp
 <footer class="ft">

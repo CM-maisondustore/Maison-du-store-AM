@@ -14,6 +14,7 @@ Route::get('/shop', [App\Http\Controllers\Site\SiteController::class, 'shop'])->
 Route::get('/shop/{shop}', [App\Http\Controllers\Site\SiteController::class, 'shop'])->whereIn('shop', ['rideaux', 'stores'])->name('site.shop.show');
 Route::get('/produit/{reference}', [App\Http\Controllers\Site\SiteController::class, 'product'])->where('reference', '[A-Za-z0-9._-]+')->name('site.product');
 Route::get('/{page}', [App\Http\Controllers\Site\SiteController::class, 'legal'])->whereIn('page', array_keys(App\Http\Controllers\Site\SiteController::LEGAL))->name('site.legal');
+Route::get('/{info}', [App\Http\Controllers\Site\SiteController::class, 'info'])->whereIn('info', array_keys(App\Http\Controllers\Site\SiteController::INFO))->name('site.info');
 Route::redirect('/cgv', '/conditions-de-vente', 301);
 Route::redirect('/cookies', '/confidentialite#cookies', 301);
 Route::get('/media/{media}/{hash}', [App\Http\Controllers\MediaController::class, 'show'])->whereNumber('media')->where('hash', '[a-f0-9]{64}')->name('media.show');
@@ -25,10 +26,15 @@ Route::get('/d/{message}', [App\Http\Controllers\SharedDocumentController::class
 Route::get('/d/{message}/pdf', [App\Http\Controllers\SharedDocumentController::class, 'file'])->whereNumber('message')->middleware(['signed:relative','throttle:30,1'])->name('documents.whatsapp.file');
 Route::get('/health/ready', App\Http\Controllers\ReadinessController::class)->middleware('throttle:60,1');
 Route::post('/api/analytics/collect', [App\Http\Controllers\AnalyticsController::class, 'collect'])->middleware('throttle:120,1');
+// Content-Signal (contentsignals.org) : référencement et réponses des assistants IA autorisés, entraînement des modèles refusé.
 Route::get('/robots.txt', function () {
-    return response("User-agent: *\n".(config('deployment.indexing') ? "Allow: /\n" : "Disallow: /\n"), 200)
-        ->header('Content-Type', 'text/plain');
+    $body = config('deployment.indexing')
+        ? "User-agent: *\nContent-Signal: search=yes, ai-input=yes, ai-train=no\nAllow: /\nDisallow: /admin\n\nSitemap: ".url('/sitemap.xml')."\n"
+        : "User-agent: *\nDisallow: /\n";
+    return response($body, 200)->header('Content-Type', 'text/plain');
 });
+Route::get('/sitemap.xml', [App\Http\Controllers\Site\SiteController::class, 'sitemap'])->name('site.sitemap');
+Route::get('/llms.txt', [App\Http\Controllers\Site\SiteController::class, 'llms'])->name('site.llms');
 
 // Même origine et middleware web : sessions et CSRF restent actifs pour les POST.
 Route::prefix('api')->group(function () {
