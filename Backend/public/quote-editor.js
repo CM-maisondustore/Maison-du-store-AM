@@ -42,7 +42,9 @@
     }
     refresh(root,initial);
   }
-  function inherit(row){if(row.querySelector('[data-inherit]').checked)refresh(row.querySelector('[data-selection]'),values(defaults));}
+  /* Pastilles « Choix communs / Personnalisé » : reflètent la case cachée, qui reste le champ enregistré. */
+  function paintInherit(row){const on=row.querySelector('[data-inherit]').checked;row.querySelectorAll('[data-inherit-mode]').forEach(b=>b.setAttribute('aria-pressed',String((b.dataset.inheritMode==='1')===on)));}
+  function inherit(row){if(row.querySelector('[data-inherit]').checked)refresh(row.querySelector('[data-selection]'),values(defaults));paintInherit(row);}
   /* Chiffrage configuré dans « Matériaux et finitions » (calcul, coefficient, base si quantité vide) :
      appliqué quand une option est choisie sur l'ouverture ; un devis enregistré garde ses réglages au chargement. */
   const setCalc=(el,value)=>{if(!el||value===''||value==null)return;if(el.tagName==='SELECT'&&![...el.options].some(o=>o.value===value))return;el.value=value;};
@@ -169,7 +171,7 @@
   init(defaults);windows.querySelectorAll('[data-window]').forEach(row=>{
     const root=row.querySelector('[data-selection]');init(root);inherit(row);
     const legacy=data.options.find(o=>String(o.id)===row.querySelector('[data-component="secondary_material"]').dataset.value);
-    if(legacy?.fabric_group==='voilage'&&field(root,'curtain_id').value&&!field(root,'sheer_id').value){field(root,'sheer_id').value=String(legacy.id);row.querySelector('[data-inherit]').checked=false;refresh(root);}
+    if(legacy?.fabric_group==='voilage'&&field(root,'curtain_id').value&&!field(root,'sheer_id').value){field(root,'sheer_id').value=String(legacy.id);row.querySelector('[data-inherit]').checked=false;refresh(root);paintInherit(row);}
     components(row,true);
   });buttons();paintBoard();coefChips();
   let dirty=false,revision=0,calculating=false,pending=null;
@@ -221,7 +223,7 @@
   form.addEventListener('change',event=>{
     dirty=true;revision++;const target=event.target,root=target.closest('[data-selection]');invalidate(target);
     if(target.dataset.fabric)field(root,target.dataset.fabric).value=target.type==='checkbox'?(target.checked?target.value:''):target.value;
-    if(root){alignFinish(root,target);if(root!==defaults)root.closest('[data-window]').querySelector('[data-inherit]').checked=false;refresh(root);if(root===defaults)windows.querySelectorAll('[data-window]').forEach(inherit);}
+    if(root){alignFinish(root,target);if(root!==defaults){const row=root.closest('[data-window]');row.querySelector('[data-inherit]').checked=false;paintInherit(row);}refresh(root);if(root===defaults)windows.querySelectorAll('[data-window]').forEach(inherit);}
     if(target.matches('[data-inherit]'))inherit(target.closest('[data-window]'));
     if(target.dataset.part){const input=target.closest('[data-cost-part]').querySelector('[data-component]');input.value=target.type==='checkbox'?(target.checked?target.value:''):target.value;input.dataset.userChoice='1';}
     if(root||target.matches('[data-inherit],[data-material-mode]')||target.dataset.part)windows.querySelectorAll('[data-window]').forEach(row=>components(row));
@@ -235,7 +237,10 @@
     const fragment=document.getElementById('quote-window-template').content.cloneNode(true);fragment.querySelectorAll('[name]').forEach(el=>el.name=el.name.replace('__INDEX__',next));next++;
     const row=fragment.querySelector('[data-window]');windows.append(fragment);init(row.querySelector('[data-selection]'));inherit(row);components(row,true);buttons();paintSupplies();dirty=true;revision++;invalidate(row);
   });
-  windows.addEventListener('click',event=>{const b=event.target.closest('[data-remove-window]');if(b&&windows.children.length>1){invalidate(b);b.closest('[data-window]').remove();buttons();dirty=true;revision++;}});
+  windows.addEventListener('click',event=>{
+    const mode=event.target.closest('[data-inherit-mode]');
+    if(mode){const box=mode.closest('[data-window]').querySelector('[data-inherit]'),on=mode.dataset.inheritMode==='1';if(box.checked!==on){box.checked=on;box.dispatchEvent(new Event('change',{bubbles:true}));}paintInherit(mode.closest('[data-window]'));return;}
+    const b=event.target.closest('[data-remove-window]');if(b&&windows.children.length>1){invalidate(b);b.closest('[data-window]').remove();buttons();dirty=true;revision++;}});
   const lines=document.getElementById('lines');
   const calculate=document.getElementById('calculate-quote'),status=document.getElementById('calculation-status');
   calculate?.addEventListener('click',async()=>{

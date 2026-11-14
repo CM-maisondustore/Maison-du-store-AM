@@ -135,3 +135,9 @@ input.editor-name:hover,input.editor-name:focus{border-color:var(--pro-line-stro
 .row-item .col-name{flex:1;min-width:0;min-height:30px;padding:2px 6px}
 .row-item .col-name+.icon-btn{margin-left:2px}
 .col-designation{margin-top:4px}
+/* Ordre des lignes d'une désignation : liste à monter / descendre, sans case à cocher */
+.row-item .row-name{flex:1;min-width:0;padding:2px 6px}
+.row-order.is-default .row-item{background:var(--pro-panel-alt)}
+.fold-inner{margin:6px 0 10px;padding:0 10px;border:1px solid var(--pro-line);border-radius:var(--r-6);background:var(--pro-panel-alt)}
+.fold-inner>summary{padding:8px 0;font-size:14px}
+.fold-inner .row-order{margin-bottom:8px}

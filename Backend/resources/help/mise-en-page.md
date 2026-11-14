@@ -22,7 +22,7 @@ La mise en page définit l’apparence commune des PDF envoyés aux clients : de
    - **Contenu** : texte libre ou complémentaire. Une ligne `---` trace un trait.
    - **Lignes du bloc** (Client, Entreprise) : lignes affichées, leur ordre, intitulés, traits horizontaux et vertical.
    - **Lignes de séparation**, **Disposition** (marge intérieure, alignement, coins arrondis), **Fond et bordure**.
-   - **Tableau** : lignes affichées et leur ordre, colonnes, intitulés, en-tête, lignes alternées.
+   - **Tableau** : lignes affichées et leur ordre, ordre des lignes de chaque désignation (tissu, voilage, rail…), colonnes, intitulés, en-tête, lignes alternées.
    - **Dupliquer**, **Premier plan**, **Arrière-plan**, **Retirer ce bloc**.
 5. **Actualiser l’aperçu A4** ou **Aperçu PDF** pour vérifier le rendu.
 6. **Enregistrer le brouillon** garde votre travail sans changer les documents envoyés. **Publier le modèle** l’applique aux prochains documents.

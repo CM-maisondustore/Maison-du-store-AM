@@ -16,7 +16,7 @@ Lors d’une prestation « Devis sur place », vous relevez les ouvertures du cl
 
 1. Ouvrez la prestation. Dans **Devis sur place**, choisissez le **Type de projet** (store, rideau, électroménager, meubles) puis touchez **Créer un devis pour ce client**.
 2. **Client** : vérifiez le prénom, le nom, le téléphone et l’adresse de pose.
-3. **Choix communs** : indiquez le type, la motorisation, la finition et la zone de pose qui valent pour toutes les ouvertures.
+3. **Choix communs** : touchez les pastilles pour le type de projet, rideaux et voilage (Oui / Non), la motorisation et la zone de pose ; choisissez la finition dans son menu. Ces choix valent pour toutes les ouvertures.
 4. **Mesures des ouvertures** : pour chaque ouverture, saisissez la **désignation** (« Salon gauche »), la **largeur** et la **hauteur** en centimètres, des **notes** et, si utile, une **photo**.
 5. Une ouverture différente des autres ? Décochez **Utiliser les choix communs** et réglez ses propres choix.
 6. Touchez **Ajouter une ouverture** pour la suivante (30 au maximum). **Retirer cette ouverture** supprime une ligne saisie par erreur.

@@ -15,7 +15,7 @@ Le formulaire complet sert à créer un devis de stores ou de rideaux au bureau,
 ## Étapes
 
 1. **Client et ouvertures** : renseignez le client (nom, téléphone, adresse de pose), puis chaque ouverture avec sa désignation et ses mesures en centimètres. **Ajouter une ouverture** en crée une autre ; les **Notes de terrain** gardent les contraintes de pose.
-2. **Matériaux et finitions** : réglez les **Choix communs** (tissu ou matériau, voilage, finition, rail ou support, coefficient). Pour personnaliser une seule ouverture, changez son menu dans **Par ouverture** ; recochez « Choix communs » pour revenir aux choix communs.
+2. **Matériaux et finitions** : réglez les **Choix communs** (tissu ou matériau, voilage, finition, rail ou support, coefficient). Pour personnaliser une seule ouverture, touchez **Personnalisé** sur sa ligne dans **Par ouverture** (ou changez directement un de ses menus) ; **Choix communs** la ramène aux choix communs.
 3. **Affectation et chiffrage** : choisissez l’agent et les dates de livraison et de pose. Dans **Chiffrage**, **Calculer depuis le catalogue** reprend les tarifs ; un prix que vous saisissez est conservé. Ajoutez la pose, la livraison ou le déplacement si besoin.
 4. **Paiement** : vérifiez les **Conditions de paiement** (acompte, échéances). Si le client a déjà versé un montant, saisissez-le dans **Paiement déjà reçu**.
 5. Touchez **Enregistrer le devis**. **Précédent** et **Suivant** permettent de circuler entre les étapes.

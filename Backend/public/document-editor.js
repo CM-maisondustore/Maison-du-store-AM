@@ -127,6 +127,9 @@
   const rowSet = () => data.kind === 'receipt' ? (data.receiptRows || {}) : (data.rows || {});
   const allRows = () => [...Object.keys(data.rows || {}), ...Object.keys(data.receiptRows || {})];
   const rowKeys = b => Array.isArray(b.row_order) ? b.row_order : allRows();
+  // Ordre des lignes d'une désignation : l'ordre choisi, complété par les natures manquantes dans l'ordre par défaut.
+  const lineKinds = () => data.lineKinds || {};
+  const lineKeys = b => { const all = Object.keys(lineKinds()), chosen = Array.isArray(b.line_order) ? b.line_order.filter(k => all.includes(k)) : []; return [...chosen, ...all.filter(k => !chosen.includes(k))]; };
   const FONT_STACKS = { 'DejaVu Serif': '"DejaVu Serif",Georgia,serif', 'Arial': 'Arial,Helvetica,sans-serif', 'Times New Roman': '"Times New Roman",Times,serif' };
   function paint(node, b) {
     const s = scale();
@@ -250,6 +253,19 @@
         li.append(lab, up, down); return li;
       }));
     }
+    const lineOrder = $('[data-line-order]', props);
+    if (lineOrder && b.type === 'lines') {
+      const kinds = lineKinds(), keys = lineKeys(b), custom = Array.isArray(b.line_order) && b.line_order.length > 0;
+      lineOrder.classList.toggle('is-default', !custom);
+      lineOrder.replaceChildren(...keys.map((key, i) => {
+        const li = el('li', 'row-item'), name = el('span', 'row-name', kinds[key]);
+        const up = el('button', 'secondary icon-btn', '↑'), down = el('button', 'secondary icon-btn', '↓');
+        [[up, -1, 'Monter'], [down, 1, 'Descendre']].forEach(([btn, dir, word]) => { btn.type = 'button'; btn.dataset.lineMove = key; btn.dataset.dir = String(dir); btn.setAttribute('aria-label', `${word} : ${kinds[key]}`);
+          btn.disabled = dir < 0 ? i === 0 : i === keys.length - 1; });
+        li.append(name, up, down); return li;
+      }));
+      const clear = $('[data-clear-prop="line_order"]', props); if (clear) clear.hidden = !custom;
+    }
     $$('[data-page-kind]', props).forEach(box => { box.checked = b.pages.includes(box.dataset.pageKind); });
   }
   function select(id, focus) {
@@ -312,7 +328,12 @@
     const b = find(selected); if (!b) return;
     const align = event.target.closest('[data-align]'), insert = event.target.closest('[data-insert]');
     if (align) commit(() => { b.align = align.dataset.align; });
-    const toggle = event.target.closest('[data-toggle]'), move = event.target.closest('[data-row-move]'), fieldMove = event.target.closest('[data-field-move]');
+    const toggle = event.target.closest('[data-toggle]'), move = event.target.closest('[data-row-move]'), fieldMove = event.target.closest('[data-field-move]'), lineMove = event.target.closest('[data-line-move]');
+    if (lineMove) {
+      const key = lineMove.dataset.lineMove, dir = Number(lineMove.dataset.dir);
+      commit(() => { const keys = lineKeys(b), i = keys.indexOf(key), j = i + dir; if (i < 0 || j < 0 || j >= keys.length) return; [keys[i], keys[j]] = [keys[j], keys[i]]; b.line_order = keys; });
+      props.querySelector(`[data-line-move="${CSS.escape(key)}"][data-dir="${lineMove.dataset.dir}"]`)?.focus();
+    }
     const colMove = event.target.closest('[data-col-move]'), valign = event.target.closest('[data-valign]'), clear = event.target.closest('[data-clear-prop]'), layerMove = event.target.closest('[data-layer-move]');
     if (colMove) {
       const key = colMove.dataset.colMove, dir = Number(colMove.dataset.dir);

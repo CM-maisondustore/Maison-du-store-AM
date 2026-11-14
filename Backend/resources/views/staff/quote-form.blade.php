@@ -48,7 +48,7 @@
 
 <section class="wizard-main" id="s-fen" data-step-section="1 2" aria-labelledby="h-fen">
 <div class="wizard-head" data-step-part="1"><h2 id="h-fen">Ouvertures</h2><p class="muted">Désignation, mesures en centimètres (de 1 à 2000 cm) et notes de chaque ouverture.</p></div>
-<div class="wizard-head" data-step-part="2"><h2>Par ouverture</h2><p class="muted">Changez un menu pour personnaliser une seule ouverture ; recochez « Choix communs » pour revenir aux choix communs. Quantités, fournitures et prix : sous chaque ouverture. Confection et pose : étape 3.</p></div>
+<div class="wizard-head" data-step-part="2"><h2>Par ouverture</h2><p class="muted">Changez un menu pour personnaliser une seule ouverture, ou choisissez « Personnalisé » ; « Choix communs » ramène l’ouverture aux choix communs. Quantités, fournitures et prix : sous chaque ouverture. Confection et pose : étape 3.</p></div>
 <div class="openings">
 <div class="openings-head" data-step-part="2" aria-hidden="true"><span>Ouverture</span><span>Projet</span><span>Motorisé</span><span>Tissu ou matériau</span><span>Voilage</span><span>Finition</span><span>Rail / support</span><span>Coefficient</span></div>
 <div id="quote-windows">@foreach($windows as $index=>$window) @include('staff.quote-window',['openCard'=>true]) @endforeach</div>

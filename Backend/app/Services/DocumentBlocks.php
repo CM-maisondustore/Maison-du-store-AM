@@ -36,6 +36,12 @@ final class DocumentBlocks
     /** Lignes des tableaux, dans l'ordre par défaut ; l'éditeur choisit celles affichées et leur ordre. */
     public const ROWS=['designations'=>'Désignations (par ouverture)','fees'=>'Pose, livraison et frais','subtotal'=>'Sous-total (avec taxes ou remise)','tax'=>'Taxes','discount'=>'Remise commerciale'];
     public const RECEIPT_ROWS=['received'=>'Montant reçu','method'=>'Moyen de paiement','reference'=>'Référence du paiement','quote_total'=>'Total du devis','cumulative'=>'Cumul reçu à l’édition','remaining'=>'Reste à payer à l’édition'];
+    /**
+     * Lignes qui composent une désignation (une ouverture) dans le tableau, par nature de fourniture.
+     * L'option « line_order » du tableau range ces lignes dans l'ordre choisi ; absente, l'ordre du chiffrage est conservé.
+     */
+    public const LINE_KINDS=['material'=>'Tissu ou matériau','secondary_material'=>'Voilage','sewing'=>'Confection','finish'=>'Finition','support'=>'Rail / support',
+        'extra_support'=>'Support supplémentaire','tape'=>'Ruflette','extra_tape'=>'Ruflette supplémentaire','hooks'=>'Accroches','motor'=>'Motorisation','installation'=>'Pose','other'=>'Autres lignes'];
     /** Lignes de séparation d'un bloc (couleur de bordure du bloc). Dans un texte, une ligne « --- » trace aussi une séparation. */
     public const SEPARATORS=['top'=>'Au-dessus du bloc','label'=>'Sous l’intitulé','bottom'=>'Sous le bloc'];
     /**
@@ -128,6 +134,9 @@ final class DocumentBlocks
                 // Lignes affichées, dans l'ordre choisi ; absent : toutes, dans l'ordre par défaut.
                 $known=[...array_keys(self::ROWS),...array_keys(self::RECEIPT_ROWS)];
                 $block['row_order']=is_array($item['row_order'] ?? null) ? array_values(array_unique(array_filter($item['row_order'],fn($k)=>is_string($k) && in_array($k,$known,true)))) : $known;
+                // Ordre des lignes d'une désignation (tissu, voilage, rail…) : facultatif, l'ordre du chiffrage reste la règle.
+                $lineOrder=is_array($item['line_order'] ?? null) ? array_values(array_unique(array_filter($item['line_order'],fn($k)=>is_string($k) && isset(self::LINE_KINDS[$k])))) : [];
+                if ($lineOrder) $block['line_order']=$lineOrder;
             }
             if (isset(self::BLOCK_FIELDS[$type])) {
                 if (is_array($item['fields'] ?? null)) $block['fields']=array_values(array_unique(array_filter($item['fields'],fn($k)=>is_string($k) && isset(self::BLOCK_FIELDS[$type][$k]))));
@@ -198,7 +207,7 @@ final class DocumentBlocks
                     if ($room!=='' && $block['group']) $rows[]=['kind'=>'room','label'=>$room];
                     foreach ($openings as $opening) {
                         if ($block['group']) $rows[]=['kind'=>'opening','label'=>$opening['label'].' · '.$opening['dimensions'].(($opening['quantity'] ?? 1)>1 ? ' · '.$opening['quantity'].' exemplaires' : '')];
-                        foreach ($opening['lines'] as $l) $rows[]=$line($l,$block['group'] ? '' : $opening['label'].' — ');
+                        foreach (self::orderLines($opening['lines'],$block['line_order'] ?? []) as $l) $rows[]=$line($l,$block['group'] ? '' : $opening['label'].' — ');
                         if ($block['group']) $rows[]=['kind'=>'subtotal','label'=>'Sous-total '.$opening['label'],'amount'=>$money($opening['subtotal'])];
                     }
                 }
@@ -210,6 +219,16 @@ final class DocumentBlocks
             case 'discount': if (!empty($totals['discountAmount'])) $rows[]=['kind'=>'sum','label'=>'Remise commerciale','amount'=>'−'.$money($totals['discountAmount'])]; break;
         }
         return $rows;
+    }
+
+    /** Lignes d'une ouverture dans l'ordre choisi (tri stable) ; les natures non listées suivent, dans l'ordre du chiffrage. */
+    public static function orderLines(array $lines,array $order): array
+    {
+        if (!$order) return $lines;
+        $rank=array_flip($order); $last=count($order);
+        $keyed=array_map(fn($i,$l)=>[$rank[isset(self::LINE_KINDS[$l['key'] ?? '']) ? $l['key'] : 'other'] ?? $last,$i,$l],array_keys($lines),$lines);
+        usort($keyed,fn($a,$b)=>[$a[0],$a[1]] <=> [$b[0],$b[1]]);
+        return array_column($keyed,2);
     }
 
     /**

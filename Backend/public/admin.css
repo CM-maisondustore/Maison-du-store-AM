@@ -931,8 +931,8 @@ input.opening-title{font-size:17px;font-weight:600}
 .opening-row-name::before{content:counter(opening,decimal-leading-zero);flex:none;font:400 13px var(--font-data);color:var(--pro-text-2)}
 .opening-row-name .opening-sum{margin-left:auto}
 .opening-inherit{margin:0;font-weight:500}
-.opening-custom{display:none;background:var(--pro-gold-tint);color:var(--pro-gold-text)}
-.opening-row:has([data-inherit]:not(:checked)) .opening-custom{display:inline-flex}
+.opening-mode{gap:4px}
+.opening-mode .chip-option{min-height:32px;padding:0 12px;font-size:13px}
 .cell-support>.cell-label{display:block;margin:12px 0 0;font-size:13px;font-weight:600;color:var(--pro-ink)}
 .cell-support[hidden]{display:none}
 .cell-na{display:none;color:var(--pro-text-2);font-size:14px;font-weight:400}
@@ -1081,6 +1081,14 @@ body:has(.float-panel:target),body:has(.float-panel[data-open]){overflow:hidden}
 .has-board .cell-finish{display:grid;grid-template-columns:minmax(150px,220px) minmax(0,360px);align-items:center;gap:6px 16px;margin:0;padding:10px 0;border-bottom:1px solid var(--pro-line)}
 .has-board .cell-finish .cell-label{font-weight:600;color:var(--pro-ink)}
 .supply-board{margin-top:18px}
+/* Relevé agent : mêmes pastilles que les choix communs du bureau ; la finition garde son menu */
+.agent-choices{margin:0}
+.agent-choices .choice-line:last-child{border-bottom:0}
+.chip-field{position:relative;display:block}
+.chip-field select{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+.choice-select{display:grid;cursor:default}
+.choice-select select{max-width:360px}
+.quote-opening-details .agent-choices{margin-top:4px}
 .choice-title{margin:0 0 4px}
 .choice-group{margin:14px 0 0;font:600 12px var(--font-ui);letter-spacing:.06em;text-transform:uppercase;color:var(--pro-text-2)}
 @media (max-width:767px){
@@ -1105,7 +1113,7 @@ body:has(.float-panel:target),body:has(.float-panel[data-open]){overflow:hidden}
 .coef-custom input{min-height:38px}
 .coef-custom input:disabled{opacity:.5}
 .chip-set .hint{flex-basis:100%;margin:0}
-@media (max-width:767px){.chip-radio span{min-height:44px}.coef-custom{max-width:none;flex:1 1 140px}}
+@media (max-width:767px){.chip-radio span{min-height:44px}.opening-mode .chip-option{min-height:40px}.coef-custom{max-width:none;flex:1 1 140px}}
 
 /* ---- Étape 2, quantités par ouverture : une ligne par poste — Oui / Non, quantité, coefficient, prix ---- */
 .cost-lines{margin-top:4px}

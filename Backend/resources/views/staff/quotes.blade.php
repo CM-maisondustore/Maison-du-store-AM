@@ -5,7 +5,9 @@
 <a class="button desktop-only" href="{{ route('staff.quotes.create') }}">@include('staff.partials.icon',['n'=>'plus','s'=>18])Nouveau devis</a>
 @if(auth()->user()->isAdmin())<a class="button quiet desktop-only" href="{{ route('staff.quote-options.index') }}">Matériaux &amp; finitions</a>@endif
 @endsection
+@unless(auth()->user()->isAdmin())
 @section('fab')<a class="fab fab-round" href="{{ route('staff.quotes.create') }}" aria-label="Nouveau devis" title="Nouveau devis">@include('staff.partials.icon',['n'=>'plus','s'=>26])</a>@endsection
+@endunless
 @section('content')
 @include('staff.partials.list-states',['type'=>'devis','state'=>$state])
 @if($state==='corbeille')

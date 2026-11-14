@@ -122,7 +122,21 @@
 </main>
 </div>
 </div>
+@hasSection('fab')
 @yield('fab')
+@elseif($me->isAdmin())
+{{-- Mobile : le « Nouveau » de la barre du haut n'existe pas ; ce bouton flottant ouvre les mêmes choix. --}}
+<button type="button" class="fab fab-round" data-open-dialog="new-sheet" aria-haspopup="dialog" aria-label="Nouveau : devis, prestation, client ou message">@include('staff.partials.icon',['n'=>'plus','s'=>26])</button>
+<dialog class="sheet" id="new-sheet" aria-labelledby="new-title">
+<div class="sheet-head"><h2 id="new-title">Nouveau</h2><button type="button" class="quiet icon-btn" data-close-dialog aria-label="Fermer">@include('staff.partials.icon',['n'=>'close'])</button></div>
+<div class="sheet-group">
+<a class="sheet-link" href="{{ route('staff.quotes.create') }}">@include('staff.partials.icon',['n'=>'devis'])<span>Devis</span></a>
+<a class="sheet-link" href="{{ route('staff.interventions.index') }}#planifier">@include('staff.partials.icon',['n'=>'prestations'])<span>Prestation</span></a>
+<a class="sheet-link" href="{{ route('staff.contacts.index') }}#nouveau-contact">@include('staff.partials.icon',['n'=>'clients'])<span>Client</span></a>
+<a class="sheet-link" href="{{ route('staff.messages.create') }}">@include('staff.partials.icon',['n'=>'messagerie'])<span>Message</span></a>
+</div>
+</dialog>
+@endif
 <nav class="tabbar" aria-label="Navigation principale">
 @foreach($ui['tabs'] as $tab)
 <a href="{{ $tab['href'] }}" @if($tab['current']) aria-current="page" @endif>@include('staff.partials.icon',['n'=>$tab['icon'],'s'=>24])@if($tab['count'])<b aria-label="{{ $tab['count'] }} {{ $tab['countLabel'] }}">{{ $tab['count'] }}</b>@endif<span>{{ $tab['label'] }}</span></a>

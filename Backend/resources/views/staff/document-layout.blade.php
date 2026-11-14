@@ -13,7 +13,7 @@
  $types=['quote'=>'Devis','invoice'=>'Facture','receipt'=>'Reçu','global'=>'Style commun'];
  $editorData=['types'=>\App\Services\DocumentBlocks::TYPES,'fields'=>\App\Services\DocumentBlocks::FIELDS,'sources'=>\App\Services\DocumentBlocks::SOURCES,
    'columns'=>\App\Services\DocumentBlocks::COLUMNS,'fonts'=>\App\Services\DocumentBlocks::FONTS,'followers'=>\App\Services\DocumentBlocks::FOLLOWERS,
-   'labels'=>\App\Services\DocumentBlocks::LABELS,'rows'=>\App\Services\DocumentBlocks::ROWS,'blockFields'=>\App\Services\DocumentBlocks::BLOCK_FIELDS,'receiptRows'=>\App\Services\DocumentBlocks::RECEIPT_ROWS,'complement'=>\App\Services\DocumentBlocks::COMPLEMENT_TYPES,
+   'labels'=>\App\Services\DocumentBlocks::LABELS,'rows'=>\App\Services\DocumentBlocks::ROWS,'blockFields'=>\App\Services\DocumentBlocks::BLOCK_FIELDS,'receiptRows'=>\App\Services\DocumentBlocks::RECEIPT_ROWS,'lineKinds'=>\App\Services\DocumentBlocks::LINE_KINDS,'complement'=>\App\Services\DocumentBlocks::COMPLEMENT_TYPES,
    'margins'=>\App\Services\PdfLetterhead::margins($options),'issuer'=>$issuer['name'] ?? '','kind'=>$template->key==='global' ? 'quote' : $template->key];
 @endphp
 @if($quoteLayout)
@@ -110,6 +110,11 @@
 <details class="fold" data-for-types="lines" open><summary>Tableau<small>Lignes, colonnes et enchaînement des pages</small></summary>
 <p class="hint mt-0" id="row-order-h">Lignes affichées, dans l’ordre du tableau :</p>
 <ol class="row-order" data-row-order aria-labelledby="row-order-h"></ol>
+<details class="fold fold-inner"><summary>Ordre des lignes de chaque désignation<small>Tissu, voilage, rail… dans l’ordre voulu</small></summary>
+<p class="hint mt-0" id="line-order-h">Pour chaque ouverture, les lignes du tableau suivent cet ordre :</p>
+<ol class="row-order" data-line-order aria-labelledby="line-order-h"></ol>
+<p class="hint">Sans réglage, l’ordre du chiffrage est conservé. <button type="button" class="quiet" data-clear-prop="line_order">Revenir à l’ordre du chiffrage</button></p>
+</details>
 <p class="hint" id="col-order-h">Colonnes affichées, leur ordre et leur intitulé :</p>
 <label class="col-designation">Colonne Désignation<input data-col-label="designation" maxlength="40" placeholder="Désignation"></label>
 <ol class="row-order" data-col-order aria-labelledby="col-order-h"></ol>

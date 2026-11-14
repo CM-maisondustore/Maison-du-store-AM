@@ -27,7 +27,7 @@ Les pastilles chiffrées signalent ce qui attend : devis à traiter, rendez-vous
 
 ## Raccourcis
 
-1. **Nouveau** (en haut) crée un devis, une prestation, un client ou un message.
+1. **Nouveau** (en haut) crée un devis, une prestation, un client ou un message. Sur téléphone, c’est le bouton rond **+** en bas à droite.
 2. La **recherche** trouve un client par nom ou téléphone, un devis ou une facture par numéro.
 3. La **cloche** affiche les dernières notifications : nouvelle demande de devis, rendez-vous demandé sur le site, message reçu.
 4. Le **?** ouvre le guide de la page où vous êtes.

@@ -20,8 +20,9 @@
 <div class="opening-id">
 <p class="opening-row-name"><span class="opening-name" data-opening-name>{{ $window['label'] ?? 'Ouverture' }}</span><span class="opening-sum" data-opening-sum>{{ $openingSum }}</span></p>
 <input type="hidden" name="windows[{{ $index }}][inherit_defaults]" value="0">
-<label class="check opening-inherit"><input type="checkbox" data-inherit name="windows[{{ $index }}][inherit_defaults]" value="1" @checked($window['inherit_defaults'] ?? !isset($window['product_id']))>Choix communs</label>
-<span class="badge opening-custom">Personnalisée</span>
+{{-- La case reste le champ enregistré ; les deux pastilles la pilotent (quote-editor.js). --}}
+<label class="sr-only"><input type="checkbox" data-inherit name="windows[{{ $index }}][inherit_defaults]" value="1" @checked($window['inherit_defaults'] ?? !isset($window['product_id']))>Choix communs</label>
+<span class="chip-set opening-mode" role="group" aria-label="Choix de cette ouverture"><button type="button" class="chip-option" data-inherit-mode="1" aria-pressed="false">Choix communs</button><button type="button" class="chip-option" data-inherit-mode="0" aria-pressed="false">Personnalisé</button></span>
 </div>
 @include('staff.quote-selection',['prefix'=>'windows['.$index.']','selection'=>$window])
 <span class="cell-na cell-na-sheer" aria-hidden="true">Sans objet pour un store</span>

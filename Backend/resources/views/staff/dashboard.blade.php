@@ -1,7 +1,9 @@
 @extends('staff.layout')
 @section('title', auth()->user()->isAdmin() ? 'Vue d’ensemble' : 'Aujourd’hui')
 @if(!auth()->user()->isAdmin())
+@unless(auth()->user()->isAdmin())
 @section('fab')<a class="fab fab-round" href="{{ route('staff.quotes.create') }}" aria-label="Nouveau devis sur place" title="Nouveau devis sur place">@include('staff.partials.icon',['n'=>'plus','s'=>26])</a>@endsection
+@endunless
 @section('page-actions')<a class="button desktop-only" href="{{ route('staff.quotes.create') }}">Devis sur place</a>@endsection
 @endif
 @section('subtitle', ucfirst(now()->locale('fr')->isoFormat('dddd')).' '.now()->format('d/m/Y').(auth()->user()->isAdmin() ? '' : ', '.auth()->user()->name))
