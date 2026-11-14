@@ -332,8 +332,9 @@
       const available=parts.some(p=>p.ids.length)||(shared.length&&mixed().some(row=>sew(row).ids.length));
       radios.forEach(r=>{r.checked=false;r.disabled=!available||(r.value==='manual'&&!mine.length);});note.textContent='';
       if(!available){price.disabled=true;note.textContent='Aucun tarif « Confection » pour '+(key==='store'?'les stores':'ces ouvertures')+' au catalogue : ajoutez-le dans Matériaux et finitions.';return;}
-      const option=data.options.find(o=>o.kind==='sewing'&&parts.concat(shared.map(sew)).some(p=>p.ids.includes(String(o.id))));
-      const catalogue=option&&Object.hasOwn(option,'unit_price')?(option.unit_price===null?'à définir':option.unit_price.toLocaleString('fr-FR')+' FCFA / '+units[option.unit]):'';
+      // Un tarif de confection par finition : chaque ouverture a le sien ; tous sont rappelés.
+      const found=[...new Set(parts.concat(shared.map(sew)).flatMap(p=>p.ids))].map(id=>data.options.find(o=>o.kind==='sewing'&&String(o.id)===id)).filter(o=>o&&Object.hasOwn(o,'unit_price'));
+      const catalogue=found.map(o=>(found.length>1?o.label+' : ':'')+(o.unit_price===null?'à définir':o.unit_price.toLocaleString('fr-FR')+' FCFA / '+units[o.unit])).join(' · ');
       const on=parts.filter(p=>p.input.value),prices=[...new Set(on.map(p=>p.price?.value||''))];
       let state;
       if(mine.length)state=!on.length?'none':on.length<parts.length||prices.length>1?'':prices[0]?'manual':'auto';

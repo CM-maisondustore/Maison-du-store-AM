@@ -12,6 +12,7 @@ Ce sont les tarifs en FCFA repris par **Calculer depuis le catalogue** dans les 
 
 1. Ouvrez **Matériaux et finitions**.
 2. Filtrez par nature, puis modifiez un prix et enregistrez. **Ajouter un matériau** crée une nouvelle ligne ; la nature choisie décide des champs utiles.
+3. Pour un rail, une ruflette, des accroches ou une **Confection**, cochez les **Finitions concernées** sous la catégorie. Un coût de confection différent par finition ? Créez une option Confection par finition : le devis propose celle qui correspond à la finition de l’ouverture.
 
 ![Matériaux et finitions](capture:materiaux)
 

@@ -71,4 +71,22 @@ class EspaceProCorrectifsTest extends TestCase
         $this->actingAs($this->user('agent'))->get(route('staff.dashboard'))->assertOk()
             ->assertDontSee('new-sheet')->assertSee('Nouveau devis sur place');
     }
+
+    public function test_confection_tariffs_can_be_tied_to_finishes_under_the_category(): void
+    {
+        $this->seed();
+        $admin = $this->user('admin');
+        $sewing = \App\Models\QuoteOption::where('code', 'confection')->firstOrFail();
+        $form = ['tariff_form' => 1, 'open_form' => (string) $sewing->id, 'kind' => 'sewing', 'category' => 'rideau', 'label' => 'Confection œillets', 'unit_price' => 1500, 'unit' => 'm',
+            'motorization' => 'any', 'active' => 1, 'public_choice' => 0, 'finish_codes' => ['wave-manuel']];
+        $this->actingAs($admin)->put(route('staff.quote-options.update', $sewing), $form)->assertSessionHasNoErrors();
+        $this->assertSame(['wave-manuel'], $sewing->fresh()->finish_codes);
+        // Une finition d'une autre catégorie est refusée.
+        $this->actingAs($admin)->put(route('staff.quote-options.update', $sewing), [...$form, 'finish_codes' => ['store-standard']])->assertSessionHasErrors('finish_codes.0');
+        // Le formulaire propose les finitions sous la catégorie, pour la confection aussi ; la liste rappelle les finitions choisies.
+        $page = $this->actingAs($admin)->get(route('staff.quote-options.index'))->assertOk();
+        $page->assertSee('data-for-kinds="support tape hooks sewing"', false)->assertSee('Finitions concernées')->assertSee('Finitions : Wave manuel');
+        $html = $page->getContent();
+        $this->assertLessThan(strpos($html, 'name="label"'), strpos($html, 'Finitions concernées'), 'Le choix des finitions suit la catégorie, avant le libellé.');
+    }
 }

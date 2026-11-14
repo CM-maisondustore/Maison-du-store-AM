@@ -14,6 +14,13 @@
 <label>Nature<select name="kind">@foreach(\App\Models\QuoteOption::KINDS as $key=>$label)<option value="{{ $key }}" @selected($use('kind',$option->kind)===$key)>{{ $label }}</option>@endforeach</select></label>
 <label>Catégorie<select name="category">@foreach(['rideau'=>'Rideaux','store'=>'Stores'] as $key=>$label)<option value="{{ $key }}" @selected($use('category',$option->category)===$key)>{{ $label }}</option>@endforeach</select></label>
 </div>
+{{-- Finitions : fournitures et confection peuvent dépendre de la finition (un tarif de confection par finition, par exemple). --}}
+<fieldset class="bare mt-8" data-for-kinds="support tape hooks sewing">
+<legend>Finitions concernées</legend>
+<p class="hint mt-0">Ne rien cocher pour toutes les finitions de la catégorie.</p>
+<p class="hint mt-0" data-for-kinds="sewing">Coût de confection différent selon la finition (œillets, plis, wave…) : créez une option « Confection » par finition et cochez ici la finition concernée. Dans le devis, la confection proposée suit la finition choisie.</p>
+<div class="scroll-list">@foreach($options->where('kind','finish') as $finish)<label class="check" data-category="{{ $finish->category }}"><input type="checkbox" name="finish_codes[]" value="{{ $finish->code }}" @checked(in_array($finish->code,$chosenFinishes,true))>{{ $finish->label }}</label>@endforeach<p class="hint" data-empty-note hidden>Aucune finition dans cette catégorie.</p></div>
+</fieldset>
 <label>Libellé<input required name="label" maxlength="150" value="{{ $use('label',$option->label) }}"></label>
 <div class="grid">
 <label>Prix unitaire<span class="field-unit is-price"><input name="unit_price" type="number" inputmode="numeric" min="0" max="100000000" step="1" value="{{ $use('unit_price',$option->unit_price) }}" placeholder="À définir"><span class="unit">FCFA</span></span><span class="hint">Vide signifie « à définir », jamais gratuit.</span></label>
@@ -22,11 +29,6 @@
 <div data-for-kinds="material">
 <label>Groupe du tissu / matériau<select name="fabric_group">@foreach([''=>'Sans objet (fourniture ou finition)','rideau'=>'Tissu rideau','voilage'=>'Voilage','store'=>'Matériau de store'] as $key=>$label)<option value="{{ $key }}" @selected(($use('fabric_group',$option->fabric_group) ?? '')===$key)>{{ $label }}</option>@endforeach</select></label>
 </div>
-<fieldset class="bare mt-12" data-for-kinds="support tape hooks">
-<legend>Finitions compatibles</legend>
-<p class="hint mt-0">Ne rien cocher pour toutes les finitions de la catégorie.</p>
-<div class="scroll-list">@foreach($options->where('kind','finish') as $finish)<label class="check" data-category="{{ $finish->category }}"><input type="checkbox" name="finish_codes[]" value="{{ $finish->code }}" @checked(in_array($finish->code,$chosenFinishes,true))>{{ $finish->label }}</label>@endforeach<p class="hint" data-empty-note hidden>Aucune finition dans cette catégorie.</p></div>
-</fieldset>
 {{-- Configuration du chiffrage : reprise dans le devis quand l'option est choisie. Vide = réglage habituel du formulaire. --}}
 @foreach(\App\Models\QuoteOption::CALC_MODES as $calcKind=>$modes)
 @php($calcOff=$use('kind',$option->kind ?? 'material')!==$calcKind)
