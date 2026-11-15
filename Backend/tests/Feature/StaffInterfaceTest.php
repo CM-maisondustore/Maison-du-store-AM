@@ -300,6 +300,8 @@ class StaffInterfaceTest extends TestCase
 
     public function test_calendar_views_are_scoped_to_the_agent(): void
     {
+        // La semaine affichée va du lundi au samedi : le test se place un mercredi, quel que soit le jour où il tourne.
+        $this->travelTo(now()->startOfWeek()->addDays(2)->setTime(10,0));
         $agent=$this->user('agent'); $other=$this->user('agent');
         $mine=Appointment::create(['reference'=>(string)Str::uuid(),'date'=>today()->toDateString(),'time'=>'09:00','agent_id'=>$agent->id,'details'=>['firstName'=>'Awa','lastName'=>'Mine']]);
         $foreign=Appointment::create(['reference'=>(string)Str::uuid(),'date'=>today()->toDateString(),'time'=>'10:00','agent_id'=>$other->id,'details'=>['firstName'=>'Ali','lastName'=>'Autre']]);
