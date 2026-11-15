@@ -129,7 +129,8 @@ final class DocumentBlocks
                     if (is_string($text) && trim($text)!=='') $labels[$col]=mb_substr(trim($text),0,40);
                 }
                 if ($labels) $block['column_labels']=$labels;
-                foreach (['hide_header','no_row_lines','stripes'] as $flag) if (($item[$flag] ?? false)===true) $block[$flag]=true;
+                // discount_percent : pourcentage dans l'intitulé de la remise ; fees_with_totals : pose et livraison dans la dernière partie, avec les totaux et la remise.
+                foreach (['hide_header','no_row_lines','stripes','discount_percent','fees_with_totals'] as $flag) if (($item[$flag] ?? false)===true) $block[$flag]=true;
                 foreach (['header_bg','header_color'] as $key) if ($c=$color($key,null)) $block[$key]=$c;
                 // Lignes affichées, dans l'ordre choisi ; absent : toutes, dans l'ordre par défaut.
                 $known=[...array_keys(self::ROWS),...array_keys(self::RECEIPT_ROWS)];
@@ -200,12 +201,22 @@ final class DocumentBlocks
             return $rows;
         }
         $totals=$vm['totals'] ?? [];
+        // Option « fees_with_totals » : la pose de chaque ouverture sort des désignations et rejoint les frais, en fin de tableau.
+        $moveFees=!empty($block['fees_with_totals']); $pose=0; $posePending=false;
+        $isPose=fn(array $l)=>($l['key'] ?? '')==='installation';
+        if ($moveFees) foreach ($vm['opening_groups'] ?? [] as $openings) foreach ($openings as $opening) foreach (array_filter($opening['lines'],$isPose) as $l) {
+            $pose+=(int)($l['displayAmount'] ?? $l['amount'] ?? 0); $posePending=$posePending || !empty($l['pending']);
+        }
         foreach ($order as $key) switch ($key) {
             case 'designations':
                 $groups=$vm['opening_groups'] ?? [];
                 foreach ($groups as $room=>$openings) {
                     if ($room!=='' && $block['group']) $rows[]=['kind'=>'room','label'=>$room];
                     foreach ($openings as $opening) {
+                        if ($moveFees) {
+                            foreach (array_filter($opening['lines'],$isPose) as $l) $opening['subtotal']-=(int)($l['displayAmount'] ?? $l['amount'] ?? 0);
+                            $opening['lines']=array_values(array_filter($opening['lines'],fn($l)=>!$isPose($l)));
+                        }
                         if ($block['group']) $rows[]=['kind'=>'opening','label'=>$opening['label'].' · '.$opening['dimensions'].(($opening['quantity'] ?? 1)>1 ? ' · '.$opening['quantity'].' exemplaires' : '')];
                         foreach (self::orderLines($opening['lines'],$block['line_order'] ?? []) as $l) $rows[]=$line($l,$block['group'] ? '' : $opening['label'].' — ');
                         if ($block['group']) $rows[]=['kind'=>'subtotal','label'=>'Sous-total '.$opening['label'],'amount'=>$money($opening['subtotal'])];
@@ -213,12 +224,25 @@ final class DocumentBlocks
                 }
                 if (!$groups) foreach ($vm['lines'] ?? [] as $l) $rows[]=$line($l);
                 break;
-            case 'fees': foreach ($vm['fee_rows'] ?? [] as $fee) $rows[]=$line($fee); break;
+            case 'fees':
+                if (!$moveFees) { foreach ($vm['fee_rows'] ?? [] as $fee) $rows[]=$line($fee); break; }
+                if ($pose>0 || $posePending) $rows[]=['kind'=>'sum','label'=>'Pose','amount'=>$posePending ? 'À définir' : $money($pose)];
+                foreach ($vm['fee_rows'] ?? [] as $fee) $rows[]=['kind'=>'sum','label'=>$fee['label'] ?? 'Frais','amount'=>$money($fee['displayAmount'] ?? 0)];
+                break;
             case 'subtotal': if (!empty($totals['tax']) || !empty($totals['discountAmount'])) $rows[]=['kind'=>'sum','label'=>'Sous-total','amount'=>$money($totals['subtotal'] ?? 0)]; break;
             case 'tax': if (!empty($totals['tax'])) $rows[]=['kind'=>'sum','label'=>'Taxes','amount'=>$money($totals['tax'])]; break;
-            case 'discount': if (!empty($totals['discountAmount'])) $rows[]=['kind'=>'sum','label'=>'Remise commerciale','amount'=>'−'.$money($totals['discountAmount'])]; break;
+            case 'discount': if (!empty($totals['discountAmount'])) $rows[]=['kind'=>'sum','label'=>'Remise commerciale'.(!empty($block['discount_percent']) ? ' ('.self::discountPercent($totals).' %)' : ''),'amount'=>'−'.$money($totals['discountAmount'])]; break;
         }
         return $rows;
+    }
+
+    /** Pourcentage de la remise : celui saisi pour une remise en %, sinon montant de la remise rapporté au total avant remise (1 décimale). */
+    public static function discountPercent(array $totals): string
+    {
+        $discount=$totals['discount'] ?? [];
+        if (($discount['type'] ?? '')==='percentage') return QuoteFinancials::quantity($discount['value']);
+        $gross=(int)($totals['grossTotal'] ?? 0);
+        return $gross>0 ? str_replace('.',',',rtrim(rtrim(number_format(round($totals['discountAmount']*100/$gross,1),1,'.',''),'0'),'.')) : '0';
     }
 
     /** Lignes d'une ouverture dans l'ordre choisi (tri stable) ; les natures non listées suivent, dans l'ordre du chiffrage. */

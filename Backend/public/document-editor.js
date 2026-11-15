@@ -287,7 +287,7 @@
     else b[key] = key.endsWith('color') ? field.value.toUpperCase() : field.value;
     save();
     const node = layer.querySelector(`[data-id="${CSS.escape(b.id)}"]`);
-    if (node && !['text', 'label', 'locked', 'source', 'shape', 'group', 'follow', 'field_labels', 'grid_h', 'grid_v', 'hide_header', 'stripes', 'no_row_lines', 'header_bg', 'header_color', 'label_color', 'padding'].includes(key)) { paint(node, b); node.querySelector('.eb-tag')?.replaceChildren(`${data.types[b.type]} · ${String(b.w).replace('.', ',')} × ${String(b.h).replace('.', ',')} mm`); }
+    if (node && !['text', 'label', 'locked', 'source', 'shape', 'group', 'follow', 'field_labels', 'grid_h', 'grid_v', 'hide_header', 'stripes', 'no_row_lines', 'fees_with_totals', 'discount_percent', 'header_bg', 'header_color', 'label_color', 'padding'].includes(key)) { paint(node, b); node.querySelector('.eb-tag')?.replaceChildren(`${data.types[b.type]} · ${String(b.w).replace('.', ',')} × ${String(b.h).replace('.', ',')} mm`); }
     else render();
   }
   props.addEventListener('input', event => {

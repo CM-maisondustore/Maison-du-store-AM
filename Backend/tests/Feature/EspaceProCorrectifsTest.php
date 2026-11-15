@@ -40,10 +40,39 @@ class EspaceProCorrectifsTest extends TestCase
         $this->assertSame(['Rail', 'Tissu', 'Ligne libre', 'Voilage', 'Pose'], $ordered);
     }
 
+    public function test_discount_percent_and_fees_with_totals_are_opt_in(): void
+    {
+        $lines = [['key' => 'material', 'description' => 'Tissu', 'displayAmount' => 60000], ['key' => 'installation', 'description' => 'Pose', 'displayAmount' => 15000]];
+        $vm = ['opening_groups' => ['' => [
+            ['label' => 'Salon', 'dimensions' => 'L 2 m × H 2,4 m', 'quantity' => 1, 'subtotal' => 75000, 'lines' => $lines],
+            ['label' => 'Chambre', 'dimensions' => 'L 1 m × H 2 m', 'quantity' => 1, 'subtotal' => 35000, 'lines' => [['key' => 'material', 'description' => 'Tissu', 'displayAmount' => 25000], ['key' => 'installation', 'description' => 'Pose', 'displayAmount' => 10000]]],
+        ]], 'fee_rows' => [['label' => 'Livraison', 'displayQuantity' => '1', 'unitPrice' => 5000, 'displayAmount' => 5000]],
+            'totals' => ['subtotal' => 115000, 'tax' => 0, 'grossTotal' => 115000, 'discount' => ['type' => 'fixed', 'value' => 11500], 'discountAmount' => 11500]];
+        $block = ['type' => 'lines', 'x' => 10, 'y' => 10, 'w' => 100, 'h' => 100, 'pages' => ['single']];
+        $items = DocumentBlocks::normalize(json_encode(['items' => [$block, [...$block, 'discount_percent' => true, 'fees_with_totals' => true]]]))['items'];
+        $this->assertArrayNotHasKey('fees_with_totals', $items[0]);
+        $this->assertArrayNotHasKey('discount_percent', $items[0]);
+
+        // Sans option : rien ne change.
+        $plain = DocumentBlocks::rows($vm, $items[0]);
+        $this->assertContains('Pose', array_column($plain, 'label'));
+        $this->assertContains('Remise commerciale', array_column($plain, 'label'));
+
+        // Avec les options : la pose quitte les ouvertures (sous-totaux corrigés) et rejoint la livraison, juste avant la remise en %.
+        $rows = DocumentBlocks::rows($vm, $items[1]);
+        $sums = array_values(array_filter($rows, fn ($r) => $r['kind'] === 'sum'));
+        $this->assertSame(['Pose', 'Livraison', 'Sous-total', 'Remise commerciale (10 %)'], array_column($sums, 'label'));
+        $this->assertSame(['25 000', '5 000', '115 000', '−11 500'], array_column($sums, 'amount'));
+        $this->assertSame(['Tissu', 'Tissu'], array_column(array_filter($rows, fn ($r) => $r['kind'] === 'line'), 'label'));
+        $this->assertSame(['60 000', '25 000'], array_column(array_filter($rows, fn ($r) => $r['kind'] === 'subtotal'), 'amount'));
+        $this->assertSame('12,5', DocumentBlocks::discountPercent(['discount' => ['type' => 'percentage', 'value' => '12.5'], 'discountAmount' => 1, 'grossTotal' => 1]));
+    }
+
     public function test_layout_editor_offers_the_line_order_list(): void
     {
         $this->actingAs($this->user('admin'))->get(route('staff.layouts.edit'))->assertOk()
-            ->assertSee('data-line-order', false)->assertSee('Ordre des lignes de chaque désignation')->assertSee('"lineKinds":{"material":', false);
+            ->assertSee('data-line-order', false)->assertSee('Ordre des lignes de chaque désignation')
+            ->assertSee('data-prop="fees_with_totals"', false)->assertSee('data-prop="discount_percent"', false)->assertSee('"lineKinds":{"material":', false);
     }
 
     public function test_office_quote_form_uses_common_or_custom_pills_per_opening(): void

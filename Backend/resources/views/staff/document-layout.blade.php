@@ -127,6 +127,8 @@
 </div>
 <label class="toggle-row"><span>Regrouper par ouverture<small>Avec un sous-total sous chaque ouverture</small></span><input class="switch" type="checkbox" data-prop="group"></label>
 <label class="toggle-row"><span>Total juste sous les lignes<small>Pose et livraison, puis total et conditions de paiement</small></span><input class="switch" type="checkbox" data-prop="follow"></label>
+<label class="toggle-row"><span>Pose et livraison avec les remises<small>Retirées des désignations, regroupées en fin de tableau avec sous-total, taxes et remise</small></span><input class="switch" type="checkbox" data-prop="fees_with_totals"></label>
+<label class="toggle-row"><span>Pourcentage de la remise<small>« Remise commerciale (10 %) »</small></span><input class="switch" type="checkbox" data-prop="discount_percent"></label>
 <p class="hint">Un document trop long continue toujours sur des pages suite, qui reprennent les blocs marqués « Pages suite ».</p>
 </details>
 <label data-for-types="logo">Image<select data-prop="source">@foreach(\App\Services\DocumentBlocks::SOURCES as $key=>$label)<option value="{{ $key }}">{{ $label }}</option>@endforeach</select></label>
