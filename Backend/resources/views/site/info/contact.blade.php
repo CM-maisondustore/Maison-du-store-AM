@@ -2,7 +2,7 @@
 <p>Venez toucher les tissus et voir nos stores en situation au showroom de Cocody, ou contactez-nous par téléphone, WhatsApp ou e-mail. Un conseiller vous répond sous 24 h ouvrées.</p>
 
 <h2>Showroom</h2>
-<p>{{ $c['address'][0] }}, {{ $c['address'][1] }}<br><a href="{{ $c['maps'] }}" rel="noopener">Ouvrir dans Google Maps</a></p>
+<p>{{ $c['address'][0] }}, {{ $c['address'][1] }}<br><a href="{{ $c['maps'] }}" rel="noopener">Ouvrir dans Google Maps</a>@if(!empty($c['review']))<br><a href="{{ $c['review'] }}" rel="noopener">Laisser un avis Google</a>@endif</p>
 
 <h2>Téléphone et WhatsApp</h2>
 <ul>

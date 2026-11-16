@@ -75,6 +75,7 @@ class SiteAiVisibilityTest extends TestCase
         $this->assertSame(['Organization', 'HomeGoodsStore', 'WebSite'], array_column($graph, '@type'));
         $this->assertSame('Abidjan', $graph[1]['address']['addressLocality']);
         $this->assertContains('https://www.instagram.com/maisondustoream/', $graph[0]['sameAs']);
+        $this->assertContains('https://share.google/KDApXstZtXHNWgKHw', $graph[0]['sameAs']);
         $this->assertStringContainsString('href="https://www.tiktok.com/@maisondustoream" rel="noopener me">TikTok</a>', $html);
         $this->assertStringContainsString('property="og:title"', $html);
 
@@ -86,7 +87,7 @@ class SiteAiVisibilityTest extends TestCase
     public function test_about_and_contact_pages_are_linked_from_the_footer(): void
     {
         $this->seed();
-        $this->get(route('site.info', 'contact'))->assertOk()->assertSee('Nous contacter')->assertSee(config('site.contact.email'));
+        $this->get(route('site.info', 'contact'))->assertOk()->assertSee('Nous contacter')->assertSee(config('site.contact.email'))->assertSee('href="https://g.page/r/CRTfZHqj1je-EBM/review"', false);
         $this->get(route('site.info', 'a-propos'))->assertOk()->assertSee('Votre projet, en quatre étapes');
         $this->get('/')->assertOk()
             ->assertSee('href="'.route('site.info', 'a-propos').'"', false)

@@ -15,15 +15,18 @@ return [
         'whatsapp' => 'https://wa.me/2250712449319',
         'email' => 'contact@maisondustoream.com',
         'address' => ['Cocody, Marché Saint Jean', 'Abidjan, Côte d’Ivoire'],
-        'maps' => 'https://maps.google.com/?q=Maison+du+Store+AM+Cocody',
+        'maps' => 'https://share.google/KDApXstZtXHNWgKHw',
+        // Lien direct vers le formulaire d'avis de la fiche Google.
+        'review' => 'https://g.page/r/CRTfZHqj1je-EBM/review',
     ],
 
     // Pages officielles de la maison : liées dans le pied de page, la page Contact, llms.txt
-    // et les données structurées (sameAs). Ajouter ici la fiche Google une fois créée.
+    // et les données structurées (sameAs).
     'profiles' => [
         'Facebook' => 'https://www.facebook.com/profile.php?id=61575563643317',
         'Instagram' => 'https://www.instagram.com/maisondustoream/',
         'TikTok' => 'https://www.tiktok.com/@maisondustoream',
+        'Google' => 'https://share.google/KDApXstZtXHNWgKHw',
     ],
 
     'communes' => ['Cocody', 'Plateau', 'Marcory', 'Yopougon', 'Treichville', 'Bingerville', 'Abobo', 'Adjamé', 'Koumassi', 'Port-Bouët', 'Attécoubé', 'Anyama', 'Songon', 'Grand-Bassam', 'Autre'],
